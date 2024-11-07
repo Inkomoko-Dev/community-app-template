@@ -51,13 +51,21 @@
             
             var UndoTransactionModel = function ($scope, $uibModalInstance, accountId, transactionId) {
                 $scope.undoTransaction = function () {
-                    var params = {loanId: accountId, transactionId: transactionId, command: 'undo'};
-                    var formData = {dateFormat: scope.df, locale: scope.optlang.code, transactionAmount: 0};
-                    formData.transactionDate = dateFilter(new Date(), scope.df);
-                    resourceFactory.loanTrxnsResource.save(params, formData, function (data) {
-                        $uibModalInstance.close('delete');
-                        location.path('/viewloanaccount/' + data.loanId);
-                    });
+                    if (scope.transaction.type.id == 6) {
+                        var params = { loanId: accountId, command: 'undowriteoff' };
+                        resourceFactory.loanTrxnsResource.save(params, this.formData, function(data) {
+                            $uibModalInstance.close('delete');
+                            location.path('/viewloanaccount/' + data.loanId);
+                        });
+                    } else {
+                        var params = {loanId: accountId, transactionId: transactionId, command: 'undo'};
+                        var formData = {dateFormat: scope.df, locale: scope.optlang.code, transactionAmount: 0};
+                        formData.transactionDate = dateFilter(new Date(), scope.df);
+                        resourceFactory.loanTrxnsResource.save(params, formData, function (data) {
+                            $uibModalInstance.close('delete');
+                            location.path('/viewloanaccount/' + data.loanId);
+                        });
+                    }
                 };
                 $scope.cancel = function () {
                     $uibModalInstance.dismiss('cancel');
