@@ -18,6 +18,7 @@
   "label.heading.basePrice": "Base Price",
   "label.heading.pctToBase": "Base Percentage",
   "label.heading.unitType": "Unit Type",
+  "label.heading.clientId": "Client Id",
   "label.heading.quantity": "Quantity",
   "label.heading.totalValue": "Total Value",
   "label.heading.totalCollateralValue": "Total Collateral Value",
