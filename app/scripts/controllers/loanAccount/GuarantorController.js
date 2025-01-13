@@ -80,6 +80,7 @@
                     guarantor.dateFormat = scope.df;
                     guarantor.locale = scope.optlang.code;
                     guarantor.firstname = this.formData.firstname;
+                    guarantor.clientId = this.formData.clientId;
                     guarantor.lastname = this.formData.lastname;
                     guarantor.mobileNumber = this.formData.mobile;
                     guarantor.housePhoneNumber = this.formData.residence;
