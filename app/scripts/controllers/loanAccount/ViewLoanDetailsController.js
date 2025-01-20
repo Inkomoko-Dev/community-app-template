@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $window, interval, webStorage) {
+        ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $window, interval, webStorage, localStorageService) {
             scope.loandocuments = [];
             scope.report = false;
             scope.hidePentahoReport = true;
@@ -898,6 +898,13 @@
                 var url = scope.hostUrl + document.docUrl;
                 var sessionData = webStorage.get('sessionData');
                 var headers = { "Authorization": "Basic " + sessionData.authenticationKey };
+
+                var userData = localStorageService.getFromLocalStorage('userData');
+
+                if (userData.isTwoFactorAuthenticationRequired && userData.authenticated){
+                    headers["Fineract-Platform-TFA-Token"] = http.defaults.headers.common['Fineract-Platform-TFA-Token'];
+                }
+
                 fetch(url, {
                     method: 'GET',
                     headers
@@ -1087,7 +1094,7 @@
 
 
     });
-    mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
+    mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', 'localStorageService', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
         $log.info("ViewLoanDetailsController initialized");
     });
 }(mifosX.controllers || {}));
