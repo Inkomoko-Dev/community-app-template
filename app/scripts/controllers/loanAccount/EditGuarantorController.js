@@ -20,6 +20,7 @@
                 scope.formData = {
                     firstname: data.firstname,
                     lastname: data.lastname,
+                    clientId: data.clientId,
                     city: data.city,
                     zip: data.zip,
                     mobile: data.mobileNumber,
@@ -80,6 +81,7 @@
                 guarantor.locale = scope.optlang.code;
                 guarantor.firstname = this.formData.firstname;
                 guarantor.lastname = this.formData.lastname;
+                guarantor.clientId = this.formData.clientId;
                 guarantor.mobileNumber = this.formData.mobile;
                 guarantor.housePhoneNumber = this.formData.residence;
                 guarantor.clientRelationshipTypeId = this.formData.relationshipType;
