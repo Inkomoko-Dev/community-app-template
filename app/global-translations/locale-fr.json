@@ -1600,6 +1600,7 @@
 	"label.tooltip.product": "Le nom du produit de prêt sur lequel le compte de prêt est basé",
 	"label.tooltip.loanofficer": "Le représentant de l’institution financière qui a la responsabilité du client ou groupe associé à un compte de prêt et qui interagit avec lui",
 	"label.tooltip.loanpurpose": "Ceci fournit une indication sur la manière dont les fonds accordés par le prêt seront utilisés et pourra être utilisé pour regrouper des prêts de même objectif pour les rapports.",
+	"label.tooltip.fund": "Qui est le bailleur de fonds du prêt",
 	"label.tooltip.submittedon": "La date à laquelle la demande du compte de prêt a été reçue",
 	"label.tooltip.disbursementon": "La date à laquelle le compte de prêt doit être décaissé",
 	"label.tooltip.externalid": "Fournit un identifiant externe pour le compte de prêt",
