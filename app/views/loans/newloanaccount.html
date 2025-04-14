@@ -61,11 +61,12 @@
                                 </select>
                             </td>
                             <td class="width14" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.fundId == true">
-                                <label>{{ 'label.input.fund' | translate }}:&nbsp;</label>
+                                <label>{{ 'label.input.fund' | translate }} <span class="required">*</span>:&nbsp;</label>
+                                <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.fund' | translate}}"></i>
                             </td>
                             <td class="paddedbottom20 width36" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.fundId == true">
                                 <select id="fundId" ng-model="formData.fundId" class="form-control width170px" ng-change="loandetails.fundName = formValue(loanaccountinfo.fundOptions,formData.fundId,'id','name')"
-                                    ng-options="fund.id as fund.name for fund in loanaccountinfo.fundOptions" style="max-width:100px;left:0;" value="{{fund.id}}">
+                                    ng-options="fund.id as fund.name for fund in loanaccountinfo.fundOptions" style="max-width:100px;left:0;" value="{{fund.id}}" required="required">
                                     <option value="" style="left:0;">{{'label.selectfund' | translate}}</option>
                                 </select>
                             </td>
