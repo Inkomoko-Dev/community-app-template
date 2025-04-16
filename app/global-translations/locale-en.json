@@ -5291,6 +5291,7 @@
   "validation.msg.ClientRecruitmentSurvey.endDate.is.less.than.date": "The End Date must be the same as or after the Start Date",
   "validation.msg.loan.loanPurposeId.cannot.be.blank": "Loan purpose cannot be blank",
   "validation.msg.loan.description.cannot.be.blank": "Loan description cannot be blank",
+  "validation.msg.loan.fundId.cannot.be.blank": "Funder cannot be blank",
   "validation.msg.client.recruitment.survey.required": "Client recruitment survey required",
   "validation.msg.client.recruitment.survey.country.required": "Client recruitment survey country required",
   "validation.msg.client.recruitment.survey.location.required": "Client recruitment survey location required",
@@ -5298,6 +5299,8 @@
   "validation.msg.loan.currency.not.supported.by.kiva": "Loan Currency not supported by kiva",
   "validation.msg.loan.department.not.supported.by.kiva": "Loan Department not supported by kiva",
   "validation.msg.loan.profile.image.not.uploaded": "Kiva Loan profile image not uploaded",
+  "validation.msg.loan.sector.activity.missing": "Kiva Sector/Activity is missing",
+  "validation.msg.loan.sector.activity.not.supported.by.kiva": "The Sector and Activity are not compatible with Kiva",
   "error.msg.document.save": "Error occurred while saving document: {{params[1].value}}",
   "label.fileSizeMustBeUnderLimitSize": "File size must be under",
   "error.msg.client.other.info.duplicate.nationalIdentificationNumber": "Client with National Identification Number {{params[0].value}} already exists",
@@ -5310,6 +5313,6 @@
   "error.msg.loan.integration.disbursementRequest.loginFailed": "Login to inkomoko Integration has failed",
   "error.msg.client.other.info.clientId.invalid": "Client Other Info does not exist",
   "label.heading.creditScore": "Metro Score",
-  "error.msg.loan.fundsource.kiva.desc.less.than.150" : "Description must be more than 150 words for KIVA fund source",
+  "error.msg.loan.fundsource.kiva.desc.more.than.150" : "Description must be less than 150 words for KIVA fund source",
   "----End---": "--End of file--- "
 }
