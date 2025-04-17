@@ -439,6 +439,9 @@
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'RECOVERYPAYMENT_LOAN';
                     break;
+                case "undoforeclosure":
+                    console.log("Actual Action to push Tx . . . .")
+                    break;
                 case "adddisbursedetails":
                     resourceFactory.LoanAccountResource.getLoanAccountDetails({loanId: routeParams.id, associations: 'multiDisburseDetails'}, function (data) {
                         scope.addDisburseDetails = true;
