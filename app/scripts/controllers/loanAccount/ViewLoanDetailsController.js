@@ -207,8 +207,12 @@
                            });
                         break;
                     case "undoforeclosure":
-                        resourceFactory.undoForeClosure.post({loanId: accountId},function (data) {
-                            location.path('/viewloanaccount/' + accountId);
+                        resourceFactory.undoForeClosure.post({loanId: accountId}, function (data) {
+                            fetchLoanAccountDetails();
+                            scope.$emit('refreshLoanDetails', {success: true, loanId: accountId});
+                        }, function(error) {
+                            scope.errorDetails = error.data || error;
+                            scope.$emit('undoForeClosureError', error);
                         });
                         break;
                 }
