@@ -105,10 +105,6 @@
                     case "writeoff":
                         location.path('/loanaccount/' + accountId + '/writeoff');
                         break;
-                    // case "payoff":
-                    //     location.path('/loanaccount/' + accountId + '/payoff');
-                    //     break;
-
                     case "recoverypayment":
                         location.path('/loanaccount/' + accountId + '/recoverypayment');
                         break;
@@ -206,10 +202,19 @@
                             });
                          break;
                        case "generateFinancialRatio":
-                                                   resourceFactory.generateFinancialRatio.post({loanId: accountId},function (data) {
-                                                   location.path('/viewloanaccount/' + accountId);
-                                                   });
-                                                break;
+                           resourceFactory.generateFinancialRatio.post({loanId: accountId},function (data) {
+                           location.path('/viewloanaccount/' + accountId);
+                           });
+                        break;
+                    case "undoforeclosure":
+                        resourceFactory.undoForeClosure.post({loanId: accountId}, function (data) {
+                            fetchLoanAccountDetails();
+                            scope.$emit('refreshLoanDetails', {success: true, loanId: accountId});
+                        }, function(error) {
+                            scope.errorDetails = error.data || error;
+                            scope.$emit('undoForeClosureError', error);
+                        });
+                        break;
                 }
             };
 
@@ -612,6 +617,16 @@
                                 taskPermissionName: 'RECOVERYPAYMENT_LOAN'
                             }
                         ]
+                        };
+                    }
+                    if (data.status.value == "Closed (obligations met)" && (data.subStatus.value == "Foreclosed")) {
+                        scope.buttons = { singlebuttons: [
+                                {
+                                    name: "button.undoforeclosure",
+                                    icon: "fa fa-money",
+                                    taskPermissionName: 'UNDOFORECLOSURE_LOAN'
+                                }
+                            ]
                         };
                     }
 
