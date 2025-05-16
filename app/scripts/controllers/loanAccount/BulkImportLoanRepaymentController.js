@@ -58,8 +58,12 @@
                         return response.blob();
                     })
                     .then(blob => {
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        window.open(blobUrl, '_blank'); // Let the browser handle filename
+                        var blobUrl = window.URL.createObjectURL(blob);
+                        var link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = "loan_repayment_template.xlsx";
+                        link.click();
+                        window.URL.revokeObjectURL(blobUrl); // Clean up
                     })
                     .catch(err => {
                         console.error(err);
