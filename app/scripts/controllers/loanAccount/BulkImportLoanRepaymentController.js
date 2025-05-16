@@ -56,7 +56,7 @@
                             throw new Error("Template download failed");
                         }
                         // Extract filename from the response headers if present
-                        const contentDisposition = response.headers.get('');
+                        const contentDisposition = response.headers.get('Content-Disposition');
                         let filename = "loan_repayment_template.xlsx"; // fallback default
 
                         if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
