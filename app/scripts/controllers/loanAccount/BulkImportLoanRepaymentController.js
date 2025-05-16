@@ -55,28 +55,11 @@
                         if (!response.ok) {
                             throw new Error("Template download failed");
                         }
-                        // Extract filename from the response headers if present
-                        const contentDisposition = response.headers.get('Content-Disposition');
-                        let filename = "loan_repayment_template.xlsx"; // fallback default
-
-                        if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
-                            const matches = contentDisposition.match(/filename="?([^"]+)"?/);
-                            if (matches && matches[1]) {
-                                filename = matches[1];
-                            }
-                        }
-
-                        return response.blob().then((blob) => ({ blob, filename }));
+                        return response.blob();
                     })
-                    .then(({ blob, filename }) => {
+                    .then(blob => {
                         const blobUrl = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = filename;
-                        document.body.appendChild(link);
-                        link.click();
-                        link.remove();
-                        window.URL.revokeObjectURL(blobUrl);
+                        window.open(blobUrl, '_blank'); // Let the browser handle filename
                     })
                     .catch(err => {
                         console.error(err);
