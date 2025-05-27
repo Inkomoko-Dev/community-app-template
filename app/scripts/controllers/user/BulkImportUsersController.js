@@ -82,7 +82,7 @@
                         var blobUrl = window.URL.createObjectURL(blob);
                         var link = document.createElement('a');
                         link.href = blobUrl;
-                        link.download = "user_template.xlsx";
+                        link.download = "user_template.xls";
                         link.click();
                         window.URL.revokeObjectURL(blobUrl); // Clean up
                     })
