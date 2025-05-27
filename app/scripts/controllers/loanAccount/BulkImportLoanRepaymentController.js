@@ -32,11 +32,7 @@
 
             scope.downloadTemplate = function () {
 
-                var url = $rootScope.hostUrl + API_VERSION + '/loans/repayments/downloadtemplate'
-                    + '?tenantIdentifier=' + $rootScope.tenantIdentifier
-                    + '&locale=' + scope.optlang.code
-                    + '&dateFormat=' + scope.df
-                    + scope.first.queryParams;
+                var url = $rootScope.hostUrl + scope.first.templateUrl + scope.first.queryParams;
 
                 var sessionData = webStorage.get('sessionData');
                 var headers = { "Authorization": "Basic " + sessionData.authenticationKey };
