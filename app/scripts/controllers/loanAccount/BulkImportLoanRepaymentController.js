@@ -57,7 +57,7 @@
                         var blobUrl = window.URL.createObjectURL(blob);
                         var link = document.createElement('a');
                         link.href = blobUrl;
-                        link.download = "loan_repayment_template.xlsx";
+                        link.download = "loan_repayment_template.xls";
                         link.click();
                         window.URL.revokeObjectURL(blobUrl); // Clean up
                     })
