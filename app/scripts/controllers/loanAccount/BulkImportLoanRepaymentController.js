@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        BulkImportLoanRepaymentController: function (scope, resourceFactory, location, API_VERSION, $rootScope, Upload) {
+        BulkImportLoanRepaymentController: function (scope, resourceFactory, location, API_VERSION, $rootScope, Upload, webStorage, localStorageService, http) {
 
             scope.first = {};
             scope.first.templateUrl =  API_VERSION + '/loans/repayments/downloadtemplate' + '?tenantIdentifier=' + $rootScope.tenantIdentifier
@@ -30,6 +30,43 @@
                 scope.formData.file = files[0];
             };
 
+            scope.downloadTemplate = function () {
+
+                var url = $rootScope.hostUrl + scope.first.templateUrl + scope.first.queryParams;
+
+                var sessionData = webStorage.get('sessionData');
+                var headers = { "Authorization": "Basic " + sessionData.authenticationKey };
+
+                var userData = localStorageService.getFromLocalStorage('userData');
+
+                if (userData.isTwoFactorAuthenticationRequired && userData.authenticated){
+                    headers["Fineract-Platform-TFA-Token"] = http.defaults.headers.common['Fineract-Platform-TFA-Token'];
+                }
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: headers
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Template download failed");
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        var blobUrl = window.URL.createObjectURL(blob);
+                        var link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = "loan_repayment_template.xls";
+                        link.click();
+                        window.URL.revokeObjectURL(blobUrl); // Clean up
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Failed to download template. Please check your authentication.");
+                    });
+            };
+
             scope.refreshImportTable=function () {
                 resourceFactory.importResource.getImports({entityType: "loantransactions"}, function (data) {
 
@@ -55,7 +92,7 @@
             };
         }
     });
-    mifosX.ng.application.controller('BulkImportLoanRepaymentController', ['$scope', 'ResourceFactory', '$location', 'API_VERSION', '$rootScope', 'Upload', mifosX.controllers.BulkImportLoanRepaymentController]).run(function ($log) {
+    mifosX.ng.application.controller('BulkImportLoanRepaymentController', ['$scope', 'ResourceFactory', '$location', 'API_VERSION', '$rootScope', 'Upload', 'webStorage', 'localStorageService', '$http', mifosX.controllers.BulkImportLoanRepaymentController]).run(function ($log) {
         $log.info("BulkImportLoanRepaymentController initialized");
     });
 }(mifosX.controllers || {}));
