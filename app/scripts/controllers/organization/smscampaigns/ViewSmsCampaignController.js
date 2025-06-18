@@ -13,6 +13,12 @@
                 scope.smsList = [];
             }
 
+            scope.hasFailedSMS = function () {
+                return scope.smsList.some(function (sms) {
+                    return sms.status && sms.status.value === 'Failed';
+                });
+            };
+
             scope.activateSmsCampaign = function () {
                 $uibModal.open({
                     templateUrl: 'activatesmscampaign.html',
