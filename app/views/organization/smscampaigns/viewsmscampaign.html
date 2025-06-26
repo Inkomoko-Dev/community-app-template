@@ -119,13 +119,15 @@
                                     <th>{{ 'label.heading.status' | translate }}</th>
                                     <th>{{ 'label.heading.mobilenumber' | translate }}</th>
                                     <th>{{ 'label.heading.campaignname' | translate }}</th>
+                                    <th ng-if="hasFailedSMS()">{{ 'label.heading.sms.errormessage' | translate }}</th>
                                     </thead>
                                     <tbody>
                                     <tr dir-paginate="sms in smsList | itemsPerPage: smsPerPage" total-items="totalSMS" pagination-id="tabObj.id">
                                         <td>{{sms.message}}</td>
                                         <td>{{sms.status.value}}</td>
                                         <td>{{sms.mobileNo}}</td>
-                                        <td>{{sms.campaignName}}</td>{{sms}}
+                                        <td>{{sms.campaignName}}</td>
+                                        <td ng-if="sms.status.value == 'Failed'">{{sms.errorMessage}}</td>{{sms}}
                                     </tr>
                                     </tbody>
                                 </table>

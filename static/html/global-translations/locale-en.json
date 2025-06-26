@@ -177,6 +177,7 @@
   "label.heading.totalamountreceivedorreturned": "Total Amount Receivable/Returned",
   "label.heading.equity": "Equity",
   "label.heading.campaignname": "Campaign Name",
+  "label.heading.sms.errormessage": "Error Message",
   "label.heading.smsProvider": "SMS Provider",
   "label.heading.templatemsg": "Template Message",
   "label.heading.campaigntype": "Campaign Type",
