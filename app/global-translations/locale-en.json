@@ -150,6 +150,7 @@
   "label.heading.icReviewLevelThree": "IC-Review Level Three",
   "label.heading.icReviewLevelFour": "IC-Review Level Four",
   "label.heading.icReviewLevelFive": "IC-Review Level Five",
+  "label.input.nextApproverId": "Next Stage Approver",
   "label.heading.loanPrepareAndSignContract": "Loan Prepare And Sign Contract",
   "label.heading.loandisbursal": "Loan Disbursal",
   "label.heading.checkerinbox": "Checker Inbox",
