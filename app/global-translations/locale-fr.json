@@ -222,6 +222,7 @@
 	"label.heading.totalamountreceivedorreturned": "Montant total à recevoir/remboursé",
 	"label.heading.equity": "Capitaux propres",
 	"label.heading.campaignname": "Nom de la campagne",
+	"label.heading.sms.errormessage": "Message d'erreur",
 	"label.heading.smsProvider": "Fournisseur de SMS",
 	"label.heading.templatemsg": "Modèle de message",
 	"label.heading.campaigntype": "Type de campagne",
