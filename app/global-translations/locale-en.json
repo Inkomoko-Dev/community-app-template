@@ -591,6 +591,7 @@
   "error.msg.loan.writeoff.cannot.be.undone.before.client.transfer.date": " The date on which a write off is made cannot be earlier than client's transfer date of ({{params[0].value}}) ",
   "error.msg.loan.close.cannot.be.undone.before.client.transfer.date": " The date on which the loan is repaid in full cannot be earlier than client's transfer date of ({{params[0].value}}) ",
   "error.msg.loan.repayment.or.waiver.account.is.not.active": "Loan account is not active",
+  "error.msg.loan.does.not.have.officer": "Loan is Missing an Officer. Please assign officer to proceed",
   "validation.msg.floatingrate.ratePeriods.cannot.be.empty": "Floating rate periods can not be empty",
   "validation.msg.floatingrate.fromDate.is.less.than.date": "Floating rate periods from date must be greater than current date",
   "validation.msg.floatingrate.isBaseLendingRate.baselendingrate.duplicate": "Base lending rate is already defined",
