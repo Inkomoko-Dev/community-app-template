@@ -557,6 +557,7 @@
   "error.msg.calendar.loan.first.repayment.date.not.valid.recurring.date": "First repayment date `{{params[0].value}}` does not fall on a meeting date.",
   "error.msg.invalid.recurring.rule": "The calendar recurring rule : `{{params[0].value}}` is not valid.",
   "error.msg.recurring.rule.parsing.error": "Error in parsing the Recurring Rule value: `{{params[0].value}}`",
+  "error.msg.waived.interest.is.greater.than.available.accrued.interest": "Waived Interest is greater than available accrued Interest. You can only waive Interest Worth: {{params[0].value}} {{params[1].value}}",
   "error.msg.calendar.loan.actual.disbursement.date.not.valid.recurring.date": "Actual disbursement date `{{params[0].value}}` does not fall on a meeting date.",
   "error.msg.calendar.collectionsheet.not.valid.recurring.date": "Selected calendar date is not a valid recurrence date",
   "validation.msg.loan.calendarId.not.greater.than.zero": "Meeting Calendar is mandatory.",
