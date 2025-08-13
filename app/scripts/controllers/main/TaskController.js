@@ -221,6 +221,7 @@
             };
             var CheckerApproveCtrl = function ($scope, $uibModalInstance, action) {
                 $scope.action = action;
+                $scope.note = '';
                 $scope.approve = function () {
                     var totalApprove = 0;
                     var approveCount = 0;
@@ -232,7 +233,7 @@
                     _.each(scope.checkData, function (value, key) {
                         if (value == true) {
 
-                            resourceFactory.checkerInboxResource.save({templateResource: key, command: action}, {}, function (data) {
+                            resourceFactory.checkerInboxResource.save({templateResource: key, command: action}, {note: $scope.note}, function (data) {
                                 approveCount++;
                                 if (approveCount == totalApprove) {
                                     scope.search();
