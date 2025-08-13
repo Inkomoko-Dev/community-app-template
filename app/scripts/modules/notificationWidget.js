@@ -117,6 +117,7 @@ angular.module('notificationWidget', [])
                                     console.warn('Could not dismiss modals', e);
                                 }
                                 $location.path('/viewMakerCheckerTask/' + response.data.commandId);
+                                return response || $q.when(response);
                             }
                         } else {
                             //when no maker checker enabled
