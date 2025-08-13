@@ -220,6 +220,7 @@
                 }
             };
             var CheckerApproveCtrl = function ($scope, $uibModalInstance, action) {
+                $scope.action = action;
                 $scope.approve = function () {
                     var totalApprove = 0;
                     var approveCount = 0;
