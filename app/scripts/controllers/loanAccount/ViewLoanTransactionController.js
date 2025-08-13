@@ -50,6 +50,7 @@
             };
             
             var UndoTransactionModel = function ($scope, $uibModalInstance, accountId, transactionId) {
+                $scope.note = ''; // Bind to textarea in the template
                 $scope.undoTransaction = function () {
                     if (scope.transaction.type.id == 6) {
                         var params = { loanId: accountId, command: 'undowriteoff' };
@@ -59,11 +60,13 @@
                         });
                     } else {
                         var params = {loanId: accountId, transactionId: transactionId, command: 'undo'};
-                        var formData = {dateFormat: scope.df, locale: scope.optlang.code, transactionAmount: 0};
+                        var formData = {dateFormat: scope.df, locale: scope.optlang.code, transactionAmount: 0, note: $scope.note};
                         formData.transactionDate = dateFilter(new Date(), scope.df);
                         resourceFactory.loanTrxnsResource.save(params, formData, function (data) {
                             $uibModalInstance.close('delete');
-                            location.path('/viewloanaccount/' + data.loanId);
+                             if (data.loanId) {
+                                location.path('/viewloanaccount/' + data.loanId);
+                            }
                         });
                     }
                 };
