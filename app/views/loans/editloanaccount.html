@@ -113,13 +113,15 @@
             <input type="checkbox" id="loanWithAnotherInstitution" name="loanWithAnotherInstitution"
                 ng-model="formData.loanWithAnotherInstitution" />
         </td>
-        <td class="width14" ng-show="formData.loanWithAnotherInstitution">
-            <label>{{ 'label.input.loan.with.another.institution.amount' | translate }}</label>
+        <td>
+            <label title="{{ 'label.input.applicationDate' | translate }}">{{ 'label.input.applicationDate' | translate }}
+                <span class="">*</span>:&nbsp;</label>
         </td>
-        <td class="paddedbottom20 width36" ng-show="formData.loanWithAnotherInstitution">
-            <input type="text" id="loanWithAnotherInstitutionAmount" class="form-control"
-                ng-model="formData.loanWithAnotherInstitutionAmount" />
-            &nbsp;{{loanaccountinfo.currency.displaySymbol}}
+        <td class="paddedbottom10">
+            <input id="applicationDate" type="text" datepicker-pop="dd MMMM yyyy" class="form-control"
+                   ng-model="formData.applicationDate"  is-open="opened" min="minDate"
+                   date-disabled="disabled(date, mode)" late-Validate
+                   ng-readonly="true" ng-disabled="true"/>
         </td>
     </tr>
     </table>
