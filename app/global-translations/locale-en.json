@@ -1526,6 +1526,7 @@
   "label.heading.submittedondate": "Submitted on",
   "label.heading.approvedondate": "Approved on",
   "label.heading.disbursedondate": "Disbursed on",
+  "label.heading.applicationDate": "Applied on",
   "label.heading.disburse": "Disburse",
   "label.heading.matureson": "Matures on",
   "label.heading.arearstolerance": "Arrears tolerance",
