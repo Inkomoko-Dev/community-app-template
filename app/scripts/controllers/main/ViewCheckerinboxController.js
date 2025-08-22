@@ -24,7 +24,7 @@
             };
             var ApproveCtrl = function ($scope, $uibModalInstance, action) {
                 $scope.approve = function () {
-                    resourceFactory.checkerInboxResource.save({templateResource: routeParams.id, command: action}, {}, function (data) {
+                    resourceFactory.checkerInboxResource.save({templateResource: routeParams.id, command: action}, {note: $scope.note}, function (data) {
                         $uibModalInstance.close('approve');
                         location.path('/checkeractionperformed');
                     });
@@ -47,7 +47,7 @@
             };
 			var RejectCtrl = function ($scope, $uibModalInstance, action) {
                 $scope.reject = function () {
-                    resourceFactory.checkerInboxResource.save({templateResource: routeParams.id, command: action}, {}, function (data) {
+                    resourceFactory.checkerInboxResource.save({templateResource: routeParams.id, command: action}, {note: $scope.note}, function (data) {
                         $uibModalInstance.close('reject');
                         location.path('/checkeractionperformed');
                     });

@@ -9,6 +9,12 @@
         </div>
         <div class="modal-body ">
             <api-validate></api-validate>
+
+            <div class="form-group">
+                <label for="undoNote">{{'label.input.note' | translate}}</label>
+                <textarea id="undoNote" class="form-control" ng-model="note" rows="3"></textarea>
+            </div>
+
             <br>
             <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
             <button class="btn btn-primary" ng-click="undoTransaction()">{{'label.button.undo' | translate}}</button>

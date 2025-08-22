@@ -110,6 +110,12 @@ angular.module('notificationWidget', [])
                                 return response || $q.when(response);
                             } else {
                                 //redirect if maker checker is enabled
+                                try {
+                                    var $uibModalStack = $injector.get('$uibModalStack');
+                                    $uibModalStack.dismissAll('delete');  // closes all open modals
+                                } catch (e) {
+                                    console.warn('Could not dismiss modals', e);
+                                }
                                 $location.path('/viewMakerCheckerTask/' + response.data.commandId);
                             }
                         } else {
