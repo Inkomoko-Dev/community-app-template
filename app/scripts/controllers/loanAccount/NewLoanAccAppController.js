@@ -35,6 +35,7 @@
             scope.vendorSavingsAccountOptions = [];
 
             scope.date.first = new Date();
+            scope.date.applicationDate = new Date();  // NEW
 
             if (scope.clientId) {
                 scope.inparams.clientId = scope.clientId;
@@ -521,6 +522,7 @@
                 this.formData.loanType = scope.inparams.templateType;
                 this.formData.expectedDisbursementDate = reqSecondDate;
                 this.formData.submittedOnDate = reqFirstDate;
+                this.formData.applicationDate = dateFilter(scope.date.applicationDate, scope.df);
                 this.formData.createStandingInstructionAtDisbursement = scope.formData.createStandingInstructionAtDisbursement;
                 if (scope.date.recalculationRestFrequencyDate) {
                     var restFrequencyDate = dateFilter(scope.date.recalculationRestFrequencyDate, scope.df);
