@@ -157,6 +157,9 @@
                         scope.formData.disbursementData[i].expectedDisbursementDate = new Date(scope.formData.disbursementData[i].expectedDisbursementDate);
                     }
                 }
+                if (scope.loanaccountinfo.timeline.applicationDate) {
+                    scope.formData.applicationDate = new Date(scope.loanaccountinfo.timeline.applicationDate);
+                }
 
                 if (scope.loanaccountinfo.timeline.submittedOnDate) {
                     scope.formData.submittedOnDate = new Date(scope.loanaccountinfo.timeline.submittedOnDate);
@@ -431,6 +434,7 @@
                 this.formData.loanType = scope.templateType;
                 this.formData.expectedDisbursementDate = dateFilter(this.formData.expectedDisbursementDate, scope.df);
                 this.formData.submittedOnDate = dateFilter(this.formData.submittedOnDate, scope.df);
+                this.formData.applicationDate = dateFilter(this.formData.applicationDate, scope.df);
                 this.formData.interestChargedFromDate = dateFilter(this.formData.interestChargedFromDate, scope.df);
                 this.formData.repaymentsStartingFromDate = dateFilter(this.formData.repaymentsStartingFromDate, scope.df);
                 if(!scope.loanaccountinfo.isLoanProductLinkedToFloatingRate) {
@@ -488,6 +492,7 @@
                 }
                 delete this.formData.syncRepaymentsWithMeeting;
                 delete this.formData.interestRateFrequencyType;
+                delete this.formData.applicationDate;
                 if(!scope.loanaccountinfo.isLoanProductLinkedToFloatingRate) {
                     delete this.formData.interestRateDifferential ;
                     delete this.formData.isFloatingInterestRate ;

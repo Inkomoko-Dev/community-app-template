@@ -512,6 +512,11 @@
                                 <td><span class="padded-td">{{loandetails.interestType.value}}</span></td>
                             </tr>
                             <tr>
+                                <td>{{'label.heading.applicationDate' | translate}}
+                                </td>
+                                <td><span class="padded-td">{{loandetails.timeline.applicationDate | DateFormat }}</span></td>
+                            </tr>
+                            <tr>
                                 <td>{{'label.heading.submittedondate' | translate}}
                                 </td>
                                 <td><span class="padded-td">{{loandetails.timeline.submittedOnDate | DateFormat }}</span></td>
