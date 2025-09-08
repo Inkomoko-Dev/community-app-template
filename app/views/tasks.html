@@ -39,7 +39,7 @@
                                                 <button type="button" class="btn btn-success"
                                                         data-ng-click="approveOrRejectChecker('approve')"><i
                                                         class="fa fa-check"></i>&nbsp;&nbsp;{{'label.button.approve' | translate}}</button>
-                                                <button type="button" class="btn btn-danger" data-ng-click="deleteChecker()"><i
+                                                <button type="button" class="btn btn-danger" data-ng-click="deleteChecker()" data-ng-show="false"><i
                                                         class="fa fa-trash-o"></i>&nbsp;&nbsp;{{'label.button.delete' | translate}}</button>
                                                 <button type="button" class="btn btn-warning"
                                                         data-ng-click="approveOrRejectChecker('reject')"><i
@@ -117,16 +117,23 @@
                             </script>
                             <script type="text/ng-template" id="approvechecker.html">
                                 <div class="modal-header silver">
-                                    <h3 class="bolder">{{'label.heading.approve' | translate}}</h3>
+                                    <h3 class="bolder">{{'label.heading.'+action | translate}}</h3>
                                 </div>
                                 <div class="modal-body">
                                     <api-validate></api-validate>
+
+                                    <div class="form-group">
+                                        <label for="undoNote">{{'label.input.note' | translate}}</label>
+                                        <textarea id="undoNote" class="form-control" ng-model="note" rows="3"
+                                                  ng-required="action === 'reject'"></textarea>
+                                    </div>
                                     <br>
                                     <button class="btn btn-default" ng-click="cancel()">{{'label.heading.no' |
                                         translate}}
                                     </button>
-                                    <button class="btn btn-primary" ng-click="approve()">{{'label.heading.yes' |
-                                        translate}}
+                                    <button class="btn btn-primary" ng-click="approve()"
+                                            ng-disabled="action === 'reject' && !note">
+                                        {{'label.heading.yes' | translate}}
                                     </button>
                                 </div>
                             </script>
