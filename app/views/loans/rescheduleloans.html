@@ -158,6 +158,46 @@
 
             <br>
             <br>-->
+            <!-- 🆕 Overdue charge handling -->
+            <div class="form-group">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">
+                    {{ 'label.input.overdueChargeHandling' | translate }}
+                </label>
+                <div class="col-sm-3 paddedbottom10 paddedtop">
+                    <select chosen="overdueChargeHandlingOptions"
+                            class="form-control"
+                            ng-options="option as option.name for option in overdueChargeHandlingOptions"
+                            ng-model="formData.overdueChargeHandling">
+                        <option value="">{{ 'label.select' | translate }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" ng-show="formData.overdueChargeHandling && formData.overdueChargeHandling.name == 'Carry Charges Forward'">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">
+                    {{ 'label.input.carryForwardChargeDef' | translate }}
+                </label>
+                <div class="col-sm-3 paddedbottom10 paddedtop">
+                    <select class="form-control"
+                            ng-model="formData.carryForwardChargeId"
+                            ng-options="charge.id as charge.name for charge in availableCarryForwardCharges">
+                        <option value="">{{ 'label.select' | translate }}</option>
+                    </select>
+                </div>
+            </div>
+            <!-- NEW: Due date for the carry forward charge -->
+            <div class="form-group"
+                 ng-show="formData.overdueChargeHandling && formData.overdueChargeHandling.name == 'Carry Charges Forward'">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">
+                    {{ 'label.input.carryForwardChargeDueDate' | translate }}
+                </label>
+                <div class="col-sm-3 paddedbottom10 paddedtop">
+                    <input type="text" name="carryForwardChargeDueDate" datepicker-pop="dd MMMM yyyy"
+                           class="form-control" ng-model="formData.carryForwardChargeDueDate" is-open="opened" min="'2000-01-01'"
+                           placeholder="{{ 'label.date' | translate }}"/>
+                </div>
+            </div>
+
             <div align="center">
 
                 <button type="button" data-ng-click="cancel()" class="btn btn-default">{{ 'label.button.cancel' | translate }}</button>

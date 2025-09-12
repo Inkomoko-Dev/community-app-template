@@ -12,6 +12,8 @@
                     scope.formData.rescheduleReasonId = data.rescheduleReasons[0].id;
                 }
                 scope.codes = data.rescheduleReasons;
+                scope.availableCarryForwardCharges = data.availableCarryForwardCharges;
+                scope.overdueChargeHandlingOptions = data.overdueChargeHandlingOptions;
                 let transactionDate = data.loanTransactionData.date;
                 scope.adjustFuturePayments = data.adjustFuturePayments;
                 scope.formData.rescheduleFromDate =new Date(transactionDate) || new Date();
@@ -28,6 +30,10 @@
                 this.formData.adjustedDueDate = dateFilter(this.formData.adjustedDueDate, scope.df);
                 this.formData.submittedOnDate = dateFilter(this.formData.submittedOnDate, scope.df);
                 this.formData.endDate = dateFilter(this.formData.endDate, scope.df);
+                if (this.formData.carryForwardChargeDueDate) {
+                    this.formData.carryForwardChargeDueDate =
+                        dateFilter(this.formData.carryForwardChargeDueDate, scope.df);
+                }
                 this.formData.rescheduleReasonComment = scope.comments;
                 resourceFactory.loanRescheduleResource.put(this.formData, function (data) {
                     scope.requestId = data.resourceId;
