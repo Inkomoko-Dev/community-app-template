@@ -160,12 +160,6 @@
                                 <td class="width19"><label>{{'label.createdon' | translate}}</label></td>
                                 <td class="width31">{{transactions[0].createdDate | DateFormat}}</td>
                             </tr>
-                            <tr>
-                                <td class="width14"><label>{{'label.iscorrection' | translate}}</label></td>
-                                <td class="width36">{{transactions[0].isCorrection}}</td>
-                                <td class="width19"><label>{{'label.correctedon' | translate}}</label></td>
-                                <td class="width31">{{transactions[0].correctionDate | DateFormat}}</td>
-                            </tr>
                         </table>
                     </div>
                     <div class="col-md-12">
@@ -177,6 +171,8 @@
                                 <th>{{'label.heading.account' | translate}}</th>
                                 <th>{{'label.heading.debit' | translate}}</th>
                                 <th>{{'label.heading.credit' | translate}}</th>
+                                <th>{{'label.heading.iscorrection' | translate}}</th>
+                                <th>{{'label.heading.correctedon' | translate}}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -194,6 +190,8 @@
                                         {{transaction.currency.displaySymbol}}&nbsp;{{transaction.amount | number}}
                                     </div>
                                 </td>
+                                <td class="pointer" data-ng-click="showTransaction(transaction)">{{transaction.isCorrection}}</td>
+                                <td class="pointer" data-ng-click="showTransaction(transaction)">{{transaction.correctionDate | DateFormat}}</td>
                             </tr>
                             </tbody>
                         </table>
