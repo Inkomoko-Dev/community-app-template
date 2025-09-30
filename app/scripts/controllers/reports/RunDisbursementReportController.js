@@ -58,10 +58,15 @@
 
             // Run the report
             $scope.runReport = function () {
+                let selectedOffice = null;
+                if ($scope.officeId) {
+                    selectedOffice = $scope.offices.find(o => o.id === $scope.officeId);
+                }
                 const queryParams = {
                     start_date: dateFilter($scope.startDate, 'yyyy-MM-dd'),
                     end_date: dateFilter($scope.endDate, 'yyyy-MM-dd'),
-                    product_ids: $scope.loanProductIds.join(",")
+                    product_ids: $scope.loanProductIds.join(","),
+                    location_name: selectedOffice ? selectedOffice.name : 'All'
                 };
 
                 // Map format to HTTP Accept header
@@ -91,11 +96,16 @@
             };
 
             $scope.saveRequest = function () {
+                let selectedOffice = null;
+                if ($scope.officeId) {
+                    selectedOffice = $scope.offices.find(o => o.id === $scope.officeId);
+                }
                 const paramters = {
                     fileFormat: $scope.fileFormat,
                     start_date: dateFilter($scope.startDate, 'yyyy-MM-dd'),
                     end_date: dateFilter($scope.endDate, 'yyyy-MM-dd'),
-                    product_ids: $scope.loanProductIds.join(",")
+                    product_ids: $scope.loanProductIds.join(","),
+                    location_name: selectedOffice ? selectedOffice.name : 'All'
                 };
 
                 const payload = {
