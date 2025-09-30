@@ -26,8 +26,8 @@
                             }
                         }
                     }).catch(function onError(response) {
-                        console.log("Error Detected: ", response.data)
-                    });
+                    console.log("Error Detected: ", response.data)
+                });
             });
 
             resourceFactory.accountCoaResource.getAllAccountCoas(function (data) {
@@ -99,14 +99,14 @@
                     method: 'GET',
                     url: $rootScope.hostUrl + API_VERSION + '/mixreport?startDate=' + scope.startDate + '&endDate=' + scope.endDate
                 }).then(function onSuccess(response) {
-                        var data = response.data;
-                        var parser = new DOMParser();
-                        var xmlDoc = parser.parseFromString(data, "text/xml");
-                        $rootScope.xmlData = xmlDoc;
-                        location.path('/xbrlreport');
-                    }) .catch( function onError(response) {
-                        console.log("Error Detected: ", response.data)
-                    });
+                    var data = response.data;
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(data, "text/xml");
+                    $rootScope.xmlData = xmlDoc;
+                    location.path('/xbrlreport');
+                }) .catch( function onError(response) {
+                    console.log("Error Detected: ", response.data)
+                });
             };
 
             scope.submit = function () {
@@ -127,7 +127,7 @@
         }
     });
     mifosX.ng.application.controller('XBRLController', ['$scope', 'ResourceFactory', '$location', 'dateFilter', '$route', '$http', 'API_VERSION', '$rootScope',
-            'localStorageService', '$timeout', mifosX.controllers.XBRLController]).run(function ($log) {
-            $log.info("XBRLController initialized");
-        });
+        'localStorageService', '$timeout', mifosX.controllers.XBRLController]).run(function ($log) {
+        $log.info("XBRLController initialized");
+    });
 }(mifosX.controllers || {}));

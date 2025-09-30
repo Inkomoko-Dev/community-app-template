@@ -602,6 +602,12 @@
             .when('/xbrlreport', {
                 templateUrl: 'views/reports/xbrlreport.html'
             })
+            .when('/disbursement-reports', {
+                templateUrl: 'views/reports/disbursementreport.html'
+            })
+            .when('/disbursement-request/:reportId?', {
+                templateUrl: 'views/reports/run_disbursementreport.html'
+            })
             .when('/new_client_saving_application/:clientId', {
                 templateUrl: 'views/savings/new_saving_account_application.html'
             })
