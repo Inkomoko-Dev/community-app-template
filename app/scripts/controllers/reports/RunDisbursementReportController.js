@@ -11,8 +11,6 @@
             $scope.isViewMode = false;
             $scope.loanProducts = [];
 
-            $log.info("RunDisbursementReportController initialized: ", $scope);
-
             if ($routeParams.reportId) {
 
                 $scope.isViewMode = true;
