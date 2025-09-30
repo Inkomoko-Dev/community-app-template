@@ -1,35 +1,133 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        DisbursementReportController: function ($scope, resourceFactory, $location) {
-            $scope.pendingReports = [];
+        XBRLController: function (scope, resourceFactory, location, dateFilter, route, http, API_VERSION, $rootScope, localStorageService, $timeout) {
+            scope.offices = [];
+            scope.date = {};
+            scope.restrictDate = new Date();
+            scope.formData = {};
+            scope.mixtaxonomyArray = [];
+            resourceFactory.xbrlMixtaxonomyResource.get(function (data) {
+                scope.mixtaxonomyArray = data;
+                http({
+                    method: 'GET',
+                    url: $rootScope.hostUrl + API_VERSION + '/mixmapping'
+                })
+                    .then(function onSuccess(response) {
+                        var data = response.data;
+                        var mappingJson = data.config;
+                        if (mappingJson != undefined && mappingJson.length > 0) {
+                            for (var i = scope.mixtaxonomyArray.length - 1; i >= 0; i--) {
+                                var taxonomyId = scope.mixtaxonomyArray[i]["id"];
+                                var mapping = ($.parseJSON(mappingJson))['' + taxonomyId];
+                                if (mapping != undefined) {
+                                    scope.mixtaxonomyArray[i].mapping = mapping;
+                                }
 
-            resourceFactory.disbursementReportsResource.query({ status: 'PENDING' }, function (data) {
-                console.log("Pending reports loaded: ", data);
-                $scope.pendingReports = data;
+                            }
+                        }
+                    }).catch(function onError(response) {
+                    console.log("Error Detected: ", response.data)
+                });
             });
 
-        
-            $scope.newRequest = function () {
-                $location.path('/reports/disbursement/new');
+            resourceFactory.accountCoaResource.getAllAccountCoas(function (data) {
+                scope.glaccounts = [];
+
+                for (var i = 0; i < data.length; i++) {
+                    var glaccount = {};
+                    glaccount.label = "{" + data[i].glCode + "}" + " - " + data[i].name;
+                    glaccount.value = "{" + data[i].glCode + "}";
+                    scope.glaccounts.push(glaccount);
+                }
+
+            });
+
+            if (localStorageService.getFromLocalStorage('XbrlReportSaveSuccess') == 'true') {
+                scope.savesuccess = true;
+                localStorageService.removeFromLocalStorage('XbrlReportSaveSuccess');
+                scope.XbrlSuccess = true;
+                $timeout(function () {
+                    scope.XbrlSuccess = false;
+                }, 3000);
+
+            }
+
+            scope.isPortfolio = function (mixtaxonomy) {
+                if (mixtaxonomy.type === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
             };
 
-            $scope.approve = function (report) {
-                resourceFactory.disbursementReportsResource.update(
-                    { id: report.id, action: 'approve' },
-                    function () {
-                        resourceFactory.disbursementReportsResource.query({ status: 'PENDING' }, function (data) {
-                            $scope.pendingReports = data;
-                        });
-                    }
-                );
+            scope.isBalanceSheet = function (mixtaxonomy) {
+                if (mixtaxonomy.type === 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            scope.isIncome = function (mixtaxonomy) {
+                if (mixtaxonomy.type === 2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            scope.isExpense = function (mixtaxonomy) {
+                if (mixtaxonomy.type === 3) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            scope.run = function () {
+                scope.startDate = dateFilter(scope.date.startDate, 'yyyy-MM-dd');
+                scope.endDate = dateFilter(scope.date.endDate, 'yyyy-MM-dd');
+
+                if (scope.startDate === undefined) {
+                    scope.startDate = "";
+                }
+                if (scope.endDate === undefined) {
+                    scope.endDate = "";
+                }
+
+                http({
+                    method: 'GET',
+                    url: $rootScope.hostUrl + API_VERSION + '/mixreport?startDate=' + scope.startDate + '&endDate=' + scope.endDate
+                }).then(function onSuccess(response) {
+                    var data = response.data;
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(data, "text/xml");
+                    $rootScope.xmlData = xmlDoc;
+                    location.path('/xbrlreport');
+                }) .catch( function onError(response) {
+                    console.log("Error Detected: ", response.data)
+                });
+            };
+
+            scope.submit = function () {
+                var config = {};
+                var serialObject = {};
+                for (var i = scope.mixtaxonomyArray.length - 1; i >= 0; i--) {
+                    var taxonomyId = scope.mixtaxonomyArray[i]["id"];
+                    var mapping = scope.mixtaxonomyArray[i].mapping;
+                    config["" + taxonomyId] = mapping;
+                }
+                serialObject["config"] = JSON.stringify(config);
+                serialObject["identifier"] = "default";
+                resourceFactory.xbrlMixMappingResource.update({}, JSON.stringify(serialObject), function (data) {
+                    localStorageService.addToLocalStorage('XbrlReportSaveSuccess', true);
+                    route.reload();
+                });
             };
         }
     });
-
-    mifosX.ng.application.controller(
-        'DisbursementReportController',
-        ['$scope', 'ResourceFactory', '$location', mifosX.controllers.DisbursementReportController]
-    ).run(function ($log) {
-        $log.info("DisbursementReportController initialized");
+    mifosX.ng.application.controller('XBRLController', ['$scope', 'ResourceFactory', '$location', 'dateFilter', '$route', '$http', 'API_VERSION', '$rootScope',
+        'localStorageService', '$timeout', mifosX.controllers.XBRLController]).run(function ($log) {
+        $log.info("XBRLController initialized");
     });
 }(mifosX.controllers || {}));
