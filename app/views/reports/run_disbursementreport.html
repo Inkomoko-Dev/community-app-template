@@ -43,6 +43,14 @@
 			</div>
 
 			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'interestPercentage' | translate }}</label>
+				<div class="col-sm-3">
+					<input type="number"  ng-model="interestPercentage" class="form-control" ng-readonly="isViewMode"
+						min="0" max="100" class="form-control" required late-Validate />
+				</div>
+			</div>
+
+			<div class="form-group">
 				<label class="col-sm-3 control-label">{{ 'label.input.office' | translate }}</label>
 				<div class="col-sm-3">
 					<select chosen="offices" class="form-control" ng-model="officeId" ng-disabled="isViewMode"
