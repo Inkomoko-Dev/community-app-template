@@ -131,8 +131,6 @@
                 );
             };
 
-
-
             // Cancel action
             $scope.cancel = function () {
                 $location.path('/disbursement-reports');
