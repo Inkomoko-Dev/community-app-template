@@ -1440,6 +1440,7 @@
   "label.tab.pendingRequests": "Pending Requests",
   "#Misc Labels": "..",
   "label.selectallowedparameter": "Select allowed parameter",
+  "interestPercentage": "Interest Percentage",
   "startDateSelect": "Start Date",
   "endDateSelect": "End Date",
   "obligDateTypeSelect": "Select Closed Or Disbursed Date",

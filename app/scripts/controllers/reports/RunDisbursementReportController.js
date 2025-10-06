@@ -28,6 +28,8 @@
                                 $scope.startDate = new Date(params.start_date);
                                 $scope.endDate = new Date(params.end_date);
                                 $scope.loanProductIds = params.product_ids ? params.product_ids.split(',').map(Number) : [];
+                                $scope.officeId = params.location_id || null;
+                                $scope.interestPercentage = params.interest_percentage || 0;
                             } catch (e) {
                                 console.error("Error parsing parameters", e);
                             }
@@ -64,7 +66,9 @@
                     start_date: dateFilter($scope.startDate, 'yyyy-MM-dd'),
                     end_date: dateFilter($scope.endDate, 'yyyy-MM-dd'),
                     product_ids: $scope.loanProductIds.join(","),
-                    location_name: selectedOffice ? selectedOffice.name : 'All'
+                    location_name: selectedOffice ? selectedOffice.name : 'All',
+                    location_id: $scope.officeId || null,
+                    interest_percentage: $scope.interestPercentage || 10
                 };
 
                 // Map format to HTTP Accept header
@@ -103,7 +107,9 @@
                     start_date: dateFilter($scope.startDate, 'yyyy-MM-dd'),
                     end_date: dateFilter($scope.endDate, 'yyyy-MM-dd'),
                     product_ids: $scope.loanProductIds.join(","),
-                    location_name: selectedOffice ? selectedOffice.name : 'All'
+                    location_name: selectedOffice ? selectedOffice.name : 'All',
+                    location_id: $scope.officeId || null,
+                    interest_percentage: $scope.interestPercentage || 10
                 };
 
                 const payload = {
@@ -124,8 +130,6 @@
                     }
                 );
             };
-
-
 
             // Cancel action
             $scope.cancel = function () {
