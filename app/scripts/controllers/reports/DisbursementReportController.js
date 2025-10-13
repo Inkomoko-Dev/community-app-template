@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        DisbursementReportController: function ($scope, resourceFactory, $location) {
+        DisbursementReportController: function ($scope, $rootScope, resourceFactory, $location, $http) {
             $scope.activeTab = 'approved';
             $scope.pendingReports = [];
             $scope.approvedReports = [];
@@ -20,6 +20,7 @@
             // New report request → navigate to a new form screen
             $scope.newDisbursementReport = function () {
                 console.log("Navigating to new request form");
+                $scope.fetchApproved();
                 $location.path('/disbursement-request');
             };
 
@@ -30,7 +31,11 @@
                     {},
                     function () {
                         $scope.activeTab = 'approved';
-                        $location.path('/disbursement-reports');
+                        // $location.path('/disbursement-reports');
+                        setTimeout(() => {
+                            $location.path('/disbursement-reports');
+                            $route.reload(); // force refresh data
+                        }, 500);
                     },
                     function (error) {
                         console.error("Error approving report:", error);
@@ -39,20 +44,19 @@
             };
 
             $scope.view = function (report) {
-                resourceFactory.disbursementReportsViewResource.view(
-                    { id: report.id },
-                    {},
-                    function (data) {
-                        console.log("Viewing report", data);
-                        if (data.filePath) {
-                            window.open(data.filePath, '_blank');
-                        }
-                    },
-                    function (error) {
-                        console.error("Error approving report:", error);
+                const url = $rootScope.hostUrl + '/fineract-provider/api/v1/reports/jasper/' + report.id + '/view/download';
+
+                $http.get(url, { responseType: 'arraybuffer' })
+                    .then(function (response) {
+                        const file = new Blob([response.data], { type: response.headers('Content-Type') });
+                        const fileURL = URL.createObjectURL(file);
+                        window.open(fileURL);
+                    })
+                    .catch(function (error) {
+                        console.error("Error viewing report:", error);
                     }
-                );
-            }
+                    );
+            };
 
             $scope.viewPending = function (report) {
                 $location.path('/disbursement-request/' + report.id);
@@ -69,7 +73,7 @@
 
     mifosX.ng.application.controller(
         'DisbursementReportController',
-        ['$scope', 'ResourceFactory', '$location', mifosX.controllers.DisbursementReportController]
+        ['$scope', '$rootScope', 'ResourceFactory', '$location', '$http', mifosX.controllers.DisbursementReportController]
     ).run(function ($log) {
         $log.info("DisbursementReportController initialized");
     });
