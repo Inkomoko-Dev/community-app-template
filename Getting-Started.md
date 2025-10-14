@@ -98,7 +98,7 @@ In locale-en.json file, you will find similar entry and its value in English. We
 ## Working on Issues and Enhancements
 
 Now thats we have a good understanding of about how our application is structured and how each part works, or working. We can now start with some small changes in the application. It’s best that before you starting working on the application, you first play around with the code. 
-Say, you have to change any icon in the application or have to correct some typo error inside the application which has been overwritten. As, our application has 200+ files, so finding  from which file the content belongs to is difficult. So, the best way to approach this is to inspect the element using your browser developer tools to and check for some unique id or keyword that you can find in the entire app directory. As, you will continue working, you will get  good ideas and can easily traverse through the app. 
+Say, you have to change any icon in the application or have to correct some typo error inside the application which has been overwritten. As, our application has 200+ files, so finding  from which file the content belongs to is difficult. So, the best way to approach this is to inspect the element using your browser developer tools to and check for some unique id or keyword that you can find in the entire app directory. As - you will continue working, you will get  good ideas and can easily traverse through the app. 
 
 
  
