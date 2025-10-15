@@ -19,7 +19,6 @@
 
             // New report request → navigate to a new form screen
             $scope.newDisbursementReport = function () {
-                console.log("Navigating to new request form");
                 $location.path('/disbursement-request');
             };
 
