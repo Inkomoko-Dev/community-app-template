@@ -21,7 +21,7 @@
                     function (data) {
                         $scope.reportName = data.reportName;
                         $scope.fileFormat = data.fileFormat;
-                        
+
                         if (data.parameters) {
                             try {
                                 const params = JSON.parse(data.parameters);
@@ -122,8 +122,12 @@
                 ResourceFactory.disbursementReportsResource.create(
                     payload,
                     function () {
-                        $log.info("Report request saved successfully");
-                        $location.path('/disbursement-reports');
+                        // $log.info("Report request saved successfully");
+                        // $location.path('/disbursement-reports');
+                        setTimeout(() => {
+                            $location.path('/disbursement-reports');
+                            $route.reload(); // force refresh data
+                        }, 500);
                     },
                     function (err) {
                         $log.error("Error saving report request:", err);
