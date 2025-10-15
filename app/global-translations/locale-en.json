@@ -3218,6 +3218,7 @@
   "label.input.addressline2": "Address Line 2",
   "label.input.addressline3": "Address Line 3",
   "label.input.street": "Street",
+  "label.input.location": "Location",
   "label.input.town_village": "Town / Village",
   "label.input.county_district": "County / District",
   "label.input.state_province": "State / Province",
