@@ -171,6 +171,8 @@
                                 <th>{{'label.heading.account' | translate}}</th>
                                 <th>{{'label.heading.debit' | translate}}</th>
                                 <th>{{'label.heading.credit' | translate}}</th>
+                                <th>{{'label.heading.iscorrection' | translate}}</th>
+                                <th>{{'label.heading.correctedon' | translate}}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -188,6 +190,8 @@
                                         {{transaction.currency.displaySymbol}}&nbsp;{{transaction.amount | number}}
                                     </div>
                                 </td>
+                                <td class="pointer" data-ng-click="showTransaction(transaction)">{{transaction.isCorrection}}</td>
+                                <td class="pointer" data-ng-click="showTransaction(transaction)">{{transaction.correctionDate | DateFormat}}</td>
                             </tr>
                             </tbody>
                         </table>
