@@ -107,7 +107,7 @@
                     <div class="col-sm-3">
                         <input id="approvedAmount" type="text" name="amount" ng-model="formData.approvedLoanAmount"
                                class="form-control"
-                               number-format required late-Validate>
+                               number-format required late-Validate ng-readonly="isDisbursementPreApprovalRequest">
                     </div>
                     <div class="col-sm-3">
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
@@ -120,7 +120,7 @@
                     <div class="col-sm-3">
                         <input id="transactionAmount" type="text" name="amount" ng-model="formData.transactionAmount"
                                class="form-control"
-                               number-format required late-Validate>
+                               number-format required late-Validate ng-readonly="isDisbursementPreApprovalRequest">
                     </div>
                     <div class="col-sm-3">
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
@@ -202,7 +202,7 @@
                         <div class="col-sm-3">
                             <select id="paymentTypeId" ng-model="formData.paymentTypeId" class="form-control"
                                     ng-options="paymentType.id as paymentType.name for paymentType in paymentTypes"
-                                    value="{{paymentType.id}}"></select>
+                                    value="{{paymentType.id}}" ng-disabled="isDisbursementPreApprovalRequest"></select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -222,7 +222,7 @@
 
                             <div class="col-sm-3">
                                 <input id="accountNumber" type="text" class="form-control"
-                                       ng-model="formData.accountNumber">
+                                       ng-model="formData.accountNumber" ng-readonly="isDisbursementPreApprovalRequest">
                             </div>
                         </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
@@ -231,7 +231,7 @@
 
                             <div class="col-sm-3">
                                 <input id="checkNumber" class="form-control" type="text"
-                                       ng-model="formData.checkNumber">
+                                       ng-model="formData.checkNumber" ng-readonly="isDisbursementPreApprovalRequest">
                             </div>
                         </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
@@ -240,7 +240,7 @@
 
                             <div class="col-sm-3">
                                 <input id="routingCode" class="form-control" type="text"
-                                       ng-model="formData.routingCode">
+                                       ng-model="formData.routingCode" ng-readonly="isDisbursementPreApprovalRequest">
                             </div>
                         </div>
                         <div class="form-group"  ng-show="!showClientOtherInfoForm">
@@ -249,7 +249,7 @@
 
                             <div class="col-sm-3">
                                 <input id="receiptNumber" class="form-control" type="text"
-                                       ng-model="formData.receiptNumber">
+                                       ng-model="formData.receiptNumber" ng-readonly="isDisbursementPreApprovalRequest">
                             </div>
                         </div>
                         <div class="form-group"  ng-show="!showClientOtherInfoForm">
@@ -257,7 +257,8 @@
                                 translate}}</label>
 
                             <div class="col-sm-3">
-                                <input id="bankNumber" class="form-control" type="text" ng-model="formData.bankNumber">
+                                <input id="bankNumber" class="form-control" type="text"
+                                       ng-model="formData.bankNumber" ng-readonly="isDisbursementPreApprovalRequest">
                             </div>
                         </div>
 
@@ -267,7 +268,8 @@
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text" ng-model="formData.clientPhoneNumber" readonly>
+                                <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text"
+                                       ng-model="formData.clientPhoneNumber" readonly>
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
