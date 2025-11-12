@@ -1073,6 +1073,13 @@
                             get: { method: 'GET' }
                         }
                     ),
+
+                    authorizedSignersResource: defineResource(
+                        apiVer + "/reports/jasper/approvers",
+                        { query: { method: 'GET', isArray: true } }
+
+                    ),
+
                     reportParamResource: defineResource(apiVer + "/reports/jasper/parameters/:reportName", { reportName: '@reportName' }, {
                         get: { method: 'GET', isArray: true }
                     })
