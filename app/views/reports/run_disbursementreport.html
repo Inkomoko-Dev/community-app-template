@@ -69,6 +69,21 @@
 				</div>
 			</div>
 
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'label.input.notifyPerson' | translate }}</label>
+				<div class="col-sm-3">
+					<select class="form-control"
+							ng-model="notifyUserId"
+							ng-options="user.id as user.fullname for user in authorizedSigners"
+							ng-disabled="isViewMode"
+							required>
+						<option value="">{{ 'label.placeholder.selectSigner' | translate }}</option>
+					</select>
+				</div>
+				<div class="col-sm-3 help-block text-muted">
+					{{ 'label.help.notifyPerson' | translate }}
+				</div>
+			</div>
 
 			<span class="col-md-offset-3 paddedleft52px">
 				<a id="run" ng-click="runReport()" class="btn btn-primary">
