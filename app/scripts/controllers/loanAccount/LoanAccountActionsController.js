@@ -125,8 +125,10 @@
                         scope.modelName = 'approvedOnDate';
                         scope.formData[scope.modelName] =  new Date();
                         scope.showApprovalAmount = true;
+                        scope.showAmountField = true;
                         scope.isTransaction = true;
                         scope.formData.approvedLoanAmount =  data.approvalAmount;
+                        scope.formData.transactionAmount = data.netDisbursalAmount;
                         scope.paymentTypes = data.paymentTypeOptions;
                         scope.isLoanDisbursementRequestEnabled = true;
                         scope.fetchEntities('m_loan','APPROVE');
@@ -959,8 +961,8 @@
 
             scope.isCashPayment = function() {
                 const paymentTypeId =scope.formData.paymentTypeId;
-                return scope.paymentTypes.find(function (paymentType) { return paymentTypeId === paymentType.id })?.isCashPayment || false;
-            }
+                return scope.paymentTypes.find(function (paymentType) { return paymentTypeId === paymentType.id;})?.isCashPayment || false;
+            };
 
             function icReviewLoanDecisionDataObjectToArray(icReviewData) {
                 const result = [];
