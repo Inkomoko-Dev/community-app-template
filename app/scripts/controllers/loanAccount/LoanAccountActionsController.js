@@ -125,7 +125,14 @@
                         scope.modelName = 'approvedOnDate';
                         scope.formData[scope.modelName] =  new Date();
                         scope.showApprovalAmount = true;
+                        scope.showAmountField = true;
+                        scope.isTransaction = true;
                         scope.formData.approvedLoanAmount =  data.approvalAmount;
+                        scope.formData.transactionAmount = data.netDisbursalAmount;
+                        scope.paymentTypes = data.paymentTypeOptions;
+                        scope.isLoanDisbursementRequestEnabled = true;
+                        scope.fetchEntities('m_loan','APPROVE');
+
                     });
                     resourceFactory.LoanAccountResource.getLoanAccountDetails({loanId: routeParams.id, associations: 'multiDisburseDetails'}, function (data) {
                         scope.form.expectedDisbursementDate = new Date(data.timeline.expectedDisbursementDate);
@@ -168,27 +175,59 @@
                     scope.showDateField = false;
                     scope.taskPermissionName = 'DISBURSALUNDO_LOAN';
                     break;
-                case "disburse":
+                case "disbursementpreapprovalrequest":
+                case "approveDisbursement":
+                    const isApprove = scope.action === "approveDisbursement";
+
+                    // Both actions should be read-only
+                    scope.isReadOnly = true;
+
+                    const command = isApprove ? "disbursementapproval" : "disbursementpreapprovalrequest";
+                    const rejectCommand = isApprove ? "rejectdisbursementapproval" : "rejectdisbursementpreapproval";
+
                     scope.modelName = 'actualDisbursementDate';
-                    resourceFactory.loanTrxnsTemplateResource.get({loanId: scope.accountId, command: 'disburse'}, function (data) {
+                    resourceFactory.loanTrxnsTemplateResource.get({ loanId: scope.accountId, command: command }, function (data) {
                         scope.paymentTypes = data.paymentTypeOptions;
-                        if (data.paymentTypeOptions.length > 0) {
-                            scope.formData.paymentTypeId = data.paymentTypeOptions[0].id;
-                        }
-                        scope.formData.transactionAmount = data.amount;
+                        scope.formData.accountNumber = data.accountNumber || '';
+                        scope.formData.checkNumber = data.checkNumber || '';
+                        scope.formData.routingCode = data.routingCode || '';
+                        scope.formData.receiptNumber = data.receiptNumber || '';
+                        scope.formData.bankNumber = data.bankNumber || '';
+                        scope.formData.clientPhoneNumber = data.clientPhoneNumber || '';
+                        scope.formData.clientAccountNumber = data.clientAccountNumber || '';
+                        scope.formData.clientBankName = data.clientBankName || '';
+                        scope.formData.paymentTypeId = Number(data.paymentTypeId);
+                        scope.formData.transactionAmount = data.netDisbursalAmount || '';
+                        scope.principalPortion = data.principalPortion || '';
+                        scope.interestPortion = data.interestPortion || '';
+                        scope.feeChargesPortion = data.feeChargesPortion || '';
                         scope.formData[scope.modelName] = new Date();
                         if (data.fixedEmiAmount) {
                             scope.formData.fixedEmiAmount = data.fixedEmiAmount;
                             scope.showEMIAmountField = true;
                         }
-                        scope.isLoanDisbursementRequestEnabled = data.isLoanDisbursementRequestEnabled;
+                        scope.isDisbursementPreApprovalRequest = !isApprove;
                     });
-                    scope.title = 'label.heading.disburseloanaccount';
+
+                    scope.title = isApprove ? 'label.heading.approvedisbursement' : 'label.heading.disbursementpreapproval';
                     scope.labelName = 'label.input.disbursedondate';
                     scope.isTransaction = true;
                     scope.showAmountField = true;
+                    scope.principalPortion = true;
+                    scope.interestPortion = true;
+                    scope.feeChargesPortion = true;
                     scope.taskPermissionName = 'DISBURSE_LOAN';
-                    scope.fetchEntities('m_loan','DISBURSE');
+                    scope.fetchEntities('m_loan', 'DISBURSE');
+
+                    // UI toggles for rejection
+                    scope.isReject = false;
+                    scope.toggleReject = function () {
+                        scope.isReject = !scope.isReject;
+                    };
+                    scope.rejectReason = "";
+
+                    // attach commands for later use in submit()
+                    scope.disburseCommands = { command, rejectCommand };
                     break;
                 case "disbursetosavings":
                     scope.modelName = 'actualDisbursementDate';
@@ -795,14 +834,35 @@
                             );
                         });
                     }
+                    else if (scope.action === "disbursementpreapprovalrequest" || scope.action === "approveDisbursement") {
+                        const isApprove = scope.action === "approveDisbursement";
+                        const chosenCommand = scope.isReject
+                            ? scope.disburseCommands.rejectCommand
+                            : scope.disburseCommands.command;
+
+                        params.loanId = scope.accountId;
+                        params.command = chosenCommand;
+
+                        scope.filterDisburseFormData();
+                        this.formData.locale = scope.optlang.code;
+                        this.formData.dateFormat = scope.df;
+
+                        if (scope.isReject && scope.rejectReason) {
+                            this.formData.rejectReason = scope.rejectReason;
+                        }
+
+                        resourceFactory.LoanAccountResource.save(params, this.formData, function (data) {
+                            location.path('/viewloanaccount/' + data.loanId);
+                        });
+                    }
                     else  {
                         params.loanId = scope.accountId;
-                        params.command = scope.isLoanDisbursementRequestEnabled && !scope.isCashPayment() ? 'disbursementRequest' : params.command;
+                        params.command = scope.isDisbursementPreApprovalRequest ? 'disbursementpreapprovalrequest' : params.command;
                         scope.filterDisburseFormData();
                         resourceFactory.LoanAccountResource.save(params, this.formData, function (data) {
                             location.path('/viewloanaccount/' + data.loanId);
                         });
-                    } 
+                    }
                 }
             };
 
@@ -921,16 +981,16 @@
             }
 
             scope.$watch('clientId', function() {
-                if(scope.action === 'disburse' && scope.clientId !== undefined) {
+                if((scope.action === 'approve' || scope.action === 'disburse') && scope.clientId !== undefined) {
                     scope.fetchClientOtherInfo(scope.clientId);
                 }
                 
-            })
+            });
 
             scope.$watch('formData.paymentTypeId', function() {
                 if(scope.formData.paymentTypeId !== undefined) {
                     const isCashPayment = scope.isCashPayment();
-                    if(scope.isLoanDisbursementRequestEnabled && scope.action === 'disburse' && !isCashPayment) {
+                    if(scope.isLoanDisbursementRequestEnabled && (scope.action === 'approve' || scope.action === 'disburse') && !isCashPayment) {
                         scope.showClientOtherInfoForm = true;
                     } else {
                         scope.showClientOtherInfoForm = false;
@@ -940,8 +1000,8 @@
 
             scope.isCashPayment = function() {
                 const paymentTypeId =scope.formData.paymentTypeId;
-                return scope.paymentTypes.find(function (paymentType) { return paymentTypeId === paymentType.id })?.isCashPayment || false;
-            }
+                return scope.paymentTypes.find(function (paymentType) { return paymentTypeId === paymentType.id;})?.isCashPayment || false;
+            };
 
             function icReviewLoanDecisionDataObjectToArray(icReviewData) {
                 const result = [];
@@ -953,6 +1013,21 @@
                 });
                 return result;
             }
+
+            scope.rejectDisbursement = function () {
+                var params = { loanId: scope.accountId, command: 'rejectDisbursement' };
+
+                var confirmReject = confirm("Are you sure you want to reject this disbursement?");
+                if (!confirmReject) {
+                    return;
+                }
+
+                // Call backend API to reject disbursement and move back to awaiting approval
+                resourceFactory.LoanAccountResource.save(params, {}, function (data) {
+                    // Redirect to loan view after successful rejection
+                    location.path('/viewloanaccount/' + data.loanId);
+                });
+            };
 
             
         }
