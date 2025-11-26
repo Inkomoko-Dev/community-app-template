@@ -146,56 +146,56 @@
                     case "reviewapplication":
                         location.path('/loanaccount/' + accountId + '/reviewapplication');
                         break;
-                    case "rejectreviewapplication":
-                        location.path('/loanaccount/' + accountId + '/rejectreviewapplication');
+                    case "undoreviewapplication":
+                        location.path('/loanaccount/' + accountId + '/undoreviewapplication');
                         break;
                     case "duediligence":
                         location.path('/viewloanaccount/' + accountId + '/duediligence');
                         break;
-                    case "rejectduediligence":
-                        location.path('/loanaccount/' + accountId + '/rejectduediligence');
+                    case "undoduediligence":
+                        location.path('/viewloanaccount/' + accountId + '/undoduediligence');
                         break;
                     case "collateralreview":
                         location.path('/loanaccount/' + accountId + '/collateralreview');
                         break;
-                    case "rejectcollateralreview":
-                        location.path('/loanaccount/' + accountId + '/rejectcollateralreview');
+                    case "undocollateralreview":
+                        location.path('/loanaccount/' + accountId + '/undocollateralreview');
                         break;
                     case "icreviewlevelone":
                         location.path('/loanaccount/' + accountId + '/icreviewlevelone');
                         break;
-                    case "rejecticreviewlevelone":
-                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelone');
+                    case "undoicreviewlevelone":
+                        location.path('/loanaccount/' + accountId + '/undoicreviewlevelone');
                         break;
                     case "icreviewleveltwo":
                         location.path('/loanaccount/' + accountId + '/icreviewleveltwo');
                         break;
-                    case "rejecticreviewleveltwo":
-                        location.path('/loanaccount/' + accountId + '/rejecticreviewleveltwo');
+                    case "undoicreviewleveltwo":
+                        location.path('/loanaccount/' + accountId + '/undoicreviewleveltwo');
                         break;
                     case "icreviewlevelthree":
                         location.path('/loanaccount/' + accountId + '/icreviewlevelthree');
                         break;
-                    case "rejecticreviewlevelthree":
-                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelthree');
+                    case "undoicreviewlevelthree":
+                        location.path('/loanaccount/' + accountId + '/undoicreviewlevelthree');
                         break;
                     case "icreviewlevelfour":
                         location.path('/loanaccount/' + accountId + '/icreviewlevelfour');
                         break;
-                    case "rejecticreviewlevelfour":
-                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelfour');
+                    case "undoicreviewlevelfour":
+                        location.path('/loanaccount/' + accountId + '/undoicreviewlevelfour');
                         break;
                     case "icreviewlevelfive":
                         location.path('/loanaccount/' + accountId + '/icreviewlevelfive');
                         break;
-                    case "rejecticreviewlevelfive":
-                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelfive');
+                    case "undoicreviewlevelfive":
+                        location.path('/loanaccount/' + accountId + '/undoicreviewlevelfive');
                         break;
                     case "prepareandsigncontract":
                         location.path('/loanaccount/' + accountId + '/prepareandsigncontract');
                         break;
-                    case "rejectprepareandsigncontract":
-                        location.path('/loanaccount/' + accountId + '/rejectprepareandsigncontract');
+                    case "undoprepareandsigncontract":
+                        location.path('/loanaccount/' + accountId + '/undoprepareandsigncontract');
                         break;
                     case "crbVerification":
                         resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId}, function (data) {
@@ -428,6 +428,60 @@
                         } else {
                             console.log("No Options Found here . . . . ");
                             return null;
+                        }
+                    }
+
+                    function getUndoLoanStage(data) {
+                        if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "REVIEW_APPLICATION"))) {
+                            return {
+                                name: "button.undoreviewapplication",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANAPPLICATIONREVIEW'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "DUE_DILIGENCE"))) {
+                            return {
+                                name: "button.undoduediligence",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_DUEDILIGENCE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_ONE"))) {
+                            return {
+                                name: "button.undoicreviewlevelone",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANICREVIEWDECISIONLEVELONE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_TWO"))) {
+                            return {
+                                name: "button.undoicreviewleveltwo",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANICREVIEWDECISIONLEVELTWO'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_THREE"))) {
+                            return {
+                                name: "button.undoicreviewlevelthree",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANICREVIEWDECISIONLEVELTHREE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_FOUR"))) {
+                            return {
+                                name: "button.undoicreviewlevelfour",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANICREVIEWDECISIONLEVELFOUR'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_FIVE"))) {
+                            return {
+                                name: "button.undoicreviewlevelfive",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANICREVIEWDECISIONLEVELFIVE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "PREPARE_AND_SIGN_CONTRACT"))) {
+                            return {
+                                name: "button.undoprepareandsigncontract",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'UNDO_LOANPREPAREANDSIGNCONTRACT'
+                            };
+                        } else {
+                            console.log("No Options Found here . . . . ");
                         }
                     }
 
