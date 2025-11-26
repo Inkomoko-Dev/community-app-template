@@ -989,8 +989,8 @@
                                             <table class="table condensed-table">
                                                 <thead>
                                                 <tr class="graybg">
-                                                    <th><input type="checkbox" ng-click="loanDisbursalAllCheckBoxesClicked()"
-                                                               ng-checked="loanDisbursalAllCheckBoxesMet()"/></th>
+                                                    <th><input type="checkbox" ng-click="loanDisbursalAllCheckBoxesClicked(office)"
+                                                               ng-checked="loanDisbursalAllCheckBoxesMet(office)"/></th>
                                                     <th>{{'label.heading.client' | translate}}</th>
                                                     <th>{{'label.heading.loanaccountnum' | translate}}</th>
                                                     <th>{{'label.heading.loanproduct' | translate}}</th>
@@ -1070,13 +1070,13 @@
                             <!-- Modal for disbursement rejection -->
                             <script type="text/ng-template" id="disbursementrejection.html">
                                 <div class="modal-header silver">
-                                    <h3 class="bolder">{{'label.heading.disbursementrejection' | translate}}</h3>
+                                    <h3 class="bolder">{{'label.heading.confirm.reject' | translate}}</h3>
                                 </div>
                                 <div class="modal-body">
                                     <api-validate></api-validate>
                                     <br>
-                                    <label>{{'label.reason' | translate}}</label>
-                                    <textarea ng-model="rejectionReason" class="form-control" rows="3"></textarea>
+                                    <label>{{'label.input.note' | translate}}</label>
+                                    <textarea ng-model="reason" class="form-control" rows="3"></textarea>
                                     <br>
                                     <button class="btn btn-default" ng-click="cancel()">
                                         {{'label.button.cancel' | translate}}
@@ -1128,7 +1128,7 @@
                                                 <tr dir-paginate="loan in office.disbursementLoans | filter:filterTextDisbursementApproval | itemsPerPage:itemsPerPage"
                                                     pagination-id="'disbapp_' + $index">
                                                     <td>
-                                                        <input type="checkbox" ng-model="disbursementApprovalTemplate[loan.id]">
+                                                        <input type="checkbox" ng-model="disbursementApprovalSelected[loan.id]">
                                                     </td>
                                                     <td>{{loan.clientUid}}</td>
                                                     <td class="pointer">
