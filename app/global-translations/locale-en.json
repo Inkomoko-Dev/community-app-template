@@ -451,6 +451,7 @@
   "label.input.dailyWithdrawLimit": "Daily withdraw limit",
   "label.input.singleWithdrawLimit": "Single Withdraw Limit",
   "label.button.submit": "Submit",
+  "label.heading.confirm.reject": "Confirm Rejection?",
   "label.button.selectAll": "Select All",
   "label.button.deselectAll": "Deselect All",
   "label.button.clientpayments": "Client Payments",

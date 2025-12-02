@@ -375,9 +375,8 @@
                     <span ng-show="noteFieldMandatory"
                             class="required">*</span>
                 </label>
-
                 <div class="col-sm-3">
-                    <textarea id="note" rows="2" class="form-control" ng-model="formData.note"></textarea>
+                    <textarea id="note" rows="2" class="form-control" ng-model="formData.note" ng-required="noteFieldMandatory"></textarea>
                 </div>
             </div>
             <div class="form-group" ng-show="installmentchargeField">
