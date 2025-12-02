@@ -178,6 +178,7 @@
                     scope.title = 'label.heading.undoapproveloanaccount';
                     scope.showDateField = false;
                     scope.taskPermissionName = 'APPROVALUNDO_LOAN';
+                    scope.noteFieldMandatory = true;
                     break;
                 case "undodisbursal":
                     scope.title = 'label.heading.undodisburseloanaccount';
@@ -228,6 +229,7 @@
                     scope.principalPortion = true;
                     scope.interestPortion = true;
                     scope.feeChargesPortion = true;
+                    scope.noteFieldMandatory = true;
                     scope.taskPermissionName = 'DISBURSE_LOAN';
                     scope.fetchEntities('m_loan', 'DISBURSE');
 
@@ -1051,12 +1053,15 @@
                         });
                     } else if (scope.action === "disbursementpreapprovalrequest" || scope.action === "approveDisbursement") {
                         const isApprove = scope.action === "approveDisbursement";
+
                         const chosenCommand = scope.isReject
                             ? scope.disburseCommands.rejectCommand
                             : scope.disburseCommands.command;
 
                         params.loanId = scope.accountId;
                         params.command = chosenCommand;
+
+                        params.command = isApprove && scope.isCashPayment() ? 'disburse' : params.command;
 
                         scope.filterDisburseFormData();
                         this.formData.locale = scope.optlang.code;
@@ -1190,8 +1195,9 @@
                 }
             }
 
-            scope.$watch('clientId', function () {
-                if ((scope.action === 'approve' || scope.action === 'disburse') && scope.clientId !== undefined) {
+            scope.$watch('clientId', function() {
+                if((scope.action === 'approve' || scope.action ===  'disbursementpreapprovalrequest' || scope.action ===  'approveDisbursement')
+                    && scope.clientId !== undefined) {
                     scope.fetchClientOtherInfo(scope.clientId);
                 }
 
@@ -1200,7 +1206,8 @@
             scope.$watch('formData.paymentTypeId', function () {
                 if (scope.formData.paymentTypeId !== undefined) {
                     const isCashPayment = scope.isCashPayment();
-                    if (scope.isLoanDisbursementRequestEnabled && (scope.action === 'approve' || scope.action === 'disburse') && !isCashPayment) {
+                    if((scope.action === 'approve' || scope.action ===  'disbursementpreapprovalrequest' || scope.action ===  'approveDisbursement')
+                        && !isCashPayment) {
                         scope.showClientOtherInfoForm = true;
                     } else {
                         scope.showClientOtherInfoForm = false;

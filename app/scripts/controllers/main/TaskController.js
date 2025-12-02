@@ -8,6 +8,8 @@
             scope.formData = {};
             scope.loanTemplate = {};
             scope.loanDisbursalTemplate = {};
+            scope.disbursementApprovalSelected = {}; // id => true/false
+            scope.disbursementApprovalTemplate = {}; // id => loan object
             scope.date = {};
             scope.checkData = [];
             scope.isCollapsed = true;
@@ -133,7 +135,7 @@
 
             // Check if all checkboxes in a collection are checked
             scope.allCheckboxesMet = function(collection, template) {
-                if (!collection) return false;
+                if (!collection) {return false;}
                 return collection.every(item => template[item.id] === true);
             };
 
@@ -147,12 +149,21 @@
             };
 
             // For loan disbursal
-            scope.loanDisbursalAllCheckBoxesClicked = function() {
-                scope.toggleAllCheckboxes(scope.loans, scope.loanDisbursalTemplate);
+            scope.loanDisbursalAllCheckBoxesClicked = function(office) {
+                scope.toggleAllCheckboxes(office.awaitingDisbursalLoans, scope.loanDisbursalTemplate);
             };
 
-            scope.loanDisbursalAllCheckBoxesMet = function() {
-                return scope.allCheckboxesMet(scope.loans, scope.loanDisbursalTemplate);
+            scope.loanDisbursalAllCheckBoxesMet = function(office) {
+                return scope.allCheckboxesMet(office.awaitingDisbursalLoans, scope.loanDisbursalTemplate);
+            };
+
+            // For loan disbursement approval
+            scope.disbursementApprovalAllCheckBoxesClicked = function(office) {
+                scope.toggleAllCheckboxes(office.disbursementLoans, scope.disbursementApprovalSelected);
+            };
+
+            scope.disbursementApprovalAllCheckBoxesMet = function(office) {
+                scope.allCheckboxesMet(office.disbursementLoans, scope.disbursementApprovalSelected);
             };
 
             // For client approvals
@@ -411,6 +422,7 @@
                                 // Disbursement Approval: status 200, substatus 300
                                 else if (loan.status.id === 200 && loan.subStatus && loan.subStatus.id === 300) {
                                     office.disbursementLoans.push(loan);
+                                    scope.disbursementApprovalTemplate[loan.id] = loan;
                                 }
 
                                 // Pending Approval: status 100, optional
@@ -491,12 +503,13 @@
 
 
             // ========================
-            // 🔁 Generic Bulk Executor
-            // ========================
+// 🔁 Generic Bulk Executor
+// ========================
             scope.bulkBatchExecutor = function ({
                                                     template,
                                                     command,
                                                     extraBody = {},
+                                                    extraBodyBuilder = null,
                                                     successMessage,
                                                     failureMessage,
                                                     getUrl // optional function(loanId) => string
@@ -507,20 +520,16 @@
                     return;
                 }
 
-                const baseBody = {
-                    dateFormat: scope.df,
-                    locale: scope.optlang.code,
-                    approvedOnDate: dateFilter(new Date(), scope.df),
-                    actualDisbursementDate: dateFilter(new Date(), scope.df),
-                    approvalDate: dateFilter(new Date(), scope.df),
-                };
-
-                const batchRequests = selectedIds.map((id, i) => ({
-                    requestId: i + 1,
-                    relativeUrl: getUrl ? getUrl(id) : `loans/${id}?command=${command}`,
-                    method: "POST",
-                    body: JSON.stringify(baseBody)
-                }));
+                const batchRequests = selectedIds.map((id, i) => {
+                    const loan = template[id];
+                    let body = extraBodyBuilder ? extraBodyBuilder(loan) : extraBody || {};
+                    return {
+                        requestId: i + 1,
+                        relativeUrl: getUrl ? getUrl(id) : `loans/${id}?command=${command}`,
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    };
+                });
 
                 resourceFactory.batchResource.post(
                     batchRequests,
@@ -550,7 +559,7 @@
                             }
                         });
 
-                        if (successful > 0) {scope.loanResource();}
+                        if (successful > 0) { scope.loanResource(); }
 
                         let msg = `${successMessage || "Bulk operation complete."}\nSuccessful: ${successful}`;
                         if (failedItems.length > 0) {
@@ -587,6 +596,7 @@
                         template: config.template,
                         command: config.command,
                         extraBody: extraBody,
+                        extraBodyBuilder: config.extraBodyBuilder || null,
                         successMessage: config.successMessage,
                         failureMessage: config.failureMessage,
                         getUrl: config.getUrl
@@ -636,17 +646,47 @@
             });
 
             // Bulk Disbursement Approval
-            scope.approveDisbursement = () => scope.openBulkActionModal({
-                actionName: "disbursementApproval",
-                templateUrl: 'disbursementapproval.html',
-                template: scope.disbursementApprovalTemplate,
-                command: 'disbursementrequest',
-                extraBody: { approvalDate: dateFilter(new Date(), scope.df) },
-                successMessage: "Bulk disbursement approval completed.",
-                failureMessage: "Bulk disbursement approval failed."
-            });
+            scope.approveDisbursement = function () {
+                const selectedLoanIds = Object.keys(scope.disbursementApprovalSelected)
+                    .filter(id => scope.disbursementApprovalSelected[id]);
 
-            // Bulk Disbursement Rejection (requires reason)
+                if (!selectedLoanIds.length) return;
+
+                const selectedLoans = {};
+                selectedLoanIds.forEach(id => {
+                    selectedLoans[id] = scope.disbursementApprovalTemplate[id];
+                });
+
+                scope.openBulkActionModal({
+                    actionName: "disbursementApproval",
+                    templateUrl: 'disbursementapproval.html',
+                    template: selectedLoans, // only selected loans
+                    command: "disbursementapproval",
+                    extraBodyBuilder: function (loan) {
+                        return {
+                            actualDisbursementDate: dateFilter(new Date(), scope.df),
+                            dateFormat: scope.df,
+                            locale: scope.optlang.code,
+                            note: loan.note || "",
+                            externalId: loan.externalId || "",
+                            resultCode: loan.resultCode || "",
+                            paymentTypeId: loan.paymentType?.id || null,
+                            accountNumber: loan.accountNumber || "",
+                            checkNumber: loan.checkNumber || "",
+                            routingCode: loan.routingCode || "",
+                            receiptNumber: loan.receiptNumber || "",
+                            bankNumber: loan.bankNumber || "",
+                            transactionAmount: loan.principal || null,
+                            postDatedChecks: null,
+                            netDisbursalAmount: loan.expectedNetDisbursalAmount || loan.netDisbursalAmount || null
+                        };
+                    },
+                    successMessage: "Bulk disbursement approval completed.",
+                    failureMessage: "Bulk disbursement approval failed."
+                });
+            };
+
+// Bulk Disbursement Rejection
             scope.rejectDisbursement = () => scope.openBulkActionModal({
                 actionName: 'disbursementRejection',
                 templateUrl: 'disbursementrejection.html',
@@ -657,7 +697,7 @@
                 failureMessage: "Bulk disbursement rejection failed."
             });
 
-            // Bulk Loan Reschedule Approval (custom URL)
+// Bulk Loan Reschedule Approval (custom URL)
             scope.approveBulkLoanReschedule = () => scope.openBulkActionModal({
                 actionName: "bulkLoanRescheduleApproval",
                 templateUrl: 'loanreschedule.html',
