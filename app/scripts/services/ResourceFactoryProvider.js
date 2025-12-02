@@ -769,20 +769,20 @@
                     loanDecisionEngineResource: defineResource(apiVer + "/loans/decision/reviewApplication/:loanId", { loanId: '@loanId' }, {
                         reviewApplication: { method: 'POST', params: {} },
                     }),
-                    undoLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/reviewApplication/:loanId", { loanId: '@loanId' }, {
-                        undoReviewApplication: { method: 'POST', params: {} },
+                    rejectLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/reviewApplication/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectReviewApplication: { method: 'POST', params: {} },
                     }),
                     collateralReviewLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/collateralReview/:loanId", { loanId: '@loanId' }, {
                         collateralReview: { method: 'POST', params: {} },
                     }),
-                    undoCollateralReviewLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/collateralReview/:loanId", { loanId: '@loanId' }, {
-                        undoCollateralReview: { method: 'POST', params: {} },
+                    rejectCollateralReviewLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/collateralReview/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectCollateralReview: { method: 'POST', params: {} },
                     }),
                     approveDueDiligenceLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/dueDiligence/:loanId", { loanId: '@loanId' }, {
                         approveDueDiligence: { method: 'POST', params: {} },
                     }),
-                    undoDueDiligenceLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/dueDiligence/:loanId", { loanId: '@loanId' }, {
-                        undoDueDiligence: { method: 'POST', params: {} },
+                    rejectDueDiligenceLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/dueDiligence/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectDueDiligence: { method: 'POST', params: {} },
                     }),
                     dueDiligenceLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/template/:loanId", { loanId: '@loanId' }, {
                         getTemplate: { method: 'GET', params: {} },
@@ -808,38 +808,38 @@
                     icReviewLevelOneLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelOne/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelOne: { method: 'POST', params: {} },
                     }),
-                    undoIcReviewLevelOneLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/icReviewDecisionLevelOne/:loanId", { loanId: '@loanId' }, {
-                        undoIcReviewLevelOne: { method: 'POST', params: {} },
+                    rejectIcReviewLevelOneLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelOne/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelOne: { method: 'POST', params: {} },
                     }),
                     icReviewLevelTwoLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelTwo/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelTwo: { method: 'POST', params: {} },
                     }),
-                    undoIcReviewLevelTwoLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/icReviewDecisionLevelTwo/:loanId", { loanId: '@loanId' }, {
-                        undoIcReviewLevelTwo: { method: 'POST', params: {} },
+                    rejectIcReviewLevelTwoLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelTwo/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelTwo: { method: 'POST', params: {} },
                     }),
                     icReviewLevelThreeLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelThree/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelThree: { method: 'POST', params: {} },
                     }),
-                    undoIcReviewLevelThreeLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/icReviewDecisionLevelThree/:loanId", { loanId: '@loanId' }, {
-                        undoIcReviewLevelThree: { method: 'POST', params: {} },
+                    rejectIcReviewLevelThreeLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelThree/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelThree: { method: 'POST', params: {} },
                     }),
                     icReviewLevelFourLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFour/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelFour: { method: 'POST', params: {} },
                     }),
-                    undoIcReviewLevelFourLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/icReviewDecisionLevelFour/:loanId", { loanId: '@loanId' }, {
-                        undoIcReviewLevelFour: { method: 'POST', params: {} },
+                    rejectIcReviewLevelFourLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFour/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelFour: { method: 'POST', params: {} },
                     }),
                     icReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFive/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelFive: { method: 'POST', params: {} },
                     }),
-                    undoIcReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/icReviewDecisionLevelFive/:loanId", { loanId: '@loanId' }, {
-                        undoIcReviewLevelFive: { method: 'POST', params: {} },
+                    rejectIcReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFive/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelFive: { method: 'POST', params: {} },
                     }),
                     prepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/prepareAndSignContract/:loanId", { loanId: '@loanId' }, {
                         acceptPrepareAndSignContract: { method: 'POST', params: {} },
                     }),
-                    undoPrepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/undo/prepareAndSignContract/:loanId", { loanId: '@loanId' }, {
-                        undoPrepareAndSignContract: { method: 'POST', params: {} },
+                    rejectPrepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/prepareAndSignContract/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectPrepareAndSignContract: { method: 'POST', params: {} },
                     }),
                     getAllLoansPendingDecisionEngineResource: defineResource(apiVer + "/loans/decision/getAllLoansPendingDecisionEngine/:nextLoanDecisionState", { nextLoanDecisionState: '@nextLoanDecisionState' }, {
                         getAll: { method: 'GET', params: {}, isArray: true },
