@@ -149,35 +149,62 @@
                     case "reviewapplication":
                         location.path('/loanaccount/' + accountId + '/reviewapplication');
                         break;
+                    case "rejectreviewapplication":
+                        location.path('/loanaccount/' + accountId + '/rejectreviewapplication');
+                        break;
                     case "duediligence":
                         location.path('/viewloanaccount/' + accountId + '/duediligence');
+                        break;
+                    case "rejectduediligence":
+                        location.path('/loanaccount/' + accountId + '/rejectduediligence');
                         break;
                     case "collateralreview":
                         location.path('/loanaccount/' + accountId + '/collateralreview');
                         break;
+                    case "rejectcollateralreview":
+                        location.path('/loanaccount/' + accountId + '/rejectcollateralreview');
+                        break;
                     case "icreviewlevelone":
                         location.path('/loanaccount/' + accountId + '/icreviewlevelone');
                         break;
-                     case "icreviewleveltwo":
-                         location.path('/loanaccount/' + accountId + '/icreviewleveltwo');
-                         break;
-                     case "icreviewlevelthree":
-                          location.path('/loanaccount/' + accountId + '/icreviewlevelthree');
-                          break;
-                     case "icreviewlevelfour":
-                          location.path('/loanaccount/' + accountId + '/icreviewlevelfour');
-                          break;
-                     case "icreviewlevelfive":
-                          location.path('/loanaccount/' + accountId + '/icreviewlevelfive');
-                          break;
-                      case "prepareandsigncontract":
-                          location.path('/loanaccount/' + accountId + '/prepareandsigncontract');
-                          break;
-                      case "crbVerification":
-                            resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId},function (data) {
-                                   scope.getCrbReport();
-                                   location.path('/viewloanaccount/' + accountId);
-                               });
+                    case "rejecticreviewlevelone":
+                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelone');
+                        break;
+                    case "icreviewleveltwo":
+                        location.path('/loanaccount/' + accountId + '/icreviewleveltwo');
+                        break;
+                    case "rejecticreviewleveltwo":
+                        location.path('/loanaccount/' + accountId + '/rejecticreviewleveltwo');
+                        break;
+                    case "icreviewlevelthree":
+                        location.path('/loanaccount/' + accountId + '/icreviewlevelthree');
+                        break;
+                    case "rejecticreviewlevelthree":
+                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelthree');
+                        break;
+                    case "icreviewlevelfour":
+                        location.path('/loanaccount/' + accountId + '/icreviewlevelfour');
+                        break;
+                    case "rejecticreviewlevelfour":
+                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelfour');
+                        break;
+                    case "icreviewlevelfive":
+                        location.path('/loanaccount/' + accountId + '/icreviewlevelfive');
+                        break;
+                    case "rejecticreviewlevelfive":
+                        location.path('/loanaccount/' + accountId + '/rejecticreviewlevelfive');
+                        break;
+                    case "prepareandsigncontract":
+                        location.path('/loanaccount/' + accountId + '/prepareandsigncontract');
+                        break;
+                    case "rejectprepareandsigncontract":
+                        location.path('/loanaccount/' + accountId + '/rejectprepareandsigncontract');
+                        break;
+                    case "crbVerification":
+                        resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId}, function (data) {
+                            scope.getCrbReport();
+                            location.path('/viewloanaccount/' + accountId);
+                        });
 
                             break;
                       case "crbVerificationKenya":
@@ -287,103 +314,163 @@
                         scope.choice = true;
                     }
                     function getLoanStage(data) {
-                    if((data.isExtendLoanLifeCycleConfig == false)){
+                        if((data.isExtendLoanLifeCycleConfig == false)){
+                            return {
+                                name: "button.approve",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'APPROVE_LOAN'
+                            };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState == null || data.loanDecisionState == ""))){
                         return {
-                            name: "button.approve",
+                            name: "button.reviewapplication",
                             icon: "fa fa-check",
-                            taskPermissionName: 'APPROVE_LOAN'
+                            taskPermissionName: 'ACCEPT_LOANAPPLICATIONREVIEW'
                         };
-                    }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState == null || data.loanDecisionState == ""))){
-                    return {
-                        name: "button.reviewapplication",
-                        icon: "fa fa-check",
-                        taskPermissionName: 'ACCEPT_LOANAPPLICATIONREVIEW'
-                    };
-                    }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "REVIEW_APPLICATION"))){
-                    return {
-                        name: "button.duediligence",
-                        icon: "fa fa-check",
-                        taskPermissionName: 'ACCEPT_DUEDILIGENCE'
-                    };
-                    }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "DUE_DILIGENCE"))){
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "REVIEW_APPLICATION"))){
                         return {
-                            name: "button.icreviewlevelone",
+                            name: "button.duediligence",
                             icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELONE'
-                    };
-                    }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_ONE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_TWO"))){
+                            taskPermissionName: 'ACCEPT_DUEDILIGENCE'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "DUE_DILIGENCE"))){
+                            return {
+                                name: "button.icreviewlevelone",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELONE'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_ONE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_TWO"))){
+                            return {
+                            name: "button.icreviewleveltwo",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_TWO" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_THREE"))){
                         return {
-                        name: "button.icreviewleveltwo",
-                        icon: "fa fa-check",
-                        taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO'
-                    };
-                    }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_TWO" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_THREE"))){
-                    return {
-                        name: "button.icreviewlevelthree",
-                        icon: "fa fa-check",
-                        taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE'
-                    };
-                }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_THREE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FOUR"))){
-                    return {
-                    name: "button.icreviewlevelfour",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR'
-                };
-                }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_FOUR" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FIVE"))){
-                return {
-                    name: "button.icreviewlevelfive",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE'
-                };
-            }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
-                return {
-                    name: "button.prepareandsigncontract",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'ACCEPT_LOANPREPAREANDSIGNCONTRACT'
-                };
-            } else if(((data.isExtendLoanLifeCycleConfig == true) && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"))){
-                return {
-                    name: "button.approve",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'APPROVE_LOAN'
-                };
-            }else{
-                    console.log("No Options Found here . . . . ");
+                            name: "button.icreviewlevelthree",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_THREE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FOUR"))){
+                            return {
+                            name: "button.icreviewlevelfour",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_FOUR" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FIVE"))){
+                        return {
+                            name: "button.icreviewlevelfive",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
+                            return {
+                                name: "button.prepareandsigncontract",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'ACCEPT_LOANPREPAREANDSIGNCONTRACT'
+                            };
+                        } else if(((data.isExtendLoanLifeCycleConfig == true) && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"))){
+                            return {
+                                name: "button.approve",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'APPROVE_LOAN'
+                            };
+                        }else{
+                                console.log("No Options Found here . . . . ");
+                                }
                     }
+
+                    function getUndoLoanStage(data) {
+                        if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "REVIEW_APPLICATION"))) {
+                            return {
+                                name: "button.rejectreviewapplication",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANAPPLICATIONREVIEW'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "DUE_DILIGENCE"))) {
+                            return {
+                                name: "button.rejectduediligence",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_DUEDILIGENCE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_ONE"))) {
+                            return {
+                                name: "button.rejecticreviewlevelone",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELONE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_TWO"))) {
+                            return {
+                                name: "button.rejecticreviewleveltwo",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELTWO'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_THREE"))) {
+                            return {
+                                name: "button.rejecticreviewlevelthree",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELTHREE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_FOUR"))) {
+                            return {
+                                name: "button.rejecticreviewlevelfour",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELFOUR'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_FIVE"))) {
+                            return {
+                                name: "button.rejecticreviewlevelfive",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELFIVE'
+                            };
+                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "PREPARE_AND_SIGN_CONTRACT"))) {
+                            return {
+                                name: "button.rejectprepareandsigncontract",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'REJECT_LOANPREPAREANDSIGNCONTRACT'
+                            };
+                        } else {
+                            console.log("No Options Found here . . . . ");
+                            return null;
+                        }
                     }
+
                     function getCrbActionOptions(data) {
-                    if((data.currency.code == "RWF")){
-                    return {
-                        name: "button.crbVerification",
-                        icon: "fa fa-search",
-                        taskPermissionName: 'VERIFYLOANONTRANSUNIONCRBRWANDA_LOAN'
-                    };
+                        if ((data.currency.code == "RWF")) {
+                            return {
+                                name: "button.crbVerification",
+                                icon: "fa fa-search",
+                                taskPermissionName: 'VERIFYLOANONTRANSUNIONCRBRWANDA_LOAN'
+                            };
+                        }
                     }
-                    }
+
                     function getIdentityVerificationActionOptions(data) {
-                    if((data.currency.code == "KES"  && data.clientLegalForm == 1)){
-                        return {
-                        name: "button.crbVerificationKenya",
-                        taskPermissionName: 'VERIFYLOANONMETROPOLCRBKENYA_LOAN'
-                        };
+                        if ((data.currency.code == "KES" && data.clientLegalForm == 1)) {
+                            return {
+                                name: "button.crbVerificationKenya",
+                                taskPermissionName: 'VERIFYLOANONMETROPOLCRBKENYA_LOAN'
+                            };
+                        }
                     }
-                    }
+
                     function getCreditInfoEnhancedActionOptions(data) {
-                    if((data.currency.code == "KES")){
-                        return {
-                        name: "button.verifyLoanCreditInfoEnhancedOnMetropolKenya",
-                        taskPermissionName: 'VERIFYLOANCREDITINFOENHANCEDONMETROPOLCRBKENYA_LOAN'
-                        };
+                        if ((data.currency.code == "KES")) {
+                            return {
+                                name: "button.verifyLoanCreditInfoEnhancedOnMetropolKenya",
+                                taskPermissionName: 'VERIFYLOANCREDITINFOENHANCEDONMETROPOLCRBKENYA_LOAN'
+                            };
+                        }
                     }
-                    }
+
                     function getCreditReportJsonActionOptions(data) {
-                    if((data.currency.code == "KES")){
-                        return {
-                        name: "button.verifyLoanReportJsonOnMetropolKenya",
-                        taskPermissionName: 'VERIFYLOANREPORTJSONONMETROPOLCRBKENYA_LOAN'
-                        };
+                        if ((data.currency.code == "KES")) {
+                            return {
+                                name: "button.verifyLoanReportJsonOnMetropolKenya",
+                                taskPermissionName: 'VERIFYLOANREPORTJSONONMETROPOLCRBKENYA_LOAN'
+                            };
+                        }
                     }
-                    }
+
                     if (data.status.value == "Submitted and pending approval") {
                         scope.buttons = { singlebuttons: [
                             {
@@ -392,6 +479,7 @@
                                 taskPermissionName: 'CREATE_LOANCHARGE'
                             },
                             getLoanStage(data),
+                            getUndoLoanStage(data),
                             getCrbActionOptions(data),
                             {
                                 name: "button.modifyapplication",
@@ -1001,8 +1089,8 @@
                 }
                 scope.totalDisbursedAmount = 0;
                 scope.count = 0;
-                for(var i in scope.loandetails.disbursementDetails){
-                    if(scope.loandetails.disbursementDetails[i].actualDisbursementDate != null){
+                for (var i in scope.loandetails.disbursementDetails) {
+                    if (scope.loandetails.disbursementDetails[i].actualDisbursementDate != null) {
                         scope.totalDisbursedAmount += scope.loandetails.disbursementDetails[i].principal;
                     }
                     else{
@@ -1094,8 +1182,8 @@
                 resolve: {
                             installmentMonthsOptions: function() {
                             return scope.installmentMonthsOptions;
-                            }
                         }
+                    }
 
             });
 
