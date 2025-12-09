@@ -188,7 +188,18 @@
                     scope.isTransaction = true;
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'DISBURSE_LOAN';
-                    scope.fetchEntities('m_loan','DISBURSE');
+                    scope.fetchEntities('m_loan', 'DISBURSE');
+
+                    // UI toggles for rejection
+                    scope.isReject = false;
+                    scope.toggleReject = function () {
+                        scope.isReject = !scope.isReject;
+                    };
+                    scope.rejectReason = "";
+                    scope.showRejectButton = true;
+
+                    // attach commands for later use in submit()
+                    scope.disburseCommands = {command, rejectCommand};
                     break;
                 case "disbursetosavings":
                     scope.modelName = 'actualDisbursementDate';
@@ -510,41 +521,44 @@
                       scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELONE';
                       resourceFactory.loanTemplateResource.get({loanId: scope.accountId, templateType: 'icreview'}, function (data) {
 
-                          scope.title = 'label.heading.icreviewleveloneloanaccount';
-                          scope.labelName = 'label.input.icReviewOn';
-                          scope.modelName = 'icReviewOn';
-                          scope.formData[scope.modelName] =  new Date();
-                          scope.noteFieldMandatory = true;
-                          scope.icreviewTemplate = data;
-                      });
+                        scope.title = 'label.heading.icreviewleveloneloanaccount';
+                        scope.labelName = 'label.input.icReviewOn';
+                        scope.modelName = 'icReviewOn';
+                        scope.formData[scope.modelName] = new Date();
+                        scope.noteFieldMandatory = true;
+                        scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
+                    });
 
                       break;
                 case "icreviewleveltwo":
                      scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO';
                      resourceFactory.loanTemplateResource.get({loanId: scope.accountId, templateType: 'icreview'}, function (data) {
 
-                         scope.title = 'label.heading.icreviewleveltwoloanaccount';
-                         scope.labelName = 'label.input.icReviewOn';
-                         scope.modelName = 'icReviewOn';
-                         scope.formData[scope.modelName] =  new Date();
-                         scope.noteFieldMandatory = true;
-                         scope.icreviewTemplate = data;
-                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
-                     });
+                        scope.title = 'label.heading.icreviewleveltwoloanaccount';
+                        scope.labelName = 'label.input.icReviewOn';
+                        scope.modelName = 'icReviewOn';
+                        scope.formData[scope.modelName] = new Date();
+                        scope.noteFieldMandatory = true;
+                        scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                    });
 
                      break;
                 case "icreviewlevelthree":
                       scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE';
                       resourceFactory.loanTemplateResource.get({loanId: scope.accountId, templateType: 'icreview'}, function (data) {
 
-                          scope.title = 'label.heading.icreviewlevelthreeloanaccount';
-                          scope.labelName = 'label.input.icReviewOn';
-                          scope.modelName = 'icReviewOn';
-                          scope.formData[scope.modelName] =  new Date();
-                          scope.noteFieldMandatory = true;
-                          scope.icreviewTemplate = data;
-                          scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
-                      });
+                        scope.title = 'label.heading.icreviewlevelthreeloanaccount';
+                        scope.labelName = 'label.input.icReviewOn';
+                        scope.modelName = 'icReviewOn';
+                        scope.formData[scope.modelName] = new Date();
+                        scope.noteFieldMandatory = true;
+                        scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                    });
 
                       break;
                 case "icreviewlevelfour":
@@ -557,6 +571,7 @@
                         scope.formData[scope.modelName] =  new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
                     });
 
@@ -571,6 +586,7 @@
                         scope.formData[scope.modelName] =  new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
                     });
 
@@ -612,8 +628,8 @@
             scope.submit = function () {
                 scope.processDate = false;
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
-                    scope.formData.note.$setTouched();
+                if (scope.showNoteField && scope.noteFieldMandatory && scope.loanactionform.note.$invalid) {
+                    scope.loanactionform.note.$setTouched();
                     window.alert('Note field is mandatory');
                     return; // Prevent submission if note is invalid
                 }
@@ -969,7 +985,7 @@
                 }
 
                 // Call backend API to reject disbursement and move back to awaiting approval
-                resourceFactory.LoanAccountResource.save(params, {}, function (data) {
+                resourceFactory.LoanAccountResource.save(params, scope.formData, function (data) {
                     // Redirect to loan view after successful rejection
                     location.path('/viewloanaccount/' + data.loanId);
                 });
@@ -999,8 +1015,8 @@
 
             scope.handleReject = function () {
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
-                    scope.formData.note.$setTouched();
+                if (scope.showNoteField && scope.noteFieldMandatory && scope.loanactionform.note.$invalid) {
+                    scope.loanactionform.note.$setTouched();
                     alert("Note field is mandatory");
                     return; // Prevent submission if note is invalid
                 }

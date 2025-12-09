@@ -370,8 +370,7 @@
             </div>
             <div class="form-group" ng-show="showNoteField">
                 <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate}}
-                    <span ng-show="noteFieldMandatory"
-                            class="required">*</span>
+                    <span ng-show="noteFieldMandatory" class="required" >*</span>
                 </label>
 
                 <div class="col-sm-3">
@@ -504,23 +503,37 @@
                     <div class="form-group" ng-show="showDelete || showwaiveforspecicficduedate">
                         <label class="control-label col-sm-2 col-md-offset-10">{{ 'label.areyousure' | translate}}</label>
                     </div>
-                    <div class="col-md-offset-2 col-md-offset-10" ng-show="showDelete || showwaiveforspecicficduedate">
-                        <button type="reset" ng-click="cancel()" class="btn btn-default">{{ 'label.button.cancel' |
-                            translate}}
-                        </button>
-                        <button type="submit" has-permission='{{taskPermissionName}}' wz-next
-                                class="btn btn-primary">{{
-                            'label.button.confirm' |
-                            translate}}
-                        </button>
-                    </div>
-                    <div class="col-md-offset-2 col-md-offset-10" ng-hide="showDelete || showwaiveforspecicficduedate">
-                        <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' |
-                            translate}}
-                        </button>
-                        <button id="save" type="submit" has-permission='{{taskPermissionName}}' wz-next class="btn btn-primary">{{
-                            'label.button.save' | translate}}
-                        </button>
+
+                    <!-- NORMAL ACTION SECTION -->
+                    <div ng-hide="showDelete || showwaiveforspecicficduedate" class="row">
+
+                        <div class="col-md-12 text-right">
+
+                            <button id="cancel" type="reset"
+                                    class="btn btn-default"
+                                    ng-click="cancel()">
+                                {{ 'label.button.cancel' | translate }}
+                            </button>
+
+                            <!-- REJECT BUTTON -->
+                            <button
+                                    ng-if="showRejectButton"
+                                    id="reject"
+                                    type="button"
+                                    class="btn btn-danger"
+                                    ng-click="handleReject()">
+                                {{ 'label.button.reject' | translate }}
+                            </button>
+
+
+                            <button id="save" type="submit"
+                                    has-permission='{{taskPermissionName}}'
+                                    wz-next class="btn btn-primary">
+                                {{ 'label.button.save' | translate }}
+                            </button>
+
+                        </div>
+
                     </div>
                 </div>
             </div>

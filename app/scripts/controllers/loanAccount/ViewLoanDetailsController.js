@@ -310,42 +310,38 @@
                     };
                     }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_ONE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_TWO"))){
                         return {
-                        name: "button.icreviewleveltwo",
-                        icon: "fa fa-check",
-                        taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO'
-                    };
-                    }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_TWO" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_THREE"))){
-                    return {
-                        name: "button.icreviewlevelthree",
-                        icon: "fa fa-check",
-                        taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE'
-                    };
-                }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_THREE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FOUR"))){
-                    return {
-                    name: "button.icreviewlevelfour",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR'
-                };
-                }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_FOUR" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FIVE"))){
-                return {
-                    name: "button.icreviewlevelfive",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE'
-                };
-            }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
-                return {
-                    name: "button.prepareandsigncontract",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'ACCEPT_LOANPREPAREANDSIGNCONTRACT'
-                };
-            } else if(((data.isExtendLoanLifeCycleConfig == true) && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"))){
-                return {
-                    name: "button.approve",
-                    icon: "fa fa-check",
-                    taskPermissionName: 'APPROVE_LOAN'
-                };
-            }else{
-                    console.log("No Options Found here . . . . ");
+                            name: "button.icreviewlevelthree",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_THREE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FOUR"))){
+                            return {
+                            name: "button.icreviewlevelfour",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_FOUR" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FIVE"))){
+                        return {
+                            name: "button.icreviewlevelfive",
+                            icon: "fa fa-check",
+                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE'
+                        };
+                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
+                            return {
+                                name: "button.prepareandsigncontract",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'ACCEPT_LOANPREPAREANDSIGNCONTRACT'
+                            };
+                        } else if(((data.isExtendLoanLifeCycleConfig == true) && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"))){
+                            return {
+                                name: "button.approve",
+                                icon: "fa fa-check",
+                                taskPermissionName: 'APPROVE_LOAN'
+                            };
+                        }else{
+                                console.log("No Options Found here . . . . ");
+                            return null;
+                                }
                     }
                     }
                     function getCrbActionOptions(data) {
