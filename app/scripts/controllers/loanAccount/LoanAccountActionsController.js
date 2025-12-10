@@ -239,6 +239,7 @@
                         scope.isReject = !scope.isReject;
                     };
                     scope.rejectReason = "";
+                    scope.showRejectButton = true;
 
                     // attach commands for later use in submit()
                     scope.disburseCommands = {command, rejectCommand};
@@ -651,6 +652,7 @@
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                     });
 
                     break;
@@ -674,6 +676,7 @@
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
                     });
 
@@ -698,6 +701,7 @@
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
                     });
 
@@ -722,6 +726,7 @@
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
                     });
 
@@ -746,6 +751,7 @@
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.icreviewTemplate = data;
+                        scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
                     });
 
@@ -804,6 +810,12 @@
 
             scope.submit = function () {
                 scope.processDate = false;
+                // Only validate the note field if it is shown and mandatory
+                if (scope.showNoteField && scope.noteFieldMandatory && scope.loanactionform.note.$invalid) {
+                    scope.loanactionform.note.$setTouched();
+                    window.alert('Note field is mandatory');
+                    return; // Prevent submission if note is invalid
+                }
                 var params = {command: scope.action};
                 if (scope.action == "recoverguarantee") {
                     params.command = "recoverGuarantees";
@@ -1242,11 +1254,60 @@
                 }
 
                 // Call backend API to reject disbursement and move back to awaiting approval
-                resourceFactory.LoanAccountResource.save(params, {}, function (data) {
+                resourceFactory.LoanAccountResource.save(params, scope.formData, function (data) {
                     // Redirect to loan view after successful rejection
                     location.path('/viewloanaccount/' + data.loanId);
                 });
             };
+
+            scope.rejectICLevel = function () {
+                var params = {loanId: scope.accountId, command: 'reject'};
+
+                var confirmReject = confirm("Are you sure you want to reject this loan level?");
+                if (!confirmReject) {
+                    return;
+                }
+                var payload = {
+                    rejectedOnDate: dateFilter(scope.formData[scope.modelName],scope.df) || dateFilter(new Date(),scope.df),
+                    dateFormat: scope.df,
+                    locale: scope.optlang.code,
+                    note: scope.formData.note
+
+                };
+
+                // Call backend API to reject disbursement and move back to awaiting approval
+                resourceFactory.LoanAccountResource.save(params, payload, function (data) {
+                    // Redirect to loan view after successful rejection
+                    location.path('/viewloanaccount/' + data.loanId);
+                });
+            };
+
+            scope.handleReject = function () {
+                // Only validate the note field if it is shown and mandatory
+                if (scope.showNoteField && scope.noteFieldMandatory && scope.loanactionform.note.$invalid) {
+                    scope.loanactionform.note.$setTouched();
+                    alert("Note field is mandatory");
+                    return; // Prevent submission if note is invalid
+                }
+                switch (scope.action) {
+                    case 'disbursementpreapprovalrequest':
+                    case 'approveDisbursement':
+                        scope.rejectDisbursement();
+                        break;
+                    case 'icreviewlevelone':
+                    case 'icreviewleveltwo':
+                    case 'icreviewlevelthree':
+                    case 'icreviewlevelfour':
+                    case 'icreviewlevelfive':
+                        scope.rejectICLevel();
+                        break;
+                    // add more cases as needed
+                    default:
+                        // fallback or error
+                        break;
+                }
+            };
+
 
 
         }

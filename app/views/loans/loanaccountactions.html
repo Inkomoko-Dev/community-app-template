@@ -372,8 +372,7 @@
             </div>
             <div class="form-group" ng-show="showNoteField">
                 <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate}}
-                    <span ng-show="noteFieldMandatory"
-                            class="required">*</span>
+                    <span ng-show="noteFieldMandatory" class="required" >*</span>
                 </label>
                 <div class="col-sm-3">
                     <textarea id="note" rows="2" class="form-control" ng-model="formData.note" ng-required="noteFieldMandatory"></textarea>
@@ -541,13 +540,15 @@
                             </button>
 
                             <!-- REJECT BUTTON -->
-                            <button ng-if="action === 'disbursementpreapprovalrequest' || action === 'approveDisbursement'"
+                            <button
+                                    ng-if="showRejectButton"
                                     id="reject"
                                     type="button"
                                     class="btn btn-danger"
-                                    ng-click="rejectDisbursement()">
+                                    ng-click="handleReject()">
                                 {{ 'label.button.reject' | translate }}
                             </button>
+
 
                             <button id="save" type="submit"
                                     has-permission='{{taskPermissionName}}'
