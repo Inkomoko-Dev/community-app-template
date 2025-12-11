@@ -611,6 +611,12 @@
 
             scope.submit = function () {
                 scope.processDate = false;
+                // Only validate the note field if it is shown and mandatory
+                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
+                    scope.formData.note.$setTouched();
+                    window.alert('Note field is mandatory');
+                    return; // Prevent submission if note is invalid
+                }
                 var params = {command: scope.action};
                 if(scope.action == "recoverguarantee"){
                     params.command = "recoverGuarantees";
