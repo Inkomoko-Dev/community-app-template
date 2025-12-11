@@ -1254,7 +1254,7 @@
                 }
 
                 // Call backend API to reject disbursement and move back to awaiting approval
-                resourceFactory.LoanAccountResource.save(params, scope.formData, function (data) {
+                resourceFactory.LoanAccountResource.save(params, {}, function (data) {
                     // Redirect to loan view after successful rejection
                     location.path('/viewloanaccount/' + data.loanId);
                 });
