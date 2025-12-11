@@ -954,7 +954,71 @@
                 return result;
             }
 
-            
+            scope.rejectDisbursement = function () {
+                var params = {loanId: scope.accountId, command: 'rejectDisbursement'};
+
+                var confirmReject = confirm("Are you sure you want to reject this disbursement?");
+                if (!confirmReject) {
+                    return;
+                }
+
+                // Call backend API to reject disbursement and move back to awaiting approval
+                resourceFactory.LoanAccountResource.save(params, {}, function (data) {
+                    // Redirect to loan view after successful rejection
+                    location.path('/viewloanaccount/' + data.loanId);
+                });
+            };
+
+            scope.rejectICLevel = function () {
+                var params = {loanId: scope.accountId, command: 'reject'};
+
+                var confirmReject = confirm("Are you sure you want to reject this loan level?");
+                if (!confirmReject) {
+                    return;
+                }
+                var payload = {
+                    rejectedOnDate: dateFilter(scope.formData[scope.modelName],scope.df) || dateFilter(new Date(),scope.df),
+                    dateFormat: scope.df,
+                    locale: scope.optlang.code,
+                    note: scope.formData.note
+
+                };
+
+                // Call backend API to reject disbursement and move back to awaiting approval
+                resourceFactory.LoanAccountResource.save(params, payload, function (data) {
+                    // Redirect to loan view after successful rejection
+                    location.path('/viewloanaccount/' + data.loanId);
+                });
+            };
+
+            scope.handleReject = function () {
+                // Only validate the note field if it is shown and mandatory
+                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
+                    scope.formData.note.$setTouched();
+                    alert("Note field is mandatory");
+                    return; // Prevent submission if note is invalid
+                }
+                switch (scope.action) {
+                    case 'disbursementpreapprovalrequest':
+                    case 'approveDisbursement':
+                        scope.rejectDisbursement();
+                        break;
+                    case 'icreviewlevelone':
+                    case 'icreviewleveltwo':
+                    case 'icreviewlevelthree':
+                    case 'icreviewlevelfour':
+                    case 'icreviewlevelfive':
+                        scope.rejectICLevel();
+                        break;
+                    // add more cases as needed
+                    default:
+                        // fallback or error
+                        break;
+                }
+            };
+
+
+
         }
     });
     mifosX.ng.application.controller('LoanAccountActionsController', ['$scope','$rootScope', 'ResourceFactory', '$location', '$routeParams', 'dateFilter', mifosX.controllers.LoanAccountActionsController]).run(function ($log) {
