@@ -43,39 +43,17 @@
             };
 
             /**
-             * Get status badge CSS class
+             * Get status badge CSS class based on hasPassed field
              */
-            scope.getStatusClass = function(status) {
-                switch(status) {
-                    case 'FAILED':
-                        return 'label-danger';
-                    case 'SUCCESS':
-                        return 'label-success';
-                    case 'PENDING':
-                        return 'label-warning';
-                    case 'RETRY':
-                        return 'label-info';
-                    default:
-                        return 'label-default';
-                }
+            scope.getStatusClass = function(hasPassed) {
+                return hasPassed === true || hasPassed === 'true' ? 'label-success' : 'label-danger';
             };
 
             /**
-             * Get status icon
+             * Get status icon based on hasPassed field
              */
-            scope.getStatusIcon = function(status) {
-                switch(status) {
-                    case 'FAILED':
-                        return 'fa fa-times-circle';
-                    case 'SUCCESS':
-                        return 'fa fa-check-circle';
-                    case 'PENDING':
-                        return 'fa fa-clock-o';
-                    case 'RETRY':
-                        return 'fa fa-redo';
-                    default:
-                        return 'fa fa-question-circle';
-                }
+            scope.getStatusIcon = function(hasPassed) {
+                return hasPassed === true || hasPassed === 'true' ? 'fa fa-check-circle' : 'fa fa-times-circle';
             };
 
             /**
@@ -145,6 +123,12 @@
                 scope.selectedStatus = 'all';
                 scope.searchText = '';
                 scope.applyFilters();
+            };
+
+            scope.toDate = function (arr) {
+                if (!arr) return null;
+                // Handle array with [year, month, day] or [year, month, day, hours, minutes, seconds]
+                return new Date(arr[0], arr[1] - 1, arr[2], arr[3] || 0, arr[4] || 0, arr[5] || 0);
             };
 
             // Initialize on controller load
