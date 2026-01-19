@@ -7,7 +7,7 @@
     <div class="card">
         <div class="content">
             <div class="toolbar">
-                <h2>CRB Posting Logger</h2>
+                <h4>CRB Posting Logger</h4>
             </div>
 
             <!-- Alert Messages -->
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Filter and Action Buttons -->
-            <div class="row" style="margin-bottom: 20px;">
+            <div class="row" style="margin-bottom: 30px;">
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Filter by Status:</label>
@@ -77,15 +77,15 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="log in filteredLogs | limitTo:pageSize:((currentPage-1)*pageSize)" 
-                            ng-class="{'danger': log.status === 'FAILED', 'warning': log.status === 'PENDING'}">
-                            <td>{{ log.id }}</td>
-                            <td>{{ log.loanAccountNumber }}</td>
+                            ng-class="{'danger': log.hasPassed === 'true', 'warning': log.hasPassed === 'false'}">
+                            <td>{{ log.batchId }}</td>
+                            <td>{{ log.loanId }}</td>
                             <td>
-                                <span class="label" ng-class="getStatusClass(log.status)">
-                                    <i ng-class="getStatusIcon(log.status)"></i> {{ log.status }}
+                                <span class="label" ng-class="getStatusClass(log.hasPassed)">
+                                    <i ng-class="getStatusIcon(log.hasPassed)"></i> {{ log.hasPassed ? 'Posted' : 'Not Posted' }}
                                 </span>
                             </td>
-                            <td>{{ log.postedDate | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                            <td>{{ toDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
                             <td><span class="badge" ng-if="log.retryCount > 0">{{ log.retryCount }}</span></td>
                             <td>
                                 <span ng-if="log.errorMessage" title="{{ log.errorMessage }}" class="text-muted">
