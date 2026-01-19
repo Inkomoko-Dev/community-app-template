@@ -1217,6 +1217,9 @@
             .when('/creditreport/thitsaworkUploadCreditbureau/:clientId/:cbId', {
                 templateUrl: 'views/loans/creditReportUpload_ThitsaWorks.html'
             })
+            .when('/crbpostinglogger/:loanId/:clientId', {
+                templateUrl: 'views/loans/crb-posting-logger.html'
+            })
             .when('/addbusinessdetail/:clientId', {
                 templateUrl: 'views/clients/addClientBusinessDetail.html'
              })
