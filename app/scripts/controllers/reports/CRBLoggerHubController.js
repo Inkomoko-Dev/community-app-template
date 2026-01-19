@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        CRBLoggerHubController: function (scope, rootScope, http, API_VERSION, resourceFactory, routeParams, location, paginatorService, dateFilter) {
+        CRBLoggerHubController: function (scope, $rootScope, http, API_VERSION, resourceFactory, routeParams, location, paginatorService, dateFilter) {
 
             scope.postingLogs = [];
             scope.filteredLogs = [];
