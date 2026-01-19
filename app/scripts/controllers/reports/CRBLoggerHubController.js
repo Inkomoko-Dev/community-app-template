@@ -14,12 +14,10 @@
              * Fetch all CRB posting logs
              */
             var fetchAllPostingLogs = function() {
-                var requestUrl = $rootScope.hostUrl + API_VERSION + '/crb/posting-logs';
-                
-                http.get(requestUrl).success(function(data) {
-                    scope.postingLogs = data.postingLogs || [];
+                resourceFactory.crbPostingReportsViewResource.query(function(data) {
+                    scope.postingLogs = data || [];
                     scope.applyFilters();
-                }).error(function(data, status, headers, config) {
+                }, function(data) {
                     scope.error = 'Unable to fetch CRB posting logs. Error: ' + (data.defaultUserMessage || 'Unknown error');
                 });
             };
