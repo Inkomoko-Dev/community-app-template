@@ -1,0 +1,131 @@
+<div class="content-container" ng-controller="CRBLoggerHubController">
+    <ul class="breadcrumb">
+        <li><a href="#/reports/all">{{ 'label.anchor.reports' | translate }}</a></li>
+        <li class="active">CRB Posting Logger</li>
+    </ul>
+    
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h2>CRB Posting Logger</h2>
+            </div>
+            
+            <p class="text-muted" style="margin-bottom: 20px;">
+                Search and view CRB posting logs for failed loan postings. Select a loan account to view its posting history and retry failed submissions.
+            </p>
+
+            <!-- Alert Messages -->
+            <div ng-if="error" class="alert alert-danger alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Error:</strong> {{ error }}
+            </div>
+
+            <!-- Search Section -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-search"></i> Search Loan Account
+                    </h3>
+                </div>
+                
+                <div class="panel-body">
+                    <form name="loanSearchForm" class="form-horizontal" ng-submit="searchLoans()">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="loanQuery">Loan Account / Client:</label>
+                            <div class="col-sm-6">
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="loanQuery"
+                                    ng-model="loanSearch.query" 
+                                    placeholder="Enter loan account number or client name..."
+                                    ng-change="searchLoans()"
+                                    ng-keyup="$event.keyCode === 13 && searchLoans()">
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-default" ng-click="clearSearch()" ng-disabled="!loanSearch.query">
+                                    <i class="fa fa-times"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="panel panel-default" ng-if="loanSearch.query && loanSearch.query.length >= 2">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-list"></i> Search Results 
+                        <span class="badge">{{ loansFound.length }}</span>
+                        <span ng-if="searching" class="pull-right">
+                            <i class="fa fa-spinner fa-spin"></i> Searching...
+                        </span>
+                    </h3>
+                </div>
+
+                <div ng-if="noLoansMessage" class="panel-body">
+                    <div class="alert alert-info">
+                        {{ noLoansMessage }}
+                    </div>
+                </div>
+
+                <table class="table table-striped table-hover" ng-if="loansFound.length > 0">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%">Loan Account</th>
+                            <th style="width: 20%">Client Name</th>
+                            <th style="width: 15%">Loan Type</th>
+                            <th style="width: 15%">Status</th>
+                            <th style="width: 15%">Amount</th>
+                            <th style="width: 20%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="loan in loansFound">
+                            <td>{{ loan.accountNo }}</td>
+                            <td>{{ loan.clientName }}</td>
+                            <td>{{ loan.productName }}</td>
+                            <td>
+                                <span class="label" ng-class="{
+                                    'label-info': loan.status.value === 'Pending',
+                                    'label-success': loan.status.value === 'Active',
+                                    'label-warning': loan.status.value === 'Overpaid',
+                                    'label-danger': loan.status.value === 'Closed',
+                                    'label-default': true
+                                }">
+                                    {{ loan.status.value }}
+                                </span>
+                            </td>
+                            <td>{{ loan.principal | number:2 }}</td>
+                            <td>
+                                <button class="btn btn-xs btn-info" ng-click="selectLoan(loan)" title="View CRB Posting Logs">
+                                    <i class="fa fa-book"></i> View Logs
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Instructions -->
+            <div class="panel panel-info" ng-if="!loanSearch.query || loanSearch.query.length < 2">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <i class="fa fa-info-circle"></i> Instructions
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <ol>
+                        <li>Enter a loan account number or client name in the search field above</li>
+                        <li>Select a loan from the search results</li>
+                        <li>View the CRB posting logs for that loan account</li>
+                        <li>Review error messages and retry failed postings if necessary</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
