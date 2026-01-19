@@ -1220,9 +1220,6 @@
             .when('/crbloggerhub', {
                 templateUrl: 'views/reports/crb-logger-hub.html'
             })
-            .when('/crbpostinglogger/:loanId/:clientId', {
-                templateUrl: 'views/loans/crb-posting-logger.html'
-            })
             .when('/addbusinessdetail/:clientId', {
                 templateUrl: 'views/clients/addClientBusinessDetail.html'
              })
