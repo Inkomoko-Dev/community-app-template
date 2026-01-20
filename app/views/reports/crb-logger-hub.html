@@ -51,9 +51,9 @@
                             <button class="btn btn-default" ng-click="clearFilters()">
                                 <i class="fa fa-refresh"></i> Clear Filters
                             </button>
-                            <button class="btn btn-info" ng-click="exportToCSV()" ng-disabled="filteredLogs.length === 0">
+                            <!-- <button class="btn btn-info" ng-click="exportToCSV()" ng-disabled="filteredLogs.length === 0">
                                 <i class="fa fa-download"></i> Export CSV
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>
@@ -90,8 +90,12 @@
                                 <span ng-if="!log.errorLogs" class="text-muted">-</span>
                             </td>
                             <td>
+                                <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)" 
+                                        ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
+                                    <i class="fa fa-check"></i> Fixed
+                                </button>
                                 <button class="btn btn-xs btn-warning" ng-click="retryPosting(log)" 
-                                        ng-if="log.status === 'FAILED'" title="Retry Posting">
+                                        ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Retry Posting">
                                     <i class="fa fa-redo"></i> Retry
                                 </button>
                             </td>
@@ -114,24 +118,23 @@
                     </div>
                     <div class="col-md-6 text-right">
                         <ul class="pagination pagination-sm" ng-if="filteredLogs.length > pageSize">
-                            <li ng-class="{disabled: currentPage === 1}">
-                                <a href="javascript:void(0)" ng-click="currentPage = 1" ng-disabled="currentPage === 1">First</a>
+                            <li ng-class="{disabled: isFirstPage()}">
+                                <a href="javascript:void(0)" ng-click="currentPage = 1" ng-disabled="isFirstPage()">First</a>
                             </li>
-                            <li ng-class="{disabled: currentPage === 1}">
-                                <a href="javascript:void(0)" ng-click="currentPage = currentPage - 1" ng-disabled="currentPage === 1">Previous</a>
+                            <li ng-class="{disabled: isFirstPage()}">
+                                <a href="javascript:void(0)" ng-click="currentPage = currentPage - 1" ng-disabled="isFirstPage()">Previous</a>
                             </li>
-                            <li ng-repeat="page in [currentPage-1, currentPage, currentPage+1]" 
-                                ng-if="page > 0 && page <= Math.ceil(filteredLogs.length / pageSize)"
+                            <li ng-repeat="page in getPageRange()" 
                                 ng-class="{active: page === currentPage}">
                                 <a href="javascript:void(0)" ng-click="currentPage = page">{{ page }}</a>
                             </li>
-                            <li ng-class="{disabled: currentPage === Math.ceil(filteredLogs.length / pageSize)}">
+                            <li ng-class="{disabled: isLastPage()}">
                                 <a href="javascript:void(0)" ng-click="currentPage = currentPage + 1" 
-                                   ng-disabled="currentPage === Math.ceil(filteredLogs.length / pageSize)">Next</a>
+                                   ng-disabled="isLastPage()">Next</a>
                             </li>
-                            <li ng-class="{disabled: currentPage === Math.ceil(filteredLogs.length / pageSize)}">
-                                <a href="javascript:void(0)" ng-click="currentPage = Math.ceil(filteredLogs.length / pageSize)" 
-                                   ng-disabled="currentPage === Math.ceil(filteredLogs.length / pageSize)">Last</a>
+                            <li ng-class="{disabled: isLastPage()}">
+                                <a href="javascript:void(0)" ng-click="currentPage = getTotalPages()" 
+                                   ng-disabled="isLastPage()">Last</a>
                             </li>
                         </ul>
                     </div>

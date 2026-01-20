@@ -9,6 +9,7 @@
             scope.currentPage = 1;
             scope.pageSize = 10;
             scope.pageSizeOptions = [10, 20, 50, 100];
+            scope.Math = window.Math;
 
             /**
              * Fetch all CRB posting logs
@@ -79,6 +80,24 @@
             };
 
             /**
+             * Mark loan record as fixed and ready to post
+             */
+            scope.markAsFixed = function(logEntry) {
+                if (!confirm('Mark loan #' + logEntry.loanId + ' as fixed? This will update the loan record status.')) {
+                    return;
+                }
+
+                var requestUrl = $rootScope.hostUrl + API_VERSION + '/crb/posting-logs/' + logEntry.id + '/mark-fixed';
+                
+                http.post(requestUrl, { loanId: logEntry.loanId }).success(function(data) {
+                    scope.success = 'Loan record marked as fixed. You can now retry posting.';
+                    fetchAllPostingLogs();
+                }).error(function(data, status, headers, config) {
+                    scope.error = 'Failed to mark loan as fixed. Error: ' + (data.defaultUserMessage || 'Unknown error');
+                });
+            };
+
+            /**
              * Export logs to CSV
              */
             scope.exportToCSV = function() {
@@ -90,7 +109,7 @@
                 var csv = 'Log ID,Loan Account,Status,Posted Date,Retry Count,Error Message\n';
                 
                 scope.filteredLogs.forEach(function(log) {
-                    var postedDate = log.postedDate ? dateFilter(new Date(log.postedDate), 'yyyy-MM-dd HH:mm:ss') : 'N/A';
+                    var postedDate = log.postedDate ? dateFilter(new Date(log.postedDate), 'yyyy-MM-dd') : 'N/A';
                     var errorMsg = (log.errorMessage || 'N/A').replace(/"/g, '""');
                     csv += log.id + ',"' + log.loanAccountNumber + '",' + log.status + ',"' + postedDate + '",' + log.retryCount + ',"' + errorMsg + '"\n';
                 });
@@ -127,6 +146,42 @@
                 scope.selectedStatus = 'all';
                 scope.searchText = '';
                 scope.applyFilters();
+            };
+
+            /**
+             * Get total number of pages
+             */
+            scope.getTotalPages = function() {
+                return Math.ceil(scope.filteredLogs.length / scope.pageSize);
+            };
+
+            /**
+             * Check if on first page
+             */
+            scope.isFirstPage = function() {
+                return scope.currentPage === 1;
+            };
+
+            /**
+             * Check if on last page
+             */
+            scope.isLastPage = function() {
+                return scope.currentPage === scope.getTotalPages();
+            };
+
+            /**
+             * Get page range to display
+             */
+            scope.getPageRange = function() {
+                var pages = [];
+                var totalPages = scope.getTotalPages();
+                var start = Math.max(1, scope.currentPage - 1);
+                var end = Math.min(totalPages, scope.currentPage + 1);
+                
+                for (var i = start; i <= end; i++) {
+                    pages.push(i);
+                }
+                return pages;
             };
 
             scope.toDate = function (arr) {
