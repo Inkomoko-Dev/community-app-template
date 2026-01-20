@@ -1,0 +1,136 @@
+<div class="content-container" data-ng-controller="AddMemberToGSimAccountController">
+    <ul class="breadcrumb">
+        <li><a href="#/groups">{{'label.anchor.groups' | translate}}</a></li>
+        <li><a href="#/viewgsimaccount/{{groupId}}/{{gsimAccountNumber}}">{{'label.anchor.viewGSimAccount' |
+            translate}}</a></li>
+        <li class="active">{{'label.anchor.addMemberToGSimAccount' | translate}}</li>
+    </ul>
+
+    <script type="text/ng-template" id="delete.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.heading.delete' | translate}}</h3>
+        </div>
+        <div class="modal-body ">
+            <api-validate></api-validate>
+            <br>
+            <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+            <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+        </div>
+    </script>
+    <api-validate></api-validate>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.heading.gsimassociatenewmembers' | translate}}</h4>
+            </div>
+            <br/>
+            <form name="managemembers" class="form-horizontal">
+                <fieldset>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">{{ 'label.input.searchformember' | translate
+                                    }}</label>
+                                <div class="col-sm-4 col-md-4">
+                                    <input id="members" type="text" ng-model="available" class="col-md-4 form-control"
+                                           typeahead-min-length="3"
+                                           typeahead-editable="false"
+                                           uib-typeahead="client as client.name for client in clientOptions($viewValue)"
+                                           typeahead-on-select="viewClient(available)"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div data-ng-show="available" class="col-md-10 col-md-offset-1">
+                                    <b><p>{{client.id}} : {{client.name}}: {{client.officeName}}</p></b>
+                                    <div class="form-group">
+                                        <form name="addMember" novalidate="" class="form-horizontal">
+                                            <table class="table">
+                                                <tr>
+                                                    <td class="width14">
+                                                        <label class="control-label">{{ 'label.input.vaultTargetAmount'
+                                                            | translate
+                                                            }}&nbsp;<span class="required">*</span></label></td>
+                                                    <td class="width36 paddedbottom10">
+                                                        <input id="vaultTargetAmount" type="text" class="form-control"
+                                                               number-format ng-model="formData.vaultTargetAmount"  required late-Validate/>
+                                                        <form-validate valattributeform="newsavingccountform"
+                                                                       valattribute="lockinPeriodFrequency"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="width14">
+                                                        <label class="control-label">{{
+                                                            'label.input.nominalannualinterestrate' | translate
+                                                            }}&nbsp;<span class="required">*</span></label>
+                                                    </td>
+
+                                                    <td class="width36 paddedbottom10">
+                                                        <input id="nominalAnnualInterestRate" type="text"
+                                                               name="nominalannualinterestrate"
+                                                               ng-model="formData.nominalAnnualInterestRate"
+                                                               class="form-control"
+                                                               required late-Validate/>
+                                                        <form-validate valattributeform="newsavingccountform"
+                                                                       valattribute="nominalannualinterestrate"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="width14">
+                                                        <label class="control-label">{{
+                                                            'label.input.lockinPeriodFrequency' | translate }}<span class="required">*</span></label>
+                                                    </td>
+                                                    <td class="width36 paddedbottom10">
+                                                        <div class="form-inline">
+                                                            <input id="lockinPeriodFrequency" type="text"
+                                                                   class="form-control"
+                                                                   ng-model="formData.lockinPeriodFrequency" required late-Validate/>&nbsp;
+                                                            <form-validate valattributeform="newsavingccountform"
+                                                                           valattribute="lockinPeriodFrequency"/>
+                                                            <select id="lockinPeriodFrequencyType"
+                                                                    ng-model="formData.lockinPeriodFrequencyType"
+                                                                    class="form-control width170px"
+                                                                    ng-options="type.id as type.value for type in data.lockinPeriodFrequencyTypeOptions"
+                                                                    value="{{type.id}}">
+                                                                <option value="">{{'label.selectone' | translate}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                            <div class="col-md-10 col-md-offset-7">
+                                                <button id="cancel2" type="cancel" class="btn btn-primary"  ng-hide="blockUI"  has-permission='ADDMEMBER_GSIMACCOUNT' ng-click="cancel()">
+                                                    {{'label.button.cancel' | translate}}
+                                                </button>
+                                                <button id="save" type="submit" class="btn btn-primary"  ng-hide="blockUI"  has-permission='ADDMEMBER_GSIMACCOUNT' ng-click="submit()">
+                                                    {{'label.button.addmember' | translate}}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <legend>{{'label.heading.gsimAccountMember' | translate}}</legend>
+                            <div class="form-group" ng-repeat="members in allMembers">
+                                <div class="col-sm-12 col-md-12">
+                                    <input disabled="" class="form-control input-xxlarge"
+                                           placeholder="{{members.accountNo}} : {{members.displayName}} : (Id: {{members.id}})"
+                                           type="text"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-md-offset-5">
+                        <br>
+                        <a id="cancel" href="#/viewgsimaccount/{{groupId}}/{{gsimAccountNumber}}"
+                           class="btn btn-default"><i class="fa fa-double-angle-left"></i> {{ 'label.button.back' |
+                            translate }}</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

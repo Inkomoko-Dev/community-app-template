@@ -53,26 +53,6 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="control-label col-sm-2">{{ 'label.input.issuedate' | translate }}
-                </label>
-
-                <div class="col-sm-2">
-                    <input id="issueDate" sort type="text" class="form-control"
-                           datepicker-pop="dd MMMM yyyy" ng-model="formData.issueDate" is-open="opened"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="control-label col-sm-2">{{ 'label.input.expirydate' | translate }}
-                </label>
-
-                <div class="col-sm-2">
-                    <input id="expiryDate" sort type="text" class="form-control"
-                           datepicker-pop="dd MMMM yyyy" ng-model="formData.expiryDate" is-open="opened"/>
-                </div>
-            </div>
-
             <div class="col-md-offset-3">
                 <a id="cancel" href="#/viewclient/{{clientId}}">
                     <button type="reset" class="btn btn-default">{{'label.button.cancel' | translate}}</button>

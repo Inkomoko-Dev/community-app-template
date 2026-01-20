@@ -26,26 +26,27 @@
                     <div class="col-sm-3 col-md-3 col-md-offset-1">
                         <label class="control-label col-sm-9">{{ 'label.input.allproducts' | translate }}</label>
                         <select id="available" ng-model="available" name="available" class="form-control multiselectmin" multiple>
-                            <option ng-repeat="allowedProduct in allProducts" value="{{allowedProduct.id}}">
+                            <option ng-repeat="allowedProduct in allloanproducts" value="{{allowedProduct.id}}">
                                 {{allowedProduct.name}}
                             </option>
                         </select>
                     </div>
                     <div class="col-sm-1 col-md-1 paddedtop25px">
-                        <button type="button" class="btn btn-primary" data-ng-click="addProduct()"><i
+                        <button type="button" class="btn btn-primary" data-ng-click="addLoanProduct()"><i
                                 class="fa fa-angle-double-right"></i></button>
                         <br/>
-                        <button type="button" class="btn btn-primary" data-ng-click="removeProduct()"><i
+                        <button type="button" class="btn btn-primary" data-ng-click="removeLoanProduct()"><i
                                 class="fa fa-angle-double-left"></i></button>
                     </div>
                     <div class="col-sm-3 col-md-3">
                         <label class="control-label col-sm-9">{{ 'label.input.selectedproducts' | translate }}</label>
                         <select id="selected" ng-model="selected" name="selected" class="form-control multiselectmin" multiple>
-                            <option ng-repeat="selectedproduct in selectedProducts" value="{{selectedproduct.id}}">
+                            <option ng-repeat="selectedproduct in selectedloanproducts" value="{{selectedproduct.id}}">
                                 {{selectedproduct.name}}
                             </option>
                         </select>
                     </div>
+
                 </div>
                 <table class="table" class="width100" ng-show="definitions.length>0">
                     <tr class="graybg">
@@ -120,7 +121,7 @@
                         <button type="reset" class="btn btn-default">{{'label.button.cancel' | translate}}</button>
                     </a>
                     <button id="save" type="submit" ng-click="visitValidation=true" class="btn btn-primary"
-                            has-permission='CREATE_PROVISIONINGCRITERIA'>{{'label.button.save' | translate}}
+                            has-permission='CREATE_PROVISIONCRITERIA'>{{'label.button.save' | translate}}
                     </button>
                 </div>
             </fieldset>

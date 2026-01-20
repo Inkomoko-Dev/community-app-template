@@ -16,15 +16,23 @@
                             <input type="checkbox" data-ng-model="temp" data-ng-change="checkClient()">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="middlename">{{ 'label.input.middlename' | translate }}<span
-                                class="required">*</span></label>
 
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">
+                            {{'label.input.office' | translate}} <span ng-show="forceOffice == null" class="required">*</span>
+                        </label>
                         <div class="col-sm-3">
-                            <input type="text" id="middlename" name="middlename" ng-model="formData.middlename" class="form-control"/>
+                            <div ng-show="forceOffice == null">
+                                <select chosen="offices" id="officeId" ng-model="formData.officeId"  class="form-control"
+                                        ng-options="office.id as office.name for office in offices" value="{{office.id}}"
+                                        ng-change="changeOffice(formData.officeId)"></select>
+                            </div>
+                            <div ng-show="forceOffice != null">
+                                <p class="form-control-static">{{forceOffice.name}}</p>
+                            </div>
                         </div>
-                       
                     </div>
+
                     <div data-ng-switch on="temp">
                         <div data-ng-switch-when="true">
                             <div class="form-group">
@@ -34,7 +42,7 @@
                                 <div class="col-sm-3">
                                     <input autocomplete="off" typeahead-on-select="viewClient($item)" name="clientname" type="text"
                                            ng-model="clientTemplate" class="form-control"
-                                           uib-typeahead="client.displayName as client.displayName for client in clients | filter:$viewValue | limitTo:8"
+                                           uib-typeahead="client.displayName as ( client.id + ' '+ client.displayName ) for client in clientOptions($viewValue) | limitTo:8"
                                            required late-validate />
                                 </div>
                                 <div class="col-sm-2">
@@ -79,8 +87,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label col-sm-2" for="middlename">{{ 'label.input.middlename' | translate }}<span
-                                        class="required">*</span></label>
+                                <label class="control-label col-sm-2" for="middlename">{{ 'label.input.middlename' | translate }}</label>
 
                                 <div class="col-sm-3">
                                     <input type="text" id="middlename" name="middlename" ng-model="formData.middlename" class="form-control"/>
@@ -100,6 +107,27 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">{{ 'label.input.clientId' | translate }}</label>
+
+                                <div class="col-sm-3">
+                                    <input id="clientId" type="text" name="clientId" ng-model="formData.clientId" class="form-control"/>
+                                </div>
+                                <div class="col-sm-2">
+                                    <form-validate valattributeform="guaratorform" valattribute="clientId"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="genderId">{{ 'label.input.gender' | translate }}</label>
+        
+                                <div class="col-sm-3">
+                                    <select chosen="genderOptions" id="genderId" ng-model="formData.genderId" class="form-control"
+                                            ng-options="gender.id as gender.name for gender in genderOptions" value="{{gender.id}}">
+                                    </select>
+                                </div>
+                            </div>
+                            
                             <div class="form-group">
                                 <label class="control-label col-sm-2">{{ 'label.input.dob' | translate }}</label>
 
@@ -140,7 +168,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-sm-2" for="email">{{'label.input.email' | translate}}<span class="required">*</span></label>
+                                <label class="control-label col-sm-2" for="email">{{'label.input.email' | translate}}</label>
   
                                 <div class="col-sm-3">
                                    <input type="email" id="email" name="email" class="form-control" ng-model="formData.email" late-validate/>
@@ -158,8 +186,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label col-sm-2" for="bvn">{{ 'label.input.bvn' | translate }}<span
-                                        class="required">*</span></label>
+                                <label class="control-label col-sm-2" for="bvn">{{ 'label.input.bvn' | translate }}</label>
 
                                 <div class="col-sm-3">
                                     <input type="text" id="bvn" name="bvn" ng-model="formData.bvn" class="form-control"/>
@@ -169,18 +196,18 @@
                                 </div>
                             </div>
 
+
                             <div class="form-group">
                                 <label class="control-label col-sm-2">{{'label.input.pep' | translate}}</label>
         
                                 <div class="col-sm-3">
                                     <select id="pep" ng-model="formData.pep"  class="form-control"
-                                            ng-options="yesNo as yesNoOption.name for yesNoOption in yesNoOptions" value="{{yesNo.name | translate}}">
+                                            ng-options="pep.id as pep.name for pep in yesNoOptions" value="{{pep.id | translate}}">
                                         <option value="">--{{'label.menu.pep' | translate}}--</option>
                                     </select>
                                 </div>
                             </div>
-                        
-
+                
 
                         </div>
                     </div>

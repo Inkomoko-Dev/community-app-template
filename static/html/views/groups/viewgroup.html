@@ -62,6 +62,9 @@
 					        	<i class="fa fa-file "></i>
 					        	{{ 'label.button.groupsavingapplication' | translate }}
 					        </a>
+							<a ng-show="group.active" href="#/new_gsim_application/{{group.id}}" has-permission='CREATE_SAVINGSACCOUNT' class="btn btn-primary"><i
+									class="fa fa-copy "></i>{{ 'label.button.gsimapplication' | translate }}
+							</a>
 					        <a ng-show="group.active"
 					        	href="#/newgrouploanaccount/{{group.id}}"
 					        	class="btn btn-primary" has-permission='CREATE_LOAN'>
@@ -75,6 +78,9 @@
 					        	<i class="fa fa-copy "></i>
 					        	{{ 'label.button.bulkjlgloanapplication' | translate }}
 					        </a>
+							<a ng-show="group.active && isGroupMembersAvailable" href="#/newglimaccount/{{group.id}}" has-permission='CREATE_LOAN' class="btn btn-primary">
+								<i class="fa fa-copy" ></i>{{ 'label.button.glimloanapplication' | translate }}
+							</a>
 		                    <span uib-dropdown class="btn-group" on-toggle="toggled(open)">
 		                      <a class="btn btn-primary "  uib-dropdown-toggle>
 		                          {{ 'label.button.more' | translate}}
@@ -188,6 +194,64 @@
 						                </div>
 				                	</div>
 				                </div>
+								<div>
+									<div class="span gray-head">
+	                            <span class="boldlabel">
+							      <strong>{{ 'label.heading.glimloanaccoverview' | translate }}</strong>
+								</span>
+									</div>
+									<table class="table col-md-5">
+										<thead>
+										<tr class="graybg">
+                                            <th>{{'label.heading.glimId' | translate}}</th>
+											<th>{{'label.heading.accnum' | translate}}</th>
+											<th>{{'label.heading.product' | translate}}</th>
+											<th>{{'label.heading.loanamount' | translate}}</th>
+                                            <th>{{'label.heading.status' | translate}}</th>
+										</tr>
+										</thead>
+										<body>
+										<tr class="pointer-main" ng-repeat="glimloanaccount in groupGLIMAccounts">
+                                           <td class="pointer" data-ng-click="routeToGLIMLoan(glimloanaccount.accountNumber,glimloanaccount.glimId)">{{glimloanaccount.glimId }}</td>
+											<td class="pointer" data-ng-click="routeToGLIMLoan(glimloanaccount.accountNumber,glimloanaccount.glimId)">{{glimloanaccount.accountNumber }}</td>
+											<td class="pointer" data-ng-click="routeToGLIMLoan(glimloanaccount.accountNumber,glimloanaccount.glimId)">{{glimloanaccount.childGLIMAccounts[0].productName }}</td>
+											<td class="pointer" data-ng-click="routeToGLIMLoan(glimloanaccount.accountNumber,glimloanaccount.glimId)">{{glimloanaccount.parentPrincipalAmount}}</td>
+                                            <td class="pointer" data-ng-click="routeToGLIMLoan(glimloanaccount.accountNumber,glimloanaccount.glimId)">{{glimloanaccount.loanStatus}}</td>
+										</tr>
+
+										</body>
+									</table>
+								</div>
+
+								<div>
+									<div class="span gray-head">
+								<span class="boldlabel">
+								      <strong>{{ 'label.heading.gsimoverview' | translate }}</strong>
+								</span>
+									</div>
+									<table class="table" >
+										<thead>
+										<tr class="graybg">
+                                            <th>{{'label.heading.gsimId' | translate}}</th>
+											<th>{{'label.heading.accnum' | translate}}</th>
+											<th>{{'label.heading.product' | translate}}</th>
+											<th>{{'label.heading.balance' | translate}}</th>
+                                            <th>{{'label.heading.status' | translate}}</th>
+
+										</tr>
+										</thead>
+										<body>
+										<tr class="pointer-main" ng-repeat="gsimAccount in groupGSIMAccounts">
+                                           <td class="pointer" data-ng-click="routeToGSIMAccount(gsimAccount.accountNumber)">{{gsimAccount.gsimId}}</td>
+											<td class="pointer" data-ng-click="routeToGSIMAccount(gsimAccount.accountNumber)">{{gsimAccount.accountNumber}}</td>
+											<td class="pointer" data-ng-click="routeToGSIMAccount(gsimAccount.accountNumber)">{{gsimAccount.childGSIMAccounts[0].productName}}</td>
+											<td class="pointer" data-ng-click="routeToGSIMAccount(gsimAccount.accountNumber)">{{gsimAccount.parentBalance}}</td>
+                                            <td class="pointer" data-ng-click="routeToGSIMAccount(gsimAccount.accountNumber)">{{gsimAccount.savingsStatus}}</td>
+										</tr>
+
+										</body>
+									</table>
+								</div>
 							    <div data-ng-show="groupAccounts.loanAccounts">
 							    	<div class="pull-right">
 										<span data-ng-show="groupAccounts.loanAccounts">
@@ -219,13 +283,32 @@
 							            <tbody>
 								            <tr class="pointer-main"
 								                ng-repeat="loanaccount in groupAccounts.loanAccounts | orderBy:'productName':reverse | filter:isLoanNotClosed">
-								                <td class="pointer" data-ng-click="routeToLoan(loanaccount.id)">
-								                	<i ng-hide="loanaccount.inArrears" tooltip-placement="right" uib-tooltip="{{loanaccount.status.value}}"
-								                    	class="fa fa-stop {{loanaccount.status.code | StatusLookup}}"></i>
-								                    <i ng-show="loanaccount.inArrears" tooltip-placement="right" uib-tooltip="{{loanaccount.status.value}}"
-								                     	class="fa fa-stop {{loanaccount.status.code | StatusLookup}}overdue"></i>
-								                	{{loanaccount.accountNo}}
-								                </td>
+
+												<td class="pointer" data-ng-click="routeToLoan(loanaccount.id)" ng-hide="groupAccounts.isExtendLoanLifeCycleConfig">
+													<i ng-hide="loanaccount.inArrears" uib-tooltip-placement="right" uib-tooltip="{{loanaccount.status.value}}"
+													   class="fa fa-stop {{loanaccount.status.code | StatusLookup}}"></i>
+													<i ng-show="loanaccount.inArrears" uib-tooltip-placement="right" uib-tooltip="{{loanaccount.status.value}}"
+													   class="fa fa-stop {{loanaccount.status.code | StatusLookup}}overdue"></i>
+													{{loanaccount.accountNo}}
+												</td>
+
+												<td class="pointer" data-ng-click="routeToLoan(loanaccount.id)" ng-show="groupAccounts.isExtendLoanLifeCycleConfig">
+
+													<i ng-show="(!loanaccount.inArrears && groupAccounts.isExtendLoanLifeCycleConfig && loanaccount.loanDecisionState == null) ||
+													(!loanaccount.inArrears && groupAccounts.isExtendLoanLifeCycleConfig && loanaccount.loanDecisionState != null && loanaccount.loanDecisionState.value == 'PREPARE_AND_SIGN_CONTRACT')||
+												    (!loanaccount.inArrears && groupAccounts.isExtendLoanLifeCycleConfig && loanaccount.loanDecisionState != null && loanaccount.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loanaccount.status.code != 'loanStatusType.submitted.and.pending.approval')"
+													   uib-tooltip-placement="right" uib-tooltip="{{loanaccount.status.value}}"
+													   class="fa fa-stop {{loanaccount.status.code | StatusLookup}}"></i>
+
+													<i ng-show="!loanaccount.inArrears && groupAccounts.isExtendLoanLifeCycleConfig && loanaccount.loanDecisionState != null && loanaccount.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loanaccount.status.code == 'loanStatusType.submitted.and.pending.approval'"
+													   uib-tooltip-placement="right" uib-tooltip="{{loanaccount.loanDecisionState.value}}"
+													   class="fa fa-stop {{loanaccount.loanDecisionState.code | StatusLookup}}"></i>
+
+													<i ng-show="loanaccount.inArrears" uib-tooltip-placement="right" uib-tooltip="{{loanaccount.status.value}}"
+													   class="fa fa-stop {{loanaccount.status.code | StatusLookup}}overdue"></i>
+													{{loanaccount.accountNo}}
+												</td>
+
 								                <td class="pointer" data-ng-click="routeToLoan(loanaccount.id)"> {{loanaccount.productName}}</td>
 												<td class="pointer center" data-ng-click="routeToLoan(loanaccount.id)" ng-if="loanaccount.loanType.value == 'Individual'">
 								                	<i uib-tooltip="{{loanaccount.loanType.value}}" class="fa fa-user fa fa-large"></i>
@@ -389,10 +472,15 @@
 								                </td>
 								            </tr>
 								            <tr data-ng-show="group.externalId">
-								                <th>{{ 'label.input.externalid' | translate }}</th>
+								                <th>{{ 'label.input.groupuid' | translate }}</th>
 								                <td><span class="padded-td">{{group.externalId}}</span>
 								                </td>
 								            </tr>
+											<tr data-ng-show="group.representativeName">
+												<th>{{ 'label.input.representative' | translate }}:</th>
+												<td><span class="padded-td"><a class="list-group-item-text" href="#/viewclient/{{group.representativeId}}">{{group.representativeName}}</a></span>
+												</td>
+											</tr>
 								            <tr data-ng-show="group.centerName">
 								                <td>{{ 'label.heading.center' | translate }}</td>
 								                <td><span class="padded-td"><a class="list-group-item-text" href="#/viewcenter/{{group.centerId}}">{{group.centerName}}</a></span>

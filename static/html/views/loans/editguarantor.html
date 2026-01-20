@@ -48,6 +48,15 @@
                             <form-validate valattributeform="editguaratorform" valattribute="lastname"/>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="clientId">{{ 'label.input.clientId' | translate }}</label>
+
+                        <div class="col-sm-3">
+                            <input type="text" id="clientId" name="clientId" ng-model="formData.clientId" />
+                            <form-validate valattributeform="editguaratorform" valattribute="clientId"/>
+                        </div>
+                    </div>
                     
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="genderId">{{ 'label.input.gender' | translate }}</label>
@@ -131,8 +140,8 @@
                         <label class="control-label col-sm-2">{{'label.input.pep' | translate}}</label>
 
                         <div class="col-sm-3">
-                            <select id="pep" ng-model="formData.pep"  class="form-control"
-                                    ng-options="pep.id as pep.name for pep in yesNoOptions" value="{{pep.id | translate}}">
+                            <select id="pep" ng-model="formData.pepId"  class="form-control"
+                                    ng-options="pep.id as pep.name for pep in yesNoOptions" value="{{pep.id}}">
                                 <option value="">--{{'label.menu.pep' | translate}}--</option>
                             </select>
                         </div>

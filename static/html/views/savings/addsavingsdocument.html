@@ -1,0 +1,54 @@
+<div class="content-container" ng-controller="SavingsDocumentsController">
+    <ul class="breadcrumb">
+        <li><a href="#/viewsavingaccount/{{savingsId}}">{{'label.anchor.viewsavingsaccount' | translate}}</a></li>
+        <li><a href="#/savingaccount/{{savingsId}}/documents">{{'label.heading.accountdocuments' | translate}}</a></li>
+        <li class="active">{{'label.anchor.uploaddocument' | translate}}</li>
+    </ul>
+    <form name="savingsdocumentform" novalidate="" class="card form-horizontal well" ng-controller="SavingsDocumentController"
+    rc-submit="submit()">
+    <api-validate></api-validate>
+    <fieldset>
+        <legend>{{'label.heading.uploadsavingsdocument' | translate}}</legend>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="name">{{'label.input.name' | translate}}<span
+                class="required">*</span></label>
+
+                <div class="col-sm-3">
+                    <select id="name" ng-model="formData.name"
+                            ng-options="documenttype.name as documenttype.name for documenttype in documenttypes"
+                            value="{{documenttype.name}}" required="required"
+                            class="form-control">
+                        <option style="display:none" value="">{{'label.menu.selectone' | translate}}
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <form-validate valattributeform="savingsdocumentform" valattribute="name"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2">{{'label.input.description' | translate}}</label>
+
+                <div class="col-sm-3">
+                    <textarea rows="2" ng-model="formData.description" class="form-control"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="file">{{'label.input.selectfile' | translate}}<span
+                    class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input type="file" id="file" ngf-select="onFileSelect($files)">
+                    </div>
+                </div>
+
+                <div class="col-md-offset-3">
+                    <a id="cancel" href="#/savingaccount/{{savingsId}}/documents">
+                        <button type="reset" class="btn btn-default">{{'label.button.cancel' | translate}}</button>
+                    </a>
+                    <button id="save" type="submit" has-permission='CREATE_DOCUMENT' class="btn btn-primary">{{'label.button.save' | translate}}</button>
+                </div>
+            </fieldset>
+        </form>
+</div>

@@ -24,7 +24,9 @@
 	        <br>
 
 	        <div class="form-group info" ng-repeat="reportParam in reportParams">
-	            <label class="control-label col-sm-2" for="{{reportParam.variable}}">{{ reportParam.label | translate}}</label>
+	            <label class="control-label col-sm-2" for="{{reportParam.variable}}">{{ reportParam.label | translate}}
+					<span class="required">*</span>
+				</label>
 
                 <div class="col-sm-3">
                     <select chosen="reportParam.selectOptions" id="{{reportParam.inputName}}" ng-model="formData[reportParam.inputName]"
@@ -37,7 +39,9 @@
 	        </div>
 	        <div class="form-group info" ng-repeat="reportTextParam in reportTextParams">
 	            <label class="control-label col-sm-2" for="{{reportTextParam.variable}}">{{ reportTextParam.label |
-	                translate}}</label>
+	                translate}}
+					<span class="required">*</span>
+				</label>
 
 	            <div class="col-sm-3">
 	                <input style="width: 257px" id="{{reportTextParam.inputName}}" type="text" ng-model="formData[reportTextParam.inputName]"  class="form-control" required late-Validate/>
@@ -45,12 +49,14 @@
 	        </div>
 	        <div class="form-group info" ng-repeat="reportDateParam in reportDateParams">
 	            <label class="control-label col-sm-2" for="{{reportDateParam.variable}}">{{ reportDateParam.label |
-	                translate}}</label>
+	                translate}}
+					<span class="required">*</span>
+				</label>
 
 	            <div class="col-sm-3">
 	                <input style="width: 257px" id="{{reportDateParam.inputName}}" type="text" datepicker-pop="yyyy-MM-dd"
 	                       ng-model="formData[reportDateParam.inputName]" is-open="'opened'+$index" min="minDate"
-	                       date-disabled="disabled(date, mode)"  class="form-control" required late-Validate/>
+	                        date-disabled="disabled(date, mode)"  class="form-control" required late-Validate/>
 	            </div>
 	        </div>
 	        <div class="form-group info" ng-show="reportType == 'Pentaho'">
@@ -80,8 +86,8 @@
 				</div>
 	        </div>
 
-	        <span class="col-md-offset-3 paddedleft120"><a id="run" ng-click="runReport()" class="btn btn-primary">
-	        <i class="fa fa-play"></i>&nbsp;&nbsp;{{ 'label.button.runreport' | translate }}</a></span>
+	        <span class="col-md-offset-3 paddedleft52px"><a id="run" ng-click="runReport()" class="btn btn-primary control"></i>
+	            &nbsp;&nbsp;{{ 'label.button.runreport' | translate }}</a></span>
 	    </div>
 	    <div style="visibility: hidden">
 	        <table>
@@ -135,6 +141,9 @@
 	            <button type="button" class="btn btn-primary" ng-csv="csvData"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportcsv'
 	                | translate }}
 	            </button>
+				<button type="button" class="btn btn-primary"  ng-click="exportToExcel()"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportexcel2'
+	                | translate }}
+	            </button>
 	        </div>
 	        <div scroll>
 	            <table style="width: 1200px;white-space:nowrap" class="table table-bordered" data-anchor>
@@ -145,7 +154,8 @@
 	                </thead>
 	                <tbody>
 	                <!-- http://www.anujgakhar.com/2013/06/15/duplicates-in-a-repeater-are-not-allowed-in-angularjs/ -->
-	                <tr id="{{$index}}" data-ng-click="highlight($index)" ng-repeat="row in reportData.data track by $index">
+	                <tr id="{{$index}}" data-ng-click="highlight($index)" dir-paginate="row in reportData.data | itemsPerPage: recordsPerPage" class="pointer-main"
+                    total-items="totalRecords"  pagination-id="records">
 						<td ng-repeat="col in row.row track by $index">
 							<span ng-show="isDecimal($index)">{{col | FormatNumber:decimalsChoice}}</span>
 							<span ng-hide="isDecimal($index)">{{col}}</span>
@@ -153,6 +163,31 @@
 	                </tr>
 	                </tbody>
 	            </table>
+				<dir-pagination-controls align="center" boundary-links="true"
+                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"
+                                     on-page-change="getResultsPage(newPageNumber)" pagination-id="records">
+               </dir-pagination-controls>
+
+
+				<!-- Table created and hidden only to be used for export table report into excel Epic INKO-32 
+					original table has two span elements with same data so excel export ends up with duplicated values in each cell.
+					Not sure why we have two spans and purpose so made this work around -->
+				<table ng-hide="true" id="report-export-table" style="width: 1200px;white-space:nowrap" class="table table-bordered" data-anchor>
+	                <thead>
+	                <tr class="graybg">
+	                    <th ng-repeat="columnHeader in reportData.columnHeaders">{{columnHeader.columnName}}</th>
+	                </tr>
+	                </thead>
+	                <tbody>
+	                <!-- http://www.anujgakhar.com/2013/06/15/duplicates-in-a-repeater-are-not-allowed-in-angularjs/ -->
+	                <tr id="{{$index}}" data-ng-click="highlight($index)" ng-repeat="row in reportData.data track by $index">
+						<td ng-repeat="col in row.row track by $index">
+							<span ng-hide="isDecimal($index)">{{col}}</span>
+						</td>
+	                </tr>
+	                </tbody>
+	            </table>
+				
 	        </div>
 	    </div>
 	    <div uib-collapse="hidePentahoReport" class="row alert-block span tab-content">

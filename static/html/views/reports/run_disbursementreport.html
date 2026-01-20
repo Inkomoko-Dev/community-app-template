@@ -1,0 +1,106 @@
+<div class="content-container">
+	<ul class="breadcrumb">
+		<li><a href="#/disbursement-reports">{{ 'label.heading.disbursement.report' | translate }}</a></li>
+		<li class="active">{{'label.anchor.runreport' | translate}}</li>
+	</ul>
+
+	<div class="card well" ng-controller="RunDisbursementReportController">
+		<api-validate></api-validate>
+		<div class="alert-block form-horizontal">
+			<br>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{'label.anchor.reportName' | translate}}</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" ng-model="reportName" ng-readonly="isViewMode"
+						placeholder="{{'label.anchor.reportName' | translate}}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{'label.input.outputtype' | translate}}</label>
+				<div class="col-sm-3">
+					<select class="form-control" ng-model="fileFormat" ng-disabled="isViewMode">
+						<option value="application/pdf">{{'label.input.pdfformat' | translate}}</option>
+						<option value="application/vnd.ms-excel">{{'label.input.exportexcel' | translate}}</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{'startDateSelect' | translate}}</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" datepicker-pop="yyyy-MM-dd" ng-model="startDate" ng-readonly="isViewMode"
+						is-open="'opened'+$index" min="minDate" class="form-control" required late-Validate />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'endDateSelect' | translate }}</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" datepicker-pop="yyyy-MM-dd" ng-model="endDate" ng-readonly="isViewMode"
+						is-open="'opened'+$index" min="minDate" class="form-control" required late-Validate />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'interestPercentage' | translate }}</label>
+				<div class="col-sm-3">
+					<input type="number"  ng-model="interestPercentage" class="form-control" ng-readonly="isViewMode"
+						min="0" max="100" class="form-control" required late-Validate />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'label.input.office' | translate }}</label>
+				<div class="col-sm-3">
+					<select chosen="offices" class="form-control" ng-model="officeId" ng-disabled="isViewMode"
+						ng-options="o.id as o.name for o in offices">
+						<option value="">{{ 'OfficeIdSelectOne' | translate }}</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'label.input.loanproduct' | translate }}</label>
+				<div class="col-sm-3">
+					<select chosen="loanProducts" ng-model="loanProductIds" class="form-control" ng-disabled="isViewMode"
+						ng-options="p.id as p.name for p in loanProducts" multiple>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{ 'label.input.notifyPerson' | translate }}</label>
+				<div class="col-sm-3">
+					<select class="form-control"
+							ng-model="notifyUserId"
+							ng-options="user.id as user.fullname for user in authorizedSigners"
+							ng-disabled="isViewMode"
+							required>
+						<option value="">{{ 'label.placeholder.selectSigner' | translate }}</option>
+					</select>
+				</div>
+				<div class="col-sm-3 help-block text-muted">
+					{{ 'label.help.notifyPerson' | translate }}
+				</div>
+			</div>
+
+			<span class="col-md-offset-3 paddedleft52px">
+				<a id="run" ng-click="runReport()" class="btn btn-primary">
+					<i class="fa fa-play"></i> {{ 'label.button.runreport' | translate }}
+				</a>
+				<a id="save" ng-click="saveRequest()" class="btn btn-success" ng-disabled="!reportGenerated || isViewMode">
+					<i class="fa fa-save"></i> {{ 'label.button.save' | translate }}
+				</a>
+
+			</span>
+
+
+		</div>
+
+		<div class="row alert-block span tab-content">
+			<br>
+			<iframe id="rptLoadingFrame" ng-src="{{baseURL}}" frameborder="0" width="100%" height="600px"></iframe>
+		</div>
+
+	</div>

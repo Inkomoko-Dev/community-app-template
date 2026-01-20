@@ -49,10 +49,10 @@
                                 | translate}}</h4>
                             <p class="list-group-item-text">{{'label.managesurveys' | translate}}</p>
                         </a>
-                        <a class="list-group-item" href="#/transactionclassification" has-permission='READ_TRANSACTIONCLASSIFICATION'>
-                            <h4 class="list-group-item-heading"><i class="fa fa-magic fa fa-large"></i>&nbsp;&nbsp;{{'label.anchor.transactionclassification'
+                        <a class="list-group-item" href="#/mytasks">
+                            <h4 class="list-group-item-heading"><i class="fa fa-file-text-o fa fa-large"></i>&nbsp;&nbsp;{{'label.anchor.mytasks'
                                 | translate}}</h4>
-                            <p class="list-group-item-text">{{'label.managetransactionclassification' | translate}}</p>
+                            <p class="list-group-item-text">{{'label.managetasks' | translate}}</p>
                         </a>
                     </div>
                 </div>
@@ -69,6 +69,11 @@
                                 | translate}}</h4>
 
                             <p class="list-group-item-text">{{'label.addnewreportand' | translate}}</p>
+                        </a>
+                        <a class="list-group-item" href="#/crbloggerhub" has-permission='READ_REPORT'>
+                            <h4 class="list-group-item-heading"><i class="fa fa-large fa fa-book"></i>&nbsp;&nbsp;CRB Posting Logger</h4>
+
+                            <p class="list-group-item-text">View and manage failed CRB loan posting logs</p>
                         </a>
                         <a class="list-group-item" href="#/jobs" has-permission='READ_SCHEDULER'>
                             <h4 class="list-group-item-heading"><i class="fa fa-large fa fa-clock-o"></i>&nbsp;&nbsp;{{'label.anchor.schedulerjobs'
@@ -99,6 +104,12 @@
                                 | translate}}</h4>
 
                             <p class="list-group-item-text">{{'label.twofactorconfig' | translate}}</p>
+                        </a>
+                        <a class="list-group-item" href="#/viewLoanApprovalMatrix" has-permission='READ_CONFIGURATION'>
+                            <h4 class="list-group-item-heading"><i class="fa fa-large fa fa-tags"></i>&nbsp;&nbsp;{{'label.anchor.loanApprovalMatrix'
+                                | translate}}</h4>
+
+                            <p class="list-group-item-text">{{'label.loanApprovalMatrix' | translate}}</p>
                         </a>
                     </div>
                 </div>

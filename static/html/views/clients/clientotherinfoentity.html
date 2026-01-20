@@ -1,0 +1,194 @@
+<div class="content-container" ng-controller="ClientOtherInfoEntityController">
+    <ul class="breadcrumb">
+        <li><a href="#/clients">{{'label.anchor.clients' | translate}}</a></li>
+        <li><a href='#/viewclient/{{clientId}}'>{{'label.anchor.viewclient' | translate}}</a></li>
+        <li class="active">{{'label.anchor.clientOtherInfo' | translate}}</li>
+    </ul>
+    <div class="card" ng-if="!exists">
+        <div class="content">
+        <div class="toolbar">
+            <h4>{{ 'label.heading.clientOtherInfo' | translate }}</h4>
+        </div>
+        <br/>
+        <form name="clientotherinfoform" class="form-horizontal" rc-submit="submit()" >
+            <api-validate></api-validate>
+            <fieldset>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="businessLocation">{{ 'label.input.businessLocation' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="businessLocation" name="businessLocation" type="text" class="form-control" ng-model="formData.businessLocation" required>
+                    </div>
+                    <form-validate valattributeform="clientotherinfoform" valattribute="businessLocation"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="taxIdentificationNumber">{{ 'label.input.taxIdentificationNumber' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="taxIdentificationNumber" name="taxIdentificationNumber" type="text" class="form-control" ng-model="formData.taxIdentificationNumber" required late-validate>
+                    </div>
+                    <form-validate valattributeform="clientotherinfoform" valattribute="taxIdentificationNumber"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="coSignorsName">{{ 'label.input.coSignorsName' | translate }}
+                    </label>
+
+                    <div class="col-sm-3">
+                        <input id="coSignorsName" name="coSignorsName" type="text" class="form-control" ng-model="formData.coSignorsName">
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="guarantor">{{ 'label.input.guarantor' | translate }}
+                    </label>
+
+                    <div class="col-sm-3">
+                        <input id="guarantor" name="guarantor" type="text" class="form-control" ng-model="formData.guarantor">
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="incomeGeneratingActivity">{{ 'label.input.incomeGeneratingActivity' | translate }}
+                    </label>
+
+                    <div class="col-sm-3">
+                        <input id="incomeGeneratingActivity" name="incomeGeneratingActivity" type="text" class="form-control" ng-model="formData.incomeGeneratingActivity" number=true late-Validate>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{ 'label.input.incomeGeneratingActivityMonthlyAmount' | translate }}</label>
+
+                    <div class="col-sm-3">
+                        <input id="incomeGeneratingActivityMonthlyAmount" type="text" name="incomeGeneratingActivityMonthlyAmount" ng-model="formData.incomeGeneratingActivityMonthlyAmount" class="form-control" number=true late-Validate/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="strata">{{ 'label.input.strata' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <select id="strata" name = "strata" ng-model="formData.strataId" class="form-control"
+                                ng-options="strata.id as strata.name for strata in strataOptions" required late-validate>
+                            <option value="" disabled>--{{'label.menu.select' | translate}}--</option>
+                        </select>
+                    </div>
+                    <form-validate valattributeform="clientotherinfoform" valattribute="strata"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.input.yearArrivedInHostCountry' | translate}}  <span ng-show="yearArrivedRequired" class="required">*</span></label>
+                    <div class="col-sm-3">
+                        <input id="yearArrivedInHostCountry" type="text" name="yearArrivedInHostCountry" datepicker-pop="dd MMMM yyyy"
+                               ng-model="first.submitondate " is-open="opened1" min="'2000-01-01'" max="restrictDate"
+                               class="form-control"  required/>
+                    </div>
+                    <form-validate valattributeform="clientotherinfoform" valattribute="yearArrivedInHostCountry" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="bankAccountNumber">
+                        {{ 'label.input.bankAccountNumber' | translate }}
+                    </label>
+                
+                    <div class="col-sm-3">
+                        <input id="bankAccountNumber" name="bankAccountNumber" type="text" class="form-control"
+                            ng-model="formData.bankAccountNumber"  late-validate />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="bankName">
+                        {{ 'label.input.bankName' | translate }}
+                    </label>
+                
+                    <div class="col-sm-3">
+                        <input id="bankName" name="bankName" type="text" class="form-control" 
+                            ng-model="formData.bankName"  late-validate />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="telephoneNo">{{ 'label.input.telephoneNo' | translate }}
+                        <span class="required">*</span>
+                    </label>
+
+                    <div class="col-sm-3">
+                        <input id="telephoneNo" name="telephoneNo" type="number" class="form-control" ng-model="formData.telephoneNo" required>
+                    </div>
+                    <form-validate valattributeform="clientotherinfoform" valattribute="telephoneNo"/>
+
+                </div>
+                <div class="col-md-offset-3">
+                    <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' | translate
+                        }}
+                    </button>
+                    <button id="save" type="submit" has-permission='CREATE_CLIENTOTHERINFO' class="btn btn-primary">{{ 'label.button.save' | translate }}</button>
+                </div>
+
+            </fieldset>
+        </form> 
+        </div>
+    </div>
+    <div class="card well" ng-if="exists">
+        <div class="toolbar">
+            <h4>Client Other Info</h4>
+        </div>
+        <div class="pull-right">
+            <div class="form-group">
+                <a href="#/editclientOtherInfoEntity/{{clientId}}/{{otherInfoData.id}}" class="btn btn-primary" has-permission='UPDATE_CLIENTOTHERINFO'><i class="fa fa-edit "></i>
+                    {{'label.button.edit' | translate}}</a>
+            </div>
+        </div>
+        <div class="row" >
+            <div class="col-md-6">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>{{'label.heading.businessLocation' | translate}}</td>
+                        <td>{{otherInfoData.businessLocation}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.taxIdentificationNumber' | translate}}</td>
+                        <td>{{otherInfoData.taxIdentificationNumber}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.coSignorsName' | translate}}</td>
+                        <td>{{otherInfoData.coSignors}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.guarantor' | translate}}</td>
+                        <td>{{otherInfoData.guarantor}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.incomeGeneratingActivity' | translate}}</td>
+                        <td>{{otherInfoData.incomeGeneratingActivity}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.incomeGeneratingActivityMonthlyAmount' | translate}}</td>
+                        <td>{{otherInfoData.incomeGeneratingActivityMonthlyAmount}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.strata' | translate}}</td>
+                        <td>{{otherInfoData.strata.name}}</td>
+                    </tr>
+                    <tr ng-show="otherInfoData.yearArrivedInHostCountry">
+                        <td>{{'label.heading.yearArrivedInHostCountry' | translate}}</td>
+                        <td>{{otherInfoData.yearArrivedInHostCountry | DateFormat}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.bankAccountNumber' | translate}}</td>
+                        <td>{{otherInfoData.bankAccountNumber}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.bankName' | translate}}</td>
+                        <td>{{otherInfoData.bankName}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{'label.heading.telephoneNo' | translate}}</td>
+                        <td>{{otherInfoData.telephoneNumber}}</td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>

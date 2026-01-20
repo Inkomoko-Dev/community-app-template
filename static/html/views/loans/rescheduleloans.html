@@ -1,4 +1,4 @@
-<div ng-controller="RescheduleLoansRequestController">
+    <div ng-controller="RescheduleLoansRequestController">
     <div>
         <ul class="breadcrumb">
             <li><a href="#/viewloanaccount/{{loanId}}">{{'label.anchor.viewloanaccount' | translate}}</a></li>
@@ -13,7 +13,7 @@
                 <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.input.installmentOn' | translate}}<span class="required">*</span></label>
 
                 <div class="col-sm-3">
-                    <input id="rescheduleFromDate" type="text" name="rescheduleFromDate" datepicker-pop="dd MMMM yyyy"
+                    <input id="rescheduleFromDate" type="text" name="rescheduleFromDate" datepicker-pop="dd MMMM yyyy"ng-disabled="!adjustFuturePayments"
                            class="form-control paddedbottom10 paddedtop" ng-model="formData.rescheduleFromDate" is-open="opened" min="'2000-01-01'" max="restrictDate"/>
                 </div>
             </div>
@@ -106,17 +106,103 @@
                            ng-model="formData.newInterestRate"></div>
             </div>
 
+            <input type="checkbox" ng-model="changeEMI" > &nbsp;<span
+                class="control-label"><label>{{ 'label.input.changeEMI' | translate }}&nbsp;</label></span>
+            <div class="form-group" data-ng-show="changeEMI" >
+
+                <label class="control-label col-sm-2 width20" style="padding-left: 32px;text-align: left;">{{ 'label.input.emi.change.upto' | translate
+                    }}&nbsp;</label>
+                <div class="col-sm-3 paddedbottom10">
+                    <input id="adjustedDueDate" type="text" data-ng-show="changeEMI"  name="adjustedDueDate" datepicker-pop="dd MMMM yyyy"
+                           class="form-control " ng-model="formData.endDate" is-open="opened" min="'2000-01-01'" max="restrictDate"/>
+                </div>
+            </div>
+
+            <div class="form-group" data-ng-show="changeEMI" >
+                <label class="control-label col-sm-2 width20"  style="padding-left: 32px;text-align: left;">{{ 'label.input.new.emi' | translate
+                    }}&nbsp;</label>
+
+                <div class="col-sm-3 paddedbottom10">
+                    <input id="interestgrace" class="form-control" data-ng-show="changeEMI"  type="text" ng-model="formData.emi">
+                </div>
+            </div>
+            <br>
+            <br>
+
+            <input type="checkbox" ng-model="changeFixedPrincipal" > &nbsp;<span
+                class="control-label"><label>{{ 'label.input.changePrincipalAmount' | translate }}&nbsp;</label></span>
+            <div class="form-group" data-ng-show="changeFixedPrincipal" >
+
+                <label class="control-label col-sm-2 width20" style="padding-left: 32px;text-align: left;">{{ 'label.input.fixedPrincipalAmount' | translate
+                    }}&nbsp;</label>
+                    <div class="col-sm-3 paddedbottom10">
+                        <input id="changeFixedPrincipal" class="form-control" data-ng-show="changeFixedPrincipal"  type="text" ng-model="formData.newPrincipalDueFixedAmount">
+                    </div>
+            </div>
+            <br>
+            <br>
+
+            <input type="checkbox" ng-model="changeFixedPrincipalPercentagePerInstallment"> &nbsp;<span
+                class="control-label">{{ 'label.input.change.fixed.principal.percentage.per.installment' | translate }}&nbsp;</span>
+            <div class="form-group">
+
+                <label class="control-label col-sm-2 width20" style="padding-left: 32px;text-align: left;" ng-show="changeFixedPrincipalPercentagePerInstallment">{{ 'label.input.new.fixed.principal.percentage.per.installment' | translate
+                    }}&nbsp;</label>
+                <div class="col-sm-3 paddedbottom10">
+                    <input id="newFixedPrincipalPercentagePerInstallment" type="text" ng-show="changeFixedPrincipalPercentagePerInstallment" class="form-control paddedbottom10"
+                           ng-model="formData.newFixedPrincipalPercentagePerInstallment"></div>
+            </div>
             <!--<input type="checkbox" ng-model="formData.recalculateInterest"> &nbsp;<span
                 class="control-label">{{ 'label.input.recalculateInterest' +
                     '' | translate }}&nbsp;</span>
 
             <br>
             <br>-->
+            <!-- 🆕 Overdue charge handling -->
+            <div class="form-group">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">
+                    {{ 'label.input.overdueChargeHandling' | translate }}
+                </label>
+                <div class="col-sm-3 paddedbottom10 paddedtop">
+                    <select chosen="overdueChargeHandlingOptions"
+                            class="form-control"
+                            ng-options="option as option.name for option in overdueChargeHandlingOptions"
+                            ng-model="formData.overdueChargeHandling">
+                        <option value="">{{ 'label.select' | translate }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" ng-show="formData.overdueChargeHandling && formData.overdueChargeHandling.name == 'Carry Charges Forward'">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">
+                    {{ 'label.input.carryForwardChargeDef' | translate }}
+                </label>
+                <div class="col-sm-3 paddedbottom10 paddedtop">
+                    <select class="form-control"
+                            ng-model="formData.carryForwardChargeId"
+                            ng-options="charge.id as charge.name for charge in availableCarryForwardCharges">
+                        <option value="">{{ 'label.select' | translate }}</option>
+                    </select>
+                </div>
+            </div>
+            <!-- NEW: Due date for the carry forward charge -->
+            <div class="form-group"
+                 ng-show="formData.overdueChargeHandling && formData.overdueChargeHandling.name == 'Carry Charges Forward'">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">
+                    {{ 'label.input.carryForwardChargeDueDate' | translate }}
+                </label>
+                <div class="col-sm-3 paddedbottom10 paddedtop">
+                    <input type="text" name="carryForwardChargeDueDate" datepicker-pop="dd MMMM yyyy"
+                           class="form-control" ng-model="formData.carryForwardChargeDueDate" is-open="opened" min="'2000-01-01'"
+                           placeholder="{{ 'label.date' | translate }}"/>
+                </div>
+            </div>
+
             <div align="center">
 
                 <button type="button" data-ng-click="cancel()" class="btn btn-default">{{ 'label.button.cancel' | translate }}</button>
 
-                <button type="button" data-ng-click="submit()" class="btn btn-primary"  has-permission='APPROVE_RESCHEDULELOAN'>
+                <button type="button" data-ng-click="submit()" class="btn btn-primary"  has-permission='CREATE_RESCHEDULELOAN'>
                     {{'label.button.save' | translate}}
 
                 </button>

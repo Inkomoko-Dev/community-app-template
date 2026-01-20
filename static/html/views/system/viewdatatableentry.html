@@ -54,7 +54,7 @@
                             <input ng-show="fieldType(columnHeader.columnDisplayType) == 'TEXT'" type="text"
                                    ng-model="formData[columnHeader.columnName]" class="form-control"/>
                             <input ng-show="fieldType(columnHeader.columnDisplayType) == 'DATE'" type="text"
-                                   datepicker-pop="dd MMMM yyyy" ng-model="formDat[columnHeader.columnName]"
+                                   min="minDate" datepicker-pop="dd MMMM yyyy" ng-model="formDat[columnHeader.columnName]"
                                    is-open="opened{{$index}}" class="form-control"/>
                             <div ng-show="fieldType(columnHeader.columnDisplayType) == 'DATETIME'" class="form-inline">
                                 <div class="form-group">
@@ -63,7 +63,7 @@
                                            is-open="opened{{$index}}" class="form-control"/>
                                 </div>
                                 <div class="form-group">
-                                    <input type="time" placeholder="HH:MM:SS"
+                                    <input step="1" type="time" placeholder="HH:MM:ss"
                                            ng-model="formDat[columnHeader.columnName].time" class="form-control"/>
                                 </div>
                             </div>

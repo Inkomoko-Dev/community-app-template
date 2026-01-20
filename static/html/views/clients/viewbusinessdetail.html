@@ -1,0 +1,189 @@
+<div class="content-container" ng-controller="ViewClientBusinessDetailController">
+  <div id="viewlptop"></div>
+  <div class="paddedbottom10">
+
+    <ul class="breadcrumb">
+      <li ng-show="clientName">
+        <a href="#/viewclient/{{clientId}}">
+          <strong>'{{clientName}}'</strong>
+        </a>
+      </li>
+      <li class="active">{{'label.anchor.viewclientbusinessdetail' | translate}}</li>
+    </ul>
+  </div>
+  <div>
+    <div class="card">
+      <div class="content">
+        <div class="pull-right">
+          <div class="btn-group" ng-show="isClientBusinessDetailEnabled">
+            <a href="#/viewclient/{{clientId}}/editbusinessdetail/{{details.id}}" class="btn btn-primary" has-permission='UPDATE_BUSINESSDETAIL'><i
+                    class="fa fa-edit "></i>&nbsp;&nbsp;{{'label.button.edit' | translate}}</a>
+            <button class="btn btn-danger" ng-click="deletebusinessDetail()" has-permission='DELETE_BUSINESSDETAIL'><i class="fa fa-trash-o" aria-hidden="true"></i>{{'label.button.delete' | translate}}</button>
+
+          </div>
+        </div>
+        <legend class="paddedtop paddedbottom10">{{clientbusinessDetails.businesstype}}</legend>
+        <table width="100%">
+          <tr>
+            <td>
+              <a id="test" class="old-syle-anchor">&nbsp;</a>
+            </td>
+          </tr>
+          <tr class="bottomborder">
+            <td colspan="4">
+              <strong>{{'label.heading.information' | translate}}</strong>
+            </td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.businesstype' | translate}} :</td>
+            <td colspan="3">{{details.businessTypeId.name}}</td>
+          </tr>
+          <tr >
+            <td>{{'label.heading.externalid' | translate}} :</td>
+            <td colspan="3">{{details.externalId}}</td>
+          </tr>
+          <tr >
+            <td>{{'label.heading.startingcapital' | translate}} :</td>
+            <td colspan="3">{{details.startingCapital}}</td>
+          </tr>
+          <tr >
+            <td>{{'label.heading.sourceofcapital' | translate}} :</td>
+            <td colspan="3">{{details.sourceOfCapitalId.name}}</td>
+          </tr>
+          <tr >
+            <td>{{'label.heading.businesscreationdate' | translate}} :</td>
+            <td colspan="3">{{details.businessCreationDate | DateFormat }}</td>
+          </tr>
+          <tr >
+            <td>{{'label.heading.totalemployees' | translate}} :</td>
+            <td colspan="3">{{details.totalEmployee}}</td>
+          </tr>
+
+          <tr class="bottomborder">
+            <td colspan="4">
+              <strong>{{'label.heading.revenue' | translate}}</strong>
+            </td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.businessrevenue' | translate}} :</td>
+            <td colspan="3">{{details.businessRevenue}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.averagemonthlyrevenue' | translate}} :</td>
+            <td colspan="3">{{details.averageMonthlyRevenue}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.bestmonth' | translate}} :</td>
+            <td colspan="3">{{details.bestMonthId.value}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.reasonforbestmonth' | translate}} :</td>
+            <td colspan="3">{{details.reasonForBestMonth}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.worstmonth' | translate}} :</td>
+            <td colspan="3">{{details.worstMonthId.value}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.reasonforworstmonth' | translate}} :</td>
+            <td colspan="3">{{details.reasonForWorstMonth}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.numberofpurchase' | translate}} :</td>
+            <td colspan="3">{{details.numberOfPurchase}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.purchasefrequency' | translate}} :</td>
+            <td colspan="3">{{details.purchaseFrequency}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalpurchaselastmonth' | translate}} :</td>
+            <td colspan="3">{{details.totalPurchaseLastMonth}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.whenlastpurchase' | translate}} :</td>
+            <td colspan="3">{{details.lastPurchase.value}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.lastpurchaseamount' | translate}} :</td>
+            <td colspan="3">{{details.lastPurchaseAmount}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.businessassetamount' | translate}} :</td>
+            <td colspan="3">{{details.businessAsset}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.amountatinventory' | translate}} :</td>
+            <td colspan="3">{{details.amountAtInventory}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.fixedassetcost' | translate}} :</td>
+            <td colspan="3">{{details.fixedAssetCost}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.amountatcash' | translate}} :</td>
+            <td colspan="3">{{details.amountAtCash}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.amountatsaving' | translate}} :</td>
+            <td colspan="3">{{details.amountAtSaving}}</td>
+          </tr>
+
+          <tr class="bottomborder">
+            <td colspan="4">
+              <strong>{{'label.heading.expense' | translate}}</strong>
+            </td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalintax' | translate}} :</td>
+            <td colspan="3">{{details.totalInTax}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalintransport' | translate}} :</td>
+            <td colspan="3">{{details.totalInTransport}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalinrent' | translate}} :</td>
+            <td colspan="3">{{details.totalInRent}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalincommunication' | translate}} :</td>
+            <td colspan="3">{{details.totalInCommunication}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.otherexpense' | translate}} :</td>
+            <td colspan="3">{{details.otherExpense}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.otherexpenseamount' | translate}} :</td>
+            <td colspan="3">{{details.otherExpenseAmount}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalutility' | translate}} :</td>
+            <td colspan="3">{{details.totalUtility}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalworkersalary' | translate}} :</td>
+            <td colspan="3">{{details.totalWorkerSalary}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.totalwage' | translate}} :</td>
+            <td colspan="3">{{details.totalWage}}</td>
+          </tr>
+          <tr class="toppadding">
+            <td>{{'label.heading.society' | translate}} :</td>
+            <td colspan="3">{{details.society}}</td>
+          </tr>
+
+          <tr>
+            <td colspan="3">
+            </td>
+            <td class="pull-right">
+              <a ng-click="scrollto('viewlptop')"><i class="fa fa-upload"></i>{{'label.button.top' | translate}}</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

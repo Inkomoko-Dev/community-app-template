@@ -4,63 +4,14 @@
         </li>
         <li ng-if="savingaccountdetails.clientName"><a href="#/viewclient/{{savingaccountdetails.clientId}}">{{savingaccountdetails.clientName}}</a>
         </li>
-        <li class="active">{{savingaccountdetails.depositProductName}}({{savingaccountdetails.accountNo}})</li>
+        <li class="active">{{savingaccountdetails.savingsProductName}}({{savingaccountdetails.accountNo}})</li>
     </ul>
     <div class="card">
-        <br>
-        <div class="form-horizontal" ng-show="report">
-            <div class="form-group" ng-show="viewSavingReport">
-                <label class="control-label col-sm-2">{{'label.input.fromdate' | translate}}<span
-                        class="required">*</span></label>
-
-                <div class="col-sm-3">
-                    <input id="fromDate" class="date-disable form-control" readonly type="text"
-                           datepicker-pop="{{df}}" ng-model="date.fromDate" is-open="opened" min="minDate"
-                           max="restrictDate"/>
-                </div>
-                <label class="control-label col-sm-2">{{'label.input.todate' | translate}}<span
-                        class="required">*</span></label>
-
-                <div class="col-sm-3">
-                    <input id="toDate" class="date-disable form-control" readonly type="text"
-                           datepicker-pop="{{df}}" ng-model="date.toDate" is-open="opened" min="minDate"
-                           max="restrictDate"/>
-                </div>
-            </div>
-
-
-            <div class="center" ng-show="viewSavingReport">
-                <button ng-click="viewSavingDetails()" class="btn btn-default ng-binding">{{'label.button.back' |
-                    translate}}
-                </button>
-                <button ng-click="viewPrintDetails('PDF')" class="btn btn-primary ng-binding">
-                    {{'label.button.generatepdf' | translate}}
-                </button>
-                <button ng-click="viewPrintDetails('XLS')" class="btn btn-primary ng-binding">
-                    {{'label.button.generatexls' | translate}}
-                </button>
-            </div>
-        </div>
-        <div ng-hide="hidePentahoReport" ng-show="report" class="alert-block span tab-content">
-            <button ng-show="printbtn" ng-click="printReport()" class="btn btn-primary">{{'label.button.print' |
-                translate}}
-            </button>
-            <div id="printcontent">
-                <iframe id="rptLoadingFrame" ng-show="viewReport" ng-src="{{viewReportResult}}" frameborder="0"
-                        width="100%" height="600px"></iframe>
-            </div>
-            <div class="col-md-13 center" ng-show="viewTransactionReport">
-                <button ng-click="viewSavingDetails()" class="btn btn-default ng-binding">{{'label.button.back' |
-                    translate}}
-                </button>
-            </div>
-        </div>
-        <div ng-hide="report">
         <div class="">
             <br>
             <div class="span gray-head">
           <span style="margin-left: 10px;font-size:24px">
-                <strong><i class="fa fa-stop {{savingaccountdetails.status.code | StatusLookup}}"></i>&nbsp;{{savingaccountdetails.depositProductName}}(#{{savingaccountdetails.accountNo}}) {{savingaccountdetails.nickname}}</strong>
+                <strong><i class="fa fa-stop {{savingaccountdetails.status.code | StatusLookup}}"></i>&nbsp;{{savingaccountdetails.depositProductName}}(#{{savingaccountdetails.accountNo}})</strong>
           </span>
             </div>
             <div class="col-md-12 primarydiv">
@@ -196,16 +147,16 @@
                         <th colspan="2"><center>{{'label.heading.performancehistory' | translate}}</center></th>
                     </tr>
                     <tr>
-                        <th class="active fontnormal col-md-3">{{'label.account.deposit.target.amount' |
+                        <th class="active fontnormal col-md-3">{{'label.account.deposit.principal.amount' |
                             translate}}
                         </th>
-                        <td class="col-md-3"><span class="padded-td">{{savingaccountdetails.currency.displaySymbol}}&nbsp;{{savingaccountdetails.targetAmount | number}}</span>
+                        <td class="col-md-3"><span class="padded-td">{{savingaccountdetails.currency.displaySymbol}}&nbsp;{{savingaccountdetails.depositAmount}}</span>
                         </td>
                     </tr>
                     <tr>
-                        <th class="active fontnormal">{{'label.account.target.maturity.amount' | translate}}
+                        <th class="active fontnormal">{{'label.account.maturity.amount' | translate}}
                         </th>
-                        <td><span class="padded-td">{{savingaccountdetails.currency.displaySymbol}}&nbsp;{{savingaccountdetails.targetMaturityAmount | number}}</span>
+                        <td><span class="padded-td">{{savingaccountdetails.currency.displaySymbol}}&nbsp;{{savingaccountdetails.maturityAmount | number}}</span>
                         </td>
                     </tr>
                     <tr>
@@ -219,12 +170,6 @@
                         </th>
                         <td><span class="padded-td" data-ng-show="savingaccountdetails.summary.totalDeposits">{{savingaccountdetails.currency.displaySymbol}}&nbsp;{{savingaccountdetails.summary.totalDeposits | number}}</span>
                             <span class="padded-td" data-ng-hide="savingaccountdetails.summary.totalDeposits">{{savingaccountdetails.currency.displaySymbol}}&nbsp;0</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="active fontnormal">{{'label.account.current.maturity.amount' | translate}}
-                        </th>
-                        <td><span class="padded-td">{{savingaccountdetails.currency.displaySymbol}}&nbsp;{{savingaccountdetails.currentMaturityAmount | number}}</span>
                         </td>
                     </tr>
                     <tr>
@@ -425,14 +370,7 @@
                 <uib-tab heading="{{'label.heading.transactions' | translate}}"
                          ng-show="savingaccountdetails.transactions" select="convertDateArrayToObject('date')">
                     <br>
-                    <button class="btn btn-primary pull-right" ng-show="checkStatus()" ng-click="export()">
-                        {{'label.button.export' | translate}}
-                    </button>
-                    <button class="btn btn-primary pull-right" ng-show="checkStatus()"
-                            ng-click="viewJournalEntries()" style="margin-right: 8px;">
-                        {{'label.button.viewjournalentries' | translate}}
-                    </button>
-                    <button class="btn btn-primary pull-right" ng-show="checkStatus()"
+                    <button class="btn btn-primary pull-right"
                             ng-click="viewAccrualTransaction()" style="margin-right: 8px;">
                         {{'label.input.show.accrual.transactions' | translate}}
                     </button>
@@ -459,12 +397,14 @@
                             <th class="pointer" ng-click="changeTransactionSort('runningBalance')">
                                 {{'label.heading.balance' | translate}}
                             </th>
+                            <th class="pointer" ng-click="changeTransactionSort('runningBalance')">
+                                {{'label.heading.doneBy' | translate}}
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="pointer-main" ng-class="{strikeoff : transaction.reversed==true}"
-                            dir-paginate="transaction in savingaccountdetails.transactions | itemsPerPage: transactionsPerPage " total-items="totalTransactions"
-                            pagination-id="transactions">
+                        <tr dir-paginate="transaction in savingaccountdetails.transactions | orderBy:transactionSort.column[2]:transactionSort.ascending  | filter:filterText | itemsPerPage: transactionsPerPage" class="pointer-main"
+                            total-items="totalTransactions"  pagination-id="transactions" ng-show="!transaction.reversed">
                             <td class="pointer"
                                 data-ng-click="routeTo(transaction.accountId,transaction.id,transaction.transfer,transaction.transfer.id)">
                                 {{transaction.id}}
@@ -492,6 +432,10 @@
                             <td class="pointer"
                                 data-ng-click="routeTo(transaction.accountId,transaction.id,transaction.transfer,transaction.transfer.id)">
                                 {{transaction.runningBalance | number}}
+                            </td>
+                            <td class="pointer"
+                                data-ng-click="routeTo(transaction.accountId,transaction.id,transaction.transfer,transaction.transfer.id)">
+                                {{transaction.submittedByUsername}}
                             </td>
                         </tbody>
                     </table>
@@ -542,6 +486,36 @@
                         </tr>
                         </tbody>
                     </table>
+                </uib-tab>
+                <uib-tab heading="{{'label.heading.recurringDocuments' | translate}}" select="getRecurringDocuments()">
+                    <div class="pull-right" data-ng-show="choice">
+                        <a href="#/addrecurringdocument/{{savingaccountdetails.id}}" class="btn btn-primary"><i class="fa fa-plus "></i>{{'label.button.upload'
+                            | translate}}</a>
+                    </div>
+                    <br>
+                    <table class="table" ng-show="recurringDocuments.length > 0">
+                        <thead>
+                        <th>{{'label.heading.name' | translate}}</th>
+                        <th>{{'label.heading.description' | translate}}</th>
+                        <th>{{'label.heading.filename' | translate}}</th>
+                        <th>{{'label.heading.actions' | translate}}</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="document in recurringDocuments">
+                            <td>{{document.name}}</td>
+                            <td>{{document.description}}</td>
+                            <td>{{document.fileName}}</td>
+                            <td>
+                                <a target="_blank" href="{{hostUrl}}{{document.docUrl}}"><i class="fa fa-cloud-download"></i></a>&nbsp;
+                                <a ng-show="document.fileIsImage" ng-click="previewDocument(document.docUrl,document.fileName)"><i class="fa fa-eye"></i></a>
+                                <a ng-click="deleteDocument(document.id,$index)"><i class="fa fa-times"></i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div style="padding-left: 25%;">
+                        <object height="60%" width="70%" ng-show="preview" data="{{fileUrl}}" type="{{fileType}}"></object>
+                    </div>
                 </uib-tab>
                 <uib-tab ng-repeat="savingdatatable in savingdatatables"
                          heading="{{savingdatatable.registeredTableName}}"
@@ -686,8 +660,7 @@
                 </div>
             </script>
         </div>
-</div>
-</div>
+</div
 </div>
 <script type="text/ng-template" id="delInstruction.html">
     <div class="modal-header silver">

@@ -75,8 +75,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr class="pointer-main" dir-paginate="transaction in transactions.currentPageItems | itemsPerPage: entriesPerPage"
-                        total-items="transactions.totalRecords" pagination-id="entries">
+                    <tr class="pointer-main" ng-repeat="transaction in transactions.currentPageItems">
                         <td class="pointer" data-ng-click="routeTo(transaction.transactionId)">{{transaction.id}}</td>
                         <td class="pointer" data-ng-click="routeTo(transaction.transactionId)">{{transaction.officeName}}</td>
                         <td class="pointer" data-ng-click="routeTo(transaction.transactionId)">{{transaction.transactionDate |
@@ -106,19 +105,15 @@
                     </tr>
                     </tbody>
                 </table>
-                <dir-pagination-controls align="center" boundary-links="true"
-                                         template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"
-                                         on-page-change="changePage(newPageNumber)" pagination-id="entries">
-                </dir-pagination-controls>
-                <div class="center" ng-show="(formData.loanaccountId != null && isValid == true) || (formData.savingsaccountId != null && isValid == true) || (formData.fixedDepositId != null && isValid == true)">
+                <div class="center" ng-show="(formData.loanaccountId != null && isValid == true) || (formData.savingsaccountId != null && isValid == true)">
                     <a href="{{path}}"
                        class="btn btn-default center"
                             ><i
                            class=""></i>{{'label.button.back' | translate}}</a></div>
-<!--                <ul class="pager">-->
-<!--                    <li class="previous"><a id="prev" ng-click="transactions.previous()" href="" ng-disabled="!transactions.hasPrevious()">&larr; {{'label.button.previous' | translate}}</a></li>-->
-<!--                    <li class="next"><a id="next" ng-click="transactions.next()" href="" ng-disabled="!transactions.hasNext()">{{'label.button.next' | translate}} &rarr;</a></li>-->
-<!--                </ul>-->
+                <ul class="pager">
+                    <li class="previous"><a id="prev" ng-click="transactions.previous()" href="" ng-disabled="!transactions.hasPrevious()">&larr; {{'label.button.previous' | translate}}</a></li>
+                    <li class="next"><a id="next" ng-click="transactions.next()" href="" ng-disabled="!transactions.hasNext()">{{'label.button.next' | translate}} &rarr;</a></li>
+                </ul>
             </div>
         </div>
     </div>
