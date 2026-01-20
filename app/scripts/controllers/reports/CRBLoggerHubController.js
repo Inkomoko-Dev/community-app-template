@@ -126,38 +126,6 @@
             };
 
             /**
-             * View detailed error information for a log entry
-             */
-            scope.viewDetails = function(logEntry) {
-                scope.selectedLog = logEntry;
-                scope.showDetailsModal = true;
-            };
-
-            /**
-             * Close details modal
-             */
-            scope.closeDetailsModal = function() {
-                scope.showDetailsModal = false;
-                scope.selectedLog = null;
-            };
-
-            /**
-             * Show error details modal
-             */
-            scope.showErrorModal = function(logEntry) {
-                scope.selectedErrorLog = logEntry;
-                scope.showErrorModal = true;
-            };
-
-            /**
-             * Close error modal
-             */
-            scope.closeErrorModal = function() {
-                scope.showErrorModal = false;
-                scope.selectedErrorLog = null;
-            };
-
-            /**
              * Clear all filters
              */
             scope.clearFilters = function() {
