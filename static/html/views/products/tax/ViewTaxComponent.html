@@ -72,12 +72,38 @@
                 </div>
             </div>
 
+            <div >
+                <div class="span gray-head">
+                    <span class="boldlabel">
+                        <strong>{{ 'label.heading.taxhistory' | translate }}</strong>
+                    </span>
+                </div>
 
-            <div class="col-md-offset-3">
+                <table class="table" >
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.startDate' | translate}}</th>
+                        <th>{{'label.heading.endDate' | translate}}</th>
+                        <th>{{'label.heading.percentage' | translate}}</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="taxData in componentHistory">
+                            <td>{{ taxData.startDate | DateFormat }}</td>
+                            <td>{{ taxData.endDate | DateFormat }}</td>
+                            <td>{{ taxData.percentage }}</td>
+                        
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-offset-1">
                 <a id="cancel" href="#/taxcomponents">
                     <button type="reset" class="btn btn-default">{{'label.button.back' | translate}}</button>
                 </a>
             </div>
-        </fieldset>
+        </fieldset>        
     </form>
 </div>

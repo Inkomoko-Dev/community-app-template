@@ -1,4 +1,4 @@
- <div class="content-container" ng-controller="EditSavingAccountController">
+<div class="content-container" ng-controller="EditSavingAccountController">
     <ul class="breadcrumb">
         <li><a href="#/viewsavingaccount/{{accountId}}">{{'label.anchor.viewsavingaccount' | translate}}</a></li>
         <li class="active">{{'label.anchor.editsavingapplication' | translate}}</li>
@@ -10,7 +10,7 @@
             <h4>{{ 'label.heading.editsavingapplication' | translate }}</h4>
         </div>
         <br/>
-        <form name="editsavingccountform" novalidate="" class="form-inline" rc-submit="submit()">
+        <form name="editsavingccountform" novalidate="" class="form-inline" rc-submit="         submit()">
         <fieldset>
         <table class="width100">
             <tr>
@@ -54,14 +54,6 @@
                 </td>
 
             </tr>
-            <tr>
-                <td class="width14">
-                    <label>{{ 'label.input.nickname' | translate }}:&nbsp;</label>
-                </td>
-                <td class="width36 paddedbottom10">
-                    <input id="nickname" ng-model="formData.nickname" class="form-control"/>
-                </td>
-            </tr>
         </table>
         <hr data-ng-show="formData.productId"/>
         <label ng-show="data"><strong>{{ 'label.heading.terms' | translate }}</strong></label>
@@ -80,6 +72,10 @@
                         <label><b>{{data.currency.decimalPlaces}}</b></label>
                     </td>
                 </tr>
+            </table>
+        </div>
+        <div ng-show="!formData.useFloatingInterestRate">
+            <table class="width100">
                 <tr>
                     <td class="width14">
                         <label class="control-label">{{ 'label.input.nominalannualinterestrate' | translate
@@ -94,6 +90,45 @@
                         <form-validate valattributeform="newsavingccountform"
                                        valattribute="nominalannualinterestrate"/>
                     </td>
+                </tr>
+            </table>
+        </div>
+        <div ng-show="data">
+            <tr>
+                <td>
+                    <label class="control-label">{{ 'label.input.usefloatinginterestrate' | translate }}
+                    </label>
+                </td>
+                <td class="width36 paddedbottom10">
+                    <label>
+                        <input type="checkbox" ng-model="formData.useFloatingInterestRate"/>
+                    </label>
+                </td>
+            </tr>
+        </div>
+        <br>
+        <div ng-show="formData.useFloatingInterestRate">
+            <tr>
+                <td>
+                    <table class="witdh100">
+                        <tr class="graybg">
+                            <th>{{'label.heading.floatinginterestrate.valid.fromDate' | translate}}</th>
+                            <th>{{'label.heading.floatinginterestrate.valid.endDate' | translate}}</th>
+                            <th>{{'label.heading.floatinginterestrate.floatingInterestRate' | translate}}</th>
+                        </tr>
+                        <tr ng-repeat="floatingInterestRate in formData.floatingInterestRates">
+                            <td class="width40"> {{ floatingInterestRate.fromDate | DateFormat}}</td>
+                            <td class="width40"> {{ floatingInterestRate.endDate | DateFormat}}</td>
+                            <td class="width20" align="center"> {{ floatingInterestRate.floatingInterestRate }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </div>
+        <br>
+        <div ng-show="data">
+            <table class="width100">
+                <tr>
                     <td class="width14">
                         <label class="control-label">{{ 'label.input.interestcompoundingperiod' | translate
                             }}&nbsp;<span class="required">*</span></label>
@@ -105,15 +140,6 @@
                                 value="{{type.id}}" class="form-control width170px"></select>
                     </td>
 
-                </tr>
-                <tr>
-                    <td class="width14">
-                        <label class="control-label">{{ 'label.input.currencyinmultiplesof' | translate }}&nbsp;</label></td>
-                    </td>
-                    <td class="width36 paddedbottom10">
-                        <input type="text" value="{{data.currency.inMultiplesOf}}"
-                               class="form-control" readonly/>
-                    </td>
                     <td class="width14">
                         <label class="control-label">{{ 'label.input.interestpostingperiod' | translate }}&nbsp;<span
                                 class="required">*</span></label></td>
@@ -168,20 +194,21 @@
                     </td>
                 </tr>
                 <tr>
+                <td class="width14">
+                    <label class="control-label">{{ 'label.input.currencyinmultiplesof' | translate }}&nbsp;</label></td>
+                </td>
+                <td class="width36 paddedbottom10">
+                    <input type="text" value="{{data.currency.inMultiplesOf}}"
+                           class="form-control" readonly/>
+                </td>
+                </tr>
+                <tr data-ng-show="formData.withdrawalFrequencyEnum">
                     <td class="width14">
-                        <label class="control-label">{{ 'label.input.dailyWithdrawLimit' | translate }}&nbsp;</label>
+                        <label class="control-label">{{ 'label.input.withdrawalFrequency' | translate }}&nbsp;</label></td>
                     </td>
                     <td class="width36 paddedbottom10">
-                        <input id="dailyWithdrawLimit" type="text"
-                               number-format ng-model="formData.dailyWithdrawLimit" class="form-control">
-                    </td>
-
-                    <td class="width14">
-                        <label class="control-label">{{ 'label.input.singleWithdrawLimit' | translate }}&nbsp;</label>
-                    </td>
-                    <td class="width36 paddedbottom10">
-                        <input id="singleWithdrawLimit" type="text"
-                               number-format ng-model="formData.singleWithdrawLimit" class="form-control">
+                        <input type="text" value="{{formData.withdrawalFrequency | number}} {{formData.withdrawalFrequencyEnum.value}}"
+                               class="form-control" readonly/>
                     </td>
                 </tr>
                 <tr>
@@ -222,6 +249,19 @@
                     </td>
                 </tr>
                 <tr>
+                    <td colspan="2" class="paddedbottom10">
+                        <input type="checkbox" ng-model="formData.lienAllowed"> &nbsp;<span
+                            class="control-label">{{ 'label.input.lienallowed' | translate }}&nbsp;</span>
+                    </td>
+                    <td class="width14" ng-show="formData.lienAllowed">
+                        <label class="control-label">{{ 'label.input.maxallowedlienlimit' | translate
+                            }}&nbsp;</label></td>
+                    <td class="width36 paddedbottom10" ng-show="formData.lienAllowed">
+                        <input id="maxAllowedLienLimit" type="text" class="form-control"
+                               number-format ng-model="formData.maxAllowedLienLimit">
+                    </td>
+                </tr>
+                <tr>
                     <td colspan="2" class="paddedbottom10" ng-hide="formData.allowOverdraft">
                         <input type="checkbox" ng-model="formData.enforceMinRequiredBalance"> &nbsp;<span
                             class="control-label">{{ 'label.input.enforceMinRequiredBalance' | translate }}&nbsp;</span>
@@ -234,16 +274,17 @@
                                number-format ng-model="formData.minRequiredBalance">
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="2" class="paddedbottom10 paddedtop">
-                        <input type="checkbox" ng-model="formData.requireAuthorizationToView">&nbsp;
-                        <label class="control-label">{{ 'label.input.requireauthorizationtoviewaccount' | translate }}&nbsp;</label>
-                    </td>
-                    <td class="width14"></td>
-                    <td class="width36 paddedbottom10"></td>
-                </tr>
                 <tr ng-show="data.minBalanceForInterestCalculation">
                     <td > {{'label.heading.minbalanceforinterestcalculation' | translate}}</td>
+                    <td > {{data.minBalanceForInterestCalculation}}</td>
+                </tr>
+                <tr ng-show="data.numOfCreditTransaction">
+                    <td > {{'label.heading.numberOfCreditTransactions' | translate}}</td>
+                    <td > {{data.numOfCreditTransaction}}</td>
+                </tr>
+                <tr ng-show="data.numOfDebitTransaction">
+                    <td > {{'label.heading.numberOfDebitTransactions' | translate}}</td>
+                    <td > {{data.numOfDebitTransaction}}</td>
                 </tr>
                 <tr ng-show="data.taxGroup">
                     <td colspan="2" class="paddedbottom10">

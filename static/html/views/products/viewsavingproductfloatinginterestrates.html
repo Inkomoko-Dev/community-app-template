@@ -1,0 +1,39 @@
+<div id="viewlptop"></div>
+<div class="content-container" ng-controller="ViewSavingsProductFloatingInterestRatesController">
+    <ul class="breadcrumb">
+        <li><a href="#/products">{{'label.anchor.products' | translate}}</a> </li>
+        <li><a href="#/savingproducts">{{'label.anchor.savingproducts' | translate}}</a></li>
+        <li><a href="#/viewsavingproduct/{{productId}}">{{productId}}</a> </li>
+        <li class="active">{{'label.anchor.floatinginterestratevieweditdelete' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <div class="pull-right">
+                    <a href="#/viewsavingproduct/{{productId}}/addfloatinginterestrate" class="btn btn-primary"><i class="fa fa-plus "></i>&nbsp;&nbsp;{{'label.label.addfloatinginterestrate' | translate}}</a>
+                </div>
+            </div>
+            <div>
+                <table class="table">
+                    <thead>
+                    <tr class="bottomborder graybg">
+                        <td>{{'label.heading.floatinginterestrate.valid.fromDate' | translate}}</td>
+                        <td>{{'label.heading.floatinginterestrate.valid.endDate' | translate}}</td>
+                        <td>{{'label.heading.floatinginterestrate.floatingInterestRate' | translate}}</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="floatingInterestRate in savingproduct.floatingInterestRates">
+                        <td class="pointer" data-ng-click="routeTo(floatingInterestRate.id)">{{floatingInterestRate.fromDate | DateFormat}}</td>
+                        <td class="pointer" data-ng-click="routeTo(floatingInterestRate.id)">{{floatingInterestRate.endDate | DateFormat}}</td>
+                        <td class="pointer" data-ng-click="routeTo(floatingInterestRate.id)">{{floatingInterestRate.floatingInterestRate}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <br>
+            <br><br><br><br><br><br>
+        </div>
+    </div>
+</div>

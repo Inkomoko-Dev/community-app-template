@@ -1,0 +1,38 @@
+<div class="content-container" ng-controller="ViewAllClientCollateralController">
+    <ul class="breadcrumb">
+        <li><a href="#/clients">{{'label.anchor.clients' | translate}}</a></li>
+        <li><a href="#/viewclient/{{clientId}}">{{'label.anchor.client' | translate}}</a></li>
+        <li class="active">{{'label.anchor.collaterals' | translate}}</li>
+    </ul>
+    
+    <div class="card well">
+        <div class="toolbar">
+        <h4>List of Collaterals</h4>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-2 col-sm-3 paddedbottom20 pull-right" >
+                <a href="#/createclientcollateral/{{clientId}}" class="btn btn-primary pull-right" has-permission='CREATE_CLIENT_COLLATERAL'><i class="fa fa-plus "></i>&nbsp;&nbsp;{{'label.button.createclientcollateral' | translate}}</a>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+            <tr class="graybg">
+                <th>{{'label.heading.name' | translate}}</th>
+                <th>{{'label.heading.quantity' | translate}}</th>
+                <th>{{'label.heading.totalValue' | translate}}</th>
+                <th>{{'label.heading.totalCollateralValue' | translate}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="pointer-main" ng-repeat="collateral in collaterals">
+                <td class="pointer" data-ng-click="routeTo(collateral.id)">{{collateral.name | translate}}</td>
+                <td class="pointer" data-ng-click="routeTo(collateral.id)">{{collateral.quantity}}</td>
+                <td class="pointer" data-ng-click="routeTo(collateral.id)">{{collateral.total}}</td>
+                <td class="pointer" data-ng-click="routeTo(collateral.id)">{{collateral.totalCollateral}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    
+</div>

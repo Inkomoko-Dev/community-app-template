@@ -40,9 +40,54 @@
 	                    <td>{{'label.heading.currency' | translate}}</td>
 	                    <td>{{charge.currency.name}}</td>
 	                </tr>
-	                <tr>
+	                <tr ng-show="!charge.varyAmounts">
 	                    <td>{{'label.heading.amount' | translate}}</td>
 	                    <td>{{charge.amount|number}}</td>
+	                </tr>
+					<tr ng-show="!charge.varyAmounts">
+						<td>{{'label.heading.maxoccurrence' | translate}}</td>
+						<td>{{charge.maxOccurrence|number}}</td>
+					</tr>
+					<tr ng-show="charge.varyAmounts">
+						<td>{{'label.heading.amount' | translate}}</td>
+						<td>
+							<table class="table table-bordered width100">
+								<tr class="graybg">
+								
+									<td>{{'label.heading.liquidation.number' | translate}}</td>
+									<td >{{'label.heading.liquidation.fee.amount' | translate}}</td>
+								</tr>
+		
+								<tr ng-repeat="chartSlab in charge.charges">
+								   
+									<td class="width15">
+										<table class="width100">
+											<tr>
+												<td>{{ chartSlab.fromPeriod }}</td>
+												<td>&nbsp;&nbsp;-&nbsp;&nbsp;</td>
+												<td>{{ chartSlab.toPeriod }}</td>
+											</tr>
+										</table>
+									</td>
+									<td class="width15">
+										<table class="width100">
+											<tr>
+												<td>{{ chartSlab.value }} </td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				
+					<tr>
+	                    <td>{{'label.heading.minAmount' | translate}}</td>
+	                    <td>{{charge.minAmount|number}}</td>
+	                </tr>
+					<tr>
+	                    <td>{{'label.heading.maxAmount' | translate}}</td>
+	                    <td>{{charge.maxAmount|number}}</td>
 	                </tr>
 	                <tr>
 	                    <td>{{'label.heading.chargetimetype' | translate}}</td>
@@ -56,6 +101,30 @@
 	                    <td>{{'label.heading.chargecalculationtype' | translate}}</td>
 	                    <td>{{charge.chargeCalculationType.value}}</td>
 	                </tr>
+					<tr>
+						<td>{{'label.heading.enablepaymenttype' | translate}}</td>
+						<td>{{charge.isPaymentType}}</td>
+					</tr>
+					<tr ng-show="charge.isPaymentType == true">
+						<td>{{'label.heading.paymenttype' | translate}}</td>
+						<td>{{charge.paymentTypeOptions	.name}}</td>
+					</tr>
+					<tr>
+						<td>{{'label.heading.enablewithdrawtype' | translate}}</td>
+						<td>{{charge.freeWithdrawal}}</td>
+					</tr>
+					<tr ng-show="charge.freeWithdrawal == true">
+						<td>{{'label.heading.freewithdrawalfrequency' | translate}}</td>
+						<td>{{charge.freeWithdrawalChargeFrequency}}</td>
+					</tr>
+					<tr ng-show="charge.freeWithdrawal == true">
+						<td>{{'label.heading.restartcount' | translate}}</td>
+						<td>{{charge.restartFrequency}}</td>
+					</tr>
+					<tr ng-show="charge.freeWithdrawal == true">
+						<td>{{'label.heading.frequencyType' | translate}}</td>
+						<td>{{frequencyType}}</td>
+					</tr>
 	                <tr>
 	                    <td>{{'label.heading.active' | translate}}</td>
 	                    <td>{{charge.active | YesOrNo}}</td>

@@ -16,7 +16,7 @@
                        class="fa fa-edit "></i>&nbsp;&nbsp;{{'label.button.edit' | translate}}</a>
                 </div>
             </div>
-            <legend>{{loanproduct.name}}</legend>
+            <legend class="paddedtop paddedbottom10">{{loanproduct.name}}</legend>
 <table width="100%">
 <tr>
     <td>
@@ -48,9 +48,21 @@
     <td>{{'label.heading.closedate' | translate}}:</td>
     <td colspan="3">{{loanproduct.closeDate | DateFormat}}</td>
 </tr>
+    <tr ng-show="loanproduct.productCategory">
+        <td>{{'label.input.productCategory' | translate}}:</td>
+        <td colspan="3">{{loanproduct.productCategory}}</td>
+    </tr>
+    <tr ng-show="loanproduct.productType">
+        <td>{{'label.input.productType' | translate}}:</td>
+        <td colspan="3">{{loanproduct.productType}}</td>
+    </tr>
 <tr>
     <td>{{'label.heading.includeborrowercycle' | translate}} :</td>
     <td colspan="3">{{loanproduct.includeInBorrowerCycle}}</td>
+</tr>
+<tr>
+    <td>{{'label.heading.islamic' | translate}} :</td>
+    <td colspan="3">{{loanproduct.isIslamic}}</td>
 </tr>
 <tr>
     <td colspan="4"><br/></td>
@@ -194,6 +206,10 @@
     <td>{{'label.heading.equalamortization' | translate}}</td>
     <td colspan="3">{{loanproduct.isEqualAmortization}}</td>
 </tr>
+<tr ng-show="loanproduct.amortizationType.id == 0">
+    <td>{{'label.heading.fixed.pricipal.percentage.per.installment' | translate}}</td>
+    <td colspan="3">{{loanproduct.fixedPrincipalPercentagePerInstallment}}</td>
+</tr>
 <tr>
     <td>{{'label.heading.interestcalculationperiod' | translate}}</td>
     <td colspan="3">{{loanproduct.interestCalculationPeriodType.value}}</td>
@@ -256,7 +272,34 @@
     <td>{{'label.input.canUseForTopup' | translate}}</td>
     <td colspan="3">{{loanproduct.canUseForTopup | YesOrNo}}</td>
 </tr>
-
+<tr>
+    <td>{{'label.input.loanTermIncludesToppedUpLoanTerm' | translate}}</td>
+    <td colspan="3">{{loanproduct.loanTermIncludesToppedUpLoanTerm | YesOrNo}}</td>
+</tr>
+<tr ng-show="loanproduct.maxNumberOfLoanExtensionsAllowed">
+    <td>{{'label.input.maxNumberOfLoanExtensionsAllowed' | translate}}</td>
+    <td colspan="3">{{loanproduct.maxNumberOfLoanExtensionsAllowed}}</td>
+</tr>
+    <tr ng-show="loanproduct.isBnplLoanProduct">
+        <td>{{'label.input.isBnplLoanProduct' | translate}}</td>
+        <td colspan="3">{{loanproduct.isBnplLoanProduct}}</td>
+    </tr>
+    <tr ng-show="loanproduct.requiresEquityContribution">
+        <td>{{'label.input.requiresEquityContribution' | translate}}</td>
+        <td colspan="3">{{loanproduct.requiresEquityContribution}}</td>
+    </tr>
+    <tr ng-show="loanproduct.equityContributionLoanPercentage">
+        <td>{{'label.input.equityContributionLoanPercentage' | translate}}</td>
+        <td colspan="3">{{loanproduct.equityContributionLoanPercentage}}</td>
+    </tr>
+    <tr ng-show="loanproduct.isAccountLevelArrearsToleranceEnable">
+        <td>{{'label.input.isAccountLevelArrearsToleranceEnable' | translate}}</td>
+        <td colspan="3">{{loanproduct.isAccountLevelArrearsToleranceEnable}}</td>
+    </tr>
+    <tr>
+        <td>{{'label.input.allowableDSCR' | translate}}</td>
+        <td colspan="3">{{loanproduct.allowableDSCR | number}}</td>
+    </tr>
 <tr>
 <td colspan="4"><br/></td>
 </tr>
@@ -271,6 +314,10 @@
 <tr data-ng-show="loanproduct.isInterestRecalculationEnabled">
     <td>{{'label.input.interest.recalculation.reschdule.strategy' | translate}}</td>
     <td colspan="3">{{loanproduct.interestRecalculationData.rescheduleStrategyType.value}}</td>
+</tr>
+<tr data-ng-show="loanproduct.isInterestRecalculationEnabled && loanproduct.interestRecalculationData.rescheduleStrategyType.id == 3">
+    <td>{{ 'label.input.interestforexactdaysinperiod' | translate }}</td>
+    <td><span class="padded-td">{{loanproduct.interestRecalculationData.advancePaymentInterestForExactDaysInPeriod | YesOrNo}}</span></td>
 </tr>
 <tr data-ng-show="loanproduct.isInterestRecalculationEnabled">
     <td>{{'label.input.preclose.interest.calculation.strategy' | translate}}</td>
@@ -406,6 +453,7 @@
         <td>{{'label.input.no.of.overdue.days.to.move.loan.into.arrears' | translate}}</td>
         <td colspan="3">{{graceOnArrearsAging}}</td>
     </tr>
+
 <tr class="bottomborder">
     <td colspan="4"><strong>{{'label.heading.charges' | translate}}</strong></td>
 </tr>

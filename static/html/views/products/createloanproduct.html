@@ -89,6 +89,28 @@
                            min="minDate" />
                 </div>
             </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.productCategory' | translate }}
+                        </label>
+                        <div class="col-sm-2">
+                            <select id="productCategoryId" name="productCategoryId" ng-model="formData.productCategoryId"
+                                    ng-options="productCategory.id as productCategory.name for productCategory in productCategories"
+                                    value="{{clientLevel.id}}" class="form-control">
+                                <option value="">{{'label.selectone' | translate}}</option>
+                            </select>
+                        </div>
+                        <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.productType' | translate }}
+                        </label>
+                        <div class="col-sm-2">
+                            <select id="productTypeId" name="productTypeId" ng-model="formData.productTypeId"
+                                    ng-options="productType.id as productType.name for productType in productTypes"
+                                    value="{{clientLevel.id}}" class="form-control">
+                                <option value="">{{'label.selectone' | translate}}</option>
+                            </select>
+                        </div>
+                    </div>
+
             <div class="form-group">
                 <label class="control-label col-sm-2">{{ 'label.input.includeinborrowerloancounter' | translate }}
                     <i class="fa fa-question-circle "
@@ -96,11 +118,20 @@
                        tooltip-append-to-body="true"></i>
                 </label>
 
-                <div class="checkbox col-sm-2">
-                    <label>
+                <div class="col-sm-2">
                         <input type="checkbox" ng-model="formData.includeInBorrowerCycle" ng-true-value="true"
                                ng-false-value="false">
-                    </label>
+                </div>
+
+                <label class="control-label col-sm-4">{{ 'label.input.islamic' | translate }}
+                    <i class="fa fa-question-circle "
+                       uib-tooltip="{{'label.tooltip.loanproduct.islamic' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </label>
+
+                <div class="col-sm-4">
+                        <input type="checkbox" ng-model="formData.isIslamic" ng-true-value="true"
+                               ng-false-value="false">
                 </div>
             </div>
                     <hr>
@@ -138,7 +169,7 @@
 
                 <div class="col-sm-2">
                     <input type="text" id="digitsAfterDecimal" name="decimalplace" class="form-control"
-                           ng-model="formData.digitsAfterDecimal" required late-validate number=true />
+                           ng-model="formData.digitsAfterDecimal" required late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Currency" valattribute="decimalplace"/>
@@ -154,7 +185,7 @@
 
                 <div class="col-sm-2">
                     <input type="text" id="inMultiplesOf" class="form-control" name="multiplesof"
-                           ng-model="formData.inMultiplesOf" required late-validate number=true />
+                           ng-model="formData.inMultiplesOf" required late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Currency" valattribute="multiplesof"/>
@@ -167,7 +198,7 @@
                 <div class="col-sm-2">
                     <input type="text" id="installmentAmountInMultiplesOf" class="form-control"
                            name="installmentAmountInMultiplesOf"
-                           ng-model="formData.installmentAmountInMultiplesOf" required late-validate number=true/>
+                           ng-model="formData.installmentAmountInMultiplesOf" required late-validate number-only-format/>
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Currency" valattribute="installmentAmountInMultiplesOf"/>
@@ -207,16 +238,16 @@
 
                 <div class="col-sm-2">
                     <input id="minPrincipal" placeholder="{{'label.input.minimum' | translate}}" type="text"
-                           class="form-control" number-format ng-model="formData.minPrincipal">
+                           class="form-control"  ng-model="formData.minPrincipal" late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <input type="text" placeholder="{{'label.input.default' | translate}}" id="principal"
                            name="principal"
-                           class="form-control" number-format ng-model="formData.principal" required late-validate number=true />
+                           class="form-control"  ng-model="formData.principal" required late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <input type="text" placeholder="{{'label.input.maximum' | translate}}" id="maxPrincipal"
-                           class="form-control" number-format ng-model="formData.maxPrincipal">
+                           class="form-control"  ng-model="formData.maxPrincipal"  late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Terms" valattribute="principal"/>
@@ -286,16 +317,16 @@
 
                 <div class="col-sm-2">
                     <input id="minNumberOfRepayments" placeholder="{{'label.input.minimum' | translate}}" type="text"
-                           class="form-control" ng-model="formData.minNumberOfRepayments">
+                           class="form-control" ng-model="formData.minNumberOfRepayments" late-validate number-only-format/>
                 </div>
                 <div class="col-sm-2">
                     <input type="text" placeholder="{{'label.input.default' | translate}}" id="numberOfRepayments"
                            name="numofrepayments" class="form-control" ng-model="formData.numberOfRepayments" required
-                           late-validate number=true />
+                           late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <input type="text" placeholder="{{'label.input.maximum' | translate}}" id="maxNumberOfRepayments"
-                           class="form-control" ng-model="formData.maxNumberOfRepayments">
+                           class="form-control" ng-model="formData.maxNumberOfRepayments"  late-validate number-only-format  />
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Terms" valattribute="numofrepayments"/>
@@ -405,20 +436,85 @@
                 <div class="col-sm-2">
                     <input id="minValue" name="minValue" class="form-control" type="text"
                            ng-model="formData.minDifferentialLendingRate"
-                           placeholder="{{'label.input.minfloatinginterestrate' | translate}}" number-format/>
+                           placeholder="{{'label.input.minfloatinginterestrate' | translate}}"   late-validate  number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <input id="default" name="default" class="form-control" type="text"
                            ng-model="formData.defaultDifferentialLendingRate"
-                           placeholder="{{'label.input.defaultfloatinginterestrate' | translate}}" number-format/>
+                           placeholder="{{'label.input.defaultfloatinginterestrate' | translate}}"  late-validate  number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <input id="maxValue" name="maxValue" class="form-control" type="text"
                            ng-model="formData.maxDifferentialLendingRate"
-                           placeholder="{{'label.input.maxfloatinginterestrate' | translate}}" number-format/>
+                           placeholder="{{'label.input.maxfloatinginterestrate' | translate}}"  late-validate number-only-format />
                 </div>
             </div>
             <div class="form-group" ng-show="!formData.isLinkedToFloatingInterestRates">
+                <!--Rate Module-->
+
+              <div ng-show="enableRates">
+                <div class="form-group">
+                  <label class="control-label col-sm-2">{{ 'label.input.nominalinterestrate' |
+                    translate }}
+                    <i class="icon-question-sign"
+                       tooltip="{{'label.tooltip.loanproduct.nominalinterestrate' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                  </label>
+
+                  <div class="col-sm-2">
+                    <input id="calculatedRatePerPeriod" readonly type="text"
+                           class="form-control" ng-model="calculatedRatePerPeriod">
+                  </div>
+                  <div class="col-sm-2">
+                    <select class="form-control" id="interestRateFrequencyTypeR"
+                            ng-model="formData.interestRateFrequencyType"
+                            ng-options="interestRateFrequencyType.id as interestRateFrequencyType.value for interestRateFrequencyType in product.interestRateFrequencyTypeOptions"
+                            value="{{interestRateFrequencyType.id}}"></select>
+                  </div>
+                  <div class="col-sm-2">
+                    <form-validate valattributeform="createloanproductform"
+                                   valattribute="interestRatePerPeriod"/>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <select id="currentRate" ng-model="currentRate" class="form-control"
+                            ng-options="rate as rate.name for rate in rateOptions"
+                            value="{{rate}}">
+                      <option class="displaynone" value="">{{'label.selectrate' | translate}}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-sm-1">
+                    <button type="button" class="btn btn-primary"
+                            ng-click="rateSelected(currentRate)">{{ 'label.button.add' | translate
+                      }}
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group col-md-12">
+                  <table data-ng-show="rateFlag" class="table width100">
+                    <tr class="graybg">
+                      <th>{{'label.heading.name' | translate}}</th>
+                      <th>{{'label.heading.percentage' | translate}}</th>
+                      <th></th>
+                      <th>{{'label.heading.actions' | translate}}</th>
+
+                    </tr>
+                    <tr ng-repeat="rate in rates">
+                      <td>{{rate.name}}</td>
+                      <td>{{rate.percentage | number}}</td>
+                      <td></td>
+                      <td><a ng-click="deleteRate($index)"><i
+                          class="fa fa-times icon-white"></i></a>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+
+              <!-- End -->
                 <label class="control-label col-sm-2">{{ 'label.input.nominalinterestrate' | translate }}
                     <span class="required">*</span>
                     <i class="fa fa-question-circle"
@@ -428,15 +524,15 @@
 
                 <div class="col-sm-2">
                     <input id="minInterestRatePerPeriod" placeholder="{{'label.input.minimum' | translate}}" type="text"
-                           class="form-control" ng-model="formData.minInterestRatePerPeriod">
+                           class="form-control" ng-model="formData.minInterestRatePerPeriod" ng-disabled="rateFlag&&enableRates"   late-validate number-only-format  />
                 </div>
                 <div class="col-sm-2">
                     <input type="text" id="interestRatePerPeriod" placeholder="{{'label.input.default' | translate}}"
-                           name="interestRatePerPeriod" class="form-control" ng-model="formData.interestRatePerPeriod" required late-validate number=true />
+                           name="interestRatePerPeriod" class="form-control" ng-model="formData.interestRatePerPeriod" required late-validate number-only-format  ng-disabled="rateFlag&&enableRates" />
                 </div>
                 <div class="col-sm-2">
                     <input id="maxInterestRatePerPeriod" placeholder="{{'label.input.maximum' | translate}}" type="text"
-                           class="form-control" ng-model="formData.maxInterestRatePerPeriod">
+                           class="form-control" ng-model="formData.maxInterestRatePerPeriod" ng-disabled="rateFlag&&enableRates"   late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <select class="form-control" id="interestRateFrequencyType"
@@ -513,7 +609,7 @@
 
                 <div class="col-sm-2">
                     <input id="repaymentEvery" name="repaymentEvery" class="form-control" type="text"
-                           ng-model="formData.repaymentEvery" required late-validate number=true />
+                           ng-model="formData.repaymentEvery" required  late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
                     <select id="repaymentFrequencyType" class="form-control"
@@ -533,7 +629,7 @@
 
                 <div class="col-sm-2">
                     <input id="minimumDaysBetweenDisbursalAndFirstRepayment" class="form-control"
-                           type="text" ng-model="formData.minimumDaysBetweenDisbursalAndFirstRepayment" late-validate number=true >
+                           type="text" ng-model="formData.minimumDaysBetweenDisbursalAndFirstRepayment" late-validate number-only-format />
                 </div>
             </div>
                     <hr>
@@ -580,6 +676,20 @@
                                ng-false-value="false">
                 </div>
             </div>
+            <div class="form-group"  ng-show="formData.amortizationType == 0">
+                <label class="control-label col-sm-2">{{ 'label.input.fixed.pricipal.percentage.per.installment' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.fixed.pricipal.percentage.per.installment' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </label>
+                <div class="col-sm-2">
+                    <input id="fixedPrincipalPercentagePerInstallment" type="text" name="fixedPrincipalPercentagePerInstallment" class="form-control"
+                           ng-model="formData.fixedPrincipalPercentagePerInstallment" late-validate number>
+                </div>
+                 <div class="col-sm-2">
+                    <form-validate valattributeform="Settings" valattribute="fixedPrincipalPercentagePerInstallment"/>
+                </div>
+            </div>
+            
             <div class="form-group">
                 <label class="control-label col-sm-2">{{ 'label.input.interestcalculationperiod' | translate }}<span
                         class="required">*</span>
@@ -636,12 +746,12 @@
                 <div class="col-sm-2">
                     <input id="graceOnPrincipalPayment" class="form-control" name="graceOnPrincipalPayment"
                            placeholder="{{'label.input.onprincipalpayment' | translate}}"
-                           type="text" ng-model="formData.graceOnPrincipalPayment"  late-validate number=true >
+                           type="text" ng-model="formData.graceOnPrincipalPayment"  late-validate number-only-format />
                     <form-validate valattributeform="Settings" valattribute="graceOnPrincipalPayment"/>
                 </div>
                 <div class="col-sm-2">
                     <input id="graceOnInterestPayment" placeholder="{{'label.input.oninterestpayment' | translate}}"
-                           type="text" name="graceOnInterestPayment" class="form-control" ng-model="formData.graceOnInterestPayment" late-validate number=true >
+                           type="text" name="graceOnInterestPayment" class="form-control" ng-model="formData.graceOnInterestPayment" late-validate number-only-format />
                     <form-validate valattributeform="Settings" valattribute="graceOnInterestPayment"/>
                 </div>
             </div>
@@ -653,7 +763,7 @@
 
                 <div class="col-sm-2">
                     <input id="graceOnInterestCharged" type="text" name="graceOnInterestCharged" class="form-control"
-                           ng-model="formData.graceOnInterestCharged" late-validate number=true >
+                           ng-model="formData.graceOnInterestCharged" late-validate number-only-format />
                     <form-validate valattributeform="Settings" valattribute="graceOnInterestCharged"/>
                 </div>
                 <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.arearstolerance' | translate }}
@@ -663,7 +773,7 @@
 
                 <div class="col-sm-2">
                     <input id="inArrearsTolerance" type="text" name="inArrearsTolerance" class="form-control" number-format
-                           ng-model="formData.inArrearsTolerance" late-validate number=true>
+                           ng-model="formData.inArrearsTolerance" late-validate number-only-format/>
                     <form-validate valattributeform="Settings" valattribute="inArrearsTolerance"/>
                 </div>
             </div>
@@ -702,6 +812,7 @@
                         <input type="checkbox" ng-model="formData.canDefineInstallmentAmount"/>
                     </label>
                 </div>
+
             </div>
 
             <div class="form-group">
@@ -714,7 +825,7 @@
                 <div class="col-sm-2">
                     <input id="graceOnArrearsAgeing" class="form-control" name="graceOnArrearsAgeing"
                            placeholder="{{'label.input.onduedate' | translate}}"
-                           type="text" ng-model="formData.graceOnArrearsAgeing" late-validate number=true>
+                           type="text" ng-model="formData.graceOnArrearsAgeing" late-validate number-only-format/>
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Settings" valattribute="graceOnArrearsAgeing"/>
@@ -730,7 +841,7 @@
                 <div class="col-sm-2">
                     <input id="overdueDaysForNPA" class="form-control" name="overdueDaysForNPA"
                            placeholder="{{'label.input.overduedaysfornpa' | translate}}"
-                           type="text" ng-model="formData.overdueDaysForNPA" late-validate number=true>
+                           type="text" ng-model="formData.overdueDaysForNPA" late-validate number-only-format/>
                 </div>
                 <div class="col-sm-2">
                     <form-validate valattributeform="Settings" valattribute="overdueDaysForNPA"/>
@@ -738,7 +849,7 @@
             </div>
             <div class="form-group">
                 <label class="control-label col-sm-4">{{'label.input.loan.account.moves.out.of.npa.only.on.arrears.completion'
-                    | translate }}<span class="required">*</span></label>
+                    | translate }}</label>
 
                 <div class="col-sm-2 checkbox">
                     <label>
@@ -754,13 +865,75 @@
 
                 <div class="col-sm-2">
                     <input id="principalThresholdForLastInstallment" type="text" name="principalThresholdForLastInstallment" class="form-control"
-                           ng-model="formData.principalThresholdForLastInstallment" late-validate number=true>
+                           ng-model="formData.principalThresholdForLastInstallment" late-validate number-only-format/>
                 </div>
                  <div class="col-sm-2">
                     <form-validate valattributeform="Settings" valattribute="principalThresholdForLastInstallment"/>
                 </div>
+
+            </div>
+            <div class="form-group">
+                    <label class="control-label col-sm-4">{{ 'label.input.maxNumberOfLoanExtensionsAllowed' | translate }}</label>
+                    <div class="col-sm-2">
+                        <input id="maxNumberOfLoanExtensionsAllowedId" class="form-control"
+                               type="text" ng-model="formData.maxNumberOfLoanExtensionsAllowed" late-validate number-only-format/>
+                    </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-4">
+                    {{ 'label.input.allowableDSCR' | translate }}
+                    <span class="required">*</span>
+                </label>
+                <div class="col-sm-2">
+                    <input id="allowableDSCR" class="form-control" type="text" name="allowableDSCR" 
+                        ng-model="formData.allowableDSCR" required late-validate decimals  />
+                </div>
+                <div class="col-sm-2">
+                    <form-validate valattributeform="Settings" valattribute="allowableDSCR" />
+                </div>
+            </div>
+                    <!-- bnpl product -->
+            <div class="form-group">
+                <div class="col-sm-3">
+                    <input type="checkbox" name="isBnplProductCheckBox" ng-model="formData.isBnplLoanProduct" ng-change="bnplValueChanged()"/>
+                    {{'label.input.isBnplLoanProduct' | translate}}
+                    <i class="fa fa-question-circle "
+                       uib-tooltip="{{'label.input.isBnplLoanProduct' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </div>
             </div>
 
+            <div class="form-group" ng-show="formData.isBnplLoanProduct">
+
+                <div class="col-sm-3">
+                    <input type="checkbox" name="requiresEquityContributionBox" ng-model="formData.requiresEquityContribution"/>
+                    {{'label.input.requiresEquityContribution' | translate}}
+                    <i class="fa fa-question-circle "
+                       uib-tooltip="{{'label.input.requiresEquityContribution' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </div>
+
+                <label class="control-label col-sm-2">{{ 'label.input.equityContributionLoanPercentage' | translate }}
+                </label>
+
+                <div class="col-sm-2">
+                    <input id="equityContributionLoanPercentage" name="equityContributionLoanPercentage" class="form-control" type="text"
+                           ng-model="formData.equityContributionLoanPercentage"
+                           placeholder="{{'label.input.equityContributionLoanPercentage' | translate}}" number-format/>
+                </div>
+            </div>
+
+            <!-- bnpl product - ends --->
+
+                    <div class="form-group">
+                        <div class="col-sm-3">
+                            <input type="checkbox" name="isAccountLevelArrearsToleranceEnable" ng-model="formData.isAccountLevelArrearsToleranceEnable"/>
+                            {{'label.input.isAccountLevelArrearsToleranceEnable' | translate}}
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.loanproduct.isAccountLevelArrearsToleranceEnable' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </div>
+                    </div>
             <div class="form-group">
                 <div class="col-sm-3">
                     <input type="checkbox" name="name1" ng-model="formData.allowVariableInstallments"/>
@@ -794,6 +967,15 @@
                     {{'label.input.canUseForTopup' | translate}}
                     <i class="fa fa-question-circle"
                        uib-tooltip="{{'label.tooltip.loanproduct.canUseForTopup' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-3">
+                    <input type="checkbox" name="loanTermIncludesToppedUpLoanTerm" ng-model="formData.loanTermIncludesToppedUpLoanTerm"/>
+                    {{'label.input.loanTermIncludesToppedUpLoanTerm' | translate}}
+                    <i class="fa fa-question-circle"
+                       uib-tooltip="{{'label.tooltip.loanproduct.loanTermIncludesToppedUpLoanTerm' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </div>
             </div>
@@ -837,6 +1019,22 @@
                             ng-options="type.id as type.value for type in product.rescheduleStrategyTypeOptions"
                             ng-change = "loanproduct.interestRecalculationData.rescheduleStrategyType.value = formValue(product.rescheduleStrategyTypeOptions,formData.rescheduleStrategyMethod)"
                             value="{{type.id}}"></select>
+                </div>
+            </div>
+            <div class="form-group" data-ng-show="formData.isInterestRecalculationEnabled">
+                <div class="form-group" data-ng-show="formData.isInterestRecalculationEnabled && formData.rescheduleStrategyMethod == 3">
+                    <label class="control-label col-sm-2">{{'label.input.interestforexactdaysinperiod'| translate }}<span class="required">*</span>
+                        <i class="fa fa-question-circle "
+                        uib-tooltip="{{'label.tooltip.interestforexactdaysinperiod' | translate}}"
+                        tooltip-append-to-body="true"></i>
+                    </label>
+
+                    <div class="col-sm-2 checkbox">
+                        <label>
+                            <input id="advancePaymentInterestForExactDaysInPeriod" type="checkbox"
+                                   ng-model="formData.advancePaymentInterestForExactDaysInPeriod">
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -1136,6 +1334,69 @@
                 </fieldset>
             </form>
         </wz-step>
+        <wz-step wz-title="{{'label.heading.interestchart' | translate}}" wz-disabled="{{disabled}}">
+            <form name="interestchart"  ng-submit="goNext(interestchart)" novalidate="" class="form-horizontal">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <h3>{{ 'label.heading.interestchart' | translate }}
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.fixeddepositproduct.interesetchart' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </h3>
+                    <hr>
+                    <div class="col-md-12">
+                        <table class="table table-bordered width100">
+                        <tr class="graybg">
+                            <td>{{'label.heading.interestratedetails.period.from.to' | translate}}</td>
+                            <td>{{'label.heading.interestratedetails.interest' | translate}}</td>
+                            <td>
+                                <div ng-show="chart.chartSlabs.length < 1">
+                                    <a class="btn btn-primary" ng-click="addNewRow()"><i class="fa fa-plus"></i>&nbsp;&nbsp;{{'label.add.row'
+                                        | translate}}</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="chartSlab in chart.chartSlabs">
+
+                            <td class="width15">
+                                <table class="width100">
+                                    <tr>
+                                        <td><input id="fromPeriod" name="fromPeriod" type="text"
+                                                   class="form-control"
+                                                   ng-model="chartSlab.fromPeriod"/></td>
+                                        <td>&nbsp;&nbsp;-&nbsp;&nbsp;</td>
+                                        <td><input id="toPeriod" name="toPeriod" type="text" class="form-control"
+                                                   ng-model="chartSlab.toPeriod"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                            <td class="width15">
+                                <input id="annualInterestRate" name="annualInterestRate" type="text"
+                                       class="form-control"
+                                       ng-model="chartSlab.annualInterestRate"/>
+                            </td>
+
+                            <td class="width10">
+                                <a ng-click="removeRow($index)"><i class="fa fa-times-circle fa-2x"></i></a>
+
+                                <div ng-show="$last">
+                                    <br/>
+                                    <a ng-click="addNewRow()" class="btn btn-primary"><i class="fa fa-plus "></i>&nbsp;&nbsp;{{'label.add.row'
+                                        | translate}}</a>
+                                </div>
+                            </td>
+                        </tr>
+                        </table>
+                    </div>
+                    <hr>
+                    <button class="btn btn-default pull-left" wz-previous><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Previous
+                    </button>
+                    <button class="btn btn-default pull-right" type="submit">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
+                    </button>
+                </fieldset>
+            </form>
+        </wz-step>
         <wz-step wz-title="{{ 'label.heading.charges' | translate }}">
             <form name="Charges" novalidate="" class=" form-horizontal " ng-submit="goNext(Charges)">
                 <fieldset>
@@ -1266,165 +1527,229 @@
             <div class="col-md-12" ng-show="isAccountingEnabled()">
                 <div class="form-group">
                     <h4>{{"label.heading.assets" | translate}}</h4>
-                    <label class="control-label col-sm-2">{{ 'label.input.fundsource' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.fundsource' | translate}}"></i>
-
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.fundsource' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.fundsource' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="fundSourceAccountId" ng-model="formData.fundSourceAccountId"
-                                chosen="assetAccountOptions"
-                                ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
-                                ng-change="loanproduct.accountingMappings.fundSourceAccount.name = formValue(assetAccountOptions,formData.fundSourceAccountId,'id','name')"
-                                value="{{assetAccount.id}}">
+                        <select id="fundSourceAccountId" class="form-control"  name="fundSourceAccountId"
+                            ng-model="formData.fundSourceAccountId" chosen="assetAccountOptions"
+                            ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
+                            ng-change="loanproduct.accountingMappings.fundSourceAccount.name = formValue(assetAccountOptions,formData.fundSourceAccountId,'id','name')"
+                            value="{{assetAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="fundSourceAccountId" />
                     </div>
-                    <label class="control-label col-sm-2">{{ 'label.input.loanportfolio' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.loanportfolio' | translate}}"></i></a>
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.loanportfolio' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.loanportfolio' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="loanPortfolioAccountId" class="form-control"
-                                ng-model="formData.loanPortfolioAccountId"
-                                chosen="assetAccountOptions"
-                                ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
-                                ng-change="loanproduct.accountingMappings.loanPortfolioAccount.name = formValue(assetAccountOptions,formData.loanPortfolioAccountId,'id','name')"
-                                value="{{assetAccount.id}}">
+                        <select id="loanPortfolioAccountId" class="form-control" name="loanPortfolioAccountId"
+                            ng-model="formData.loanPortfolioAccountId" chosen="assetAccountOptions"
+                            ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
+                            ng-change="loanproduct.accountingMappings.loanPortfolioAccount.name = formValue(assetAccountOptions,formData.loanPortfolioAccountId,'id','name')"
+                            value="{{assetAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
-                    </div>
-                </div>
-                <div class="form-group" ng-show="isAccrualAccountingEnabled()">
-                    <label class="control-label col-sm-2">{{ 'label.input.receivableinterest' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.receivableinterest' | translate}}"></i>
-
-                    <div class="col-sm-3">
-                        <select id="receivableInterestAccountId" class="form-control"
-                                ng-model="formData.receivableInterestAccountId" chosen="assetAccountOptions"
-                                ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
-                                ng-change="loanproduct.accountingMappings.receivableInterestAccount.name = formValue(assetAccountOptions,formData.receivableInterestAccountId,'id','name')"
-                                value="{{assetAccount.id}}">
-                        </select>
-                    </div>
-                    <label class="control-label col-sm-2">{{ 'label.input.receivablefees' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.receivablefees' | translate}}"></i></a>
-                    <div class="col-sm-3">
-                        <select id="receivableFeeAccountId" ng-model="formData.receivableFeeAccountId"
-                                chosen="assetAccountOptions"
-                                ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
-                                ng-change = "loanproduct.accountingMappings.receivableFeeAccount.name = formValue(assetAccountOptions,formData.receivableFeeAccountId,'id','name')"
-                                value="{{assetAccount.id}}">
-                        </select>
+                        <form-validate valattributeform="Accounting" valattribute="loanPortfolioAccountId" />
                     </div>
                 </div>
                 <div class="form-group" ng-show="isAccrualAccountingEnabled()">
-                    <label class="control-label col-sm-2">{{ 'label.input.receivablepenalties' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.receivablepenalties' | translate}}"></i>
-
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.receivableinterest' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.receivableinterest' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="receivablePenaltyAccountId" ng-model="formData.receivablePenaltyAccountId"
-                                chosen="assetAccountOptions"
-                                ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
-                                ng-change="loanproduct.accountingMappings.receivablePenaltyAccount.name = formValue(assetAccountOptions,formData.receivablePenaltyAccountId,'id','name')"
-                                value="{{assetAccount.id}}">
+                        <select id="receivableInterestAccountId" class="form-control" name="receivableInterestAccountId"
+                            ng-model="formData.receivableInterestAccountId" chosen="assetAccountOptions"
+                            ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
+                            ng-change="loanproduct.accountingMappings.receivableInterestAccount.name = formValue(assetAccountOptions,formData.receivableInterestAccountId,'id','name')"
+                            value="{{assetAccount.id}}" ng-required="isAccrualAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="receivableInterestAccountId" />
+                    </div>
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.receivablefees' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.receivablefees' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
+                    <div class="col-sm-3">
+                        <select id="receivableFeeAccountId" class="form-control"  name="receivableFeeAccountId"
+                            ng-model="formData.receivableFeeAccountId" chosen="assetAccountOptions"
+                            ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
+                            ng-change = "loanproduct.accountingMappings.receivableFeeAccount.name = formValue(assetAccountOptions,formData.receivableFeeAccountId,'id','name')"
+                            value="{{assetAccount.id}}" ng-required="isAccrualAccountingEnabled()">
+                            <option value=""></option>
+                        </select>
+                        <form-validate valattributeform="Accounting" valattribute="receivableFeeAccountId" />
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isAccrualAccountingEnabled()">
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.receivablepenalties' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.receivablepenalties' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
+                    <div class="col-sm-3">
+                        <select id="receivablePenaltyAccountId" class="form-control" name="receivablePenaltyAccountId"
+                            ng-model="formData.receivablePenaltyAccountId" chosen="assetAccountOptions"
+                            ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
+                            ng-change="loanproduct.accountingMappings.receivablePenaltyAccount.name = formValue(assetAccountOptions,formData.receivablePenaltyAccountId,'id','name')"
+                            value="{{assetAccount.id}}" ng-required="isAccrualAccountingEnabled()">
+                            <option value=""></option>
+                        </select>
+                        <form-validate valattributeform="Accounting" valattribute="receivablePenaltyAccountId" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2">{{ 'label.input.transfersinsuspense' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.transfersinsuspense' | translate}}"></i></a>
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.transfersinsuspense' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.transfersinsuspense' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="transfersInSuspenseAccountId" ng-model="formData.transfersInSuspenseAccountId"
-                                chosen="assetAccountOptions"
-                                ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
-                                ng-change="loanproduct.accountingMappings.transfersInSuspenseAccount.name = formValue(assetAccountOptions,formData.transfersInSuspenseAccountId,'id','name')"
-                                value="{{assetAccount.id}}">
+                        <select id="transfersInSuspenseAccountId" class="form-control" name="transfersInSuspenseAccountId"
+                            ng-model="formData.transfersInSuspenseAccountId" chosen="assetAccountOptions"
+                            ng-options="assetAccount.id as assetAccount.name for assetAccount in assetAccountOptions"
+                            ng-change="loanproduct.accountingMappings.transfersInSuspenseAccount.name = formValue(assetAccountOptions,formData.transfersInSuspenseAccountId,'id','name')"
+                            value="{{assetAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="transfersInSuspenseAccountId" />
                     </div>
                 </div>
                 <hr>
                 <div class="form-group">
                     <h4>{{"label.heading.income" | translate}}</h4>
-                    <label class="control-label col-sm-2">{{ 'label.input.incomefrominterest' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.incomefrominterest' | translate}}"></i>
-
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.incomefrominterest' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.incomefrominterest' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="interestOnLoanAccountId" ng-model="formData.interestOnLoanAccountId"
-                                chosen="incomeAccountOptions"
-                                ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
-                                ng-change="loanproduct.accountingMappings.interestOnLoanAccount.name = formValue(incomeAccountOptions,formData.interestOnLoanAccountId,'id','name')
-                                value="{{incomeAccount.id}}">
+                        <select id="interestOnLoanAccountId" class="form-control"  name="interestOnLoanAccountId"
+                            ng-model="formData.interestOnLoanAccountId" chosen="incomeAccountOptions"
+                            ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
+                            ng-change="loanproduct.accountingMappings.interestOnLoanAccount.name = formValue(incomeAccountOptions,formData.interestOnLoanAccountId,'id','name')"
+                            value="{{incomeAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="interestOnLoanAccountId" />
                     </div>
-                    <label class="control-label col-sm-2">{{ 'label.input.incomefromfees' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.incomefromfees' | translate}}"></i></a>
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.incomefromfees' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.incomefromfees' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="incomeFromFeeAccountId" ng-model="formData.incomeFromFeeAccountId"
-                                chosen="incomeAccountOptions"
-                                ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
-                                ng-change="loanproduct.accountingMappings.incomeFromFeeAccount.name = formValue(incomeAccountOptions,formData.incomeFromFeeAccountId,'id','name')
-                                value="{{incomeAccount.id}}">
+                        <select id="incomeFromFeeAccountId" class="form-control" name="incomeFromFeeAccountId"
+                            ng-model="formData.incomeFromFeeAccountId" chosen="incomeAccountOptions"
+                            ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
+                            ng-change="loanproduct.accountingMappings.incomeFromFeeAccount.name = formValue(incomeAccountOptions,formData.incomeFromFeeAccountId,'id','name')"
+                            value="{{incomeAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="incomeFromFeeAccountId" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2">{{ 'label.input.incomefrompenalties' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.incomefrompenalties' | translate}}"></i>
-
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.incomefrompenalties' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.incomefrompenalties' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="incomeFromPenaltyAccountId" ng-model="formData.incomeFromPenaltyAccountId"
-                                chosen="incomeAccountOptions"
-                                ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
-                                ng-change="loanproduct.accountingMappings.incomeFromPenaltyAccount.name = formValue(incomeAccountOptions,formData.incomeFromPenaltyAccountId,'id','name')"
-                                value="{{incomeAccount.id}}">
+                        <select id="incomeFromPenaltyAccountId" class="form-control" name="incomeFromPenaltyAccountId"
+                            ng-model="formData.incomeFromPenaltyAccountId" chosen="incomeAccountOptions"
+                            ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
+                            ng-change="loanproduct.accountingMappings.incomeFromPenaltyAccount.name = formValue(incomeAccountOptions,formData.incomeFromPenaltyAccountId,'id','name')"
+                            value="{{incomeAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="incomeFromPenaltyAccountId" />
                     </div>
-                    <label class="control-label col-sm-2">{{ 'label.input.recoverypayments' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.recoverypayments' | translate}}"></i></a>
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.recoverypayments' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.recoverypayments' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="incomeFromRecoveryAccountId" ng-model="formData.incomeFromRecoveryAccountId"
-                                chosen="incomeAccountOptions"
-                                ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
-                                ng-change="loanproduct.accountingMappings.incomeFromRecoveryAccount.name = formValue(incomeAccountOptions,formData.incomeFromRecoveryAccountId,'id','name')"
-                                value="{{incomeAccount.id}}">
+                        <select id="incomeFromRecoveryAccountId" class="form-control" name="incomeFromRecoveryAccountId"
+                            ng-model="formData.incomeFromRecoveryAccountId" chosen="incomeAccountOptions"
+                            ng-options="incomeAccount.id as incomeAccount.name for incomeAccount in incomeAccountOptions"
+                            ng-change="loanproduct.accountingMappings.incomeFromRecoveryAccount.name = formValue(incomeAccountOptions,formData.incomeFromRecoveryAccountId,'id','name')"
+                            value="{{incomeAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="incomeFromRecoveryAccountId" />
                     </div>
                 </div>
                 <hr>
                 <div class="form-group">
                     <h4>{{"label.heading.expenses" | translate}}</h4>
-                    <label class="control-label col-sm-2">{{ 'label.input.loseswrittenoff' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.loseswrittenoff' | translate}}"></i>
-
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.loseswrittenoff' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.loseswrittenoff' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="writeOffAccountId" ng-model="formData.writeOffAccountId"
-                                chosen="expenseAccountOptions"
-                                ng-options="expenseAccount.id as expenseAccount.name for expenseAccount in expenseAccountOptions"
-                                ng-change="loanproduct.accountingMappings.writeOffAccount.name = formValue(expenseAccountOptions,formData.writeOffAccountId,'id','name')"
-                                value="{{expenseAccount.id}}">
+                        <select id="writeOffAccountId" class="form-control" name="writeOffAccountId"
+                            ng-model="formData.writeOffAccountId" chosen="expenseAccountOptions"
+                            ng-options="expenseAccount.id as expenseAccount.name for expenseAccount in expenseAccountOptions"
+                            ng-change="loanproduct.accountingMappings.writeOffAccount.name = formValue(expenseAccountOptions,formData.writeOffAccountId,'id','name')"
+                            value="{{expenseAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="writeOffAccountId" />
                     </div>
                 </div>
                 <hr>
                 <div class="form-group">
                     <h4>{{"label.heading.liabilities" | translate}}</h4>
-                    <label class="control-label col-sm-2">{{ 'label.input.overpaymentliability' | translate }}</label>
-                    <i class="fa fa-question-circle col-sm-1 "
-                       uib-tooltip="{{'label.tooltip.overpaymentliability' | translate}}"></i>
-
+                    <label class="control-label col-sm-2">
+                        {{ 'label.input.overpaymentliability' | translate }}
+                        <span class="required">*</span>
+                        <i class="fa fa-question-circle"
+                           uib-tooltip="{{'label.tooltip.overpaymentliability' | translate}}"
+                           tooltip-append-to-body="true"></i>
+                    </label>
                     <div class="col-sm-3">
-                        <select id="overpaymentLiabilityAccountId" ng-model="formData.overpaymentLiabilityAccountId"
-                                chosen="liabilityAccountOptions"
-                                ng-options="liabilityAccount.id as liabilityAccount.name for liabilityAccount in liabilityAccountOptions"
-                                ng-change="loanproduct.accountingMappings.overpaymentLiabilityAccount.name = formValue(liabilityAccountOptions,formData.overpaymentLiabilityAccountId,'id','name')"
-                                value="{{liabilityAccount.id}}">
+                        <select id="overpaymentLiabilityAccountId" class="form-control" name="overpaymentLiabilityAccountId"
+                            ng-model="formData.overpaymentLiabilityAccountId" chosen="liabilityAccountOptions"
+                            ng-options="liabilityAccount.id as liabilityAccount.name for liabilityAccount in liabilityAccountOptions"
+                            ng-change="loanproduct.accountingMappings.overpaymentLiabilityAccount.name = formValue(liabilityAccountOptions,formData.overpaymentLiabilityAccountId,'id','name')"
+                            value="{{liabilityAccount.id}}" ng-required="isAccountingEnabled()">
+                            <option value=""></option>
                         </select>
+                        <form-validate valattributeform="Accounting" valattribute="overpaymentLiabilityAccountId" />
                     </div>
                 </div>
                 <hr>
@@ -1798,6 +2123,10 @@
                 <tr>
                     <td>{{'label.input.canUseForTopup' | translate}}</td>
                     <td colspan="3">{{loanproduct.canUseForTopup | YesOrNo}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.input.allowableDSCR' | translate}}</td>
+                    <td colspan="3">{{loanproduct.allowableDSCR | number}}</td>
                 </tr>
 
                 <tr>

@@ -32,9 +32,12 @@
 								<div class="col-sm-2">
 									<form-validate valattributeform="creategroupform" valattribute="office"/>
 								</div>
-								<label class="control-label col-sm-2" for="externalId">{{'label.input.externalid' | translate}}</label>
+								<label class="control-label col-sm-2" for="externalId">{{'label.input.groupuid' | translate}}<span class="required">*</span></label>
 								<div class="col-sm-3">
-									<input type="text" name="externalid" id="externalId" ng-model="formData.externalId" class="form-control"/>
+									<input type="text" name="externalid" id="externalId" ng-model="formData.externalId" class="form-control" required late-validate/>
+								</div>
+								<div class="col-sm-2">
+									<form-validate valattributeform="creategroupform" valattribute="externalId"/>
 								</div>
 							</div>
 							<div class="form-group">
@@ -127,6 +130,23 @@
 									</div>
 								</div>
 							</div>
+							<div class="form-group">
+								<label class="control-label col-sm-2" for="representativeId">
+									{{'label.input.representative' | translate}}<span
+										class="required">*</span>
+								</label>
+
+								<div class="col-sm-3">
+									<select id="representativeId" ng-model="formData.representativeId" class="form-control"
+											ng-options="representative.id as representative.displayName for representative in addedClients"
+											value="{{representative.id}}" required >
+										<option value="">--{{'label.menu.selectone' | translate}}--</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<form-validate valattributeform="creategroupform" valattribute="representativeId"/>
+								</div>
+							</div>
 							<div class="col-md-offset-5" ng-hide="datatables.length > 0">
 								<a id="cancel" ng-href="{{cancel}}" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
 								<button id="save" type="submit" class="btn btn-primary" has-permission='CREATE_GROUP' wz-next>{{'label.button.save' | translate}}</button>
@@ -145,7 +165,6 @@
 				<form name="Datatables" class="form-horizontal" ng-submit="submit()">
 					<fieldset>
 						<api-validate></api-validate>
-						<!--<h3><strong>{{datatable.registeredTableName}}</strong></h3>-->
 						<hr/>
 						<div class="form-group" ng-repeat="columnHeader in datatable.columnHeaderData">
 							<label class="control-label col-sm-3">{{ columnHeader.columnName | prettifyDataTableColumn }}
@@ -204,15 +223,6 @@
 										</span>
 							</div>
 						</div>
-						<!--<div class="col-md-offset-5" ng-if="$last">-->
-						<!--<button id="cancel3" type="reset" class="btn btn-default" ng-click="cancel()">-->
-						<!--{{'label.button.cancel' | translate}}-->
-						<!--</button>-->
-						<!--<button id="save3" type="submit" has-permission='CREATE_LOAN' class="btn btn-primary"-->
-						<!--ng-show="loanaccountinfo">{{'label.button.save' |-->
-						<!--translate}}-->
-						<!--</button>-->
-						<!--</div>-->
 						<hr>
 						<div class="col-md-offset-5">
 							<a id="cancel" ng-href="{{cancel}}" class="btn btn-default">{{'label.button.cancel' | translate}}</a>

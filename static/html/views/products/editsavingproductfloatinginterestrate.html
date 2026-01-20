@@ -1,0 +1,46 @@
+<div ng-controller="EditSavingsProductFloatingInterestRateController" class="content-container">
+    <ul class="breadcrumb">
+        <li><a href="#/products">{{'label.anchor.products' | translate}}</a> </li>
+        <li><a href="#/savingproducts">{{'label.anchor.savingproducts' | translate}}</a></li>
+        <li><a href="#/viewsavingproduct/{{productId}}">{{productId}}</a> </li>
+        <li><a href="#/viewsavingproduct/{{productId}}/floatinginterestrate">{{'label.anchor.floatinginterestratevieweditdelete' | translate}}</a> </li>
+        <li><a href="#/viewsavingproduct/{{productId}}/floatinginterestrate/{{floatingInterestRateId}}">{{'label.anchor.floatinginterestratevieweditdelete' | translate}}</a> </li>
+        <li class="active">{{floatingInterestRateId}}</li>
+    </ul>
+    <form name="editglfloatingInterestform" novalidate="" class="card form-horizontal well" rc-submit="submit()">
+        <api-validate></api-validate>
+        <fieldset>
+            <div class="form-group">
+                <label class="control-label col-sm-2 " for="type">{{'label.heading.floatinginterestrate.valid.fromDate' | translate}}<span
+                        class="required">*</span>
+                </label>
+                <div class="col-sm-2">
+                    <input id="fromDate" sort type="text" name="fromDate" class="form-control" datepicker-pop="dd MMMM yyyy"
+                           ng-model="savingProductsFloatingInterestRate.fromDate" is-open="opened" min="minDate" max="restrictDate" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="parentId">{{'label.heading.floatinginterestrate.valid.endDate' | translate}}</label>
+                <div class="col-sm-2">
+                    <input id="endDate" sort type="text" name="fromDate" class="form-control" datepicker-pop="dd MMMM yyyy"
+                           ng-model="savingProductsFloatingInterestRate.endDate" is-open="opened" min="minDate" max="restrictDate">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2 ">{{'label.heading.floatinginterestrate.floatingInterestRate' | translate}}<span
+                        class="required">*</span></label>
+                <div class="col-sm-2">
+                    <input id="floatingInterestRateValue" name="floatingInterestRateValue" type="text" class="form-control"
+                           ng-model="savingProductsFloatingInterestRate.floatingInterestRate" decimals required/>
+                </div>
+            </div>
+
+            <div class="col-md-offset-5">
+                <a id="cancel" href="#/viewsavingproduct/{{productId}}/floatinginterestrate/{{floatinginterestrateId}}" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
+                <button id="save" type="submit" class="btn btn-primary">{{'label.button.save' | translate}}</button>
+            </div>
+        </fieldset>
+    </form>
+</div>

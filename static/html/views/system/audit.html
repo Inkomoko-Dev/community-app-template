@@ -37,6 +37,7 @@
 
                     <div class="form-inline">
                         <input type="text" placeholder="{{'label.input.resourceid' | translate}}" ng-model="formData.resourceId" class="form-control">
+                        <input type="text" placeholder="{{'label.input.clientid' | translate}}" ng-model="formData.clientId" class="form-control">
                         <input type="text" sort placeholder="{{'label.input.todate' | translate}}" datepicker-pop="dd MMMM yyyy" ng-model="date.second" is-open="opened1" min="minDate"  class="form-control"/>
                         <input type="text" sort placeholder="{{'label.input.checkedto' | translate}}" datepicker-pop="dd MMMM yyyy" ng-model="date.fourth" is-open="opened3" min="minDate"  class="form-control"/>
                         <select ng-model="formData.entity" class="form-control width170px">
@@ -49,8 +50,6 @@
                             <option selected="selected" value="">{{'label.all' | translate}}</option>
                             <option ng-repeat="user in template.appUsers" value="{{user.id}}">{{user.username}}</option>
                         </select>
-                        <input type="text" placeholder="{{'label.input.loanaccountno' | translate}}" ng-model="formData.loanAccountNo" class="form-control">
-                        <input type="text" placeholder="{{'label.input.savingsaccountno' | translate}}" ng-model="formData.savingsAccountNo" class="form-control">
                         <span><a ng-click="searchAudit()" class="btn btn-primary pull-right" has-permission='READ_AUDIT'><i class="fa fa-search "></i>&nbsp;&nbsp;{{'label.button.advancesearch' | translate}}</a></span>
                     </div>
                 </div>
@@ -58,7 +57,7 @@
                 <div ng-show="displayResults">
                 <br>
                     <div data-ng-show="flag" class="pull-right">
-                        <button type="button" class="btn btn-primary" ng-csv="csvData"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportcsv' | translate }}</button>
+                        <button type="button" class="btn btn-primary" ng-click="getCsvData()"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportcsv' | translate }}</button>
                     </div>
                     <br> 
                     <div data-ng-show="flag">
@@ -66,6 +65,7 @@
                             <thead>
                             <tr class="graybg">
                                 <th>{{'label.heading.id' | translate}}</th>
+                                <th>{{'label.heading.clientid' | translate}}</th>
                                 <th>{{'label.heading.resourceid' | translate}}</th>
                                 <th>{{'label.heading.status' | translate}}</th>
                                 <th>{{'label.heading.madeby' | translate}}</th>
@@ -80,6 +80,7 @@
                             <tbody>
                             <tr class="pointer-main" data-ng-click="routeTo(data.id)" ng-repeat="data in searchData.pageItems">
                                 <td>{{data.id}}</td>
+                                <td>{{data.clientId}}</td>
                                 <td>{{data.resourceId}}</td>
                                 <td>{{data.processingResult | translate}}</td>
                                 <td>{{data.maker}}</td>

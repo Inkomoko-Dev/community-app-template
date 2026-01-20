@@ -3,14 +3,10 @@
         <li><a href="#/viewfixeddepositaccount/{{accountId}}">{{'label.anchor.viewfixeddepositaccount' | translate}}</a></li>
         <li class="active">{{'label.anchor.editfixeddepositapplication' | translate}}</li>
     </ul>
-    <api-validate></api-validate>
-    <div class="card">
-        <div class="content">
-            <div class="toolbar">
-                <h4>{{ 'label.heading.editfixeddepositapplication' | translate }}</h4>
-            </div>
-            <form name="editfixeddepositaccountform" novalidate="" class="well form-inline" rc-submit="submit()">
-        <fieldset>
+    <form name="editfixeddepositaccountform" novalidate="" class="well form-inline card" rc-submit="submit()">
+        <api-validate></api-validate>
+    <fieldset>
+        <legend>{{ 'label.heading.editfixeddepositapplication' | translate }}</legend>
         <table class="width100">
             <tr>
                 <td class="width14">
@@ -45,10 +41,11 @@
                     </select>
                 </td>
                 <td class="width14">
-                    <label>{{ 'label.input.nickname' | translate }}:&nbsp;</label>
+                    <label ng-show="formData.productId" class="control-label">{{ 'label.input.externalid' | translate
+                        }}</label>
                 </td>
                 <td class="width36 paddedbottom10">
-                    <input id="nickname" ng-model="formData.nickname" class="form-control"/>
+                    <input ng-show="formData.productId" id="externalId" ng-model="formData.externalId" class="form-control"/>
                 </td>
             </tr>
         </table>
@@ -140,7 +137,7 @@
                 </td>
                 <td class="width36 paddedbottom20">
                     <input id="nominalAnnualInterestRate" type="text" name="nominalannualinterestrate" ng-model="formData.nominalAnnualInterestRate"
-                           class="form-control" number-format required late-Validate/>
+                           class="form-control" ng-change="setInterestRate()" number-format required late-Validate/>
                     <form-validate valattributeform="Terms" valattribute="nominalannualinterestrate" />
                 </td>
                 <td class="width14">
@@ -158,6 +155,8 @@
                         </select>
                     </div>
                 </td>
+                <td class="width14"></td>
+                <td class="width36 paddedbottom10"></td>
             </tr>
         </table>
         <hr data-ng-show="formData.productId"/>
@@ -191,13 +190,6 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="4">
-                    <div class="form-inline" data-ng-show="formData.preClosureChargeApplicable">
-                        <label class="control-label">{{ 'label.checkbox.applypreclosurecharge' | translate }}&nbsp;&nbsp;-&nbsp;&nbsp;{{data.preClosureCharge.name}}</label>
-                    </div>
-                </td>
-            </tr>
-            <tr>
                 <td>
                     <label class="control-label">{{ 'label.input.trasfertosavings' | translate }}</label>
                 </td>
@@ -219,6 +211,49 @@
                     </select>
                 </td>
             </tr>
+
+            <tr>
+                <td>
+                    <label class="control-label">{{ 'label.input.maturity.instruction' | translate }}</label>
+                </td>
+                <td>
+                    <select id="depositRollover" ng-model="formData.maturityInstructionId" ng-options="depositRollover.id as depositRollover.value for depositRollover in depositRolloverOptions"
+                            class="form-control width170px" value="{{depositRollover.id}}" ng-change="changeMaturityInstruction()">
+                    </select>
+                </td>
+            </tr>
+            <tr ng-if="formData.maturityInstructionId == 200">
+                <td >
+                    <label class="control-label">{{ 'label.input.transfer.to.account' | translate }}&nbsp;
+                    </label>
+                </td>
+                <td >
+                    <select id="depositRollover" ng-model="formData.transferToSavingsId" ng-options="savingsAccount.id as savingsAccount.accountNo for savingsAccount in savingsAccounts"
+                    class="form-control width170px" value="{{savingsAccount.id}}" >
+                    <option value="">{{'label.menu.selectone' | translate}}</option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="paddedbottom10">
+                    <label class="control-label">{{ 'label.input.liquidation.allow'  | translate }}</label>
+                    <input type="checkbox"
+                           ng-model="formData.allowPartialLiquidation" ng-true-value="true"
+                           ng-false-value="false">
+                   
+                </td>
+
+            </tr>
+            <tr ng-show="formData.allowPartialLiquidation">
+                <td >
+                    <label>{{ 'label.input.liquidation.maximum'  | translate }}</label>
+                </td>
+                <td >
+                   
+                    <input id="totalLiquidationAllowed" type="text" class="form-control"  ng-model="formData.totalLiquidationAllowed" >
+                 
+               </td>
+            </tr>       
             <tr ng-show="data.taxGroup">
                 <td colspan="2" class="paddedbottom10">
                     <input type="checkbox" ng-model="formData.withHoldTax"> &nbsp;<span
@@ -229,16 +264,6 @@
                         }}&nbsp;</label></td>
                 <td class="width36 paddedbottom10" ng-show="formData.withHoldTax">
                     {{data.taxGroup.name}}
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" class="paddedbottom20">
-                    <input type="checkbox" ng-model="formData.withdrawalFeeForTransfers">&nbsp;
-                    <label class="control-label">{{ 'label.input.applywithdrawalfeefortransfers' | translate }}&nbsp;</label>
-                </td>
-                <td colspan="2" class=" paddedbottom20">
-                    <input type="checkbox" ng-model="formData.autoRollover">
-                    <label class="control-label">{{ 'label.input.allowautorollover' | translate }}&nbsp;</label>
                 </td>
             </tr>
         </table>
@@ -365,6 +390,4 @@
         </script>
         </fieldset>
         </form>
-    </div>
-</div>
 </div>

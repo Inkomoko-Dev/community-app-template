@@ -73,16 +73,6 @@
                                             <textarea id="description" class="form-control" rows="2" ng-model="formData.description"></textarea>
                                             </div>
                                         </td>
-                                        <td class="width20 paddedbottom10">
-                                            <label class="control-label">{{ 'label.input.reportdatabasetype' | translate }}&nbsp;<span
-                                                    class="required">*</span></label>
-                                            <select ng-model="formData.reportDatabaseTypeId" class="form-control">
-                                                <option value="">{{'label.selectdatabasetype' | translate}}</option>
-                                                <option ng-repeat="reportDatabaseType in reportdetail.reportDatabaseTypes"
-                                                                value="{{reportDatabaseType.id}}">{{reportDatabaseType.code | translate}}
-                                                </option>
-                                            </select>
-                                        </td>
                                     </tr>
                                 </table>
                             </td>

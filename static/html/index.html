@@ -32,7 +32,7 @@
 
         <div class="row">
             <div class="col-xs-12">
-                <div class="pull-right " ng-show="false">
+                <div class="pull-right ">
                     {{ 'label.input.changelanguage' | translate }}
                     <div class="btn-group" uib-dropdown>
                         <button type="button" class="btn btn-default btn-xs" uib-dropdown-toggle ng-disabled="disabled">
@@ -95,7 +95,7 @@
                             <form class="form">
 
                                 <div class="form-group">
-                                    <label for="uid">USERNAME</label>
+                                    <label for="uid">{{ 'label.input.username' | translate | uppercase }}</label>
                                     <input type="text" name="username" id="uid" class="form-control"
                                            ng-model="loginCredentials.username"
                                            placeholder="{{ 'label.input.username' | translate |lowercase }}"
@@ -103,7 +103,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="pwd">PASSWORD</label>
+                                    <label for="pwd">{{ 'label.input.password' | translate | uppercase }}</label>
                                     <input type="password" name="password" id="pwd" class="form-control"
                                            ng-model="loginCredentials.password" autocomplete="new-password"
                                            placeholder="{{ 'label.input.password' | translate | lowercase }}"
@@ -192,76 +192,17 @@
 
                 </div>
 
-
-                <hr ng-show="false"/>
-
-                <div class="row" ng-show="false">
-                    <div class="col-xs-4 text-center">
-
-                        <ul class="list-unstyled">
-                            <li><h5>RESOURCES</h5></li>
-                            <li><a target="https://mifosforge.jira.com/wiki/display/MIFOS/User+Manual"
-                                   href="https://mifosforge.jira.com/wiki/display/MIFOS/User+Manual">{{
-                                'label.anchor.usermanual' | translate }}</a></li>
-                            <li><a target="https://mifosforge.jira.com/wiki/pages/viewpage.action?pageId=14712842"
-                                   href="https://mifosforge.jira.com/wiki/pages/viewpage.action?pageId=14712842">{{
-                                'label.anchor.functionalspec' | translate }}</a></li>
-                            <li><a href="https://mifosforge.jira.com/wiki/display/MDZ/Welcome+in+the+Zone">{{
-                                'label.anchor.developerzone' | translate }}</a></li>
-                        </ul>
-
-                    </div>
-                    <div class="col-xs-4 text-center">
-                        <ul class="list-unstyled">
-                            <li><h5>COMMUNITY</h5></li>
-                            <li><a target="https://groups.google.com/forum/#!forum/mifosusers"
-                                   href="https://groups.google.com/forum/#!forum/mifosusers">{{
-                                'label.anchor.usersgroup' |
-                                translate }}</a></li>
-                            <li><a target="https://groups.google.com/forum/#!forum/mifosdeveloper"
-                                   href="https://groups.google.com/forum/#!forum/mifosdeveloper">{{
-                                'label.anchor.developergroup' | translate }}</a></li>
-                            <li><a target="http://mifos.org/resources/community/communications/#mifos-irc"
-                                   href="http://mifos.org/community/communications/mifos-irc">{{ 'label.anchor.irc' |
-                                translate
-                                }}</a></li>
-                        </ul>
-
-                    </div>
-                    <div class="col-xs-4 text-center">
-                        <ul class="list-unstyled">
-                            <li><h5>CONTRIBUTE</h5></li>
-                            <li><a target="https://mifosforge.jira.com/wiki/display/MDZ/Key+Design+Principles"
-                                   href="https://mifosforge.jira.com/wiki/display/MDZ/Key+Design+Principles/">{{
-                                'label.anchor.keydesignprinciples' | translate }}</a></li>
-                            <li><a target="https://mifosforge.jira.com/wiki/display/MDZ/Working+with+Code"
-                                   href="http://sourceforge.net/projects/mifos/">{{ 'label.anchor.workingwithcode' |
-                                translate
-                                }}</a></li>
-                            <li><a target="http://mifos.org/donate/" href="http://mifos.org/donate/">{{
-                                'label.anchor.donate' |
-                                translate }}</a></li>
-                        </ul>
-
-                    </div>
-                </div>
-
+                <div class="row" ng-hide = "response.uiDisplayConfigurations.whiteLabel.loginPage.hideCommunityDetails">
                 <hr/>
-                <div class="row" ng-show="false">
-                    <div class="col-sm-6 col-sm-offset-3 text-center">
-                        <br>
+                
 
-                        <p class=" text-muted"><span ng-bind-html="text"></span>
-                            <br>
-                            <span style=" display: inline-block; margin:auto;min-width:40px; border-bottom:2px solid #e0e0e0;">&nbsp;</span>
-                        </p>
-
-                    </div>
-                </div>
+            </div>
+            <div class="row" ng-hide = "response.uiDisplayConfigurations.whiteLabel.loginPage.releaseDetails">
                 <p class="text-center text-muted small">
                     <span>{{ 'label.heading.version' | translate }} {{ version }}</span>
-                    <br/> <span>{{ 'label.heading.uptodate' | translate }}</span>
+                    <br/> <span>{{response.uiDisplayConfigurations.whiteLabel.loginPage.companyName}}{{ 'label.heading.uptodate' | translate }}</span>
                 </p>
+            </div>
             </div>
         </div>
     </div>
@@ -371,7 +312,7 @@
                             </li>
 
                             <li>
-                                <a class="black" ng-click="helpf()">
+                                <a class="black" style="cursor: pointer;" ng-click="helpf()">
                                     <i class="fa fa-question-circle"></i>
                                     <span>{{'label.anchor.help' | translate }}</span> &nbsp; <i class="fa fa-external-link"></i>
                                 </a>
@@ -397,6 +338,6 @@
     </div>
 </div>
 <!-- Le javascript -->
-<script type='text/javascript' data-main="scripts/loader.750c7dca.js" src='bower_components/requirejs/require.js'></script>
+<script type='text/javascript' data-main="scripts/loader.51445b94.js" src='bower_components/requirejs/require.js'></script>
 </body>
 </html>
