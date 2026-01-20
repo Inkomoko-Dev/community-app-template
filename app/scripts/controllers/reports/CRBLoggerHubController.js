@@ -23,16 +23,20 @@
             };
 
             /**
-             * Apply filters to posting logs (status, search text)
+             * Apply filters to posting logs (hasPassed status, search text)
              */
             scope.applyFilters = function() {
                 scope.filteredLogs = scope.postingLogs.filter(function(log) {
-                    var statusMatch = scope.selectedStatus === 'all' || log.status === scope.selectedStatus;
+                    var statusMatch = scope.selectedStatus === 'all' || 
+                                    (scope.selectedStatus === 'true' && log.hasPassed === true) ||
+                                    (scope.selectedStatus === 'true' && log.hasPassed === 'true') ||
+                                    (scope.selectedStatus === 'false' && log.hasPassed === false) ||
+                                    (scope.selectedStatus === 'false' && log.hasPassed === 'false');
                     var searchMatch = true;
                     
                     if (scope.searchText) {
                         var search = scope.searchText.toLowerCase();
-                        searchMatch = (log.loanAccountNumber && log.loanAccountNumber.toLowerCase().indexOf(search) > -1) ||
+                        searchMatch = (log.loanId && log.loanId.toString().toLowerCase().indexOf(search) > -1) ||
                                     (log.errorMessage && log.errorMessage.toLowerCase().indexOf(search) > -1) ||
                                     (log.details && log.details.toLowerCase().indexOf(search) > -1);
                     }
