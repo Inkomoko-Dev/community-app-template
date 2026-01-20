@@ -85,10 +85,7 @@
                             <td>{{ toDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
                             <td>
                                 <span ng-if="log.errorLogs" class="text-muted">
-                                    <div>{{ log.errorLogs | limitTo:300 }}{{ log.errorLogs.length > 300 ? '...' : '' }}</div>
-                                    <button class="btn btn-xs btn-link" ng-click="showErrorModal(log)" ng-if="log.errorLogs.length > 300" style="padding: 0; margin-top: 5px;">
-                                        <i class="fa fa-eye"></i> View Full Error
-                                    </button>
+                                    {{ log.errorLogs | limitTo:300 }}{{ log.errorLogs.length > 300 ? '...' : '' }}
                                 </span>
                                 <span ng-if="!log.errorLogs" class="text-muted">-</span>
                             </td>
@@ -145,84 +142,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Details Modal -->
-    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" ng-show="showDetailsModal" style="display: block;">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">CRB Posting Log Details</h5>
-                    <button type="button" class="close" ng-click="closeDetailsModal()" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" ng-if="selectedLog">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Log ID:</strong> {{ selectedLog.id }}</p>
-                            <p><strong>Loan Account:</strong> {{ selectedLog.loanAccountNumber }}</p>
-                            <p><strong>Status:</strong> 
-                                <span class="label" ng-class="getStatusClass(selectedLog.status)">
-                                    <i ng-class="getStatusIcon(selectedLog.status)"></i> {{ selectedLog.status }}
-                                </span>
-                            </p>
-                            <p><strong>Posted Date:</strong> {{ selectedLog.postedDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Retry Count:</strong> {{ selectedLog.retryCount }}</p>
-                            <p><strong>Last Retry Date:</strong> {{ selectedLog.lastRetryDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
-                            <p><strong>Response Code:</strong> {{ selectedLog.responseCode || 'N/A' }}</p>
-                            <p><strong>Request ID:</strong> {{ selectedLog.requestId || 'N/A' }}</p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div ng-if="selectedLog.errorMessage">
-                        <h5>Error Message:</h5>
-                        <div class="alert alert-danger">
-                            <pre>{{ selectedLog.errorMessage }}</pre>
-                        </div>
-                    </div>
-                    <div ng-if="selectedLog.details">
-                        <h5>Additional Details:</h5>
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <pre>{{ selectedLog.details }}</pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" ng-click="closeDetailsModal()">Close</button>
-                    <button type="button" class="btn btn-warning" ng-click="retryPosting(selectedLog)" 
-                            ng-if="selectedLog.status === 'FAILED'">
-                        <i class="fa fa-redo"></i> Retry Posting
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade" ng-show="showDetailsModal"></div>
-
-    <!-- Error Details Modal -->
-    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" ng-show="showErrorModal" style="display: block;">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Error Details - Batch ID: {{ selectedErrorLog.batchId }}</h5>
-                    <button type="button" class="close" ng-click="closeErrorModal()" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" ng-if="selectedErrorLog">
-                    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 4px; border-left: 4px solid #d9534f;">
-                        <pre style="white-space: pre-wrap; word-wrap: break-word; margin: 0; font-family: 'Courier New', monospace;">{{ selectedErrorLog.errorLogs }}</pre>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" ng-click="closeErrorModal()">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade" ng-show="showErrorModal"></div>
 </div>
