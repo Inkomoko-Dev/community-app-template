@@ -140,6 +140,22 @@
             };
 
             /**
+             * Show error details modal
+             */
+            scope.showErrorModal = function(logEntry) {
+                scope.selectedErrorLog = logEntry;
+                scope.showErrorModal = true;
+            };
+
+            /**
+             * Close error modal
+             */
+            scope.closeErrorModal = function() {
+                scope.showErrorModal = false;
+                scope.selectedErrorLog = null;
+            };
+
+            /**
              * Clear all filters
              */
             scope.clearFilters = function() {
