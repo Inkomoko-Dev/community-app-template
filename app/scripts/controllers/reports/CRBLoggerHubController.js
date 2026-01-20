@@ -10,6 +10,7 @@
             scope.pageSize = 10;
             scope.pageSizeOptions = [10, 20, 50, 100];
             scope.Math = window.Math;
+            scope.pageRange = [];
 
             /**
              * Fetch all CRB posting logs
@@ -45,6 +46,7 @@
                     return statusMatch && searchMatch;
                 });
                 scope.currentPage = 1;
+                scope.updatePageRange();
             };
 
             /**
@@ -189,6 +191,13 @@
              * Get page range to display
              */
             scope.getPageRange = function() {
+                return scope.pageRange;
+            };
+
+            /**
+             * Update cached page range
+             */
+            scope.updatePageRange = function() {
                 var pages = [];
                 var totalPages = scope.getTotalPages();
                 var start = Math.max(1, scope.currentPage - 1);
@@ -197,7 +206,7 @@
                 for (var i = start; i <= end; i++) {
                     pages.push(i);
                 }
-                return pages;
+                scope.pageRange = pages;
             };
 
             scope.toDate = function (arr) {
@@ -205,6 +214,11 @@
                 // Handle array with [year, month, day] or [year, month, day, hours, minutes, seconds]
                 return new Date(arr[0], arr[1] - 1, arr[2], arr[3] || 0, arr[4] || 0, arr[5] || 0);
             };
+
+            // Watch for currentPage changes to update pageRange
+            scope.$watch('currentPage', function() {
+                scope.updatePageRange();
+            });
 
             // Initialize on controller load
             fetchAllPostingLogs();
