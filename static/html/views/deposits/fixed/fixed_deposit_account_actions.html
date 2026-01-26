@@ -174,7 +174,8 @@
                                    ng-model="formData[modelName]" is-open="opened"/>
                         </div>
                     </div>
-                    <div class="form-group" ng-show="(showDelete || waiveCharge) && (!showBlock)">
+
+                    <div class="form-group" ng-show="showDelete || waiveCharge">
                         <label class="control-label col-sm-2">{{ 'label.areyousure' | translate }}</label>
                     </div>
                     <div class="col-md-offset-2" ng-show="showDelete">
@@ -183,32 +184,13 @@
                             }}
                         </button>
                     </div>
-                    <div ng-show = "!showBlock">
-                        <div class="col-md-offset-2" ng-hide="showDelete">
-                            <button id="cancel" ng-click="cancel()" class="btn">{{ 'label.button.cancel' | translate }}</button>
-                            <button id="save" type="submit" class="btn btn-primary">{{ 'label.button.save' | translate }}</button>
-                        </div>
+
+                    <div class="col-md-offset-2" ng-hide="showDelete">
+                        <button id="cancel" ng-click="cancel()" class="btn">{{ 'label.button.cancel' | translate }}</button>
+                        <button id="save" type="submit" class="btn btn-primary">{{ 'label.button.save' | translate }}</button>
                     </div>
 
-
                 </fieldset>
-            </form>
-            <form name="savingccountactionform" novalidate="" class="form-horizontal">
-                <div class="col-md-offset-3" ng-show="showBlock">
-                    <label class="control-label col-sm-4">{{ 'label.blockNarration.select' | translate }}</label>
-                    <select id="narrationId" ng-model="formData.narrationId"
-                            ng-options="narrationType.id as narrationType.name for narrationType in blockNarrationTypes"
-                            value="{{narrationType.id}}" class="form-control">
-                    </select>
-                    <br/>
-                    <button id="cancel" ng-click="cancel()"
-                            class="btn btn-default">{{ 'label.button.cancel' | translate }}</button>
-
-                    <button id="debit"  type="submit" ng-click = "blockUnblockDebit(taskPermissionNameDebit)" ng-show = "debitStatus"
-                            class="btn btn-primary">{{buttonTextDebit | translate}}</button>
-                    <button id="credit"  type="submit" ng-click = "blockUnblockDebit(taskPermissionNameCredit)" ng-show = "creditStatus"
-                            class="btn btn-primary">{{buttonTextCredit | translate}}</button>
-                </div>
             </form>
         </div>
     </div>

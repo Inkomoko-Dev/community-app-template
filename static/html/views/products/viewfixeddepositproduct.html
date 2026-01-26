@@ -35,10 +35,15 @@
         <td>{{'label.heading.shortname' | translate}} :</td>
         <td colspan="3">{{depositproduct.shortName}}</td>
     </tr>
-    <tr>
-        <td>{{'label.heading.deposit.category' | translate}} :</td>
-        <td colspan="3">{{depositproduct.savingsProductDepositCategory.name}}</td>
-    </tr>
+
+        <tr ng-show="depositproduct.productCategory">
+            <td>{{'label.input.productCategory' | translate}}:</td>
+            <td colspan="3">{{depositproduct.productCategory}}</td>
+        </tr>
+        <tr ng-show="depositproduct.productType">
+            <td>{{'label.input.productType' | translate}}:</td>
+            <td colspan="3">{{depositproduct.productType}}</td>
+        <tr>
     <tr>
         <td colspan="4"><br/></td>
     </tr>
@@ -124,11 +129,6 @@
             {{depositproduct.preClosurePenalInterestOnType.value}}
         </td>
     </tr>
-    <tr ng-show="depositproduct.preClosureChargeApplicable">
-        <td>{{'label.checkbox.applypreclosurecharge' | translate}}</td>
-        <td>{{depositproduct.preClosureCharge.name}}
-        </td>
-    </tr>
     <tr>
         <td>{{'label.heading.withholdtax' | translate}}</td>
         <td colspan="3">{{depositproduct.withHoldTax}}</td>
@@ -138,9 +138,15 @@
         <td colspan="3">{{depositproduct.taxGroup.name}}</td>
     </tr>
     <tr>
-        <td>{{'label.input.withdrawalfeefortransfers' | translate}}</td>
-        <td colspan="3">{{depositproduct.withdrawalFeeForTransfers}}</td>
-    </tr>
+        <td>{{ 'label.input.liquidation.allow' | translate }}</td>
+        <td colspan="6">{{depositproduct.allowPartialLiquidation}}
+        </td>
+    <tr>
+    <tr>
+        <td>{{ 'label.input.liquidation.maximum' | translate }}</td>
+        <td colspan="6">{{depositproduct.totalLiquidationAllowed}}
+        </td>
+    <tr>
     <tr>
         <td colspan="4"><br/></td>
     </tr>
@@ -217,20 +223,20 @@
                     <td>{{'label.heading.savingsreference' | translate}}({{'label.heading.assets' | translate}})</td>
                     <td colspan="3">{{depositproduct.accountingMappings.savingsReferenceAccount.name}}</td>
                 </tr>
-                <tr>
-                    <td>{{ 'label.input.receivablefees' | translate }}({{'label.heading.assets' | translate}})</td>
-                    <td colspan="3">{{depositproduct.accountingMappings.receivableFeeAccountId.name}}</td>
-                </tr>
-                <tr>
-                    <td>{{ 'label.input.receivablepenalties' | translate }}({{'label.heading.assets' | translate}})</td>
-                    <td colspan="3">{{depositproduct.accountingMappings.receivablePenaltyAccountId.name}}</td>
-                </tr>
-                <tr>
-                    <td>{{'label.input.intrestpayable' | translate}}({{'label.heading.liabilities' |
+
+                <tr ng-if="depositproduct.accountingMappings.receivablePenaltyAccountId">
+                    <td>{{'label.input.receivablepenalties' | translate}}({{'label.heading.assets' |
                         translate}})
                     </td>
-                    <td colspan="3">{{depositproduct.accountingMappings.interestPayableAccountId.name}}</td>
+                    <td colspan="3">{{depositproduct.accountingMappings.receivablePenaltyAccountId.name}}</td>
                 </tr>
+                <tr ng-if="depositproduct.accountingMappings.receivableFeeAccountId">
+                    <td>{{'label.input.receivablefees' | translate}}({{'label.heading.assets' |
+                        translate}})
+                    </td>
+                    <td colspan="3">{{depositproduct.accountingMappings.receivableFeeAccountId.name}}</td>
+                </tr>
+
                 <tr>
                     <td>{{'label.heading.savingscontrol' | translate}}({{'label.heading.liabilities' | translate}})</td>
                     <td colspan="3">{{depositproduct.accountingMappings.savingsControlAccount.name}}</td>
@@ -240,6 +246,12 @@
                         translate}})
                     </td>
                     <td colspan="3">{{depositproduct.accountingMappings.transfersInSuspenseAccount.name}}</td>
+                </tr>
+                <tr ng-if="depositproduct.accountingMappings.interestPayableAccountId">
+                    <td>{{'label.input.interestPayableAccountId' | translate}}({{'label.heading.liabilities' |
+                        translate}})
+                    </td>
+                    <td colspan="3">{{depositproduct.accountingMappings.interestPayableAccountId.name}}</td>
                 </tr>
                 <tr>
                     <td>{{'label.heading.interestonsavings' | translate}}({{'label.heading.expenses' | translate}})</td>

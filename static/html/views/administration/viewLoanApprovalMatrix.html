@@ -1,0 +1,44 @@
+<div class="content-container" ng-controller="ViewLoanApprovalMatrixController">
+    <div class="card">
+        <div class="toolbar">
+            <h4 class="pull-left">List of Loan Approval Matrix</h4>
+        </div>
+        <div class="content">
+            <br>
+            <div class="row">
+                <div class="col-sm-8">
+
+                </div>
+                <div class="col-sm-4" data-ng-show="configurations.isExtendLoanLifeCycleConfig">
+                    <a href="#/loanApprovalMatrix" class="btn btn-primary pull-right" has-permission='CREATE_LOANAPPROVALMATRIX'><i
+                        class="fa fa-plus"></i> {{'label.button.createloanapprovalmatrix' | translate}}</a> &nbsp;
+                </div>
+            </div>
+            <hr/>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{{'label.heading.id' | translate}}</th>
+                    <th>{{'label.heading.currency' | translate}}</th>
+                    <th>{{'label.heading.levelOneUnsecuredFirstCycleMaxAmount' | translate}}</th>
+                    <th>{{'label.heading.levelOneUnsecuredFirstCycleMinTerm' | translate}}</th>
+                    <th>{{'label.heading.levelOneUnsecuredFirstCycleMaxTerm' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="matrixDetail in matrixDetails" class="pointer-main">
+                    <td class="pointer" data-ng-click="routeTo(matrixDetail.id)">{{matrixDetail.id}}</td>
+                    <td class="pointer" data-ng-click="routeTo(matrixDetail.id)">{{matrixDetail.currency}}</td>
+                    <td class="pointer" data-ng-click="routeTo(matrixDetail.id)">{{matrixDetail.levelOneUnsecuredFirstCycleMaxAmount}}</td>
+                    <td class="pointer" data-ng-click="routeTo(matrixDetail.id)">{{matrixDetail.levelOneUnsecuredFirstCycleMinTerm}}</td>
+                    <td class="pointer" data-ng-click="routeTo(matrixDetail.id)">{{matrixDetail.levelOneUnsecuredFirstCycleMaxTerm}}</td>
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+
+</div>

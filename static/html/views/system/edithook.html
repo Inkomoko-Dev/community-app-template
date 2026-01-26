@@ -48,11 +48,13 @@
                             <input ng-switch-when="string" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" />
                             <input ng-switch-when="password" type="password" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" />
                             <input ng-switch-when="boolean" type="checkbox" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" />
+                            <textarea ng-switch-when="text" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" ></textarea>
                         </div>
                         <div class="col-sm-3" ng-switch on="s.fieldType" ng-if="!s.optional">
                             <input ng-switch-when="string" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" required late-validate />
                             <input ng-switch-when="password" type="password" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" required late-validate />
                             <input ng-switch-when="boolean" type="checkbox" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" required late-validate />
+                            <textarea ng-switch-when="text" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" required late-validate> </textarea>
                         </div>
                     </div>
 

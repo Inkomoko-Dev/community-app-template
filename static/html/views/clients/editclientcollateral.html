@@ -1,0 +1,201 @@
+<div class="content-container" ng-controller="EditClientCollateralController">
+    <div class="card">
+        <div class="content">
+        <div class="toolbar">
+            <h4>{{ 'label.heading.editcollateral' | translate }}</h4>
+        </div>
+        <br/>
+        <form name="editcollateralform" class="form-horizontal" rc-submit="submit()">
+            <api-validate></api-validate>
+            <fieldset>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="name">{{ 'label.input.name' | translate }}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="name" name="name" type="text" class="form-control" ng-model="formData.name" required disabled>
+                    </div>
+                    
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="quantity">{{'label.input.quantity' | translate}}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="quantity" name="quantity" type="number" min="1" ng-model="formData.quantity" ng-change="updateValues()" class="form-control" required late-Validate/>
+                    </div>
+
+                    <div class="col-sm-2">
+                        <form-validate valattributeform="editcollateralform" valattribute="quantity"/>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="total">{{'label.input.total' | translate}}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="total" name="total" type="text" ng-model="formData.total" class="form-control" number-format disabled/>
+                    </div>
+                    
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="totalCollateral">{{'label.input.totalCollateralValue' | translate}}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="totalCollateral" name="totalCollateral" type="text" ng-model="formData.totalCollateral" class="form-control" number-format disabled/>
+                    </div>
+                    
+                </div>
+                <div class="form-group" ng-if="additionalCollateralDetailsEnabled && !existingAdditionalDetails">
+                  <div class="control-label col-sm-3">
+                    <h5><strong>{{ 'label.input.additionalDetails' | translate }}</strong>&nbsp;<a
+                            ng-click="addAdditionalDetails()"><i class="fa fa-plus"
+                                                                 title="{{'label.button.additionalDetails' | translate}}"></i></a></h5>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="upiNo">{{ 'label.input.upiNo' | translate }}</label>
+
+                        <div class="col-sm-3">
+                            <input id="upiNo" name="upiNo" type="text" class="form-control" ng-model="additionalDetails.upiNo">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="chassisNo">{{ 'label.input.chassisNo' | translate }}</label>
+
+                        <div class="col-sm-3">
+                            <input id="chassisNo" name="chassisNo" type="text" class="form-control" ng-model="additionalDetails.chassisNo">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="collateralOwnerFirst">{{ 'label.input.collateralOwnerFirst' | translate }}
+                            <span class="required">*</span></label>
+
+                        <div class="col-sm-3">
+                            <input id="collateralOwnerFirst" name="collateralOwnerFirst" type="text" class="form-control" ng-model="additionalDetails.collateralOwnerFirst" ng-required="additionalDetailsAddOrRemove">
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="editcollateralform" valattribute="collateralOwnerFirst"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="idNoOfCollateralOwnerFirst">{{ 'label.input.idNoOfCollateralOwnerFirst' | translate }}<span
+                                class="required">*</span></label>
+
+                        <div class="col-sm-3">
+                            <input id="idNoOfCollateralOwnerFirst" name="idNoOfCollateralOwnerFirst" type="text" class="form-control" ng-model="additionalDetails.idNoOfCollateralOwnerFirst" ng-required="additionalDetailsAddOrRemove">
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="editcollateralform" valattribute="idNoOfCollateralOwnerFirst"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="collateralOwnerSecond">{{ 'label.input.collateralOwnerSecond' | translate }}</label>
+
+                        <div class="col-sm-3">
+                            <input id="collateralOwnerSecond" name="collateralOwnerSecond" type="text" class="form-control" ng-model="additionalDetails.collateralOwnerSecond">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="idNoOfCollateralOwnerSecond">{{ 'label.input.idNoOfCollateralOwnerSecond' | translate }}</label>
+
+                        <div class="col-sm-3">
+                            <input id="idNoOfCollateralOwnerSecond" name="idNoOfCollateralOwnerSecond" type="text" class="form-control" ng-model="additionalDetails.idNoOfCollateralOwnerSecond">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                        <label class="control-label col-sm-2" for="worthOfCollateral">{{'label.input.worthOfCollateral' | translate}}<span
+                                class="required">*</span></label>
+
+                        <div class="col-sm-3">
+                            <input id="worthOfCollateral" name="worthOfCollateral" type="text" ng-model="additionalDetails.worthOfCollateral" class="form-control"
+                            ng-required="additionalDetailsAddOrRemove" number-format late-validate number=true />
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="editcollateralform" valattribute="worthOfCollateral"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                    <label class="control-label col-sm-2">{{ 'label.heading.province' | translate }}</label>
+                    <div class="col-sm-3">
+                        <select chosen="provinceOptions" id ="provinceId" name ="provinceId" ng-model="additionalDetails.province.id"
+                                class="form-control" ng-options="provinceOption.id as provinceOption.name for provinceOption in provinceOptions"
+                                value="provinceId">
+                                <option value=""></option>
+                            </select>
+                    </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div ng-show ="additionalDetailsAddOrRemove">
+                    <label class="control-label col-sm-2">{{ 'label.heading.district' | translate }}</label>
+                    <div class="col-sm-3">
+                        <select chosen="districtOptions" name = "district" ng-model="additionalDetails.district.id"
+                                class="form-control" ng-options="districtOption.id as districtOption.name for districtOption in districtOptions"
+                                value="districtId">
+                                <option value=""></option>
+                            </select>
+                    </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show ="additionalDetailsAddOrRemove">
+                    <label class="control-label col-sm-2">{{ 'label.heading.sector' | translate }}</label>
+                    <div class="col-sm-3">
+                        <select chosen="sectorOptions" name = "sector" ng-model="additionalDetails.sector.id"
+                                class="form-control" ng-options="sectorOption.id as sectorOption.name for sectorOption in sectorOptions"
+                                value="sectorId">
+                                <option value=""></option>
+                            </select>
+                    </div>
+                </div>
+                <div class="form-group" ng-show ="additionalDetailsAddOrRemove">
+                    <label class="control-label col-sm-2">{{ 'label.heading.cell' | translate }}</label>
+                    <div class="col-sm-3">
+                        <select chosen="cellOptions" name = "cell" ng-model="additionalDetails.cell.id"
+                                class="form-control" ng-options="cellOption.id as cellOption.name for cellOption in cellOptions"
+                                value="cellId">
+                                <option value=""></option>
+                            </select>
+                    </div>
+                </div>
+                <div class="form-group" ng-show ="additionalDetailsAddOrRemove">
+                    <label class="control-label col-sm-2">{{ 'label.heading.village' | translate }}</label>
+                    <div class="col-sm-3">
+                        <select chosen="villageOptions" name = "village" ng-model="additionalDetails.village.id"
+                                class="form-control" ng-options="villageOption.id as villageOption.name for villageOption in villageOptions"
+                                value="villageId">
+                                <option value=""></option>
+                            </select>
+                    </div>
+                </div>
+                <div class="col-md-offset-3">
+                    <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' | translate }}
+                    </button>
+                    <button id="save" type="submit" has-permission='CREATE_CLIENT_COLLATERAL_PRODUCT' class="btn btn-primary">{{ 'label.button.save' | translate }}</button>
+                </div>
+
+            </fieldset>
+        </form> 
+        </div>
+    </div>
+</div>

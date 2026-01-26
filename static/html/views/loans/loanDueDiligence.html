@@ -1,0 +1,132 @@
+<div class="content-container" ng-controller="ApproveLoanDueDiligenceController">
+    <ul class="breadcrumb">
+        <li ng-show="loandetails.clientName"><a
+                ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
+        <li ng-show="loandetails.group"><a ng-href="#/viewgroup/{{loandetails.group.id}}">{{loandetails.group.name}}</a></li>
+        <li class="active">{{loandetails.loanProductName}}({{loandetails.accountNo}})</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+        <div class="toolbar">
+            <h4>{{ 'label.heading.addduediligence' | translate }}</h4>
+        </div>
+        <br/>
+        <form name="addduediligenceform" class="form-horizontal" ng-submit="submit()">
+            <api-validate></api-validate>
+            <fieldset>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="isIdeaClient">{{ 'label.input.isIdeaClient' | translate }}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-1">
+                        <input id="isIdeaClient" name="isIdeaClient" type="checkbox" class="form-control" ng-model="formData.isIdeaClient" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="isCrbVerificationRequired">{{ 'label.input.isCrbVerificationRequired' | translate }}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-1">
+                        <input id="isCrbVerificationRequired" name="isCrbVerificationRequired" type="checkbox" class="form-control" ng-model="formData.isCrbVerificationRequired" >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="recommendedAmount">
+                        {{ 'label.input.icReviewRecommendedAmount' | translate }}
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{ loandetails.currency.displaySymbol }}</span>
+                            <input
+                                    id="recommendedAmount"
+                                    class="form-control"
+                                    type="text"
+                                    name="recommendedAmount"
+                                    ng-model="formData.recommendedAmount"
+                                    number-only required/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="recommendedLoanTermFrequency">
+                        {{ 'label.input.icReviewTermFrequency' | translate }}
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-sm-3">
+                        <input
+                                id="recommendedLoanTermFrequency"
+                                class="form-control"
+                                type="text"
+                                name="recommendedLoanTermFrequency"
+                                ng-model="formData.recommendedLoanTermFrequency"
+                                number-only required/>
+                    </div>
+                    <div class="col-sm-2">
+                        <select
+                                id="recommendedLoanTermFrequencyType"
+                                ng-model="formData.recommendedLoanTermFrequencyType"
+                                class="form-control col=sm-2"
+                                name="recommendedLoanTermFrequencyType"
+                                ng-options="termFrequencyType.id as termFrequencyType.value for termFrequencyType in loandetails.termFrequencyTypeOptions"
+                                value="{{frequency.id}}" required>
+                            <option value="">-- Term Period --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="dueDiligenceOn">{{ 'label.input.approvedondate' | translate }}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="dueDiligenceOn" type="text" name="dueDiligenceOn" datepicker-pop="dd MMMM yyyy"
+                               ng-model="third.dueDiligenceOn" is-open="opened" min="'2000-01-01'" max="restrictDate"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-sm-2">
+                        <form-validate valattributeform="addduediligenceform" valattribute="dueDiligenceOn"/>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="nextApproverId">
+                        {{ 'label.input.nextApproverId' | translate }}
+<!--                        <span class="required">*</span>-->
+                    </label>
+                    <div class="col-sm-3">
+                        <select
+                                id="nextApproverId"
+                                name="nextApproverUserId"
+                                ng-model="formData.nextApproverUserId"
+                                ng-options="user.id as (user.firstname + ' ' + user.lastname + ' (' + user.username + ')') for user in loandetails.approverOptions"
+                                class="form-control">
+                            <option value="">-- Select Next Stage Approver --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate }}
+                    <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <textarea id="note" class="form-control" ng-model="formData.note" rows="4" cols="" required late-validate ></textarea>
+                    </div>
+                </div>
+                <div class="col-md-offset-3">
+                    <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' | translate
+                        }}
+                    </button>
+                    <button id="save" type="submit" has-permission='ACCEPT_DUEDILIGENCE' class="btn btn-primary">{{ 'label.button.save' | translate }}</button>
+                </div>
+
+            </fieldset>
+        </form> 
+        </div>
+    </div>
+</div>

@@ -1,0 +1,124 @@
+<div id="viewlptop"></div>
+<div class="content-container" ng-controller="CRBLoggerHubController">
+    <ul class="breadcrumb">
+        <li><a href="#/reports/all">{{ 'label.anchor.reports' | translate }}</a></li>
+        <li class="active">CRB Posting Logger</li>
+    </ul>
+    
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>CRB Posting Logger</h4>
+            </div>
+
+            <!-- Alert Messages -->
+            <div ng-if="error" class="alert alert-danger alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Error:</strong> {{ error }}
+            </div>
+
+            <div ng-if="success" class="alert alert-success alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Success:</strong> {{ success }}
+            </div>
+
+            <!-- Filter and Action Buttons -->
+            <div class="row" style="margin-bottom: 30px;">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Filter by Status:</label>
+                        <select class="form-control" ng-model="selectedStatus" ng-change="applyFilters()">
+                            <option value="all">All Status</option>
+                            <option value="true">Posted</option>
+                            <option value="false">Not Posted</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Search:</label>
+                        <input type="text" class="form-control" placeholder="Search by account/error..." 
+                               ng-model="searchText" ng-change="applyFilters()" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <div>
+                            <button class="btn btn-default" ng-click="clearFilters()">
+                                <i class="fa fa-refresh"></i> Clear Filters
+                            </button>
+                            <!-- <button class="btn btn-info" ng-click="exportToCSV()" ng-disabled="filteredLogs.length === 0">
+                                <i class="fa fa-download"></i> Export CSV
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Table -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr class="graybg">
+                            <th style="width: 8%">Batch Id</th>
+                            <th style="width: 12%">Loan Account</th>
+                            <th style="width: 10%">Status</th>
+                            <th style="width: 15%">Posted Date</th>
+                            <th style="width: 43%">Error Message</th>
+                            <th style="width: 12%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="log in filteredLogs | itemsPerPage:pageSize"
+                            ng-class="{'danger': log.hasPassed === 'true', 'warning': log.hasPassed === 'false'}">
+                            <td>{{ log.batchId }}</td>
+                            <td>{{ log.loanId }}</td>
+                            <td>
+                                <span class="label" ng-class="getStatusClass(log.hasPassed)">
+                                    <i ng-class="getStatusIcon(log.hasPassed)"></i> {{ log.hasPassed ? 'Posted' : 'Not Posted' }}
+                                </span>
+                            </td>
+                            <td>{{ toDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
+                            <td>
+                                <span ng-if="log.errorLogs" class="text-muted">
+                                    {{ log.errorLogs | limitTo:300 }}{{ log.errorLogs.length > 300 ? '...' : '' }}
+                                </span>
+                                <span ng-if="!log.errorLogs" class="text-muted">-</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)" 
+                                        ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
+                                    <i class="fa fa-check"></i> Fixed
+                                </button>
+                                <button class="btn btn-xs btn-warning" ng-click="retryPosting(log)" 
+                                        ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Retry Posting">
+                                    <i class="fa fa-redo"></i> Retry
+                                </button>
+                            </td>
+                        </tr>
+                        <tr ng-if="filteredLogs.length === 0">
+                            <td colspan="7" class="text-center text-muted">No logs found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <table class="table">
+                <tr>
+                    <td colspan="5">
+                    </td>
+                    <td class="pull-right">
+                        <a ng-click="scrollto('viewlptop')"><i class="fa fa-upload"></i> Top</a>
+                    </td>
+                </tr>
+            </table>
+            <dir-pagination-controls boundary-links="true" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+</div>

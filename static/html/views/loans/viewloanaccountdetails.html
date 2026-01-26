@@ -17,6 +17,80 @@
             <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
         </div>
     </script>
+    <api-validate></api-validate>
+
+    <script type="text/ng-template" id="cashFlowProjectionUpdateModal.html">
+        <div class="modal-header">
+            <h4>{{ 'label.heading.update.projection.rate' | translate }}</h4>
+        </div>
+        <div class="modal-body">
+            <div class="card">
+                <div class="content">
+                    <form name="addduediligenceform" class="form-horizontal" ng-submit="submitForm()">
+                        <api-validate></api-validate>
+                        <fieldset>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="cashFlowType">{{ 'label.input.cashFlow.type' | translate }}<span
+                                        class="required">*</span></label>
+
+                                <div class="col-sm-4">
+                                    <select id="cashFlowType" name="cashFlowType" class="form-control" ng-model="projectionUpdate.cashFlowType" required late-validate convert-to-number
+                                        ng-options="type.id as type.value for type in projectionCashFlowType"
+                                        value="{{type.value}}"><option value="">--{{'label.menu.select' | translate}}--</option>
+
+                                    </select>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <form-validate valattributeform="addduediligenceform" valattribute="projectionUpdate.cashFlowType"/>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="months">{{ 'label.input.cashFlow.month' | translate }}<span
+                                        class="required">*</span></label>
+
+                                <div class="col-sm-4">
+                                    <select id="months" ng-model="projectionUpdate.month" class="form-control" required late-validate
+                                            ng-options="installmentMonth.id as installmentMonth.value for installmentMonth in installmentMonthsOptions"
+                                            value="{{installmentMonth.value}}"><option value="">--{{'label.menu.select' | translate}}--</option></select>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <form-validate valattributeform="addduediligenceform" valattribute="projectionUpdate.month"/>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="projectionRate">{{ 'label.input.cashFlow.projectionRate' | translate }}<span
+                                        class="required">*</span></label>
+
+                                <div class="col-sm-4">
+                                    <input id="projectionRate" name="projectionRate" type="text" data-ng-model="projectionUpdate.projectionRate"
+                                           class="input-sm form-control"
+                                           required late-validate>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <form-validate valattributeform="addduediligenceform" valattribute="projectionUpdate.projectionRate"/>
+                                </div>
+
+                            </div>
+                        </fieldset>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" ng-click="updateCashFlowProjection()">Save</button>
+                            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </script>
+
     <div class="card" style="min-height: 550px; overflow: hidden;">
         <div class="form-horizontal" ng-show="report">
         	<div class="form-group" ng-show="viewLoanReport">
@@ -39,7 +113,10 @@
              </div>
              <div class="col-md-11 center" ng-show="viewLoanReport">
                  <button ng-click="viewLoanDetails()" class="btn btn-default ng-binding">{{'label.button.back' | translate}} </button>
-                 <button ng-click="viewprintdetails()" class="btn btn-primary ng-binding">{{'label.button.viewprint' | translate}} </button>
+                 <button ng-click="viewprintdetails('PDF')" class="btn btn-primary ng-binding">{{'label.button.viewprint' | translate}} </button>
+                 <button ng-click="viewprintdetails('XLS')" class="btn btn-primary ng-binding">
+                     {{'label.button.generatexls' | translate}}
+                 </button>
              </div>
 
 
@@ -57,21 +134,53 @@
         </div>
         <br>
         <div ng-hide="report">
-            <div class="span gray-head" style="margin-left:0%;">
+            <div class="span gray-head" style="margin-left:0%;" ng-hide="loandetails.isExtendLoanLifeCycleConfig">
                       <span style="margin-left: 10px;font-size:24px">
-                            <strong> <i ng-hide="loandetails.inArrears"
-                                        class="fa fa-stop {{loandetails.status.code | StatusLookup}}"></i>
+                            <strong>
+
+                                <i ng-hide="loandetails.inArrears"
+                                        class="fa fa-stop {{isPendingDisbursement ? loandetails.subStatus.code : loandetails.status.code | StatusLookup}}"></i>
+
                                 <i ng-show="loandetails.inArrears"
-                                   class="fa fa-stop {{loandetails.status.code | StatusLookup}}overdue"></i>&nbsp;{{loandetails.loanProductName}}(#{{loandetails.accountNo}})</strong>
+                                   class="fa fa-stop {{loandetails.status.code | StatusLookup}}overdue"></i>
+                                &nbsp;{{loandetails.loanProductName}}(#{{loandetails.accountNo}})
+                            </strong>
+                      </span>
+            </div>
+            <div class="span gray-head" style="margin-left:0%;" ng-show="loandetails.isExtendLoanLifeCycleConfig">
+                      <span style="margin-left: 10px;font-size:24px">
+                            <strong>
+
+                                 <i ng-show="(!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState == null) ||
+                                 (!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value == 'PREPARE_AND_SIGN_CONTRACT') ||
+                                 (!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loandetails.status.code != 'loanStatusType.submitted.and.pending.approval')"
+
+                                    class="fa fa-stop {{isPendingDisbursement ? loandetails.subStatus.code : loandetails.status.code | StatusLookup}}"></i>
+
+
+                                 <i ng-show="!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loandetails.status.code == 'loanStatusType.submitted.and.pending.approval'"
+                                    class="fa fa-stop {{loandetails.loanDecisionState.code | StatusLookup}}"></i>
+
+
+                                <i ng-show="loandetails.inArrears"
+                                   class="fa fa-stop {{loandetails.status.code | StatusLookup}}overdue"></i>
+
+
+                                &nbsp;{{loandetails.loanProductName}}(#{{loandetails.accountNo}})
+
+                            </strong>
                       </span>
             </div>
             <br>
+
             <div class="col-sm-12 col-md-12 primarydiv">
                 <div class="pull-right btn-group">
+                    <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary">{{'label.button.creditcheck' | translate}}</a>
+
                     <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
                        class="btn btn-primary" has-permission='{{button.taskPermissionName}}'><i
                             class="{{button.icon}} "></i>&nbsp;{{'label.' + button.name |
-                        translate}}</a>
+                        translate}} </a>
 
                       <span ng-show="buttons.options" uib-dropdown  class="btn-group dropdown" on-toggle="toggled(open)">
                           <a class="btn btn-primary" uib-dropdown-toggle>
@@ -107,7 +216,7 @@
                             <th class="table-bold-loan">{{'label.heading.loanofficer' | translate}}</th>
                             <td><span class="padded-td"><span data-ng-hide="loandetails.loanOfficerName">{{'label.unassigned' | translate}}</span>{{loandetails.loanOfficerName}}&nbsp;
                                     <span ng-show="loandetails.loanOfficerName">
-                                      <a ng-click="clickEvent('unassignloanofficer', loandetails.id)"><i
+                                      <a ng-click="clickEvent('unassignloanofficer', loandetails.id)" has-permission = 'REMOVELOANOFFICER_LOAN'><i
                                               class="fa fa-times"></i></a>
                                     </span>
                                     </span>
@@ -116,6 +225,26 @@
                         <tr>
                             <th class="table-bold-loan">{{'label.heading.externalid' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.externalId}}</span><span ng-hide="loandetails.externalId">{{'label.heading.notprovided' | translate}}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="table-bold-loan">{{'label.heading.department' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.department.name}}</span><span ng-hide="loandetails.department">{{'label.heading.notprovided' | translate}}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="table-bold-loan">{{'label.heading.kivaId' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.kivaId}}</span><span ng-hide="loandetails.kivaId">{{'label.heading.notprovided' | translate}}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="table-bold-loan">{{'label.heading.kivaUUId' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.kivaUUId}}</span><span ng-hide="loandetails.kivaUUId">{{'label.heading.notprovided' | translate}}</span></td>
+                        </tr>
+                        <tr ng-show="isPendingDisbursement">
+                            <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
+                        </tr>
+                        <tr ng-show="loandetails.loanWithAnotherInstitutionAmount">
+                            <th class="table-bold-loan">{{'label.heading.loan.with.another.institution.amount' | translate}}</th>
+                            <td>{{loandetails.loanWithAnotherInstitutionAmount | number}}</td>
                         </tr>
                     </table>
                     <div ng-show="loandetails.summary">
@@ -203,8 +332,12 @@
                             </td>
                         </tr>
                         <tr>
-                            <th class="table-bold-loan">{{'label.heading.proposedamount' | translate}}</th>
+                            <th class="table-bold-loan">{{'label.heading.appliedamount' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.proposedPrincipal | number}}</span></td>
+                        </tr>
+                        <tr ng-show="showApprovedICAmount">
+                            <th class="table-bold-loan">{{'label.heading.approvedicreview' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.approvedICReview | number}}</span></td>
                         </tr>
                         <tr ng-show="showApprovedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.approvedamount' | translate}}</th>
@@ -238,10 +371,16 @@
                             </td>
                         </tr>
                         <tr>
+                            <th class="table-bold-loan">{{'label.heading.department' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.department.name}}
+                                <span data-ng-hide="loandetails.department">{{'label.heading.notprovided' | translate}}</span></span>
+                            </td>
+                        </tr>
+                        <tr>
                             <th class="table-bold-loan">{{'label.heading.loanofficer' | translate}}</th>
                             <td><span class="padded-td"><span data-ng-hide="loandetails.loanOfficerName">{{'label.unassigned' | translate}}</span>{{loandetails.loanOfficerName}}&nbsp;
                                     <span ng-show="loandetails.loanOfficerName">
-                                      <a ng-click="clickEvent('unassignloanofficer', loandetails.id)"><i
+                                      <a ng-click="clickEvent('unassignloanofficer', loandetails.id)" has-permission = 'REMOVELOANOFFICER_LOAN'><i
                                               class="fa fa-times"></i></a>
                                     </span>
                                     </span>
@@ -256,8 +395,16 @@
                             <td><span class="padded-td">{{loandetails.externalId}}</span><span ng-hide="loandetails.externalId">{{'label.heading.notprovided' | translate}}</span></td>
                         </tr>
                         <tr>
-                            <th class="table-bold-loan">{{'label.heading.proposedamount' | translate}}</th>
+                            <th class="table-bold-loan">{{'label.heading.kivaId' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.kivaId}}</span><span ng-hide="loandetails.kivaId">{{'label.heading.notprovided' | translate}}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="table-bold-loan">{{'label.heading.appliedamount' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.proposedPrincipal | number}}</span></td>
+                        </tr>
+                        <tr ng-show="showApprovedICAmount">
+                            <th class="table-bold-loan">{{'label.heading.approvedicreview' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.approvedICReview | number}}</span></td>
                         </tr>
                         <tr ng-show="showApprovedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.approvedamount' | translate}}</th>
@@ -276,14 +423,6 @@
                             <th>{{'label.heading.numberOfRepayments' | translate}}</th>
                             <td>{{loandetails.numberOfRepayments | number }}</td>
                         </tr>
-                        <!--<tr>-->
-                            <!--<th>{{'label.heading.numberOfMissedPayments' | translate}}</th>-->
-                            <!--<td>{{'label.heading.notprovided' | translate}}</td>-->
-                        <!--</tr>-->
-                        <!--<tr>-->
-                            <!--<th>{{'label.heading.daysInArrears' | translate}}</th>-->
-                            <!--<td>{{'label.heading.notprovided' | translate}}</td>-->
-                        <!--</tr>-->
                         <tr>
                             <th>{{'label.account.maturity.date' | translate}}</th>
                             <td>{{loandetails.timeline.expectedMaturityDate | DateFormat}}</td>
@@ -373,6 +512,11 @@
                                 <td><span class="padded-td">{{loandetails.interestType.value}}</span></td>
                             </tr>
                             <tr>
+                                <td>{{'label.heading.applicationDate' | translate}}
+                                </td>
+                                <td><span class="padded-td">{{loandetails.timeline.applicationDate | DateFormat }}</span></td>
+                            </tr>
+                            <tr>
                                 <td>{{'label.heading.submittedondate' | translate}}
                                 </td>
                                 <td><span class="padded-td">{{loandetails.timeline.submittedOnDate | DateFormat }}</span></td>
@@ -419,6 +563,10 @@
                                 <td>{{ 'label.input.daysinmonth' | translate }}</td>
                                 <td><span class="padded-td">{{ loandetails.daysInMonthType.value }}</span></td>
                             </tr>
+                            <tr ng-show ="loandetails.groupSavingsAccountId > 0">
+                                <td>{{ 'label.input.groupSavingsAccountLinkage' | translate }}</td>
+                                <td><span class="padded-td">{{ loandetails.groupSavingsAccountId }}</span></td>
+                            </tr>
                             <tr data-ng-show="loandetails.isInterestRecalculationEnabled">
                                 <td>{{ 'label.input.interest.recalculation.compounding.method' | translate }}</td>
                                 <td><span class="padded-td">{{ loandetails.interestRecalculationData.interestRecalculationCompoundingType.value}}</span></td>
@@ -426,6 +574,10 @@
                             <tr data-ng-show="loandetails.isInterestRecalculationEnabled">
                                 <td>{{ 'label.input.interest.recalculation.reschdule.strategy' | translate }}</td>
                                 <td><span class="padded-td">{{ loandetails.interestRecalculationData.rescheduleStrategyType.value}}</span></td>
+                            </tr>
+                            <tr data-ng-show="loandetails.isInterestRecalculationEnabled && loandetails.interestRecalculationData.rescheduleStrategyType.id == 3">
+                                <td>{{ 'label.input.interestforexactdaysinperiod' | translate }}</td>
+                                <td><span class="padded-td">{{loandetails.interestRecalculationData.advancePaymentInterestForExactDaysInPeriod}}</span></td>
                             </tr>
                             <tr data-ng-show="loandetails.isInterestRecalculationEnabled">
                                 <td>{{ 'label.input.frequency.for.recalculte.outstanding.principal' | translate }}</td>
@@ -445,6 +597,14 @@
                                 <td colspan="3">(Min:{{loandetails.minimumGap}}&nbsp;{{'label.input.days' | translate }} &nbsp;, Max:{{loandetails.maximumGap}}&nbsp;{{'label.input.days' | translate }})
                                 </td>
 
+                            </tr>
+                            <tr data-ng-show="loandetails.description">
+                                <td>{{ 'label.input.kivaDescription' | translate }}</td>
+                                <td><span class="padded-td">{{loandetails.description}}</span></td>
+                            </tr>
+                            <tr data-ng-show="loandetails.kivaUUId">
+                                <td>{{ 'label.input.kivaUUId' | translate }}</td>
+                                <td><span class="padded-td">{{loandetails.kivaUUId}}</span></td>
                             </tr>
                             </tbody>
                         </table>
@@ -500,8 +660,9 @@
 
                     </uib-tab>
 
-                    <uib-tab heading="{{'label.heading.repaymentschedule' | translate}}">
-
+                    <uib-tab heading="{{'label.heading.repaymentschedule' | translate}}"> 
+                        <button class="btn btn-primary pull-right" ng-show="checkStatusNotActive()" ng-click="export()">{{'label.button.exportSchedule' | translate}}</button>
+                        <div class="table-responsive">
                         <table class="table table-striped .width100">
                             <colgroup span="4"></colgroup>
                             <thead>
@@ -522,7 +683,6 @@
                                 <th scope="col">{{'label.heading.balanceofloan' | translate}}</th>
 
                                 <th scope="col">{{'label.heading.interest' | translate}}</th>
-                                <th scope="col">{{'label.heading.overdueinterest' | translate}}</th>
                                 <th scope="col">{{'label.heading.fees' | translate}}</th>
                                 <th scope="col">{{'label.heading.penalties' | translate}}</th>
 
@@ -547,7 +707,6 @@
                                 <td>{{period.principalDue | number}}</td>
                                 <td>{{period.principalLoanBalanceOutstanding | number}}</td>
                                 <td>{{period.interestOriginalDue | number}}</td>
-                                <td>{{period.overdueInterest | number}}</td>
                                 <td>{{period.feeChargesDue | number}}</td>
                                 <td>{{period.penaltyChargesDue | number}}</td>
 
@@ -568,7 +727,6 @@
                                 <th>{{loandetails.repaymentSchedule.totalPrincipalExpected | number}}</th>
                                 <th>&nbsp;</th>
                                 <th>{{loandetails.repaymentSchedule.totalInterestCharged | number}}</th>
-                                <th>{{loandetails.repaymentSchedule.totalOverdueInterest | number}}</th>
                                 <th>{{loandetails.repaymentSchedule.totalFeeChargesCharged | number}}</th>
                                 <th>{{loandetails.repaymentSchedule.totalPenaltyChargesCharged | number}}</th>
 
@@ -581,6 +739,7 @@
                             </tr>
                             </tfoot>
                         </table>
+</div>
 
                     </uib-tab>
 
@@ -713,23 +872,6 @@
                                 <iframe id="rptLoadingreceiptFrame" ng-show="viewReport" ng-src="{{viewReportDetails}}" frameborder="0" width="100%" height="800px"></iframe>
                             </div>
                         </div>
-                    </uib-tab>
-
-                    <uib-tab heading="{{'label.heading.loancollaterals' | translate}}" ng-show="loandetails.collateral">
-                        <table class="table">
-                            <thead>
-                            <th>{{'label.heading.type' | translate}}</th>
-                            <th>{{'label.heading.value' | translate}}</th>
-                            <th>{{'label.heading.description' | translate}}</th>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="collateral in loandetails.collateral" class="pointer-main">
-                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.type.name}}</td>
-                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.value | number}}</td>
-                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.description}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
                     </uib-tab>
 
                     <uib-tab ng-show="loandetails.multiDisburseLoan" heading="{{'label.heading.tranchedetails' | translate}}">
@@ -877,6 +1019,7 @@
                                 | translate}}</a>
                         </div>
                         <br>
+                        <div class="table-responsive">
                         <table class="table" ng-show="loandocuments.length > 0">
                             <thead>
                             <th>{{'label.heading.name' | translate}}</th>
@@ -890,8 +1033,8 @@
                                 <td>{{document.description}}</td>
                                 <td>{{document.fileName}}</td>
                                 <td>
-                                    <a target="_blank" href="{{hostUrl}}{{document.docUrl}}"><i class="fa fa-cloud-download"></i></a>&nbsp;
-                                    <a ng-show="document.fileIsImage" ng-click="previewDocument(document.docUrl,document.fileName)"><i class="fa fa-eye"></i></a>
+                                    <a ng-click="downloadDocument(document)"><i class="fa fa-cloud-download"></i></a>&nbsp;
+                                    <a ng-show="document.fileIsImage" ng-click="downloadDocument(document)"><i class="fa fa-eye"></i></a>
                                     <a ng-click="deleteDocument(document.id,$index)"><i class="fa fa-times"></i></a>
                                 </td>
                             </tr>
@@ -899,6 +1042,7 @@
                         </table>
                         <div style="padding-left: 25%;">
                           <object height="60%" width="70%" ng-show="preview" data="{{fileUrl}}" type="{{fileType}}"></object>
+                        </div>
                         </div>
                     </uib-tab>
                     <uib-tab heading="{{ 'label.heading.notes' | translate }}" has-permission='READ_LOANNOTE'>
@@ -977,7 +1121,6 @@
                     </uib-tab>
                     <uib-tab heading="{{loandatatable.registeredTableName}}" ng-repeat="loandatatable in loandatatables" has-permission='READ_{{loandatatable.registeredTableName}}'
                          select="dataTableChange(loandatatable)">
-                        <api-validate></api-validate>
                         <div>
                             <div data-ng-show="choice" class="btn-group pull-right">
                                 <a ng-show="datatabledetails.isData" class="btn btn-danger pull-right"
@@ -1015,6 +1158,1511 @@
                                     </tr>
                                 </table>
                             </div>
+                        </div>
+                    </uib-tab>
+                    <uib-tab ng-show="loandetails.loanDueDiligenceData" heading="{{'label.heading.duediligencedetail' | translate}}">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="empty"></th>
+                                <th class="empty"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{'label.heading.surveyname' |
+                                    translate}}
+                                </td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.surveyName}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.startdate' | translate}}</td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.startDate | DateFormat}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.enddate' | translate}}</td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.endDate | DateFormat }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.surveylocation' | translate}}</td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.surveyLocation}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.cohort' | translate}}</td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.cohort}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.program' | translate}}</td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.program}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.country' | translate}}</td>
+                                <td><span class="padded-td">{{loandetails.loanDueDiligenceData.country}}</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </uib-tab>
+                    <uib-tab ng-show="crbReportTransUnion" heading="{{'label.heading.crbReportDetails' | translate}}">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="empty"></th>
+                                <th class="empty"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{'label.heading.crbName' |
+                                    translate}}
+                                </td>
+                                <td><span class="padded-td">{{crbReportTransUnion.crbName}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.pdfId' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.pdfId}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.productDisplayName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.productDisplayName}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.reportDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.reportDate | DateFormat }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.reportType' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.reportType}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.requestNo' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.requestNo}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.requester' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.requester}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.createdOnDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.createdOnDate | DateFormat }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.personalCrn' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.personalCrn}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.dateOfBirth' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.dateOfBirth | DateFormat}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.fullName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.fullName}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.gender' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.gender}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.healthInsuranceNo' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.healthInsuranceNo}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.maritalStatus' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.maritalStatus}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.nationalId' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.nationalId}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.otherNames' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.otherNames}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.salutation' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.salutation}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.surname' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.surname}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.grade' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.grade}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.positiveScore' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.positiveScore}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.possibility' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.possibility}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.reasonCodeAarc1' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.reasonCodeAarc1}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.reasonCodeAarc2' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.reasonCodeAarc2}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.reasonCodeAarc3' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.reasonCodeAarc3}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 1">
+                                <td>{{'label.heading.reasonCodeAarc4' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.reasonCodeAarc4}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportTransUnion.clientType == 2">
+                                <td>{{'label.heading.corporateCrn' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.corporateCrn}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 2">
+                                <td>{{'label.heading.companyRegNo' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.companyRegNo}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 2">
+                                <td>{{'label.heading.companyName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.companyName}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.clientType == 2">
+                                <td>{{'label.heading.companyRegDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.companyRegDate}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.summary' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.lastBouncedChequeDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.lastBouncedChequeDate}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.lastCreditApplicationDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.lastCreditApplicationDate}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.lastFraudDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.lastFraudDate}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.lastInsurancePolicyDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.lastInsurancePolicyDate}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.lastPAListingDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.lastPAListingDate}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.bouncedCheques' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bcAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bcMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bcOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.bouncedCheques90' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc90AllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc90MySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc90OtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.bouncedCheques180' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc180AllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc180MySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc180OtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.bouncedCheques365' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc365AllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc365MySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.bc365OtherSectors}}</span></td>
+                            </tr>
+
+
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.closedAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.closedAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.closedAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.closedAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.creditApplications' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.caAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.caMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.caOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.creditHistory' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.chAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.chMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.chOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.enquiries31to60Days' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq31to60DaysAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq31to60DaysMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq31to60DaysOtherSectors}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.enquiries61to90Days' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq61to90DaysAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq61to90DaysMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq61to90DaysOtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.enquiries91Days' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq91DaysAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq91DaysMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq91DaysOtherSectors}}</span></td>
+                            </tr>
+
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.enquiries91to180Days' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq91to180DaysAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq91to180DaysMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enq91to180DaysOtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.enquiriesLast30Days' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enqLast30DaysAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enqLast30DaysMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.enqLast30DaysOtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.fraudulentCases' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.fcAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.fcMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.fcOtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.insurancePolicies' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.insurancePoliciesAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.insurancePoliciesMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.insurancePoliciesOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.lastNPAListingDate' | translate}}</b></td>
+                                <td></td>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.lastNPAListingDate}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.NPAAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.openAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.openAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.openAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.openAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.paAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.paAccountsWithDh' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paAccountsWithDhAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paAccountsWithDhMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paAccountsWithDhOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.paClosedAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paClosedAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paClosedAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paClosedAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.paClosedAccountsWithDh' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paClosedAccountsWithDhAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paClosedAccountsWithDhMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paClosedAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.npaOpenAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaOpenAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaOpenAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaOpenAccountsOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.npaTotalValueListed' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.currency' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaTotalValueListedAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaTotalValueListedMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaTotalValueListedOtherSectors}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.paOpenAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paOpenAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paOpenAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paOpenAccountsOtherSectors}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.paOpenAccountsWithDh' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paOpenAccountsWithDhAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paOpenAccountsWithDhMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.paOpenAccountsWithDhOtherSectors}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.npaClosedAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.allSector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaClosedAccountsAllSectors}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.mySector' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaClosedAccountsMySector}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td>{{'label.heading.otherSectors' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportTransUnion.transUnionRwandaCrbSummaryReportData.npaClosedAccountsOtherSectors}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportTransUnion.transUnionRwandaCrbSummaryReportData">
+                                <td><b>{{'label.heading.performingAccounts' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div style="overflow-x:auto;">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="empty">{{'label.heading.accountClassification' | translate}}</th>
+                                <th class="empty">{{'label.heading.accountClosingDate' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransAccountNo' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransAccountOpeningDate' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransAccountOwner' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransAccountStatus' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransAccountType' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransArrearAmount' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransArrearDays' | translate}}</th>
+                                <th class="empty">{{'label.heading.TransBalanceAmount' | translate}}</th>
+                                <th class="empty">{{'label.heading.currency' | translate}}</th>
+                                <th class="empty">{{'label.heading.disputed' | translate}}</th>
+                                <th class="empty">{{'label.heading.isMyAccount' | translate}}</th>
+                                <th class="empty">{{'label.heading.jointLoanParticipants' | translate}}</th>
+                                <th class="empty">{{'label.heading.lastPaymentDate' | translate}}</th>
+                                <th class="empty">{{'label.heading.listingDate' | translate}}</th>
+                                <th class="empty">{{'label.heading.principalAmount' | translate}}</th>
+                                <th class="empty">{{'label.heading.repaymentDuration' | translate}}</th>
+                                <th class="empty">{{'label.heading.repaymentTerm' | translate}}</th>
+                                <th class="empty">{{'label.heading.scheduledPaymentAmount' | translate}}</th>
+                                <th class="empty">{{'label.heading.tradeSector' | translate}}</th>
+                                <th class="empty">{{'label.heading.worstArrear' | translate}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="account in crbReportTransUnion.accountReportDataList">
+                                <td>{{account.accountClassification}}</td>
+                                <td>{{account.accountClosingDate}}</td>
+                                <td>&nbsp;&nbsp;&nbsp;{{ account.accountNo }}</td>
+                                <td>{{ account.accountOpeningDate }}</td>
+                                <td>{{ account.accountOwner }}</td>
+                                <td>{{ account.accountStatus }}</td>
+                                <td>{{ account.accountType }}</td>
+                                <td>{{ account.arrearAmount }}</td>
+                                <td>{{ account.arrearDays }}</td>
+                                <td>{{ account.balanceAmount }}</td>
+                                <td>{{ account.currency }}</td>
+                                <td>{{ account.disputed }}</td>
+                                <td>{{ account.isMyAccount }}</td>
+                                <td>{{ account.jointLoanParticipants }}</td>
+                                <td>{{ account.lastPaymentDate }}</td>
+                                <td>{{ account.listingDate }}</td>
+                                <td>{{ account.principalAmount }}</td>
+                                <td>{{ account.repaymentDuration }}</td>
+                                <td>{{ account.repaymentTerm }}</td>
+                                <td>{{ account.scheduledPaymentAmount }}</td>
+                                <td>{{ account.tradeSector }}</td>
+                                <td>{{ account.worstArrear }}</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </uib-tab>
+                    <uib-tab ng-show="crbReportMetrolpolIdentityVerification" heading="{{'label.heading.crbReportMetrolpolIdentityVerification' | translate}}">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="empty"></th>
+                                <th class="empty"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.id" style="color: #00205F;">
+                                <td><b>{{'label.heading.identityVerification' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.citizenShip">
+                                <td>{{'label.heading.metropolCitizenShip' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.citizenShip}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.clan">
+                                <td>{{'label.heading.metropolClan' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.clan}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.dateOfBirth">
+                                <td>{{'label.heading.metropolDateOfBirth' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.dateOfBirth | DateFormat}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.dateOfDeath">
+                                <td>{{'label.heading.metropolDateOfDeath' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.dateOfDeath | DateFormat}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.dateOfIssue">
+                                <td>{{'label.heading.metropolDateOfIssue' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.dateOfIssue | DateFormat}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.ethnicGroup">
+                                <td>{{'label.heading.metropolEthnicGroup' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.ethnicGroup}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.family">
+                                <td>{{'label.heading.metropolFamily' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.family}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.firstName">
+                                <td>{{'label.heading.metropolFirstName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.firstName}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.gender">
+                                <td>{{'label.heading.metropolGender' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.gender}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.identityNumber">
+                                <td>{{'label.heading.metropolIdentityNumber' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.identityNumber}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.identityType">
+                                <td>{{'label.heading.metropolIdentityType' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.identityType}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.lastName">
+                                <td>{{'label.heading.metropolLastName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.lastName}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.occupation">
+                                <td>{{'label.heading.metropolOccupation' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.occupation}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.otherName">
+                                <td>{{'label.heading.metropolOtherName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.otherName}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.placeOfBirth">
+                                <td>{{'label.heading.metropolPlaceOfBirth' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.placeOfBirth}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.placeOfDeath">
+                                <td>{{'label.heading.metropolPlaceOfDeath' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.placeOfDeath}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.placeOfLive">
+                                <td>{{'label.heading.metropolPlaceOfLive' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.placeOfLive}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.refOffice">
+                                <td>{{'label.heading.metropolRefOffice' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.refOffice}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.serialNumber">
+                                <td>{{'label.heading.metropolSerialNumber' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.serialNumber}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.trxId">
+                                <td>{{'label.heading.metropolReferenceNumber' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.trxId}}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.createdOn">
+                                <td>{{'label.heading.metropolCreationDate' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.createdOn | DateFormat}}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.reportType === 'CREDIT_INFO_ENHANCED'" style="color: #00205F;">
+                                <td><b>{{'label.heading.creditInfoEnhanced' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.reportType === 'JSON_REPORT'" style="color: #00205F;">
+                                <td><b>{{'label.heading.verifyLoanReportJsonOnMetropolKenya' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.reportType">
+                                <td>{{'label.heading.creditInfoReportType' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.reportType }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.applicationRefNo">
+                                <td>{{'label.heading.creditInfoApplicationRefNo' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.applicationRefNo }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.delinquencyCode">
+                                <td>{{'label.heading.creditInfoDelinquencyCode' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.delinquencyCode }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.hasError">
+                                <td>{{'label.heading.creditInfoHasError' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.hasError }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.hasFraud">
+                                <td>{{'label.heading.creditInfoHasFraud' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.hasFraud }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.identityType">
+                                <td>{{'label.heading.metropolIdentityType' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.identityType }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.isGuarantor">
+                                <td>{{'label.heading.creditInfoIsGuarantor' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.isGuarantor }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.trxId">
+                                <td>{{'label.heading.creditInfoTrxId' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.trxId }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.creditInfoLenderSector' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditinfoBankAccountNpa' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.lenderBankAccountNpa }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditinfoBankAccountPerforming' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.lenderBankAccountPerforming }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditinfoBankAccountPerformingNpaHistory' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.lenderBankAccountPerformingNpaHistory }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditinfoOtherAccountNpa' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.lenderOtherAccountNpa }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditinfoOtherAccountPerforming' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.lenderOtherAccountPerforming }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditinfoOtherAccountPerformingNpaHistory' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.lenderOtherAccountPerformingNpaHistory }}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.creditinfoNumberOfBouncedCheques' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_12_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.bChecquesLast12Months }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_3_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.bChecquesLast3Months }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_6_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.bChecquesLast6Months }}</span></td>
+                            </tr>
+
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.creditinfoNumberOfCreditApplications' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_12_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.creditApLast12Months }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_3_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.creditApLast3Months }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_6_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.creditApLast6Months }}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.creditinfoNumberOfEnquiries' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_12_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.enquiriesApLast12Months }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_3_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.enquiriesApLast3Months }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.last_6_months' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.enquiriesApLast6Months }}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.ppiAnalysis' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.ppiAnalysisMonth' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.ppiAnalysisMonth }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.ppiAnalysisPpi' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.ppiAnalysisPpi }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.ppiAnalysisPpiRank' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.ppiAnalysisPpiRank }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.creditScore' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.creditScore' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.creditScore}}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.verifiedName' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.verifiedNameFirstName' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.verifiedNameFirstName }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.verifiedNameOthername' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.verifiedNameOthername }}</span></td>
+                            </tr>
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData">
+                                <td>{{'label.heading.verifiedNameSurname' | translate}}</td>
+                                <td><span class="padded-td">{{crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.verifiedNameSurname }}</span></td>
+                            </tr>
+
+                            <tr data-ng-show="crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData" style="color: #5DC5E9;">
+                                <td><b>{{'label.heading.accountInfo' | translate}}</b></td>
+                                <td></td>
+                            </tr>
+
+
+                            </tbody>
+                        </table>
+                        <div style="overflow-x: auto;">
+                        <table class="table table-striped .width100">
+                            <thead>
+                            <tr>
+                                <th>{{'label.heading.id' | translate}}</th>
+                                <th>{{'label.heading.accountNumber' | translate}}</th>
+                                <th>{{'label.heading.accountStatus' | translate}}</th>
+                                <th>{{'label.heading.currentBalance' | translate}}</th>
+                                <th>{{'label.heading.dateOpened' | translate}}</th>
+                                <th>{{'label.heading.daysInArrears' | translate}}</th>
+                                <th>{{'label.heading.delinquencyCode' | translate}}</th>
+                                <th>{{'label.heading.highestDaysInArrears' | translate}}</th>
+                                <th>{{'label.heading.isYourAccount' | translate}}</th>
+                                <th>{{'label.heading.lastPaymentAmount' | translate}}</th>
+                                <th>{{'label.heading.lastPaymentDate' | translate}}</th>
+                                <th>{{'label.heading.loadedAt' | translate}}</th>
+                                <th>{{'label.heading.originalAmount' | translate}}</th>
+                                <th>{{'label.heading.overdueBalance' | translate}}</th>
+                                <th>{{'label.heading.overdueDate' | translate}}</th>
+                                <th>{{'label.heading.accountType' | translate}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="acc in crbReportMetrolpolIdentityVerification.metropolCrbCreditInfoEnchancedData.accountInfoDataList">
+
+                                <td>{{acc.id}}</td>
+                                <td>{{acc.accountNumber}}</td>
+                                <td>{{acc.accountStatus}}</td>
+                                <td>{{acc.currentBalance}}</td>
+                                <td>{{acc.dateOpened}}</td>
+                                <td>{{acc.daysInArrears}}</td>
+                                <td>{{acc.delinquencyCode}}</td>
+                                <td>{{acc.highestDaysInArrears}}</td>
+                                <td>{{acc.isYourAccount}}</td>
+                                <td>{{acc.lastPaymentAmount}}</td>
+                                <td>{{acc.lastPaymentDate}}</td>
+                                <td>{{acc.loadedAt}}</td>
+                                <td>{{acc.originalAmount}}</td>
+                                <td>{{acc.overdueBalance}}</td>
+                                <td>{{acc.overdueDate}}</td>
+                                <td>{{acc.accountType}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </uib-tab>
+                    <uib-tab heading="{{'label.heading.cashflowReport' | translate}}" select="retrieveCashFlow()">
+                        <uib-tab-heading>
+                            {{'label.heading.cashflowReport' | translate}} &nbsp;&nbsp;<i class="fa fa-edit" ng-click="openCashFlowEditModal()" style="cursor:pointer"></i>
+                        </uib-tab-heading>
+                        <div>
+
+
+                            <h2 style="color: red;">{{result}}</h2>
+                        </div>
+                        <div style="overflow-x:auto;">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="empty"></th>
+                                <th class="empty"></th>
+                                <th class="empty" colspan="2" style="text-align: center;">{{'label.heading.historicalInformation' | translate | uppercase}}</th>
+                                <th class="empty">{{'label.heading.baseline' | translate | uppercase}}</th>
+                                <th class="empty" colspan="{{projectionSize}}" style="text-align: center;">{{'label.heading.projections' | translate | uppercase}}</th>
+
+                            </tr>
+                            <tr>
+                                <th class="empty">{{'label.heading.sN' | translate | uppercase}}</th>
+                                <th class="empty">{{'label.heading.particulars' | translate | uppercase}}</th>
+                                <th class="empty">{{'label.heading.previousMonth2' | translate}}</th>
+                                <th class="empty">{{'label.heading.previousMonth1' | translate}}</th>
+                                <th class="empty">{{'label.heading.month0' | translate}}</th>
+
+                                <th class="empty" ng-repeat="sales in cashFlowData.cashFlowProjectionDataList | filter:{cashFlowType: 'INCOME', particularType: 'Sales Income'} | limitTo:(cashFlowData.cashFlowProjectionDataList.length / 2)">
+                                    Month {{ $index + 1 }}
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr><td colspan="7"></td></tr>
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'INCOME' && cash.particularType === 'Sales Income'">
+                                <td><b>{{ cash.cashFlowType | translate | uppercase}}</b></td>
+                                <td><b>{{ cash.particularType }}</b></td>
+                                <td>{{ cash.previousMonth2 | number : '2' }}</td>
+                                <td>{{ cash.previousMonth1 | number : '2' }}</td>
+                                <td>{{ cash.month0 | number : '2' }}</td>
+                                <td ng-repeat="sales in cashFlowData.cashFlowProjectionDataList" ng-if="sales.cashFlowType === 'INCOME' && sales.particularType === 'Sales Income'">{{ sales.amount | number : '2' }}</td>
+
+                            </tr>
+                            <tr>
+                                <td><b></b></td>
+                                <td><b>{{'label.heading.otherIncome' | translate}}</b></td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[0] | number : '2' }}</td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[1] | number : '2' }}</td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[2] | number : '2' }}</td>
+                                <td ng-repeat="sales in cashFlowData.cashFlowProjectionDataList" ng-if="sales.cashFlowType === 'INCOME' && sales.particularType === 'Sales Income'">{{ calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[2] | number : '2' }}</td>
+
+                            </tr>
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'INCOME' && cash.particularType === 'Other Income'">
+                                <td></td>
+                                <td>&nbsp;&nbsp;&nbsp;{{ cash.name }}</td>
+                                <td>{{ cash.previousMonth2 | number : '2' }}</td>
+                                <td>{{ cash.previousMonth1 | number : '2' }}</td>
+                                <td>{{ cash.month0 | number : '2' }}</td>
+                                <td ng-repeat="sales in cashFlowData.cashFlowProjectionDataList" ng-if="sales.cashFlowType === 'INCOME' && sales.particularType === 'Sales Income'">{{ cash.month0 | number : '2' }}</td>
+
+                            </tr>
+                            <tr><td colspan="7"></td></tr>
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'INCOME' && cash.particularType === 'Sales Income'">
+                                <td><b></b></td>
+                                <td><b>{{'label.heading.totalIncome' | translate | uppercase}}</b></td>
+                                <td><b>{{ cash.previousMonth2 + calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[0] | number : '2' }}</b></td>
+                                <td><b>{{ cash.previousMonth1 + calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[1] | number : '2' }}</b></td>
+                                <td><b>{{ cash.month0 + calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[2] | number : '2' }}</b></td>
+                                <td ng-repeat="sales in cashFlowData.cashFlowProjectionDataList" ng-if="sales.cashFlowType === 'INCOME' && sales.particularType === 'Sales Income'">
+                                    <b>{{ sales.amount + calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[2] | number : '2' }}</b>
+                                    <span ng-init="calculateAndSaveTotalIncome(sales.amount + calculateSums(cashFlowData.cashFlowDataList, 'INCOME', 'Other Income')[2])"></span>
+
+                                </td>
+
+                            </tr>
+                            <tr><td colspan="7"></td></tr>
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'EXPENSE' && cash.particularType === 'Purchases'">
+                                <td><b>{{'label.heading.expensesBothBusinessAndNon' | translate | uppercase}}</b></td>
+                                <td><b>{{ cash.particularType}}</b></td>
+                                <td>{{ cash.previousMonth2 | number : '2' }}</td>
+                                <td>{{ cash.previousMonth1 | number : '2' }}</td>
+                                <td>{{ cash.month0 | number : '2' }}</td>
+                                <td ng-repeat="purchases in cashFlowData.cashFlowProjectionDataList" ng-if="purchases.cashFlowType === 'EXPENSE' && purchases.particularType === 'Purchases'">{{ purchases.amount | number : '2' }}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><b>{{'label.heading.businessExpenses' | translate}}</b></td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[0] | number : '2' }}</td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[1] | number : '2' }}</td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[2] | number : '2' }}</td>
+                                <td ng-repeat="purchases in cashFlowData.cashFlowProjectionDataList" ng-if="purchases.cashFlowType === 'EXPENSE' && purchases.particularType === 'Purchases'">{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[2] | number : '2' }}</td>
+
+                            </tr>
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'EXPENSE' && cash.particularType === 'Business Expenses'">
+                                <td></td>
+                                <td>&nbsp;&nbsp;&nbsp;{{ cash.name}}</td>
+                                <td>{{ cash.previousMonth2 | number : '2' }}</td>
+                                <td>{{ cash.previousMonth1 | number : '2' }}</td>
+                                <td>{{ cash.month0 | number : '2' }}</td>
+                                <td ng-repeat="purchases in cashFlowData.cashFlowProjectionDataList" ng-if="purchases.cashFlowType === 'EXPENSE' && purchases.particularType === 'Purchases'">{{ cash.month0 | number : '2' }}</td>
+
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><b>{{'label.heading.houseHoldExpense' | translate}}</b></td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[0] | number : '2' }}</td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[1] | number : '2' }}</td>
+                                <td>{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[2] | number : '2' }}</td>
+                                <td ng-repeat="purchases in cashFlowData.cashFlowProjectionDataList" ng-if="purchases.cashFlowType === 'EXPENSE' && purchases.particularType === 'Purchases'">{{ calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[2] | number : '2' }}</td>
+
+                            </tr>
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'EXPENSE' && cash.particularType === 'Household Expenses'">
+                                <td></td>
+                                <td>&nbsp;&nbsp;&nbsp;{{ cash.name}}</td>
+                                <td>{{ cash.previousMonth2 | number : '2' }}</td>
+                                <td>{{ cash.previousMonth1 | number : '2' }}</td>
+                                <td>{{ cash.month0 | number : '2' }}</td>
+                                <td ng-repeat="purchases in cashFlowData.cashFlowProjectionDataList" ng-if="purchases.cashFlowType === 'EXPENSE' && purchases.particularType === 'Purchases'">{{ cash.month0 | number : '2' }}</td>
+
+                            </tr>
+
+                            <tr ng-repeat="cash in cashFlowData.cashFlowDataList" ng-if="cash.cashFlowType === 'EXPENSE' && cash.particularType === 'Purchases'">
+                                <td></td>
+                                <td><b>{{'label.heading.totalExpense' | translate | uppercase}}</b></td>
+                                <td><b>{{ cash.previousMonth2 + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[0] + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[0] | number : '2' }}</b></td>
+                                <td><b>{{ cash.previousMonth1 + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[1] + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[1] | number : '2' }}</b></td>
+                                <td><b>{{ cash.month0 + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[2] + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[2] | number : '2' }}</b></td>
+                                <td ng-repeat="purchases in cashFlowData.cashFlowProjectionDataList" ng-if="purchases.cashFlowType === 'EXPENSE' && purchases.particularType === 'Purchases'">
+                                    <b>{{ purchases.amount + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[2] + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[2] | number : '2' }}</b>
+
+                                    <span ng-init="calculateAndSaveTotalExpense(purchases.amount + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Business Expenses')[2] + calculateSums(cashFlowData.cashFlowDataList, 'EXPENSE', 'Household Expenses')[2])"></span>
+
+                                </td>
+                            </tr>
+                            <tr><td colspan="{{projectionSize+5}}"></td></tr>
+                            <tr>
+                                <td><b>{{'label.heading.netCashFlow' | translate | uppercase}}</b></td>
+                                <td></td>
+                                <td><b>{{ cashFlowData.netCashFlowData.previousMonth2 | number : '2' }}</b></td>
+                                <td><b>{{ cashFlowData.netCashFlowData.previousMonth1 | number : '2' }}</b></td>
+                                <td><b>{{ cashFlowData.netCashFlowData.month0 | number : '2' }}</b></td>
+                                <td ng-repeat="sales in cashFlowData.cashFlowProjectionDataList | filter:{cashFlowType: 'INCOME', particularType: 'Sales Income'} | limitTo:(cashFlowData.cashFlowProjectionDataList.length / 2)">
+                                    <b> {{ calculateNetCashFlow($index) | number : '2'}} </b>
+                                </td>
+
+                            </tr>
+                            <tr><td colspan="{{projectionSize+5}}"></td></tr>
+                            <tr>
+                                <td></td>
+                                <td><b>{{'label.heading.allowableDSCR' | translate}}</b></td>
+                                <td>{{loandetails.allowableDscr}}</td>
+                                <td colspan="{{projectionSize+5}}"></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><b>{{'label.heading.maximumAmountToBePaid' | translate}}</b></td>
+                                <td>{{ loandetails.allowableDscr * cashFlowData.netCashFlowData.month0 | number : '2'}}</td>
+                                <td colspan="{{projectionSize+5}}"></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><b>{{'label.heading.maxLoanAmount' | translate}}</b></td>
+                                <td>{{loandetails.allowableDscr * cashFlowData.netCashFlowData.month0 * projectionSize | number : '2'}}</td>
+                                <td colspan="{{projectionSize+5}}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </uib-tab>
+                    <uib-tab heading="{{'label.heading.financialRatioReport' | translate}}" select="retrieveFinancialRatio()">
+
+                        <style type="text/css">.ritz .waffle a { color: inherit; }.ritz .waffle .s1{border-bottom:1px SOLID #000000;background-color:#ffffff;}.ritz .waffle .s4{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:center;font-weight:bold;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s10{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#f3f3f3;text-align:right;font-weight:bold;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s11{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:left;font-weight:bold;color:#000000;font-family:'Arial';font-size:11pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s3{border-right:1px SOLID #000000;background-color:#ffffff;}.ritz .waffle .s12{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:right;font-weight:bold;color:#000000;font-family:'Arial';font-size:11pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s14{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#f3f3f3;text-align:right;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s7{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:right;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s9{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#f3f3f3;text-align:left;font-weight:bold;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s0{background-color:#ffffff;text-align:left;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s5{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:left;font-weight:bold;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:middle;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s6{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:left;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s13{border-bottom:1px SOLID #000000;background-color:#ffffff;text-align:left;font-weight:bold;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s8{border-bottom:1px SOLID #000000;border-right:1px SOLID #000000;background-color:#ffffff;text-align:left;font-weight:bold;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s2{border-bottom:1px SOLID #000000;background-color:#ffffff;text-align:left;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}</style>
+                        <div class="ritz grid-container" dir="ltr" style="padding-left: 80px;">
+                            <table class="waffle" cellspacing="0" cellpadding="0">
+
+                                <tbody>
+                                <tr style="height: 20px">
+
+                                    <td></td>
+                                    <td></td>
+                                    <td class="s0"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td></td>
+                                    <td class="s1"></td>
+                                    <td class="s2"></td>
+                                    <td class="s1"></td>
+                                    <td class="s1"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="s1"></td>
+                                    <td class="s1"></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s4" dir="ltr" colspan="4">{{'label.heading.financialRatio.balanceSheet' | translate }}</td>
+                                    <td></td>
+                                    <td class="s3" style="width:100px;"></td>
+                                    <td class="s4" style="width:100px;" dir="ltr" colspan="2"> {{'label.heading.financialRatio.financialRatios' | translate }} </td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s4" dir="ltr" colspan="2">{{'label.heading.financialRatio.assets' | translate }}</td>
+                                    <td class="s4" dir="ltr" colspan="2">{{'label.heading.financialRatio.liabilities' | translate }}</td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.netMargin' | translate }}</td>
+                                    <td class="s7">{{financialRatioData.netMargin | number : '2'}}</td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s4" dir="ltr" colspan="2">{{'label.heading.financialRatio.currentAssets' | translate }}</td>
+                                    <td class="s4" dir="ltr" colspan="2">{{'label.heading.financialRatio.shortTerm' | translate }} </td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.rotation' | translate }}</td>
+                                    <td class="s7">{{financialRatioData.rotation | number : '2'}}</td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.cash' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.cash | number : '2'}}</td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.goodsBoughtOnCredit' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.goodsBoughtOnCredit | number : '2'}}</td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.liquidity' | translate }} </td>
+                                    <td class="s7">{{financialRatioData.liquidity | number : '2'}}</td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.inventoryStock' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.inventoryStock | number : '2'}}</td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.pendingPayable' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.anyOtherPendingPayables | number : '2'}}</td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.leverage' | translate }}</td>
+                                    <td class="s7">{{financialRatioData.leverage | number : '2'}}</td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.receivables' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.receivables | number : '2'}}</td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.shortTermLoans' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.shortTermLoans | number : '2'}}</td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.capitalization' | translate }}</td>
+                                    <td class="s7">{{financialRatioData.capitalization | number : '2'}}</td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.chama' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.chamaTontines | number : '2'}}</td>
+                                    <td class="s6" dir="ltr"></td>
+                                    <td class="s6"></td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s6 softmerge" dir="ltr">
+                                        <div class="softmerge-inner" style="width:119px;left:-1px">{{'label.heading.financialRatio.dscr' | translate }}</div>
+                                    </td>
+                                    <td class="s7">{{financialRatioData.dscr | number : '2'}}</td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.otherCurrentAssets' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.otherCurrentAssets | number : '2'}}</td>
+                                    <td class="s8" dir="ltr"></td>
+                                    <td class="s6"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s9 softmerge" dir="ltr">
+                                        <div class="softmerge-inner" style="width:132px;left:-1px">{{'label.heading.financialRatio.totalCurrentAssets' | translate }}</div>
+                                    </td>
+                                    <td class="s10">{{financialRatioData.totalCurrentAssets | number : '2'}}</td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.totalShortTerm' | translate }} </td>
+                                    <td class="s10" dir="ltr">{{financialRatioData.totalShortTerm | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s4" dir="ltr" colspan="2">{{'label.heading.financialRatio.fixedAssets' | translate }}</td>
+                                    <td class="s4" dir="ltr" colspan="2">{{'label.heading.financialRatio.longTerm' | translate }}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.equipment' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.equipmentTools | number : '2'}}</td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.unsecuredLoans' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.unsecuredLoans | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.furniture' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.furniture | number : '2'}}</td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.securedLoans' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.securedLoans | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.businessPremises' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.businessPremises | number : '2'}}</td>
+                                    <td class="s6"></td>
+                                    <td class="s6"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s6" dir="ltr">{{'label.heading.financialRatio.otherFixedAssets' | translate }}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.otherFixedAssets | number : '2'}}</td>
+                                    <td class="s6"></td>
+                                    <td class="s6"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="s0"></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.totalFixedAssets' | translate }}</td>
+                                    <td class="s10" dir="ltr">{{financialRatioData.totalFixedAssets | number : '2'}}</td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.totalLongTerm' | translate }}</td>
+                                    <td class="s10" dir="ltr">{{financialRatioData.totalLongTerm | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.totalAssets' | translate }}</td>
+                                    <td class="s10">{{financialRatioData.totalAssets | number : '2'}}</td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.totalLiabilities' | translate }}</td>
+                                    <td class="s10" dir="ltr">{{financialRatioData.totalLiabilities | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td></td>
+                                    <td></td>
+                                    <td class="s3"></td>
+                                    <td class="s11" dir="ltr">{{'label.heading.financialRatio.equity' | translate }}</td>
+                                    <td class="s12">{{financialRatioData.equity | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td></td>
+                                    <td></td>
+                                    <td class="s0"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td></td>
+                                    <td class="s13" dir="ltr" colspan="2">{{'label.heading.financialRatio.bankStatementSummary' | translate }}</td>
+                                    <td class="s1"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.deposits' | translate }}Deposits</td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.withdrawals' | translate }}Withdrawals</td>
+                                    <td class="s9" dir="ltr">{{'label.heading.financialRatio.turnOver' | translate }}Monthly turn over</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 20px">
+
+                                    <td class="s3"></td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.bssDeposits | number : '2'}}</td>
+                                    <td class="s7" dir="ltr">{{financialRatioData.bssWithdrawals | number : '2'}}</td>
+                                    <td class="s14" dir="ltr">{{financialRatioData.bssMonthlyTurnOver | number : '2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </uib-tab>
                 </uib-tabset>

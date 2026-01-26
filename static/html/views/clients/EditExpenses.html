@@ -1,0 +1,81 @@
+<div ng-controller="EditExpensesController">
+    <form name="FieldConfiguration" novalidate="" class="form-horizontal well" >
+        <api-validate></api-validate>
+        <fieldset>
+            <div class="form-group" >
+                <label class="control-label col-sm-3" for="foodExpensesAmount">{{ 'label.input.foodexpensesamount' | translate }}</label>
+                <div class="col-sm-2">
+                    <input type="text" id="foodExpensesAmount" name="foodExpensesAmount" ng-model="formData.foodExpensesAmount"  class="form-control" number-format>
+                </div>
+            </div>
+            <div class="form-group" >
+                <label class="control-label col-sm-3" for="schoolFessAmount">{{ 'label.input.schoolexpensesamount' | translate }}</label>
+
+                <div class="col-sm-2">
+                    <input type="text" id="schoolFessAmount" name="schoolFessAmount" ng-model="formData.schoolFessAmount"  class="form-control" number-format>
+                </div>
+            </div>
+            <div class="form-group" >
+                <label class="control-label col-sm-3" for="rentAmount">{{ 'label.input.rentexpensesamount' | translate }}</label>
+
+                <div class="col-sm-2">
+                    <input type="text" id="rentAmount" name="rentAmount" ng-model="formData.rentAmount"  class="form-control" number-format>
+                </div>
+
+            </div>
+            <div class="form-group" >
+                <label class="control-label col-sm-3" for="utilitiesAmount">{{ 'label.input.utilitiesexpensesamount' | translate }}</label>
+                <div class="col-sm-2">
+                    <input type="text" id="utilitiesAmount" name="utilitiesAmount" ng-model="formData.utilitiesAmount"  class="form-control" number-format>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">
+                    <strong>{{ 'label.input.otherexpenses' | translate }}</strong>
+                </label>
+                <select ng-model="otherExpensesData.otherExpensesId" ng-options="otherExpenses.id as otherExpenses.name for otherExpenses in expenses"
+                        value="{{otherExpenses.id}}" class="form-control width170px col-sm-2">
+                </select>&nbsp;&nbsp;
+                <div class="col-sm-2">
+                    <input class="form-control" type="text" ng-model="otherExpensesData.amount" placeholder="{{'label.input.otherexpensesamount' | translate}}"
+                           number-format >
+                </div>
+                <div class="col-sm-1">
+                    <a class="btn btn-primary" ng-click="addOtherExpenses()" class="col-sm-1">&nbsp;
+                        <i class="fa fa-plus "></i>&nbsp;Add</a>
+                </div>
+            </div>
+            <br>
+            <div>
+                <table class="" class="width100" ng-show="expenses.length>0">
+                    <tr class="graybg">
+                        <th>{{'label.heading.otherexpenses' | translate}}</th>
+                        <th>{{'label.heading.otherexpensesamount' | translate}}</th>
+                    </tr>
+                    <tr ng-repeat="otherExpenses in otherExpensesList">
+                        <td>
+                            <input type="text" class="form-control" ng-model="otherExpenses.description" readonly>
+                        </td>
+                        <td>
+                            <input id="{{expenses[$index].amount}}" type="text" class="form-control" ng-model="otherExpenses.amount" readonly>
+                        </td>
+                        <td>
+                            <a ng-click="deleteOtherExpenses($index)">
+                                <i class="fa fa-times-circle fa-2x"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-offset-3" ng-model="editable">
+                <button id="cancel"   ng-click="routeTo()" class="btn btn-primary">{{
+                    'label.button.cancel' | translate }}
+                </button>
+                <button id="add" type="submit"  ng-click="save()" class="btn btn-primary">{{
+                    'label.button.submit' | translate }}
+                </button>
+            </div>
+        </fieldset>
+
+    </form>
+</div>

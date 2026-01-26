@@ -15,7 +15,7 @@
 				
 				            <div class="col-sm-3">
 				                <select class="form-control" ng-model="formData.chargeId" id="chargeId" name="charge"
-				                        ng-options="charge.id as (charge.name + ' ('+charge.currency.name+')') for charge in chargeOptions"
+				                        ng-options="charge.id as (charge.name+&nbsp;+'('+charge.currency.name+')') for charge in chargeOptions"
 				                        value="{{formData.chargeId}}"
 				                        ng-change="chargeSelected(formData.chargeId)" required>
 				                    <option style="display:none" value="">{{ 'label.selectcharge' | translate }}</option>
@@ -26,8 +26,48 @@
 				            </div>
 				        </div>
 				
-				        <div ng-show="chargeDetails">
-				            <div class="form-group">
+				        <div class="form-group" ng-show="chargeDetails">
+							
+							<div ng-show="varyAmounts">
+								<label class="control-label col-sm-2">{{ 'label.input.amount' | translate }}<span
+								class="required">*</span></label>
+								<table>
+									<tr >
+										<td>
+											<table class="table table-bordered width100">
+												<tr class="graybg">
+												
+													<td>{{'label.heading.liquidation.number' | translate}}</td>
+													<td >{{'label.heading.liquidation.fee.amount' | translate}}</td>
+												</tr>
+						
+												<tr ng-repeat="chartSlab in chargeSlabs">
+												   
+													<td class="width15">
+														<table class="width100">
+															<tr>
+																<td>{{ chartSlab.fromPeriod }}</td>
+																<td>&nbsp;&nbsp;-&nbsp;&nbsp;</td>
+																<td>{{ chartSlab.toPeriod }}</td>
+															</tr>
+														</table>
+													</td>
+													<td class="width15">
+														<table class="width100">
+															<tr>
+																<td>{{ chartSlab.value }} </td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+
+							</div>
+							
+				            <div class="form-group" ng-show="!varyAmounts">
 				                <label class="control-label col-sm-2">{{ 'label.input.amount' | translate }}<span
 				                        class="required">*</span></label>
 				
@@ -60,7 +100,7 @@
 				                    </select>
 				                </div>
 				            </div>
-				            <div class="form-group" ng-show="!stampDutyCharge && !withDrawCharge && !chargeTimeTypeAnnualOrMonth">
+				            <div class="form-group" ng-show="!withDrawCharge && !chargeTimeTypeAnnualOrMonth && !liquidationFee">
 				                <label class="control-label col-sm-2">{{ 'label.input.dueforcollectedon' | translate }}<span
 				                        class="required">*</span></label>
 				
@@ -69,7 +109,7 @@
 				                           ng-model="date.specificduedate" is-open="opened"/>
 				                </div>
 				            </div>
-				            <div class="form-group" ng-show="!stampDutyCharge && !withDrawCharge && chargeTimeTypeAnnualOrMonth">
+				            <div class="form-group" ng-show="!withDrawCharge && chargeTimeTypeAnnualOrMonth">
 				                <label class="control-label col-sm-2">{{ 'label.input.dueon' | translate }}<span
 				                        class="required">*</span></label>
 				

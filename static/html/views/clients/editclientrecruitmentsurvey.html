@@ -1,0 +1,101 @@
+<div class="content-container" ng-controller="EditClientRecruitmentSurveyController">
+    <ul class="breadcrumb">
+        <li><a href="#/clients">{{'label.anchor.clients' | translate}}</a></li>
+        <li><a href='#/viewclient/{{clientId}}'>{{'label.anchor.viewclient' | translate}}</a></li>
+        <li class="active">{{'label.anchor.editClientRecruitmentSurvey' | translate}}</li>
+    </ul>
+    <div class="card" ng-if="!exists">
+        <div class="content">
+        <div class="toolbar">
+            <h4>{{ 'label.heading.editClientRecruitmentSurvey' | translate }}</h4>
+        </div>
+        <br/>
+        <form name="surveyform" class="form-horizontal" novalidate="" rc-submit="submit()" >
+            <api-validate></api-validate>
+            <fieldset>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="countryId">{{ 'label.input.country' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <select chosen="countryOptions" id="countryId" name = "countryId" ng-model="formData.countryId" class="form-control"
+                                ng-options="country.id as country.name for country in countryOptions"
+                                value="{{country.id}}" required></select>
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="countryId"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="cohortId">{{ 'label.input.cohort' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <select chosen="cohortOptions" id="cohortId" name="cohortId" ng-model="formData.cohortId" class="form-control"
+                                ng-options="cohort.id as cohort.name for cohort in cohortOptions"
+                                value="{{cohort.id}}" required></select>
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="cohortId"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="programId">{{ 'label.input.program' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <select chosen="programOptions" id="programId" name="programId" ng-model="formData.programId" class="form-control"
+                                ng-options="program.id as program.name for program in programOptions"
+                                value="{{program.id}}" required></select>
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="programId"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="surveyName">{{ 'label.input.surveyName' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <input id="surveyName" name="surveyName" type="text" class="form-control" ng-model="formData.surveyName" required>
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="surveyName"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="surveyLocationId">{{ 'label.input.surveyLocation' | translate }}
+                        <span class="required">*</span></label>
+
+                    <div class="col-sm-3">
+                        <select chosen="surveyLocationOptions" id="surveyLocationId" name="surveyLocationId" ng-model="formData.surveyLocationId" class="form-control"
+                                ng-options="surveyLocation.id as surveyLocation.name for surveyLocation in surveyLocationOptions"
+                                value="{{surveyLocation.id}}" required></select>
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="surveyLocationId"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="startDate">{{ 'label.input.startDate' | translate }}
+                        <span class="required">*</span></label>
+                    <div class="col-sm-3">
+                        <input id="startDate" type="text" name="startDate" datepicker-pop="dd MMMM yyyy"
+                               ng-model="formData.startDate" is-open="opened1" min="minDate" max="restrictDate"
+                               class="form-control" required />
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="startDate"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="endDate">{{ 'label.input.endDate' | translate }}
+                        <span class="required">*</span></label>
+                    <div class="col-sm-3">
+                        <input id="endDate" type="text" name="endDate" datepicker-pop="dd MMMM yyyy"
+                               ng-model="formData.endDate" is-open="opened1" min="minDate" max="restrictDate"
+                               class="form-control" required />
+                    </div>
+                    <form-validate valattributeform="surveyform" valattribute="endDate"/>
+                </div>
+                <div class="col-md-offset-3">
+                    <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' | translate}}</button>
+                    <button id="save" type="submit" has-permission='CREATE_CLIENTRECRUITMENTSURVEY' class="btn btn-primary">{{ 'label.button.save' | translate }}</button>
+                </div>
+
+            </fieldset>
+        </form> 
+        </div>
+    </div>
+</div>

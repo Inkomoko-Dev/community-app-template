@@ -16,7 +16,6 @@
                         fetchFunction(this.currentOffset, pageSize, function (items) {
                             self.currentPageItems = items.pageItems;
                             self.hasNextVar = items.pageItems.length === pageSize;
-                            self.totalRecords = items.totalFilteredRecords;
                         });
                     },
                     hasNext: function () {

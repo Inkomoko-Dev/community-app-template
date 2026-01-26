@@ -35,10 +35,9 @@
                     </div>
                 </script>
                 <!-- end -->
-                <label class="control-label col-sm-2" ng-show="provisioningType == 'loan'">{{'label.input.loanproduct' | translate}}</label>
-                <label class="control-label col-sm-2" ng-show="provisioningType == 'overdraft'">{{'label.anchor.savingproducts' | translate}}</label>
+                <label class="control-label col-sm-2">{{'label.input.loanproduct' | translate}}</label>
                 <div class="col-sm-8">
-                    <textarea type="text" rows="3" name="products" ng-model="formattedProductNames" class="form-control" disabled></textarea>
+                    <textarea type="text" rows="3" name="loanproducts" ng-model="formattedProductNames" class="form-control" disabled></textarea>
                 </div>
                 <table class="table" class="width100" ng-show="definitions.length>0">
                     <tr class="graybg">

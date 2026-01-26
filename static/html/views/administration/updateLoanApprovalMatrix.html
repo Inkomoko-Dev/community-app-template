@@ -1,0 +1,1415 @@
+<div class="content-container" ng-controller = "UpdateLoanApprovalMatrixController">
+
+    <wizard current-step="step" on-finish="submit()" class="card well">
+        <wz-step wz-title="{{ 'label.heading.decisionLevelOne' |translate}}">
+            <form name="Details" novalidate="" class=" form-horizontal " ng-submit="goNext(Details)">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.currency' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle "
+                               uib-tooltip="{{'label.tooltip.loanproduct.currency' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <select id="currency" ng-model="formData.currency" class="form-control"
+                                    ng-options="currency.code as currency.name for currency in matrixDetails.currencyOptions"
+                                    value="{{currency.code}}" ng-change="matrixDetails.currency.name = formValue(matrixDetails.currencyOptions,formData.currencyCode,'code','name')"></select>
+                        </div>
+                        </div>
+                    <h4>{{ 'label.heading.unsecuredloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneUnsecuredFirstCycleMaxAmount" name="levelOneUnsecuredFirstCycleMaxAmount" ng-model="formData.levelOneUnsecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                            <div class="col-sm-2">
+                                <form-validate valattributeform="Details" valattribute="levelOneUnsecuredFirstCycleMaxAmount"/>
+                            </div>
+                        </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneUnsecuredFirstCycleMinTerm" name="levelOneUnsecuredFirstCycleMinTerm" ng-model="formData.levelOneUnsecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneUnsecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneUnsecuredFirstCycleMaxTerm" name="levelOneUnsecuredFirstCycleMaxTerm" ng-model="formData.levelOneUnsecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneUnsecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.unsecuredloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneUnsecuredSecondCycleMaxAmount" name="levelOneUnsecuredSecondCycleMaxAmount" ng-model="formData.levelOneUnsecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneUnsecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneUnsecuredSecondCycleMinTerm" name="levelOneUnsecuredSecondCycleMinTerm" ng-model="formData.levelOneUnsecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneUnsecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneUnsecuredSecondCycleMaxTerm" name="levelOneUnsecuredSecondCycleMaxTerm" ng-model="formData.levelOneUnsecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneUnsecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4>{{ 'label.heading.securedloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneSecuredFirstCycleMaxAmount" name="levelOneSecuredFirstCycleMaxAmount" ng-model="formData.levelOneSecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneSecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneSecuredFirstCycleMinTerm" name="levelOneSecuredFirstCycleMinTerm" ng-model="formData.levelOneSecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneSecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneSecuredFirstCycleMaxTerm" name="levelOneSecuredFirstCycleMaxTerm" ng-model="formData.levelOneSecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneSecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.securedloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneSecuredSecondCycleMaxAmount" name="levelOneSecuredSecondCycleMaxAmount" ng-model="formData.levelOneSecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneSecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneSecuredSecondCycleMinTerm" name="levelOneSecuredSecondCycleMinTerm" ng-model="formData.levelOneSecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneSecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelOneSecuredSecondCycleMaxTerm" name="levelOneSecuredSecondCycleMaxTerm" ng-model="formData.levelOneSecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelOneSecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class = "btn btn-default pull-left" wz-previous disabled><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    <button class = "btn btn-default pull-right" type="submit">Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>
+                </fieldset>
+            </form>
+        </wz-step>
+        <wz-step wz-title="{{ 'label.heading.decisionLevelTwo' | translate }}">
+            <form name="Currency" novalidate="" class=" form-horizontal " ng-submit="goNext(Currency)">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <br>
+                    <hr>
+                    <h4>{{ 'label.heading.unsecuredloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoUnsecuredFirstCycleMaxAmount" name="levelTwoUnsecuredFirstCycleMaxAmount" ng-model="formData.levelTwoUnsecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoUnsecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoUnsecuredFirstCycleMinTerm" name="levelTwoUnsecuredFirstCycleMinTerm" ng-model="formData.levelTwoUnsecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoUnsecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoUnsecuredFirstCycleMaxTerm" name="levelTwoUnsecuredFirstCycleMaxTerm" ng-model="formData.levelTwoUnsecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoUnsecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.unsecuredloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoUnsecuredSecondCycleMaxAmount" name="levelTwoUnsecuredSecondCycleMaxAmount" ng-model="formData.levelTwoUnsecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoUnsecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoUnsecuredSecondCycleMinTerm" name="levelTwoUnsecuredSecondCycleMinTerm" ng-model="formData.levelTwoUnsecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoUnsecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoUnsecuredSecondCycleMaxTerm" name="levelTwoUnsecuredSecondCycleMaxTerm" ng-model="formData.levelTwoUnsecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoUnsecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4>{{ 'label.heading.securedloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoSecuredFirstCycleMaxAmount" name="levelTwoSecuredFirstCycleMaxAmount" ng-model="formData.levelTwoSecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoSecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoSecuredFirstCycleMinTerm" name="levelTwoSecuredFirstCycleMinTerm" ng-model="formData.levelTwoSecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoSecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoSecuredFirstCycleMaxTerm" name="levelTwoSecuredFirstCycleMaxTerm" ng-model="formData.levelTwoSecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoSecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.securedloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoSecuredSecondCycleMaxAmount" name="levelTwoSecuredSecondCycleMaxAmount" ng-model="formData.levelTwoSecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoSecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoSecuredSecondCycleMinTerm" name="levelTwoSecuredSecondCycleMinTerm" ng-model="formData.levelTwoSecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoSecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelTwoSecuredSecondCycleMaxTerm" name="levelTwoSecuredSecondCycleMaxTerm" ng-model="formData.levelTwoSecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelTwoSecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class = "btn btn-default pull-left" wz-previous><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    <button class = "btn btn-default pull-right" type="submit" >Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>
+                </fieldset>
+            </form>
+        </wz-step>
+        <wz-step wz-title="{{ 'label.heading.decisionLevelThree' | translate }}">
+            <form name="Terms" novalidate="" class=" form-horizontal " ng-submit="goNext(Terms)">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <br>
+                    <hr>
+                    <h4>{{ 'label.heading.unsecuredloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeUnsecuredFirstCycleMaxAmount" name="levelThreeUnsecuredFirstCycleMaxAmount" ng-model="formData.levelThreeUnsecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeUnsecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeUnsecuredFirstCycleMinTerm" name="levelThreeUnsecuredFirstCycleMinTerm" ng-model="formData.levelThreeUnsecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeUnsecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeUnsecuredFirstCycleMaxTerm" name="levelThreeUnsecuredFirstCycleMaxTerm" ng-model="formData.levelThreeUnsecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeUnsecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.unsecuredloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeUnsecuredSecondCycleMaxAmount" name="levelThreeUnsecuredSecondCycleMaxAmount" ng-model="formData.levelThreeUnsecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeUnsecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeUnsecuredSecondCycleMinTerm" name="levelThreeUnsecuredSecondCycleMinTerm" ng-model="formData.levelThreeUnsecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeUnsecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeUnsecuredSecondCycleMaxTerm" name="levelThreeUnsecuredSecondCycleMaxTerm" ng-model="formData.levelThreeUnsecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeUnsecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4>{{ 'label.heading.securedloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeSecuredFirstCycleMaxAmount" name="levelThreeSecuredFirstCycleMaxAmount" ng-model="formData.levelThreeSecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeSecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeSecuredFirstCycleMinTerm" name="levelThreeSecuredFirstCycleMinTerm" ng-model="formData.levelThreeSecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeSecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeSecuredFirstCycleMaxTerm" name="levelThreeSecuredFirstCycleMaxTerm" ng-model="formData.levelThreeSecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeSecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.securedloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeSecuredSecondCycleMaxAmount" name="levelThreeSecuredSecondCycleMaxAmount" ng-model="formData.levelThreeSecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeSecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeSecuredSecondCycleMinTerm" name="levelThreeSecuredSecondCycleMinTerm" ng-model="formData.levelThreeSecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeSecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelThreeSecuredSecondCycleMaxTerm" name="levelThreeSecuredSecondCycleMaxTerm" ng-model="formData.levelThreeSecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelThreeSecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class = "btn btn-default pull-left" wz-previous><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    <button class = "btn btn-default pull-right" type="submit">Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>
+                </fieldset>
+            </form>
+        </wz-step>
+        <wz-step wz-title="{{ 'label.heading.decisionLevelFour' | translate }}">
+            <form name="Terms" novalidate="" class=" form-horizontal " ng-submit="goNext(Terms)">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <br>
+                    <hr>
+                    <h4>{{ 'label.heading.unsecuredloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourUnsecuredFirstCycleMaxAmount" name="levelFourUnsecuredFirstCycleMaxAmount" ng-model="formData.levelFourUnsecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourUnsecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourUnsecuredFirstCycleMinTerm" name="levelFourUnsecuredFirstCycleMinTerm" ng-model="formData.levelFourUnsecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourUnsecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourUnsecuredFirstCycleMaxTerm" name="levelFourUnsecuredFirstCycleMaxTerm" ng-model="formData.levelFourUnsecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourUnsecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.unsecuredloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourUnsecuredSecondCycleMaxAmount" name="levelFourUnsecuredSecondCycleMaxAmount" ng-model="formData.levelFourUnsecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourUnsecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourUnsecuredSecondCycleMinTerm" name="levelFourUnsecuredSecondCycleMinTerm" ng-model="formData.levelFourUnsecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourUnsecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourUnsecuredSecondCycleMaxTerm" name="levelFourUnsecuredSecondCycleMaxTerm" ng-model="formData.levelFourUnsecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourUnsecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4>{{ 'label.heading.securedloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourSecuredFirstCycleMaxAmount" name="levelFourSecuredFirstCycleMaxAmount" ng-model="formData.levelFourSecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourSecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourSecuredFirstCycleMinTerm" name="levelFourSecuredFirstCycleMinTerm" ng-model="formData.levelFourSecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourSecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourSecuredFirstCycleMaxTerm" name="levelFourSecuredFirstCycleMaxTerm" ng-model="formData.levelFourSecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourSecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.securedloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourSecuredSecondCycleMaxAmount" name="levelFourSecuredSecondCycleMaxAmount" ng-model="formData.levelFourSecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourSecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourSecuredSecondCycleMinTerm" name="levelFourSecuredSecondCycleMinTerm" ng-model="formData.levelFourSecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourSecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFourSecuredSecondCycleMaxTerm" name="levelFourSecuredSecondCycleMaxTerm" ng-model="formData.levelFourSecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFourSecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class = "btn btn-default pull-left" wz-previous><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    <button class = "btn btn-default pull-right" type="submit">Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>
+                </fieldset>
+            </form>
+        </wz-step>
+        <wz-step wz-title="{{ 'label.heading.decisionLevelFive' | translate }}">
+            <form name="Terms" novalidate="" class=" form-horizontal " ng-submit="goNext(Terms)">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <br>
+                    <hr>
+                    <h4>{{ 'label.heading.unsecuredloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveUnsecuredFirstCycleMaxAmount" name="levelFiveUnsecuredFirstCycleMaxAmount" ng-model="formData.levelFiveUnsecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveUnsecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveUnsecuredFirstCycleMinTerm" name="levelFiveUnsecuredFirstCycleMinTerm" ng-model="formData.levelFiveUnsecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveUnsecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveUnsecuredFirstCycleMaxTerm" name="levelFiveUnsecuredFirstCycleMaxTerm" ng-model="formData.levelFiveUnsecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveUnsecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.unsecuredloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveUnsecuredSecondCycleMaxAmount" name="levelFiveUnsecuredSecondCycleMaxAmount" ng-model="formData.levelFiveUnsecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveUnsecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveUnsecuredSecondCycleMinTerm" name="levelFiveUnsecuredSecondCycleMinTerm" ng-model="formData.levelFiveUnsecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveUnsecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveUnsecuredSecondCycleMaxTerm" name="levelFiveUnsecuredSecondCycleMaxTerm" ng-model="formData.levelFiveUnsecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveUnsecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4>{{ 'label.heading.securedloanfirstcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveSecuredFirstCycleMaxAmount" name="levelFiveSecuredFirstCycleMaxAmount" ng-model="formData.levelFiveSecuredFirstCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveSecuredFirstCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveSecuredFirstCycleMinTerm" name="levelFiveSecuredFirstCycleMinTerm" ng-model="formData.levelFiveSecuredFirstCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveSecuredFirstCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveSecuredFirstCycleMaxTerm" name="levelFiveSecuredFirstCycleMaxTerm" ng-model="formData.levelFiveSecuredFirstCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveSecuredFirstCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <h4>{{ 'label.heading.securedloansecondcycle' | translate }}</h4>
+                    <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanprincipalamount' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanprincipalamount' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveSecuredSecondCycleMaxAmount" name="levelFiveSecuredSecondCycleMaxAmount" ng-model="formData.levelFiveSecuredSecondCycleMaxAmount"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveSecuredSecondCycleMaxAmount"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{ 'label.input.minimumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.minimumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveSecuredSecondCycleMinTerm" name="levelFiveSecuredSecondCycleMinTerm" ng-model="formData.levelFiveSecuredSecondCycleMinTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveSecuredSecondCycleMinTerm"/>
+                        </div>
+                        <label class="control-label col-sm-2">{{ 'label.input.maximumloanterm' | translate }}<span
+                                class="required">*</span>
+                            <i class="fa fa-question-circle"
+                               uib-tooltip="{{'label.tooltip.approvalmatrix.maximumloanterm' | translate}}"
+                               tooltip-append-to-body="true"></i>
+                        </label>
+
+                        <div class="col-sm-2">
+                            <input type="text" id="levelFiveSecuredSecondCycleMaxTerm" name="levelFiveSecuredSecondCycleMaxTerm" ng-model="formData.levelFiveSecuredSecondCycleMaxTerm"
+                                   class="form-control" number-format required late-validate number=true/>
+                        </div>
+                        <div class="col-sm-2">
+                            <form-validate valattributeform="Details" valattribute="levelFiveSecuredSecondCycleMaxTerm"/>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class = "btn btn-default pull-left" wz-previous><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    <button class = "btn btn-default pull-right" type="submit">Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>
+                </fieldset>
+            </form>
+        </wz-step>
+        <wz-step ng-if="isClicked" wz-title = "Preview">
+            <form name="Preview" novalidate="" class="form-horizontal  ">
+                <fieldset>
+                    <api-validate></api-validate>
+                    <br>
+                    <table width="100%">
+                        <tr>
+                            <td>{{'label.heading.currency' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.currency}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneUnsecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneUnsecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneUnsecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneUnsecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneUnsecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneUnsecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneSecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneSecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneSecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneSecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneSecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelOneSecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoUnsecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoUnsecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoUnsecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoUnsecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoUnsecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoUnsecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoSecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoSecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoSecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoSecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoSecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelTwoSecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeUnsecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeUnsecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeUnsecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeUnsecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeUnsecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeUnsecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeSecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeSecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeSecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeSecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeSecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelThreeSecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourUnsecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourUnsecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourUnsecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourUnsecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourUnsecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourUnsecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourSecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourSecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourSecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourSecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourSecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFourSecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <hr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveUnsecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveUnsecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveUnsecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveUnsecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveUnsecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveUnsecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveSecuredFirstCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveSecuredFirstCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveSecuredFirstCycleMaxTerm}}</td>
+                        </tr>
+                        <tr class="bottomborder">
+                            <td colspan="4">
+                                <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveSecuredSecondCycleMaxAmount}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveSecuredSecondCycleMinTerm}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                            <td colspan="3">{{matrixDetails.levelFiveSecuredSecondCycleMaxTerm}}</td>
+                        </tr>
+
+
+                    </table>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="col-md-offset-5 paddedtop">
+                        <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' |
+                            translate}}
+                        </button>
+                        <button id="save" type="submit" class="btn btn-primary" wz-next has-permission='UPDATE_LOANAPPROVALMATRIX'>
+                            {{'label.button.updateLoanapprovalmatrix'
+                            | translate}}
+                        </button>
+                    </div>
+                    <hr>
+                    <button class = "btn btn-default pull-left" wz-previous><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    <button class = "btn btn-default pull-right" disabled>Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>
+                </fieldset>
+            </form>
+        </wz-step>
+    </wizard>
+</div>

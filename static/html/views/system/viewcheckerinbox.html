@@ -11,7 +11,7 @@
             <br>
             <div class="pull-right form-group">
                 <button type="button" class="btn btn-success" data-ng-click="checkerApprove('approve')"><i class="fa fa-check"></i>&nbsp;&nbsp;{{'label.button.approve' | translate}}</button>
-                <button type="button" class="btn btn-danger" data-ng-click="checkerDelete()"><i class="fa fa-trash-o"></i>&nbsp;&nbsp;{{'label.button.delete' | translate}}</button>
+                <button type="button" class="btn btn-danger" data-ng-click="checkerDelete()" data-ng-show="false"><i class="fa fa-trash-o"></i>&nbsp;&nbsp;{{'label.button.delete' | translate}}</button>
                 <button type="button" class="btn btn-warning" data-ng-click="checkerReject('reject')"><i class="fa fa-times"></i>&nbsp;&nbsp;{{'label.button.reject' | translate}}</button>
             </div>
             <div class="paddedleft">
@@ -64,15 +64,13 @@
                     <thead>
                     <tr class="graybg">
                         <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ 'label.heading.command' | translate }}</th>
-                        <th>{{ 'label.heading.modifiedValues' | translate }}</th>
-                        <th>{{ 'label.heading.previousValues' | translate }}</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr data-ng-repeat="json in jsondata">
                         <td class="width20"><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{json.name}}</strong></td>
-                        <td class="width40">{{json.property}}</td>
-                        <td class="width40" data-ng-show="details.oldValuesAsJson">{{ getOldValuesForField(json.name) }}</td>
+                        <td class="width80">{{json.property}}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -97,6 +95,10 @@
         </div>
         <div class="modal-body ">
             <api-validate></api-validate>
+            <div class="form-group">
+                <label for="approveUndoNote">{{'label.input.note' | translate}}</label>
+                <textarea id="approveUndoNote" class="form-control" ng-model="note" rows="3"></textarea>
+            </div>
             <br>
             <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
             <button class="btn btn-primary" ng-click="approve()">{{'label.button.confirm' | translate}}</button>
@@ -108,9 +110,13 @@
         </div>
         <div class="modal-body ">
             <api-validate></api-validate>
+            <div class="form-group">
+                <label for="rejectUndoNote">{{'label.input.note' | translate}}</label>
+                <textarea id="rejectUndoNote" class="form-control" ng-model="note" rows="3" ng-required="true"></textarea>
+            </div>
             <br>
             <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
-            <button class="btn btn-primary" ng-click="reject()">{{'label.button.confirm' | translate}}</button>
+            <button class="btn btn-primary" ng-click="reject()" ng-disabled="!note">{{'label.button.confirm' | translate}}</button>
         </div>
     </script>
 </div>

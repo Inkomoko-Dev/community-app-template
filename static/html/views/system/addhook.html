@@ -48,10 +48,12 @@
                     <div class="form-group" ng-show="template" ng-repeat="s in template.schema">
                     <label class="control-label col-sm-2" ng-if="s.optional">{{s.fieldName}}</label>
                     <label class="control-label col-sm-2" ng-if="s.optional == false">{{s.fieldName}} <span class="required">*</span></label>
-                        <div class="col-sm-3" ng-switch on="s.fieldType">
-                            <input ng-switch-when="string" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" required late-validate/>
-                            <input ng-switch-when="password" type="password" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" required late-validate/>
-                            <input ng-switch-when="boolean" type="checkbox" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" required late-validate/>
+                        <div class="col-sm-5" ng-switch on="s.fieldType">
+                            <input ng-switch-when="string" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" ng-required="{{!s.optional}}" late-validate/>
+                            <input ng-switch-when="password" type="password" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" ng-required="{{!s.optional}}" late-validate/>
+                            <input ng-switch-when="boolean" type="checkbox" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" ng-required="{{!s.optional}}" late-validate/>
+                            <textarea ng-switch-when="text" type="text" id="{{s.fieldName}}" name="{{s.fieldName}}" class="form-control" ng-model="schemaInputs[$index]" placeholder="{{s.placeholder}}" ng-required="{{!s.optional}}" late-validate></textarea>
+
                         </div>
 
                     </div>

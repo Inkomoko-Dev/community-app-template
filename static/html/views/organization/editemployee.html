@@ -64,7 +64,15 @@
                         <label class="control-label col-sm-2" for="mobileNo">{{ 'label.input.mobileNo' | translate }}</label>
 
                         <div class="col-sm-3">
-                            <input type="text" id="mobileNo" class="form-control" ng-model="formData.mobileNo">
+                            <input type="text" id="mobileNo" name="mobileNo" ng-model="formData.mobileNo"
+                                   ng-pattern="/^[0-9]+$/"  class="form-control"/>
+                        </div>
+                        <div class="col-sm-2">
+                        <span ng-show="editemployeeform.mobileNo.$invalid && editemployeeform.mobileNo.$dirty">
+                        <small class="required" ng-show="editemployeeform.mobileNo.$error.pattern">
+                        {{'label.mustbenumeric' | translate}}
+                        </small>
+                        </span>
                         </div>
                     </div>
 
@@ -83,24 +91,6 @@
                         <div class="col-sm-3">
                             <input id="joiningDate" sort type="text" datepicker-pop="dd MMMM yyyy" ng-model="formData.joiningDate"
                                    class="form-control" is-open="opened" min="minDate" max="restrictDate"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="genderId">{{ 'label.input.gender' | translate }}</label>
-
-                        <div class="col-sm-3">
-                            <select chosen="genderOptions" id="genderId" ng-model="formData.genderId" class="form-control"
-                                    ng-options="gender.id as gender.name for gender in genderOptions" value="{{gender.id}}">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="staffCategoryId">{{ 'label.input.staffCategory' | translate }}</label>
-
-                        <div class="col-sm-3">
-                            <select chosen="staffCategoryOptions" id="staffCategoryId" ng-model="formData.staffCategoryId" class="form-control"
-                                    ng-options="staffCategory.id as staffCategory.name for staffCategory in staffCategoryOptions" value="{{staffCategory.id}}">
-                            </select>
                         </div>
                     </div>
 
