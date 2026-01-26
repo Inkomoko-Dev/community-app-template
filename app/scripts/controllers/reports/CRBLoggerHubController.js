@@ -67,11 +67,11 @@
 
                 var requestUrl = $rootScope.hostUrl + API_VERSION + '/crb/posting-logs/' + logEntry.id + '/retry';
                 
-                http.post(requestUrl, {}).success(function(data) {
+                http.post(requestUrl, {}).then(function(response) {
                     scope.success = 'Retry posting initiated successfully. Log entry has been queued for reprocessing.';
                     fetchAllPostingLogs();
-                }).error(function(data, status, headers, config) {
-                    scope.error = 'Failed to retry posting. Error: ' + (data.defaultUserMessage || 'Unknown error');
+                }).catch(function(error) {
+                    scope.error = 'Failed to retry posting. Error: ' + (error.data.defaultUserMessage || 'Unknown error');
                 });
             };
 
@@ -83,13 +83,13 @@
                     return;
                 }
 
-                var requestUrl = $rootScope.hostUrl + API_VERSION + '/crb/posting-logs/' + logEntry.id + '/mark-fixed';
+                var requestUrl = $rootScope.hostUrl + API_VERSION + '/crb/posting-logs/' + logEntry.loanId + '/mark-fixed';
                 
-                http.post(requestUrl, { loanId: logEntry.loanId }).success(function(data) {
-                    scope.success = 'Loan record marked as fixed. You can now retry posting.';
+                http.post(requestUrl, { loanId: logEntry.loanId }).then(function(response) {
+                    scope.success = 'Loan record marked as fixed and has been rescheduled for retry.';
                     fetchAllPostingLogs();
-                }).error(function(data, status, headers, config) {
-                    scope.error = 'Failed to mark loan as fixed. Error: ' + (data.defaultUserMessage || 'Unknown error');
+                }).catch(function(error) {
+                    scope.error = 'Failed to mark loan as fixed. Error: ' + (error.data.defaultUserMessage || 'Unknown error');
                 });
             };
 
@@ -141,6 +141,8 @@
             scope.showErrorModal = function(logEntry) {
                 scope.selectedErrorLog = logEntry;
                 scope.showErrorModal = true;
+            };
+
             /**
              * View detailed error information for a log entry
              */

@@ -85,19 +85,13 @@
                             </td>
                             <td>{{ toDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
                             <td>
-                                <span ng-if="log.errorLogs" class="text-muted">
-                                    {{ log.errorLogs | limitTo:300 }}{{ log.errorLogs.length > 300 ? '...' : '' }}
-                                </span>
+                                <span ng-if="log.errorLogs" class="text-muted" style="white-space: pre-wrap; word-wrap: break-word; display: inline-block; max-width: 100%;">{{ log.errorLogs }}</span>
                                 <span ng-if="!log.errorLogs" class="text-muted">-</span>
                             </td>
                             <td>
                                 <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)" 
                                         ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
                                     <i class="fa fa-check"></i> Fixed
-                                </button>
-                                <button class="btn btn-xs btn-warning" ng-click="retryPosting(log)" 
-                                        ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Retry Posting">
-                                    <i class="fa fa-redo"></i> Retry
                                 </button>
                             </td>
                         </tr>
