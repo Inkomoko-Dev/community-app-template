@@ -1,4 +1,4 @@
-name: Deploy to Inkomoko Staging
+name: Deploy to Inkomoko Staging T/shooting
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
   
   deploy:
     
-    name: Deploy archive to ubuntu server
+    name: Deploy archive to ubuntu server T/shooting
     runs-on: ubuntu-latest
 
     steps:
