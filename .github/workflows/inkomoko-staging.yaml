@@ -2,8 +2,7 @@ name: Deploy to Inkomoko Staging T/shooting
 
 on:
   push:
-    branches:
-      - uat-test-tshoot
+    branches: [ uat-test-tshoot ]
   workflow_dispatch:
     inputs:
       environment:
