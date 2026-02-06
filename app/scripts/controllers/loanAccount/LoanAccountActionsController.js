@@ -11,6 +11,7 @@
             scope.noteFieldMandatory = false;
             scope.showAmountField = false;
             scope.restrictDate = new Date();
+            scope.error = false;
             // Transaction UI Related
             scope.isTransaction = false;
             scope.showPaymentDetails = false;
@@ -811,9 +812,8 @@
             scope.submit = function () {
                 scope.processDate = false;
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
-                    scope.formData.note.$setTouched();
-                    window.alert('Note field is mandatory');
+                if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
+                    scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
                 var params = {command: scope.action};
@@ -1284,9 +1284,8 @@
 
             scope.handleReject = function () {
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
-                    scope.formData.note.$setTouched();
-                    alert("Note field is mandatory");
+                if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
+                    scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
                 switch (scope.action) {
