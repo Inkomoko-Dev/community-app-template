@@ -944,6 +944,25 @@
                                 </div>
                             </div>
                         </uib-tab>
+                        <!-- Modal for disbursement rejection -->
+                        <script type="text/ng-template" id="disbursementrejection.html">
+                            <div class="modal-header silver">
+                                <h3 class="bolder">{{'label.heading.confirm.reject' | translate}}</h3>
+                            </div>
+                            <div class="modal-body">
+                                <api-validate></api-validate>
+                                <br>
+                                <label>{{'label.input.note' | translate}}</label>
+                                <textarea ng-model="reason" class="form-control" rows="3"></textarea>
+                                <br>
+                                <button class="btn btn-default" ng-click="cancel()">
+                                    {{'label.button.cancel' | translate}}
+                                </button>
+                                <button class="btn btn-danger" ng-click="confirm()">
+                                    {{'label.button.confirm' | translate}}
+                                </button>
+                            </div>
+                        </script>
                         <uib-tab heading="{{'label.heading.loandisbursal' | translate}}" has-permission='READ_LOAN'>
                             <div class="head-affix">
                                 <table class="table condensed-table">
@@ -958,6 +977,12 @@
                                             <button type="button" class="btn btn-success" data-ng-click="disburseLoan()"
                                                     has-permission='APPROVE_LOAN'><i class="fa fa-check"></i>&nbsp;&nbsp;{{'label.button.disburse'
                                                 | translate}}
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-danger"
+                                                    data-ng-click="rejectPreDisbursement()"
+                                                    has-permission='APPROVE_LOAN'>
+                                                <i class="fa fa-times"></i>&nbsp;&nbsp;{{'label.button.reject' | translate}}
                                             </button>
                                         </th>
                                     </tr>
@@ -989,8 +1014,11 @@
                                             <table class="table condensed-table">
                                                 <thead>
                                                 <tr class="graybg">
-                                                    <th><input type="checkbox" ng-click="loanDisbursalAllCheckBoxesClicked(office)"
-                                                               ng-checked="loanDisbursalAllCheckBoxesMet(office)"/></th>
+                                                    <th>
+                                                        <input type="checkbox"
+                                                               ng-click="loanDisbursalAllCheckBoxesClicked(office)"
+                                                               ng-checked="loanDisbursalAllCheckBoxesMet(office)"/>
+                                                    </th>
                                                     <th>{{'label.heading.client' | translate}}</th>
                                                     <th>{{'label.heading.loanaccountnum' | translate}}</th>
                                                     <th>{{'label.heading.loanproduct' | translate}}</th>
@@ -1062,26 +1090,6 @@
                                         {{'label.button.cancel' | translate}}
                                     </button>
                                     <button class="btn btn-primary" ng-click="confirm()">
-                                        {{'label.button.confirm' | translate}}
-                                    </button>
-                                </div>
-                            </script>
-
-                            <!-- Modal for disbursement rejection -->
-                            <script type="text/ng-template" id="disbursementrejection.html">
-                                <div class="modal-header silver">
-                                    <h3 class="bolder">{{'label.heading.confirm.reject' | translate}}</h3>
-                                </div>
-                                <div class="modal-body">
-                                    <api-validate></api-validate>
-                                    <br>
-                                    <label>{{'label.input.note' | translate}}</label>
-                                    <textarea ng-model="reason" class="form-control" rows="3"></textarea>
-                                    <br>
-                                    <button class="btn btn-default" ng-click="cancel()">
-                                        {{'label.button.cancel' | translate}}
-                                    </button>
-                                    <button class="btn btn-danger" ng-click="confirm()">
                                         {{'label.button.confirm' | translate}}
                                     </button>
                                 </div>

@@ -426,7 +426,7 @@
                                 }
 
                                 // Pending Approval: status 100, optional
-                                else if (loan.status.id === 100) {
+                                else if (loan.status.id === 100 && loan.loanDecisionState && loan.loanDecisionState.id === 1900) {
                                     office.loans.push(loan);
                                 }
                             });
@@ -503,8 +503,8 @@
 
 
             // ========================
-// 🔁 Generic Bulk Executor
-// ========================
+            // 🔁 Generic Bulk Executor
+            // ========================
             scope.bulkBatchExecutor = function ({
                                                     template,
                                                     command,
@@ -686,12 +686,23 @@
                 });
             };
 
-// Bulk Disbursement Rejection
+            scope.rejectPreDisbursement = () => scope.openBulkActionModal({
+                actionName: 'disbursementRejection',
+                templateUrl: 'disbursementrejection.html',
+                template: scope.loanDisbursalTemplate,
+                command: 'rejectDisbursement',
+                requireReason: true,
+                successMessage: "Bulk disbursement rejection completed.",
+                failureMessage: "Bulk disbursement rejection failed."
+            });
+
+
+            // Bulk Disbursement Rejection
             scope.rejectDisbursement = () => scope.openBulkActionModal({
                 actionName: 'disbursementRejection',
                 templateUrl: 'disbursementrejection.html',
                 template: scope.disbursementApprovalTemplate,
-                command: 'disbursementreject',
+                command: 'rejectDisbursement',
                 requireReason: true,
                 successMessage: "Bulk disbursement rejection completed.",
                 failureMessage: "Bulk disbursement rejection failed."

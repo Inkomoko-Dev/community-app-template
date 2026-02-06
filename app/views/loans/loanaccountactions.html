@@ -8,6 +8,12 @@
     <wizard on-finish="submitDatatable()" current-step = "step" class="card well">
         <wz-step wz-title="{{ title | translate}}">
     <form class="form-horizontal" name="loanactionform" novalidate="" >
+        <div ng-if="error" class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Error:</strong> {{ error }}
+            </div>
         <fieldset>
             <div ng-show="submittedDatatables.length > 0" uib-alert type="success">
                 <span ng-repeat="table in submittedDatatables"><i class="fa fa-check"></i>Entry in ` {{table}} ` has been made successfully. If the inputs are changed, the datatable entries will be updated.<br></span>
