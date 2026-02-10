@@ -102,7 +102,7 @@
                                     Posted' }}
                                 </span>
                             </td>
-                            <td>{{ toDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
+                            <td>{{ arrayToDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
                             <td>
                                 <span ng-if="log.errorLogs" class="text-muted"
                                     style="white-space: pre-wrap; word-wrap: break-word; display: inline-block; max-width: 100%;">{{
