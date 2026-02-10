@@ -20,10 +20,18 @@
                 });
             };
 
+            scope.$watch('fromDate', function (newVal, oldVal) {
+                scope.applyFilters();
+            });
+            scope.$watch('toDate', function (newVal, oldVal) {
+                scope.applyFilters();
+            });
+
             /**
              * Apply filters to posting logs (hasPassed status, search text)
              */
             scope.applyFilters = function () {
+                console.log("apply filter called")
                 scope.filteredLogs = scope.postingLogs.filter(function (log) {
                     var statusMatch = scope.selectedStatus === 'all' ||
                         (scope.selectedStatus === 'true' && log.hasPassed === true) ||
@@ -36,11 +44,13 @@
                     // -------------------------
                     var dateMatch = true;
 
-                    if (log.datePosted) {
-                        var logDate = new Date(log.datePosted);
+                    if (log.date) {
+                        console.log("log date " + scope.arrayToDate(log.date))
+                        var logDate = scope.arrayToDate(log.date);
 
                         if (scope.fromDate) {
                             var from = new Date(scope.fromDate);
+                            console.log("from date " + from)
                             from.setHours(0, 0, 0, 0);
                             if (logDate < from) dateMatch = false;
                         }
@@ -61,7 +71,7 @@
                             (log.details && log.details.toLowerCase().indexOf(search) > -1);
                     }
 
-                    return statusMatch && searchMatch;
+                    return statusMatch && searchMatch && dateMatch;
                 });
             };
 
@@ -207,6 +217,8 @@
             scope.clearFilters = function () {
                 scope.selectedStatus = 'all';
                 scope.searchText = '';
+                scope.fromDate = ''
+                scope.toDate = ''
                 scope.applyFilters();
             };
 
