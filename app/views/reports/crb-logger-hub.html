@@ -4,7 +4,7 @@
         <li><a href="#/reports/all">{{ 'label.anchor.reports' | translate }}</a></li>
         <li class="active">CRB Posting Logger</li>
     </ul>
-    
+
     <div class="card">
         <div class="content">
             <div class="toolbar">
@@ -38,11 +38,28 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>From Date:</label>
+                        <input type="text" datepicker-pop="yyyy-MM-dd" class="form-control"
+                        ng-readonly="isViewMode"
+						is-open="'opened'+$index" min="minDate" ng-model="fromDate" ng-change="applyFilters()" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>To Date:</label>
+                        <input type="text" datepicker-pop="yyyy-MM-dd" class="form-control"
+                        ng-readonly="isViewMode"
+						is-open="'opened'+$index" min="minDate" ng-model="toDate" ng-change="applyFilters()" />
+                    </div>
+                </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Search:</label>
-                        <input type="text" class="form-control" placeholder="Search by account/error..." 
-                               ng-model="searchText" ng-change="applyFilters()" />
+                        <input type="text" class="form-control" placeholder="Search by account/error..."
+                            ng-model="searchText" ng-change="applyFilters()" />
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -52,9 +69,10 @@
                             <button class="btn btn-default" ng-click="clearFilters()">
                                 <i class="fa fa-refresh"></i> Clear Filters
                             </button>
-                            <!-- <button class="btn btn-info" ng-click="exportToCSV()" ng-disabled="filteredLogs.length === 0">
+                            <button class="btn btn-info" ng-click="exportToCSV()"
+                                ng-disabled="filteredLogs.length === 0">
                                 <i class="fa fa-download"></i> Export CSV
-                            </button> -->
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -80,17 +98,20 @@
                             <td>{{ log.loanAccountNumber || '-' }}</td>
                             <td>
                                 <span class="label" ng-class="getStatusClass(log.hasPassed)">
-                                    <i ng-class="getStatusIcon(log.hasPassed)"></i> {{ log.hasPassed ? 'Posted' : 'Not Posted' }}
+                                    <i ng-class="getStatusIcon(log.hasPassed)"></i> {{ log.hasPassed ? 'Posted' : 'Not
+                                    Posted' }}
                                 </span>
                             </td>
-                            <td>{{ toDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
+                            <td>{{ arrayToDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
                             <td>
-                                <span ng-if="log.errorLogs" class="text-muted" style="white-space: pre-wrap; word-wrap: break-word; display: inline-block; max-width: 100%;">{{ log.errorLogs }}</span>
+                                <span ng-if="log.errorLogs" class="text-muted"
+                                    style="white-space: pre-wrap; word-wrap: break-word; display: inline-block; max-width: 100%;">{{
+                                    log.errorLogs }}</span>
                                 <span ng-if="!log.errorLogs" class="text-muted">-</span>
                             </td>
                             <td>
-                                <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)" 
-                                        ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
+                                <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)"
+                                    ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
                                     <i class="fa fa-check"></i> Fixed
                                 </button>
                             </td>
@@ -112,7 +133,8 @@
                     </td>
                 </tr>
             </table>
-            <dir-pagination-controls boundary-links="true" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
+            <dir-pagination-controls boundary-links="true"
+                template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
         </div>
     </div>
 </div>
