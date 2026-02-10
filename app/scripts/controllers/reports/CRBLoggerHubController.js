@@ -125,6 +125,17 @@
                 });
             };
 
+            function formatDate(date) {
+                if (!date) return '';
+                var d = new Date(date);
+                var month = '' + (d.getMonth() + 1);
+                var day = '' + d.getDate();
+                var year = d.getFullYear();
+                if (month.length < 2) month = '0' + month;
+                if (day.length < 2) day = '0' + day;
+                return [year, month, day].join('-');
+            }
+
             /**
              * Export logs to CSV
              */
@@ -135,18 +146,37 @@
                     return;
                 }
 
-                const url = $rootScope.hostUrl + '/fineract-provider/api/v1/crb/posting-logs/export';
+                var params = {};
+                if (scope.selectedStatus === 'true' || scope.selectedStatus === 'false') {
+                    params.status = scope.selectedStatus;
+                }
+                if (scope.fromDate) {
+                    params.fromDate = formatDate(scope.fromDate);
+                }
+                if (scope.toDate) {
+                    params.toDate = formatDate(scope.toDate);
+                }
+
+                var queryString = Object.keys(params)
+                    .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
+                    .join('&');
+
+                const url = $rootScope.hostUrl + '/fineract-provider/api/v1/crb/posting-logs/export' + (queryString ? '?' + queryString : '');
 
                 http.get(url, { responseType: 'arraybuffer' })
                     .then(function (response) {
-
+                        console.log(response)
                         const file = new Blob([response.data], {
                             type: response.headers('Content-Type')
                         });
-
                         const fileURL = URL.createObjectURL(file);
-                        window.open(fileURL);
-
+                        const a = document.createElement('a');
+                        a.href = fileURL;
+                        a.download = 'crb-logs.csv';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(fileURL);
                     })
                     .catch(function (error) {
                         console.error("Error exporting report:", error);
