@@ -486,11 +486,6 @@
                                 name: "button.modifyapplication",
                                 icon: "fa fa-pincel-square-o",
                                 taskPermissionName: 'UPDATE_LOAN'
-                            },
-                            {
-                                name: "button.reject",
-                                icon: "fa fa-times",
-                                taskPermissionName: 'REJECT_LOAN'
                             }
                         ],
                             options: [
