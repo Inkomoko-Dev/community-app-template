@@ -15,14 +15,14 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
     
-    - name: Setup Node.js and Ruby
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16.13.1'
       
     
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.7'
 
