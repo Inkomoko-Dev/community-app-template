@@ -37,35 +37,60 @@
                      </div>
                   </div>
                   <div class="form-group">
-                     <label class="control-label col-sm-2">{{'label.input.legalForm' | translate}}</label>
+                     <label class="control-label col-sm-2">{{'label.input.legalForm' | translate}}<span class="required">*</span></label>
                      <div class="col-sm-3">
-                        <select id="legalFormId" ng-model="formData.legalFormId" class="form-control"
+                        <select chosen="clientLegalFormOptions" id="legalFormId" name="legalFormId" ng-model="formData.legalFormId" class="form-control"
                            ng-options="legalForm.id as legalForm.value for legalForm in clientLegalFormOptions"
-                           value="{{legalForm.id}}" ng-change="displayPersonOrNonPersonOptions(formData.legalFormId)">
-                           <option value="">--{{'label.menu.legalForm' | translate}}--</option>
+                           value="{{legalForm.id}}" ng-change="displayPersonOrNonPersonOptions(formData.legalFormId)" late-Validate required>
+                           <option disabled value="">--{{'label.menu.legalForm' | translate}}--</option>
                         </select>
                      </div>
-                      <label class="control-label col-sm-2" ng-show = "formData.legalFormId=='2'">{{'label.heading.clientAccountTypeId' | translate}}</label>
-                      <div class="col-sm-3" ng-show = "formData.legalFormId=='2'">
-                          <select id="clientAccountTypeId" ng-model="formData.clientAccountTypeId"  class="form-control" ng-show = "formData.legalFormId=='2'"
-                                  ng-options="accountType.id as accountType.value for accountType in clientAccountTypeOptions" value="{{accountType.id}}" required>
+                     <div class="col-sm-2">
 
-                          </select>
-                      </div>
-                      <label class="control-label col-sm-2" ng-hide = "formData.legalFormId=='2'">{{'label.heading.clientLevel' | translate}}</label>
-                      <div class="col-sm-3" ng-hide = "formData.legalFormId=='2'">
-                          <select id="clientLevelId" ng-model="formData.clientLevelId"  class="form-control" ng-hide = "formData.legalFormId=='2'"
-                                  ng-options="clientLevel.id as clientLevel.name for clientLevel in clientLevelOptions" value="{{clientLevel.id}}" required>
-
-                          </select>
-                      </div>
+                        <form-validate valattributeform="createclientform" valattribute="legalFormId" />
+                     </div>
+                     <label class="control-label col-sm-2" ng-model="formData.employmentStatusId" ng-show="formData.legalFormId === 1 && employmentInfoEnabled">{{'label.input.employmentStatus' | translate}}</label>
+                     <div class="col-sm-3" ng-show="formData.legalFormId === 1 && employmentInfoEnabled">
+                        <select id="employmentStatusId" ng-model="formData.employmentStatusId"  class="form-control"
+                                ng-options="employmentStatus.id as employmentStatus.name for employmentStatus in employmentStatusOptions"
+                                value="{{employmentStatus.id}}" data-ng-change="displayFields(formData.employmentStatusId)">
+                           <option value="">--{{'label.menu.employmentStatus' | translate}}--</option>
+                        </select>
+                     </div>
                   </div>
                   <div data-ng-switch on="showNonPersonOptions">
                      <div data-ng-switch-when="false">
                         <div class="form-group">
-                           <label class="control-label col-sm-2"
-                              for="firstname">{{ 'label.input.firstname' | translate }}<span
-                                 class="required">*</span></label>
+                           <label class="control-label col-sm-2">{{'label.input.title' | translate}}</label>
+                           <div class="col-sm-3">
+                              <select id="titleId" ng-model="formData.titleId" class="form-control"
+                                 ng-options="titleOption.id as titleOption.name for titleOption in titleOptions"
+                                 value="formData.titleId">
+                                 <option value="">--{{'label.menu.title' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div data-ng-switch on="showNonPersonOptions">
+                     <div data-ng-switch-when="true">
+                        <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.businessregistered' | translate}}</label>
+                        <div class="col-sm-3">
+                           <select id="isRegistered" ng-model="formData.clientNonPersonDetails.isRegistered" class="form-control"
+                                   ng-options="businessRegisteredOption.id as businessRegisteredOption.name for businessRegisteredOption in businessRegisteredOptions"
+                                   value="{{businessRegisteredOption.id}}">
+                              <option value="">--{{'label.menu.businessRegistered' | translate}}--</option>
+                           </select>
+                        </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div data-ng-switch on="showNonPersonOptions">
+                     <div data-ng-switch-when="false">
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="firstname">{{ 'label.input.firstname' | translate
+                              }}<span class="required">*</span></label>
                            <div class="col-sm-3">
                               <input type="text" id="firstname" name="firstname" ng-model="formData.firstname"
                                  class="form-control" required ng-pattern="/(^[A-z])[A-z.'-]*/" late-Validate />
@@ -84,8 +109,8 @@
                   <div data-ng-switch on="showNonPersonOptions">
                      <div data-ng-switch-when="false">
                         <div class="form-group">
-                           <label class="control-label col-sm-2"
-                              for="middlename">{{'label.input.middlename' | translate}}</label>
+                           <label class="control-label col-sm-2" for="middlename">{{'label.input.middlename' |
+                              translate}}</label>
                            <div class="col-sm-3">
                               <input type="text" id="middlename" name="middlename" ng-model="formData.middlename"
                                  class="form-control" ng-pattern="/(^[A-z])[A-z.'-]*/" />
@@ -133,9 +158,8 @@
                   <div data-ng-switch on="showNonPersonOptions">
                      <div data-ng-switch-when="true">
                         <div class="form-group">
-                           <label class="control-label col-sm-2"
-                              for="fullname">{{'label.input.fullname' | translate}}<span
-                                 class="required">*</span></label>
+                           <label class="control-label col-sm-2" for="fullname">{{'label.input.fullname' |
+                              translate}}<span class="required">*</span></label>
                            <div class="col-sm-3">
                               <input type="text" id="fullname" name="fullname" ng-model="formData.fullname"
                                  class="form-control" ng-pattern="/(^[A-z])[A-z.'-]*/" required late-Validate />
@@ -146,45 +170,41 @@
                         </div>
                      </div>
                   </div>
-                  <!--<div class="form-group">-->
-                  <!--<label class="control-label col-sm-2" for="mobileNo">{{'label.input.mobilenumber' | translate}}</label>-->
-                  <!--<div class="col-sm-3">-->
-                  <!--<input type="text" id="mobileNo" name="mobileNo" ng-model="formData.mobileNo"-->
-                  <!--ng-pattern="/^[0-9]+$/"  class="form-control"/>-->
-                  <!--</div>-->
-                  <!--<div class="col-sm-2">-->
-                  <!--<span ng-show="createclientform.mobileNo.$invalid && createclientform.mobileNo.$dirty">-->
-                  <!--<small class="required" ng-show="createclientform.mobileNo.$error.pattern">-->
-                  <!--{{'label.mustbenumeric' | translate}}-->
-                  <!--</small>-->
-                  <!--</span>-->
-                  <!--</div>-->
-                  <!--</div>-->
-                  <div data-ng-switch on="showNonPersonOptions">
-                     <div data-ng-switch-when="false">
-                        <div class="form-group">
-                           <label class="control-label col-sm-2"
-                              for="mothersMaidenName">{{'label.input.mothersmaidenname' | translate}}</label>
-                           <div class="col-sm-3">
-                              <input type="text" id="mothersMaidenName" name="mothersMaidenName"
-                                 ng-model="formData.mothersMaidenName" class="form-control"
-                                 ng-pattern="/(^[A-z])[A-z.'-]*/" />
-                           </div>
-                           <div class="col-sm-2">
-                              <span
-                                 ng-show="createclientform.mothersMaidenName.$invalid && createclientform.mothersMaidenName.$dirty">
-                                 <small class="error required"
-                                    ng-show="createclientform.mothersMaidenName.$error.pattern">
-                                    {{'validation.msg.client.name.cannot.start.specialchar.ornumber' | translate}}
-                                 </small>
-                              </span>
-                           </div>
-                        </div>
+                  <div class="form-group">
+                     <label class="control-label col-sm-2" for="mobileNo">{{'label.input.mobilenumber' |
+                        translate}}</label>
+                     <div class="col-sm-3">
+                        <input type="text" id="mobileNo" name="mobileNo" ng-model="formData.mobileNo"
+                           ng-pattern="/^[0-9]+$/" class="form-control" />
+                     </div>
+                     <div class="col-sm-2">
+                        <span ng-show="createclientform.mobileNo.$invalid && createclientform.mobileNo.$dirty">
+                           <small class="required" ng-show="createclientform.mobileNo.$error.pattern">
+                              {{'label.mustbenumeric' | translate}}
+                           </small>
+                        </span>
                      </div>
                   </div>
                   <div class="form-group">
-                     <label class="control-label col-sm-2"
-                        ng-hide="showNonPersonOptions">{{'label.input.dateofbirth' | translate}}</label>
+                     <label class="control-label col-sm-2" for="altMobileNo">{{'label.input.altMobileNo' |
+                        translate}}</label>
+                     <div class="col-sm-3">
+                        <input type="text" id="altMobileNo" name="altMobileNo" ng-model="formData.altMobileNo"
+                           ng-pattern="/^[0-9]+$/" class="form-control" />
+                     </div>
+                     <div class="col-sm-2">
+                        <span ng-show="createclientform.altMobileNo.$invalid && createclientform.altMobileNo$dirty">
+                           <small class="required" ng-show="createclientform.altMobileNo$error.pattern">
+                              {{'label.mustbenumeric' | translate}}
+                           </small>
+                        </span>
+                     </div>
+                     
+
+                  </div>
+                  <div class="form-group">
+                     <label class="control-label col-sm-2" ng-hide="showNonPersonOptions">{{'label.input.dateofbirth' |
+                        translate}}</label>
                      <label class="control-label col-sm-2"
                         ng-show="showNonPersonOptions">{{'label.input.incorporationdate' | translate}}</label>
                      <div class="col-sm-3">
@@ -206,40 +226,67 @@
                      </div>
                      <div data-ng-switch on="showNonPersonOptions">
                         <div data-ng-switch-when="true">
-                           <label
-                              class="control-label col-sm-2">{{'label.input.incorpValidityTillDate' | translate}}</label>
+                           <label class="control-label col-sm-2">{{'label.input.incorpValidityTillDate' |
+                              translate}}</label>
                            <div class="col-sm-3">
                               <input id="incorpValidityTillDate" type="text" name="incorpValidityTillDate"
                                  datepicker-pop="dd MMMM yyyy" ng-model="first.incorpValidityTillDate" is-open="opened1"
-                                  class="form-control" />
+                                 class="form-control" />
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div data-ng-switch on="showNonPersonOptions">
+                     <div data-ng-switch-when="true">
+                        <div class="form-group">
+                  
+                           <label class="control-label col-sm-2">{{'label.input.ageinbusiness' |
+                              translate}}</label>
+                           <div class="col-sm-3">
+                              <input id="ageInBusiness" type="text" name="ageInBusiness" datepicker-pop="dd MMMM yyyy"
+                                 ng-model="first.inBusinessSince" is-open="opened1" class="form-control"  min="minData" max="restrictDate"/>
                            </div>
                         </div>
                      </div>
                   </div>
                   <div class="form-group">
-                     <label class="control-label col-sm-2">{{'label.input.purposeofaccount' | translate}}</label>
+                  <div data-ng-switch on="showNonPersonOptions">
+                     <div data-ng-switch-when="false">
+                        <label class="control-label col-sm-2">{{'label.input.maritalstatus' | translate}}</label>
+                        <div class="col-sm-3">
+                           <select chosen="maritalStatusIdOptions" id="maritalStatusId"
+                              ng-model="formData.maritalStatusId" class="form-control"
+                              ng-options="maritalStatusIdOption.id as maritalStatusIdOption.name for maritalStatusIdOption in maritalStatusIdOptions track by maritalStatusIdOption.id"
+                              value="formData.maritalStatusId">
+                              <option value="">--{{'label.menu.maritalstatus' | translate}}--</option></select>
+                        </div>
+                     </div>
+                  </div>
+                  </div>
+                  <div class="form-group">
+                     <label class="control-label col-sm-2">{{'label.input.clienttype' | translate}}</label>
                      <div class="col-sm-3">
                         <select id="clienttypeId" ng-model="formData.clientTypeId" class="form-control"
                            ng-options="clienttype.id as clienttype.name for clienttype in clienttypeOptions"
                            value="{{clienttype.id}}">
-                           <option value="">--{{'label.menu.purposeofaccount' | translate}}--</option>
+                           <option value="">--{{'label.menu.clienttype' | translate}}--</option>
                         </select>
                      </div>
-                     <label class="control-label col-sm-2">{{'label.input.maritalstatus' | translate}}</label>
+                     <label class="control-label col-sm-2">{{'label.input.clientclassification' | translate}}</label>
                      <div class="col-sm-3">
                         <select id="clientClassificationId" ng-model="formData.clientClassificationId"
                            class="form-control"
                            ng-options="clientClassification.id as clientClassification.name for clientClassification in clientClassificationOptions"
                            value="{{clientClassification.id}}">
-                           <option value="">--{{'label.menu.maritalstatus' | translate}}--</option>
+                           <option value="">--{{'label.menu.clientclassification' | translate}}--</option>
                         </select>
                      </div>
                   </div>
                   <div data-ng-switch on="showNonPersonOptions">
                      <div data-ng-switch-when="true">
                         <div class="form-group">
-                           <label class="control-label col-sm-2"
-                              for="incorpNumber">{{'label.input.incorpNumber' | translate}}</label>
+                           <label class="control-label col-sm-2" for="incorpNumber">{{'label.input.incorpNumber' |
+                              translate}}</label>
                            <div class="col-sm-3">
                               <input type="text" id="incorpNumber"
                                  ng-model="formData.clientNonPersonDetails.incorpNumber" class="form-control" />
@@ -260,12 +307,12 @@
                      <div data-ng-switch-when="true">
                         <div class="form-group">
                            <label class="control-label col-sm-2">{{'label.input.constitution' | translate}}<span
-                                 class="required"></span></label>
+                                 class="required">*</span></label>
                            <div class="col-sm-3">
                               <select id="constitutionId" name="constitution"
                                  ng-model="formData.clientNonPersonDetails.constitutionId" class="form-control"
                                  ng-options="constitution.id as constitution.name for constitution in clientNonPersonConstitutionOptions"
-                                 value="{{constitution.id}}">
+                                 value="{{constitution.id}}" required>
                                  <option value="">--{{'label.menu.constitution' | translate}}--</option>
                               </select>
                            </div>
@@ -277,41 +324,49 @@
                   <div data-ng-switch on="showNonPersonOptions">
                      <div data-ng-switch-when="true">
                         <div class="form-group">
-                           <label class="control-label col-sm-2"
-                              for="remarks">{{'label.input.remarks' | translate}}</label>
+                           <label class="control-label col-sm-2" for="remarks">{{'label.input.remarks' |
+                              translate}}</label>
                            <div class="col-sm-3">
                               <textarea type="text" id="remarks" ng-model="formData.clientNonPersonDetails.remarks"
                                  rows="4" class="form-control" />
-                              </div>
+                           </div>
                         </div>
                      </div>
                   </div>
                   <div class="form-group">
-                     <label class="control-label col-sm-2" for="externalId">{{'label.input.externalid' | translate}}</label>
+                     <label class="control-label col-sm-2" for="externalId">{{'label.input.externalid' |
+                        translate}}<span class="required">*</span></label>
                      <div class="col-sm-3">
-                        <input type="text" id="externalId" name="externalId" ng-model="formData.externalId"  class="form-control"/>
+                        <input type="text" id="externalId" name="externalId" ng-model="formData.externalId"
+                               class="form-control" required/>
+
                      </div>
-                      <label class="control-label col-sm-2">{{'label.heading.referredBy' | translate}}</label>
-                      <div class="col-sm-3">
-                           <input id="referralClientId" type="text" ng-model="formData.referralClientId" class="col-md-4 form-control"
-                              autocomplete="off"
-                              typeahead-min-length="1"
-                              typeahead-editable="false"
-                              uib-typeahead="client.displayName as client.displayName for client in clientOptions($viewValue)"
-                              typeahead-on-select="viewClient($item, $model, $label)"/>
-                      </div>
+                     <div class="col-sm-1">
+                        <form-validate valattributeform="createclientform" valattribute="externalId" />
+                     </div>
+                     <div class="col-sm-1">
+                     <label class="control-label col-sm-2" for="kivaId">{{'label.input.kivaId' |
+                        translate}}</label>
+                     </div>
+                     <div class="col-sm-3">
+                        <input type="text" id="kivaId" name="kivaId" ng-model="formData.kivaId"
+                               class="form-control" />
+                     </div>
                   </div>
                   <div class="form-group" has-permission="ACTIVATE_CLIENT">
                      <label class="control-label col-sm-2">{{'label.input.active' | translate}}</label>
                      <div class="col-sm-3">
-                        <input id="activeCheckbox" type="checkbox" ng-model="formData.active" data-ng-change="setChoice()" ng-disabled = "showNonPersonOptions">
+                        <input id="activeCheckbox" type="checkbox" ng-model="formData.active"
+                           data-ng-change="setChoice()">
                      </div>
                      <div data-ng-switch on="choice">
                         <div data-ng-switch-when="1">
-                           <label class="control-label col-sm-2">{{'label.input.activationdate' | translate}}<span class="required">*</span></label>
+                           <label class="control-label col-sm-2">{{'label.input.activationdate' | translate}}<span
+                                 class="required">*</span></label>
                            <div class="col-sm-3">
                               <input id="activationDate" type="text" name="activationdate" datepicker-pop="dd MMMM yyyy"
-                                 ng-model="first.date" is-open="opened" min="'2000-01-01'" max="restrictDate"  class="form-control"/>
+                                 ng-model="first.date" is-open="opened" min="'2000-01-01'" max="restrictDate"
+                                 class="form-control" />
                            </div>
                         </div>
                      </div>
@@ -320,47 +375,66 @@
                      <label class="control-label col-sm-2">{{'label.input.submittedon' | translate}}</label>
                      <div class="col-sm-3">
                         <input id="submittedon" type="text" name="submittedon" datepicker-pop="dd MMMM yyyy"
-                           ng-model="first.submitondate" is-open="opened1" min="'2000-01-01'" max="restrictDate"  class="form-control"/>
+                           ng-model="first.submitondate" is-open="opened1" min="'2000-01-01'" max="restrictDate"
+                           class="form-control" />
                      </div>
-                      <label class="control-label col-sm-2" ng-hide = "formData.legalFormId=='2'">{{'label.input.dailyWithdrawLimit' | translate}}</label>
-                      <div class="col-sm-3" ng-hide = "formData.legalFormId=='2'">
-                          <input id="dailyWithdrawLimit" type="text" name="dailyWithdrawLimit"  ng-model="formData.dailyWithdrawLimit"
-                                 class="form-control"
-                                 number-format>
-                      </div>
+
+                     <label class="control-label col-sm-2" ng-hide = "formData.legalFormId=='2'">{{'label.input.dailyWithdrawLimit' | translate}}</label>
+                     <div class="col-sm-3" ng-hide = "formData.legalFormId=='2'">
+                        <input id="dailyWithdrawLimit" type="text" name="dailyWithdrawLimit"  ng-model="formData.dailyWithdrawLimit"
+                               class="form-control"
+                               number-format>
+                     </div>
                   </div>
-
-                   <div class="form-group" ng-hide = "formData.legalFormId=='2'">
-                       <label class="control-label col-sm-2"></label>
-                       <div class="col-sm-3"></div>
-                       <label class="control-label col-sm-2">{{'label.input.singleWithdrawLimit' | translate}}</label>
-                       <div class="col-sm-3">
-                           <input id="singleWithdrawLimit" type="text" name="singleWithdrawLimit" ng-model="formData.singleWithdrawLimit"
-                                  class="form-control"
-                                  number-format>
-                       </div>
-                   </div>
-
-                   <div class="form-group">
-                     <label class="control-label col-sm-2" >{{'label.input.requireauthorizationtoview' | translate}} </label>
+                  <div class="form-group" ng-hide = "formData.legalFormId=='2'">
+                     <label class="control-label col-sm-2"></label>
+                     <div class="col-sm-3"></div>
+                     <label class="control-label col-sm-2">{{'label.input.singleWithdrawLimit' | translate}}</label>
                      <div class="col-sm-3">
-                        <input class="input-mini-small" type="checkbox"
-                           ng-model="formData.requireAuthorizationToView">
+                        <input id="singleWithdrawLimit" type="text" name="singleWithdrawLimit" ng-model="formData.singleWithdrawLimit"
+                               class="form-control"
+                               number-format>
                      </div>
                   </div>
-                  
+
+                  <div class="form-group">
+                  <label class="control-label col-sm-2" ng-hide = "formData.legalFormId=='2'">{{'label.heading.clientLevel' | translate}}</label>
+                  <div class="col-sm-3" ng-hide = "formData.legalFormId=='2'">
+                     <select id="clientLevelId" ng-model="formData.clientLevelId"  class="form-control" ng-hide = "formData.legalFormId=='2'"
+                             ng-options="clientLevel.id as clientLevel.name for clientLevel in template.clientLevelOptions" value="{{clientLevel.id}}" >
+
+                     </select>
+                  </div>
+                  </div>
+
+                  <div class="form-group">
+                     <label class="control-label col-sm-2">{{'label.heading.mnemonics' | translate}}</label>
+                     <div class="col-sm-3">
+                        <input id="mnemonics" type="text" name="mnemonics" ng-model="formData.mnemonics"
+                               class="form-control">
+                     </div>
+
+                     <label class="control-label col-sm-2">{{'label.heading.initials' | translate}}</label>
+                     <div class="col-sm-3">
+                        <input id="initials" type="text" name="initials" ng-model="formData.initials"
+                               class="form-control">
+                     </div>
+                  </div>
+
+
                   <div class="form-group" ng-show="showSavingOptions">
-                     <label class="control-label col-sm-2">{{ 'label.input.opensavingsproduct' | translate }}&nbsp;</label>
+                     <label class="control-label col-sm-2">{{ 'label.input.opensavingsproduct' | translate
+                        }}&nbsp;</label>
                      <div class="col-sm-3">
-                        <input id="opensavingsproduct" type="checkbox" ng-model="savings.opensavingsproduct" ng-true-value="true"
-                           ng-false-value="false">
+                        <input id="opensavingsproduct" type="checkbox" ng-model="savings.opensavingsproduct"
+                           ng-true-value="true" ng-false-value="false">
                      </div>
                      <div ng-show="savings.opensavingsproduct">
                         <label class="control-label col-sm-2">{{'label.input.savingproduct' | translate}}</label>
                         <div class="col-sm-3">
                            <select id="savingsProductId" ng-model="formData.savingsProductId"
                               ng-options="savingProduct.id as savingProduct.name for savingProduct in savingproducts"
-                              value="{{savingProduct.id}}"  class="form-control">
+                              value="{{savingProduct.id}}" class="form-control">
                               <option value="">--{{'label.menu.selectsavingproduct' | translate}}--</option>
                            </select>
                         </div>
@@ -368,344 +442,1026 @@
                   </div>
                   <div class="form-group">
                      <div class="form-group">
-                        <div class="control-label col-sm-3">
-                        <h3><strong>{{ 'label.heading.familymembers' | translate }}</strong>&nbsp;<a ng-click="addFamilyMember()" ><i class="fa fa-plus" title="{{'label.button.addfamilymember' | translate}}"></i></a></h3>
+                        <div class="control-label col-sm-2">
+                           <h3><strong>{{ 'label.heading.nextOfKin' | translate }}</strong>&nbsp;<a
+                                 ng-click="addFamilyMember()"><i class="fa fa-plus"
+                                    title="{{'label.button.addfamilymember' | translate}}"></i></a></h3>
                         </div>
 
                      </div>
 
-                      <div ng-repeat="family in familyArray">
+                     <div ng-repeat="family in familyArray">
 
-                          <div class="form-group" >
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.relationship' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="relationshipIdOptions" id="relationshipIdOption" name="relationshipIdOption"
+                                 ng-model="familyArray[$index].relationshipId" class="form-control"
+                                 ng-options="relationshipIdOption.id as relationshipIdOption.name for relationshipIdOption in relationshipIdOptions track by relationshipIdOption.id"
+                                 value="formData.relationshipId" required>
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="relationshipIdOption" />
+                           </div>
+                           <a ng-click="removeFamilyMember($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i
+                                 class="fa fa-times"></i></a>
+                        </div>
+
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="firstName">{{'label.input.firstname' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="firstName" name="firstName"
+                                 ng-model="familyArray[$index].firstName" class="form-control" required>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="firstName" />
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="middleName">{{'label.input.middlename' | translate
+                              }}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="middleName" name="middleName"
+                                 ng-model="familyArray[$index].middleName" class="form-control">
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="lastName">{{'label.input.lastname' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="lastName" name="lastName" ng-model="familyArray[$index].lastName"
+                                 class="form-control" required>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="lastName" />
+                           </div>
+
+                        </div>
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="emailId">{{'label.input.email' | translate}}</label>
+
+                           <div class="col-sm-3">
+                              <input type="email" id="emailId" name="emailId" class="form-control" ng-model="familyArray[$index].email"/>
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="qualification">{{ 'label.input.qualification' |
+                              translate }}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="qualification" name="qualification"
+                                 ng-model="familyArray[$index].qualification" class="form-control">
+                           </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="mobileNumber">{{ 'label.input.mobileNumber' |
+                              translate }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="mobileNumber" name="mobileNumber"
+                                 ng-model="familyArray[$index].mobileNumber" class="form-control" required>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="mobileNumber" />
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="age">{{ 'label.input.age' | translate }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="age" name="age" ng-model="familyArray[$index].age"
+                                 class="form-control" number-only required>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="age" />
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="isDependent">{{ 'label.input.isDependent' |
+                              translate }}</label>
+
+                           <div class="col-sm-3">
+                              <input type="checkbox" class="input-mini-small" id="isDependent" name="isDependent"
+                                 ng-model="familyArray[$index].isDependent">
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.gender' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="genderIdOptions" id="genderIdOption"
+                                 ng-model="familyArray[$index].genderId" class="form-control"
+                                 ng-options="genderIdOption.id as genderIdOption.name for genderIdOption in genderIdOptions track by genderIdOption.id"
+                                 value="formData.genderId" required>
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="mobileNumber" />
+                           </div>
+                        </div>
+
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.profession' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="professionIdOptions" id="professionIdOption"
+                                 ng-model="familyArray[$index].professionId" class="form-control"
+                                 ng-options="professionIdOption.id as professionIdOption.name for professionIdOption in professionIdOptions track by professionIdOption.id"
+                                 value="formData.professionId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.maritalstatus' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="maritalStatusIdOptions" id="maritalStatusId"
+                                 ng-model="familyArray[$index].maritalStatusId" class="form-control"
+                                 ng-options="maritalStatusIdOption.id as maritalStatusIdOption.name for maritalStatusIdOption in maritalStatusIdOptions track by maritalStatusIdOption.id"
+                                 value="formData.maritalStatusId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="dateofbirth">{{ 'label.input.dateofbirth' |
+                              translate }}</label>
+
+                           <div class="col-sm-3">
+                              <input id="dateofbirth" type="text" name="dateofbirth" datepicker-pop="dd MMMM yyyy"
+                                 ng-model="familyArray[$index].dateOfBirth" is-open="opened1" min="minDate "
+                                 max="restrictDate" class="form-control" />
+                           </div>
+                        </div>
+                           <div class="form-group">
                               <div class="control-label col-sm-2">
-                                  <label>{{ 'label.input.relationship' | translate }}<span class="required">*</span></label>
+                                 <label>{{ 'label.input.addressType' | translate }}</label>
                               </div>
-                              <div class="col-sm-3"  >
-                                  <select chosen="relationshipIdOptions" id="relationshipIdOption" ng-model="familyArray[$index].relationshipId"  class="form-control"
-                                          ng-options="relationshipIdOption.id as relationshipIdOption.name for relationshipIdOption in relationshipIdOptions track by relationshipIdOption.id"
-                                          value="formData.relationshipId"></select>
-                              </div>
-                              <div class = "col-sm-2">
-                                  <form-validate valattributeform="createclientform" valattribute="addressType"/>
-                              </div>
-                              <a ng-click="removeFamilyMember($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
-                          </div>
-
-
-                          <div class="form-group" >
-                              <label class="control-label col-sm-2" for="firstName">{{'label.input.firstname' | translate }}</label>
-
                               <div class="col-sm-3">
-                                  <input type="text" id="firstName" name="firstName"  ng-model="familyArray[$index].firstName"  class="form-control">
+                                 <select chosen="addressTypes" name="addressType"
+                                         ng-model="familyArray[$index].addressTypeId" class="form-control"
+                                         ng-options="addressType.id as addressType.name for addressType in addressTypes "
+                                         value="addressTypeId" late-validate>
+                                    <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                 </select>
                               </div>
-
-                          </div>
-
-                          <div class="form-group">
-                              <label class="control-label col-sm-2" for="middleName">{{'label.input.middlename' | translate }}</label>
-
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2">{{ 'label.input.addressline1' | translate }}</label>
                               <div class="col-sm-3">
-                                  <input type="text" id="middleName" name="middleName" ng-model="familyArray[$index].middleName"  class="form-control">
+                                 <input type="text" name="addressline1" ng-model="familyArray[$index].addressLine1"
+                                        class="form-control">
                               </div>
-
-                          </div>
-
-                          <div class="form-group" >
-                              <label class="control-label col-sm-2" for="lastName">{{'label.input.lastname' | translate }}</label>
-
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2">{{ 'label.input.addressline2' | translate }}</label>
                               <div class="col-sm-3">
-                                  <input type="text" id="lastName" name="lastName" ng-model="familyArray[$index].lastName"  class="form-control">
+                                 <input type="text" name="addressline2" ng-model="familyArray[$index].addressLine2"
+                                        class="form-control">
                               </div>
-
-                          </div>
-
-
-                          <div class="form-group" >
-                              <label class="control-label col-sm-2" for="qualification">{{ 'label.input.qualification' | translate }}</label>
-
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2">{{ 'label.input.addressline3' | translate }}</label>
                               <div class="col-sm-3">
-                                  <input type="text" id="qualification" name="qualification" ng-model="familyArray[$index].qualification"  class="form-control">
+                                 <input type="text" name="addressline3" ng-model="familyArray[$index].addressLine3"
+                                        class="form-control">
                               </div>
-
-                          </div>
-
-                          <div class="form-group" >
-                              <label class="control-label col-sm-2" for="age">{{ 'label.input.age' | translate }}</label>
-
-                              <div class="col-sm-3">
-                                  <input type="text" id="age" name="age" ng-model="familyArray[$index].age"  class="form-control">
-                              </div>
-
-                          </div>
-
-                          <div class="form-group" >
-                              <label class="control-label col-sm-2" for="isDependent">{{ 'label.input.isDependent' | translate }}</label>
-
-                              <div class="col-sm-3">
-                                  <input type="checkbox" class="input-mini-small"  id="isDependent" name="isDependent" ng-model="familyArray[$index].isDependent" >
-                              </div>
-
-                          </div>
-
-                          <div>
-
-                          </div>
-
-                          <div class="form-group" >
+                           </div>
+                           <div class="form-group">
                               <div class="control-label col-sm-2">
-                                  <label>{{ 'label.input.gender' | translate }}</label>
+                                 <label>{{ 'label.heading.city' | translate }}</label>
                               </div>
-                              <div class="col-sm-3" >
-                                  <select chosen="genderIdOptions" id="genderIdOption" ng-model="familyArray[$index].genderId"  class="form-control"
-                                          ng-options="genderIdOption.id as genderIdOption.name for genderIdOption in genderIdOptions track by genderIdOption.id"
-                                          value="formData.genderId"></select>
+                              <div class="col-sm-3">
+                                 <select chosen="cityOptions" name = "cityOption" ng-model="familyArray[$index].cityId"
+                                         class="form-control" ng-options="cityOption.id as cityOption.name for cityOption in cityOptions track by cityOption.id"
+                                         value="cityId">
+                                    <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                 </select>
                               </div>
-                          </div>
 
-
-                          <div class="form-group" >
+                           </div>
+                           <div class="form-group">
                               <div class="control-label col-sm-2">
-                                  <label>{{ 'label.input.profession' | translate }}</label>
+                                 <label>{{ 'label.input.state_province' | translate }}</label>
                               </div>
-                              <div class="col-sm-3" >
-                                  <select chosen="professionIdOptions" id="professionIdOption" ng-model="familyArray[$index].professionId"  class="form-control"
-                                          ng-options="professionIdOption.id as professionIdOption.name for professionIdOption in professionIdOptions track by professionIdOption.id"
-                                          value="formData.professionId"></select>
+                              <div class="col-sm-3">
+                                 <select chosen="stateOptions" name = "stateProvince" ng-model="familyArray[$index].stateProvinceId"
+                                         class="form-control"
+                                         ng-options="stateOption.id as stateOption.name for stateOption in stateOptions track by stateOption.id"
+                                         value="stateProvinceId">
+                                    <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                 </select>
                               </div>
-                          </div>
+                           </div>
 
-
-                          <div class="form-group" >
+                           <div class="form-group" >
                               <div class="control-label col-sm-2">
-                                  <label>{{ 'label.input.maritalstatus' | translate }}</label>
+                                 <label>{{ 'label.input.country' | translate }}<span class="required">*</span></label>
                               </div>
-                              <div class="col-sm-3" >
-                                  <select chosen="maritalStatusIdOptions" id="maritalStatusId" ng-model="familyArray[$index].maritalStatusId"  class="form-control"
-                                          ng-options="maritalStatusIdOption.id as maritalStatusIdOption.name for maritalStatusIdOption in maritalStatusIdOptions track by maritalStatusIdOption.id"
-                                          value="formData.maritalStatusId"></select>
+                              <div class="col-sm-3">
+                                 <select chosen="countryOptions" name = "country" ng-model="familyArray[$index].countryId"
+                                         class="form-control"
+                                         ng-options="countryOption.id as countryOption.name for countryOption in countryOptions track by countryOption.id"
+                                         value="countryId" required>
+                                    <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                 </select>
                               </div>
-                          </div>
+                              <div class="col-sm-2">
+                                 <form-validate valattributeform="createclientform" valattribute="mobileNumber" />
+                              </div>
+                           </div>
+                           <div class="form-group">
+                              <div class="control-label col-sm-2">
+                                 <label>{{ 'label.input.postalCode' | translate }}</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <input type="text" name="postalCode" ng-model="familyArray[$index].postalCode" class="form-control">
+                              </div>
+                              <div class="col-sm-2">
+                                 <form-validate valattributeform="createclientform" valattribute="postalCode" />
+                              </div>
+                           </div>
 
-                          <div class="form-group" >
-                              <label class="control-label col-sm-2" for="dateofbirth">{{ 'label.input.dateofbirth' | translate }}</label>
+
+                     </div>
+
+                  </div>
+
+                  <div ng-show="(businessOwnerEnabled) && (formData.legalFormId == 2)" class="form-group">
+                     <div class="form-group">
+                        <div class="control-label col-sm-3">
+                           <h3><strong>{{ 'label.input.businessowners' | translate }}</strong>&nbsp;<a
+                                 ng-click="addBusinessOwners()"><i class="fa fa-plus"
+                                    title="{{'label.button.addBusinessOwners' | translate}}"></i></a></h3>
+                        </div>
+                     </div>
+                     <div ng-repeat="owners in businessOwnersArray">
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="firstnameOwner">{{'label.input.firstname' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="firstnameOwner" name="firstnameOwner" ng-model="businessOwnersArray[$index].firstnameOwner"
+                                     class="form-control" required ng-pattern="/(^[A-z])[A-z.'-]*/" late-Validate />
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="firstnameOwner" />
+                           </div>
+                           <a ng-click="removeBusinessOwners($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i
+                                   class="fa fa-times"></i></a>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="lastnameOwner">{{'label.input.lastname' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="lastNameOwner" name="lastNameOwner" ng-model="businessOwnersArray[$index].lastNameOwner"
+                                     class="form-control" required ng-pattern="/(^[A-z])[A-z.'-]*/">
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="lastNameOwner" />
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.title' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="titleOptions" name = "titleOption" ng-model="businessOwnersArray[$index].titleId"
+                                      class="form-control" required
+                                      ng-options="titleOption.id as titleOption.name for titleOption in titleOptions track by titleOption.id"
+                                      value="titleId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="title" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="ownershipOwner">{{'label.input.ownership' | translate
+                              }}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="ownershipOwner" name="ownershipOwner"
+                                     ng-model="businessOwnersArray[$index].ownershipOwner" class="form-control">
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.heading.type' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="typeOptions" name = "typeOption" ng-model="businessOwnersArray[$index].typeId"
+                                      class="form-control" required ng-options="typeOption.id as typeOption.name for typeOption in typeOptions track by typeOption.id"
+                                      value="typeId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="type" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="mobileNumberOwner">{{ 'label.input.mobileNumber' |
+                              translate }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="mobileNumberOwner" name="mobileNumberOwner"
+                                     ng-model="businessOwnersArray[$index].mobileNumberOwner" class="form-control" required>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="mobileNumberOwner" />
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="businessOwnerNumber">{{ 'label.input.businessOwnerNumber' |
+                              translate }}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="businessOwnerNumber" name="businessOwnerNumber"
+                                     ng-model="businessOwnersArray[$index].businessOwnerNumber" class="form-control">
+                           </div>
+
+                        </div>
+
+                        <div class="form-group">
+                              <label class="control-label col-sm-2" for="email">{{'label.input.email' | translate}}<span class="required">*</span></label>
 
                               <div class="col-sm-3">
-                                  <input id="dateofbirth" type="text" name="dateofbirth" datepicker-pop="dd MMMM yyyy"
-                                         ng-model="familyArray[$index].dateOfBirth" is-open="opened1" max="restrictDate"  class="form-control"/>
+                                 <input type="email" id="email" name="email" class="form-control" ng-model="businessOwnersArray[$index].email" required/>
                               </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="email" />
+                           </div>
+                        </div>
 
-                          </div>
+                        <div class="form-group">
+                           <label class="control-label col-sm-2">{{ 'label.input.streetNumberAndName' | translate }}<span class="required">*</span></label>
+                           <div class="col-sm-3">
+                              <input type="text" name="streetNumberAndName" ng-model="businessOwnersArray[$index].streetNumberAndName"
+                                     class="form-control" required>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="streetNumberAndName" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2">{{ 'label.input.address1' | translate }}</label>
+                           <div class="col-sm-3">
+                              <input type="text" name="address1" ng-model="businessOwnersArray[$index].address1"
+                                     class="form-control">
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="address1" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2">{{ 'label.input.address2' | translate }}</label>
+                           <div class="col-sm-3">
+                              <input type="text" name="address2" ng-model="businessOwnersArray[$index].address2"
+                                     class="form-control">
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="address2" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2">{{ 'label.input.address3' | translate }}</label>
+                           <div class="col-sm-3">
+                              <input type="text" name="address3" ng-model="businessOwnersArray[$index].address3"
+                                     class="form-control">
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="address3" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.landmark' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <input type="text" name="landmark" ng-model="businessOwnersArray[$index].landmark" class="form-control">
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="landmark" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.postalCode' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <input type="text" name="postalCode" ng-model="businessOwnersArray[$index].postalCode" class="form-control">
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="postalCode" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.heading.city' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="cityOptions" name = "cityOption" ng-model="businessOwnersArray[$index].cityId"
+                                      class="form-control" required ng-options="cityOption.id as cityOption.name for cityOption in cityOptions track by cityOption.id"
+                                      value="cityId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="city" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.state_province' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="stateOptions" name = "stateProvince" ng-model="businessOwnersArray[$index].stateProvinceId"
+                                      class="form-control" required
+                                      ng-options="stateOption.id as stateOption.name for stateOption in stateOptions track by stateOption.id"
+                                      value="stateProvinceId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="stateProvince" />
+                           </div>
+                     </div><div class="form-group" >
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.country' | translate }}<span class="required">*</span></label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="countryOptions" name = "country" ng-model="businessOwnersArray[$index].countryId"
+                                      class="form-control" required
+                                      ng-options="countryOption.id as countryOption.name for countryOption in countryOptions track by countryOption.id"
+                                      value="countryId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                           <div class="col-sm-2">
+                              <form-validate valattributeform="createclientform" valattribute="country" />
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="bvn">{{'label.input.bvn' | translate}}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="bvn" name="bvn" class="form-control" ng-model="businessOwnersArray[$index].bvn"/>
+                           </div>
+                        </div>
+
+                        <div class="form-group">
+                           <label class="control-label col-sm-2" for="bvn">{{'label.input.nin' | translate}}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="nin" name="nin" class="form-control" ng-model="businessOwnersArray[$index].nin"/>
+                           </div>
+                        </div>
+                        <div class="form-group" >
+                           <label class="control-label col-sm-2">{{'label.input.is_active' | translate}} </label>
+                           <div class="col-sm-3">
+                              <input class="input-mini-small" type="checkbox" ng-model="businessOwnersArray[$index].isActive">
+                           </div>
+                        </div>
+
+                     </div>
+                  </div>
+
+                  <div ng-show="(employmentInfoEnabled) && (formData.legalFormId == 1)" class="form-group">
+                     <div class="form-group">
+                        <div class="control-label col-sm-3">
+                           <h3><strong>{{ 'label.input.employmentInfo' | translate }}</strong>&nbsp;<a
+                                   ng-click="addEmploymentInfo()"><i class="fa fa-plus"
+                                                                     title="{{'label.button.addEmploymentInfo' | translate}}"></i></a></h3>
+                        </div>
+                     </div>
+                     <div ng-repeat="info in employmentInfoArray" ng-show ="!showJobSearching">
+
+                        <div class="form-group" ng-show ="showJobOption">
+                           <label class="control-label col-sm-2" for="employerName">{{'label.input.employerName' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="employerName" name="employerName" ng-model="employmentInfoArray[$index].employerName"
+                                     class="form-control"  ng-pattern="/(^[A-z])[A-z.'-]*/" late-Validate />
+                           </div>
+                           <a ng-click="removeEmploymentInfo($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i
+                                   class="fa fa-times"></i></a>
+
+                        </div>
+
+                        <div class="form-group" ng-show ="showBusinessOption">
+                           <label class="control-label col-sm-2" for="businessName">{{'label.input.businessName' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="businessName" name="businessName"
+                                     ng-model="employmentInfoArray[$index].businessName" class="form-control" ng-pattern="/(^[A-z])[A-z.'-]*/">
+                           </div>
+                           <a ng-click="removeEmploymentInfo($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i
+                                   class="fa fa-times"></i></a>
+                        </div>
+
+                        <div class="form-group" ng-show ="showStudentOptions">
+                           <label class="control-label col-sm-2" for="nameOfSchool">{{'label.input.nameOfSchool' | translate
+                              }}<span class="required">*</span></label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="nameOfSchool" name="nameOfSchool" ng-model="employmentInfoArray[$index].nameOfSchool"
+                                     class="form-control" ng-pattern="/(^[A-z])[A-z.'-]*/">
+                           </div>
+                           <a ng-click="removeEmploymentInfo($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i
+                                   class="fa fa-times"></i></a>
+                        </div>
 
 
+                        <div class="form-group" ng-show ="showBusinessOption">
+                           <label class="control-label col-sm-2" for="monthlyIncome">{{ 'label.input.monthlyIncome' |
+                              translate }}</label>
 
+                           <div class="col-sm-3">
+                              <input type="text" id="monthlyIncome" name="monthlyIncome"
+                                     ng-model="employmentInfoArray[$index].monthlyIncome" class="form-control">
+                           </div>
 
+                        </div>
 
+                        <div class="form-group">
+                           <label class="control-label col-sm-2">{{ 'label.input.streetNumberAndName' | translate }}</label>
+                           <div class="col-sm-3">
+                              <input type="text" name="streetNumberAndName" ng-model="employmentInfoArray[$index].streetNumberAndName"
+                                     class="form-control" >
+                           </div>
+                        </div>
+                        <div class="form-group" >
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.city' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="cityOptions" name = "cityId" ng-model="employmentInfoArray[$index].cityId"
+                                      class="form-control"
+                                      ng-options="cityOption.id as cityOption.name for cityOption in cityOptions track by cityOptions.id"
+                                      value="cityId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="form-group">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.state_province' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="stateOptions" name = "stateProvince" ng-model="employmentInfoArray[$index].stateProvinceId"
+                                      class="form-control"
+                                      ng-options="stateOption.id as stateOption.name for stateOption in stateOptions track by stateOption.id"
+                                      value="stateProvinceId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
 
-                      </div>
+                        <div class="form-group" >
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.lga' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="lgaOptions" name = "lga" ng-model="employmentInfoArray[$index].lgaId"
+                                      class="form-control"
+                                      ng-options="lgaOption.id as lgaOption.name for lgaOption in lgaOptions track by lgaOption.id"
+                                      value="lgaId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
 
+                        <div class="form-group" >
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.country' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="countryOptions" name = "country" ng-model="employmentInfoArray[$index].countryId"
+                                      class="form-control"
+                                      ng-options="countryOption.id as countryOption.name for countryOption in countryOptions track by countryOption.id"
+                                      value="countryId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="form-group"  ng-show ="showBusinessOption || showJobOption">
+                        <div class="control-label col-sm-2">
+                           <label>{{ 'label.input.sector' | translate }}</label>
+                        </div>
+                        </div>
+                        <div class="form-group" ng-show ="showBusinessOption">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.industry' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="industryOptions" name = "industryId" ng-model="employmentInfoArray[$index].industryId"
+                                      class="form-control"
+                                      ng-options="industryOption.id as industryOption.name for industryOption in industryOptions track by industryOption.id"
+                                      value="industryId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="form-group" ng-show ="showBusinessOption">
+                           <div class="control-label col-sm-3">
+                              <label>{{ 'label.input.mainbankdetails' | translate }}</label>
+                           </div>
+                        </div>
+                        <div class="form-group" ng-show ="showBusinessOption">
+                           <div class="control-label col-sm-2">
+                              <label>{{ 'label.input.bankname' | translate }}</label>
+                           </div>
+                           <div class="col-sm-3">
+                              <select chosen="bankOptions" name = "bankId" ng-model="employmentInfoArray[$index].bankId"
+                                      class="form-control"
+                                      ng-options="bankOption.id as bankOption.name for bankOption in bankOptions track by bankOption.id"
+                                      value="bankId">
+                                 <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="form-group" ng-show ="showBusinessOption">
+                           <label class="control-label col-sm-2" for="accountNumber">{{ 'label.input.accountnumber' |
+                              translate }}</label>
+
+                           <div class="col-sm-3">
+                              <input type="text" id="accountNumber" name="accountNumber"
+                                     ng-model="employmentInfoArray[$index].accountNumber" class="form-control">
+                           </div>
+
+                        </div>
+
+                        <div class="form-group" >
+                           <label class="control-label col-sm-2">{{'label.input.is_active' | translate}} </label>
+                           <div class="col-sm-3">
+                              <input class="input-mini-small" type="checkbox" ng-model="employmentInfoArray[$index].isActive">
+                           </div>
+                        </div>
+
+                     </div>
                   </div>
 
                   <div ng-show="enableAddress" class="form-group">
                      <div class="form-group">
                         <div class="control-label col-sm-2">
-                           <h3><strong>{{ 'label.input.address' | translate }}</strong>&nbsp;<a ng-click="addAddress()" ><i class="fa fa-plus" title="{{'label.button.addAddress' | translate}}"></i></a></h3>
+                           <h3><strong>{{ 'label.input.address' | translate }}</strong>&nbsp;<a
+                                   ng-click="addAddress()"><i class="fa fa-plus h3"
+                                                              title="{{'label.button.addAddress' | translate}}"></i></a></h3>
                         </div>
                      </div>
-                     <div ng-repeat="addr in addressArray">
-                        <div class="form-group" >
-                           <div class="control-label col-sm-2">
-                              <label>{{ 'label.input.addressType' | translate }}<span class="required">*</span></label>
+                     <div ng-repeat="addr in addressArray" class="col-sm-offset-1 col-sm-10">
+                        <div class="panel panel-default">
+                           <div class="panel-heading">
+                              <div class="pull-right">
+                                 <a ng-click="removeAddress($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
+                              </div>
+                              <h5 class="heading-title text-muted">{{'label.input.address' | translate}} {{$index + 1}}</h5>
                            </div>
-                           <div class="col-sm-3"  >
-                              <select chosen="addressTypes" name="addressType" ng-model="addressArray[$index].addressTypeId"  class="form-control"
-                                 ng-options="addressType.id as addressType.name for addressType in addressTypes track by addressType.id"
-                                 value="addressTypeId" required late-validate></select>
-                           </div>
-                           <div class = "col-sm-2">
-                              <form-validate valattributeform="createclientform" valattribute="addressType"/>
-                           </div>
-                           <a ng-click="removeAddress($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
-                        </div>
-                        <div class="form-group" ng-show="street">
-                           <div class="control-label col-sm-2">
-                              <label>{{ 'label.input.street' | translate }}<span class="required">*</span></label>
-                           </div>
-                           <div class="col-sm-3">
-                              <input type="text" name="street"  ng-model="addressArray[$index].street"  class="form-control" required late-validate/>
-                           </div>
-                           <div class = "col-sm-2">
-                              <form-validate valattributeform="createclientform" valattribute="street"/>
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="addressLine1">
-                           <label class="control-label col-sm-2" >{{ 'label.input.addressline1' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="addressline1" ng-model="addressArray[$index].addressLine1"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="addressLine2">
-                           <label class="control-label col-sm-2" >{{ 'label.input.addressline2' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="addressline2" ng-model="addressArray[$index].addressLine2"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="addressLine3">
-                           <label class="control-label col-sm-2" >{{ 'label.input.addressline3' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="addressline3" ng-model="addressArray[$index].addressLine3"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="city">
-                           <label class="control-label col-sm-2" >{{ 'label.input.city' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text" name="city" ng-model="addressArray[$index].city"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="townVillage">
-                           <label class="control-label col-sm-2" >{{ 'label.input.town_village' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="town_village" ng-model="addressArray[$index].townVillage"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="countyDistrict">
-                           <label class="control-label col-sm-2" >{{ 'label.input.county_district' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="county_district" ng-model="addressArray[$index].countyDistrict"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="stateProvinceId">
-                           <div class="control-label col-sm-2">
-                              <label>{{ 'label.input.state_province' | translate }}</label>
-                           </div>
-                           <div class="col-sm-3" >
-                              <select chosen="stateOptions"  ng-model="addressArray[$index].stateProvinceId"  class="form-control"
-                                 ng-options="stateOption.id as stateOption.name for stateOption in stateOptions track by stateOption.id"
-                                 value="stateProvinceId"></select>
-                           </div>
-                        </div>
-                        <div>
-                        </div>
-                        <div class="form-group" ng-show="countryId">
-                           <div class="control-label col-sm-2">
-                              <label>{{ 'label.input.country' | translate }}</label>
-                           </div>
-                           <div class="col-sm-3" >
-                              <select chosen="countryOptions"  ng-model="addressArray[$index].countryId"  class="form-control"
-                                 ng-options="countryOption.id as countryOption.name for countryOption in countryOptions track by countryOption.id"
-                                 value="countryId"></select>
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="postalCode">
-                           <label class="control-label col-sm-2" >{{ 'label.input.postal_code' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="postal_code" ng-model="addressArray[$index].postalCode"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="latitude">
-                           <label class="control-label col-sm-2" >{{ 'label.input.latitude' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="latitude" ng-model="addressArray[$index].latitude"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="longitude">
-                           <label class="control-label col-sm-2" >{{ 'label.input.longitude' | translate }}</label>
-                           <div class="col-sm-3">
-                              <input type="text"  name="longitude" ng-model="addressArray[$index].longitude"  class="form-control">
-                           </div>
-                        </div>
-                        <div class="form-group" ng-show="isActive">
-                           <label class="control-label col-sm-2" >{{'label.input.is_active' | translate}} </label>
-                           <div class="col-sm-3">
-                              <input class="input-mini-small" type="checkbox"
-                                 ng-model="addressArray[$index].isActive">
+                           <div class="panel-body">
+                              <div class="form-group">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.addressType' | translate }}<span class="required">*</span></label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <select chosen="addressTypes" name="addressType"
+                                          ng-model="addressArray[$index].addressTypeId" class="form-control"
+                                          ng-options="addressType.id as addressType.name for addressType in addressTypes "
+                                          value="addressTypeId" required late-validate>
+                                       <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                    </select>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="addressType" />
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="street">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.street' | translate }}</label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="street" ng-model="addressArray[$index].street"
+                                          class="form-control" late-validate />
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="street" />
+                                 </div>
+                              </div>
+
+
+                              <div class="form-group" ng-show="addressLine1">
+                                 <label class="control-label col-sm-3">{{ 'label.input.addressline1' | translate }}<span class="required">*</span></label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="addressline1" ng-model="addressArray[$index].addressLine1"
+                                          class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="addressline1" />
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="addressLine2">
+                                 <label class="control-label col-sm-3">{{ 'label.input.addressline2' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="addressline2" ng-model="addressArray[$index].addressLine2"
+                                          class="form-control">
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="addressLine3">
+                                 <label class="control-label col-sm-3">{{ 'label.input.addressline3' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="addressline3" ng-model="addressArray[$index].addressLine3"
+                                          class="form-control">
+                                 </div>
+                              </div>
+
+                              <div class="form-group" ng-show="city">
+                                 <label class="control-label col-sm-3">{{ 'label.input.city' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="city" ng-model="addressArray[$index].city" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="townVillage">
+                                 <label class="control-label col-sm-3">{{ 'label.input.town_village' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="town_village" ng-model="addressArray[$index].townVillage"
+                                          class="form-control">
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="countyDistrict">
+                                 <label class="control-label col-sm-3">{{ 'label.input.county_district' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="county_district" ng-model="addressArray[$index].countyDistrict"
+                                          class="form-control">
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="stateProvinceId">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.state_province' | translate }}<span class="required">*</span></label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <select chosen="stateOptions" ng-model="addressArray[$index].stateProvinceId"
+                                          name="stateProvinceId"
+                                          class="form-control"
+                                          ng-options="stateOption.id as stateOption.name for stateOption in stateOptions track by stateOption.id"
+                                          value="stateProvinceId" required late-validate>
+                                       <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                    </select>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="stateProvinceId" />
+                                 </div>
+                              </div>
+                              <div class="form-group" >
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.lga' | translate }}</label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <select chosen="lgaOptions" name = "lga" ng-model="addressArray[$index].lgaId"
+                                          class="form-control"
+                                          ng-options="lgaOption.id as lgaOption.name for lgaOption in lgaOptions track by lgaOption.id"
+                                          value="lgaId">
+                                       <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                    </select>
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="countryId">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.country' | translate }}<span class="required">*</span></label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <select chosen="countryOptions" ng-model="addressArray[$index].countryId"
+                                          name="countryId"
+                                          class="form-control"
+                                          ng-options="countryOption.id as countryOption.name for countryOption in countryOptions track by countryOption.id"
+                                          value="countryId" required late-validate>
+                                       <option disabled value="">--{{'label.selectone' | translate}}--</option>
+                                    </select>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="countryId" />
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="postalCode">
+                                 <label class="control-label col-sm-3">{{ 'label.input.postal_code' | translate }}<span class="required">*</span></label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="postal_code" ng-model="addressArray[$index].postalCode"
+                                          class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="postal_code" />
+                                 </div>
+                              </div>
+
+                              <div class="form-group">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.physicalAddressDistrict' | translate }}<span class="required">*</span></label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="physicalAddressDistrict" ng-model="addressArray[$index].physicalAddressDistrict" class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="physicalAddressDistrict" />
+                                 </div>
+                              </div>
+                              <div class="form-group">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.physicalAddressSector' | translate }}<span class="required">*</span></label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="physicalAddressSector" ng-model="addressArray[$index].physicalAddressSector" class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="physicalAddressSector" />
+                                 </div>
+                              </div>
+                              <div class="form-group">
+                                 <div class="control-label col-sm-3">
+                                    <label>{{ 'label.input.physicalAddressCell' | translate }}<span class="required">*</span></label>
+                                 </div>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="physicalAddressCell" ng-model="addressArray[$index].physicalAddressCell" class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <form-validate valattributeform="createclientform" valattribute="physicalAddressCell" />
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="latitude">
+                                 <label class="control-label col-sm-3">{{ 'label.input.latitude' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="latitude" ng-model="addressArray[$index].latitude"
+                                          class="form-control">
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="longitude">
+                                 <label class="control-label col-sm-3">{{ 'label.input.longitude' | translate }}</label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="longitude" ng-model="addressArray[$index].longitude"
+                                          class="form-control">
+                                 </div>
+                              </div>
+                              <div class="form-group" ng-show="isActive">
+                                 <label class="control-label col-sm-3">{{'label.input.is_active' | translate}} </label>
+                                 <div class="col-sm-4">
+                                    <input class="input-mini-small" type="checkbox" ng-model="addressArray[$index].isActive">
+                                 </div>
+                              </div>
                            </div>
                         </div>
                      </div>
                   </div>
+
                   <div class="pull-right">
-                     <button id="save1"  class="btn btn-primary" ng-if="datatables" wz-next>
-                     {{'label.button.proceed' | translate}}
+                     <button id="save1" class="btn btn-primary" ng-if="datatables" wz-next>
+                        {{'label.button.proceed' | translate}}
                      </button>
                      <div ng-if="!datatables">
-                        <a id="cancel" ng-href="{{cancel}}" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
-                        <button id="save" type="submit" class="btn btn-primary"  ng-hide="blockUI" has-permission='CREATE_CLIENT'>{{'label.button.save' | translate}}</button>
-                        <button class="btn btn-info" ng-show="blockUI"><strong>{{'label.button.processing' | translate}}</strong></button>
+                        <a id="cancel" ng-href="{{cancel}}" class="btn btn-default">{{'label.button.cancel' |
+                           translate}}</a>
+                        <button id="save" type="submit" class="btn btn-primary" ng-hide="blockUI"
+                           has-permission='CREATE_CLIENT'>{{'label.button.save' | translate}}</button>
+                        <button class="btn btn-info" ng-show="blockUI"><strong>{{'label.button.processing' |
+                              translate}}</strong></button>
                      </div>
                   </div>
                </fieldset>
             </form>
-        </div>
-    </wz-step>
-    <wz-step ng-if="datatables" ng-repeat="datatable in datatables" icon="fa fa-circle-o" wz-title="{{datatable.registeredTableName}}">
-    	<div class="card-content">
-		   <form class="form-horizontal" ng-submit="submit()">
-		      <api-validate></api-validate>
-		      <fieldset>
-		      	<legend>{{datatable.registeredTableName}}</legend>
-		        <div class="form-group" ng-repeat="columnHeader in datatable.columnHeaderData">
-		            <label class="control-label col-sm-3">{{ columnHeader.columnName | prettifyDataTableColumn }}
-		            <span ng-show="!columnHeader.isColumnNullable" class="required">*</span>
-		            </label>
-		            <div class="col-sm-3">
-		               <input ng-show="fieldType(columnHeader.columnDisplayType) == 'TEXT'" type="text"
-		                  ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]" class="form-control"/>
-		               <input ng-show="fieldType(columnHeader.columnDisplayType) == 'DATE'" type="text"
-		                  datepicker-pop="dd MMMM yyyy" ng-model="formDat.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
-		                  is-open="opened{{$index}}" class="form-control"/>
-		               <div ng-show="fieldType(columnHeader.columnDisplayType) == 'DATETIME'" class="form-inline">
-		                  <div class="form-group">
-		                     <input type="text" datepicker-pop="dd MMMM yyyy"
-		                        ng-model="formDat.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName].date"
-		                        is-open="opened{{$index}}" class="form-control"/>
-		                  </div>
-		                  <div class="form-group">
-		                     <input type="time" placeholder="HH:MM:SS"
-		                        ng-model="formDat.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName].time" class="form-control"/>
-		                  </div>
-		               </div>
-		               <div ng-show="fieldType(columnHeader.columnDisplayType) == 'BOOLEAN'">
-		                  <label class="radio-inline">
-		                  <input type="radio" ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
-		                     value="true"/>
-		                  {{'label.input.true' | translate}}
-		                  </label>
-		                  <label class="radio-inline">
-		                  <input type="radio" ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
-		                     value="false"/>
-		                  {{'label.input.false' | translate}}
-		                  </label>
-		               </div>
-		               <span data-ng-switch on="columnHeader.columnDisplayType">
-		                  <select ng-show="fieldType(columnHeader.columnDisplayType) == 'SELECT'"
-		                     data-ng-switch-when="CODELOOKUP"
-		                     ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
-		                     ng-options="columnValue.id as columnValue.value for columnValue in columnHeader.columnValues"
-		                     value="{{columnValue.id}}" class="form-control">
-		                     <option value="">{{'label.selectone' | translate}}</option>
-		                  </select>
-		                  <select ng-show="fieldType(columnHeader.columnDisplayType) == 'SELECT'"
-		                     data-ng-switch-when="CODEVALUE"
-		                     ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
-		                     ng-options="columnValue.value as columnValue.value for columnValue in columnHeader.columnValues"
-		                     value="{{columnValue.id}}" class="form-control">
-		                     <option value="">{{'label.selectone' | translate}}</option>
-		                  </select>
-		               </span>
-		            </div>
-		        </div>
-		        <div class="pull-right" ng-if="!$last">
-		            <button id="save4"  class="btn btn-primary" wz-next>
-		            {{'label.button.proceed' | translate}}
-		            </button>
-		        </div>
-		        <div class="col-md-offset-5" ng-if="$last">
-		            <a id="cancel2" ng-href="{{cancel}}" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
-		            <button id="save2" type="submit" class="btn btn-primary"  ng-hide="blockUI" has-permission='CREATE_CLIENT'>{{'label.button.save' | translate}}</button>
-		            <button class="btn btn-info" ng-show="blockUI"><strong>{{'label.button.processing' | translate}}</strong></button>
-		        </div>
-		      </fieldset>
-		   </form>
-		</div>
-	</wz-step>
+         </div>
+      </wz-step>
+      <wz-step ng-if="datatables" ng-repeat="datatable in datatables" icon="fa fa-circle-o"
+         wz-title="{{datatable.registeredTableName}}">
+         <div class="card-content">
+            <form class="form-horizontal" ng-submit="submit()">
+               <api-validate></api-validate>
+               <fieldset>
+                  <legend>{{datatable.registeredTableName}}</legend>
+                  <div class="form-group" ng-repeat="columnHeader in datatable.columnHeaderData">
+                     <label class="control-label col-sm-3">{{ columnHeader.columnName | prettifyDataTableColumn }}
+                        <span ng-show="!columnHeader.isColumnNullable" class="required">*</span>
+                     </label>
+                     <div class="col-sm-3">
+                        <input ng-show="fieldType(columnHeader.columnDisplayType) == 'TEXT'" type="text"
+                           ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
+                           class="form-control" />
+                        <input ng-show="fieldType(columnHeader.columnDisplayType) == 'DATE'" type="text"
+                           datepicker-pop="dd MMMM yyyy"
+                           ng-model="formDat.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
+                           is-open="opened{{$index}}" class="form-control" />
+                        <div ng-show="fieldType(columnHeader.columnDisplayType) == 'DATETIME'" class="form-inline">
+                           <div class="form-group">
+                              <input type="text" datepicker-pop="dd MMMM yyyy"
+                                 ng-model="formDat.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName].date"
+                                 is-open="opened{{$index}}" class="form-control" />
+                           </div>
+                           <div class="form-group">
+                              <input type="time" placeholder="HH:MM:SS"
+                                 ng-model="formDat.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName].time"
+                                 class="form-control" />
+                           </div>
+                        </div>
+                        <div ng-show="fieldType(columnHeader.columnDisplayType) == 'BOOLEAN'">
+                           <label class="radio-inline">
+                              <input type="radio"
+                                 ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
+                                 value="true" />
+                              {{'label.input.true' | translate}}
+                           </label>
+                           <label class="radio-inline">
+                              <input type="radio"
+                                 ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
+                                 value="false" />
+                              {{'label.input.false' | translate}}
+                           </label>
+                        </div>
+                        <span data-ng-switch on="columnHeader.columnDisplayType">
+                           <select ng-show="fieldType(columnHeader.columnDisplayType) == 'SELECT'"
+                              data-ng-switch-when="CODELOOKUP"
+                              ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
+                              ng-options="columnValue.id as columnValue.value for columnValue in columnHeader.columnValues"
+                              value="{{columnValue.id}}" class="form-control">
+                              <option value="">{{'label.selectone' | translate}}</option>
+                           </select>
+                           <select ng-show="fieldType(columnHeader.columnDisplayType) == 'SELECT'"
+                              data-ng-switch-when="CODEVALUE"
+                              ng-model="formData.datatables[datatables.indexOf(datatable)].data[columnHeader.columnName]"
+                              ng-options="columnValue.value as columnValue.value for columnValue in columnHeader.columnValues"
+                              value="{{columnValue.id}}" class="form-control">
+                              <option value="">{{'label.selectone' | translate}}</option>
+                           </select>
+                        </span>
+                     </div>
+                  </div>
+                  <div class="pull-right" ng-if="!$last">
+                     <button id="save4" class="btn btn-primary" wz-next>
+                        {{'label.button.proceed' | translate}}
+                     </button>
+                  </div>
+                  <div class="col-md-offset-5" ng-if="$last">
+                     <a id="cancel2" ng-href="{{cancel}}" class="btn btn-default">{{'label.button.cancel' |
+                        translate}}</a>
+                     <button id="save2" type="submit" class="btn btn-primary" ng-hide="blockUI"
+                        has-permission='CREATE_CLIENT'>{{'label.button.save' | translate}}</button>
+                     <button class="btn btn-info" ng-show="blockUI"><strong>{{'label.button.processing' |
+                           translate}}</strong></button>
+                  </div>
+               </fieldset>
+            </form>
+         </div>
+      </wz-step>
    </wizard>
 </div>

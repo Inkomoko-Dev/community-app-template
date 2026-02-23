@@ -11,6 +11,7 @@
             scope.noteFieldMandatory = false;
             scope.showAmountField = false;
             scope.restrictDate = new Date();
+            scope.error = false;
             // Transaction UI Related
             scope.isTransaction = false;
             scope.showPaymentDetails = false;
@@ -178,34 +179,58 @@
                     scope.title = 'label.heading.undoapproveloanaccount';
                     scope.showDateField = false;
                     scope.taskPermissionName = 'APPROVALUNDO_LOAN';
+                    scope.noteFieldMandatory = true;
                     break;
                 case "undodisbursal":
                     scope.title = 'label.heading.undodisburseloanaccount';
                     scope.showDateField = false;
                     scope.taskPermissionName = 'DISBURSALUNDO_LOAN';
                     break;
-                case "disburse":
+                case "disbursementpreapprovalrequest":
+                case "approveDisbursement":
+                    const isApprove = scope.action === "approveDisbursement";
+
+                    // Both actions should be read-only
+                    scope.isReadOnly = true;
+
+                    const command = isApprove ? "disbursementapproval" : "disbursementpreapprovalrequest";
+                    const rejectCommand = isApprove ? "rejectdisbursementapproval" : "rejectdisbursementpreapproval";
+
                     scope.modelName = 'actualDisbursementDate';
                     resourceFactory.loanTrxnsTemplateResource.get({
                         loanId: scope.accountId,
                         command: command
                     }, function (data) {
                         scope.paymentTypes = data.paymentTypeOptions;
-                        if (data.paymentTypeOptions.length > 0) {
-                            scope.formData.paymentTypeId = data.paymentTypeOptions[0].id;
-                        }
-                        scope.formData.transactionAmount = data.amount;
+                        scope.formData.accountNumber = data.accountNumber || '';
+                        scope.formData.checkNumber = data.checkNumber || '';
+                        scope.formData.routingCode = data.routingCode || '';
+                        scope.formData.receiptNumber = data.receiptNumber || '';
+                        scope.formData.bankNumber = data.bankNumber || '';
+                        scope.formData.clientPhoneNumber = data.clientPhoneNumber || '';
+                        scope.formData.clientAccountNumber = data.clientAccountNumber || '';
+                        scope.formData.clientBankName = data.clientBankName || '';
+                        scope.formData.paymentTypeId = Number(data.paymentTypeId);
+                        scope.formData.transactionAmount = data.netDisbursalAmount || '';
+                        scope.principalPortion = data.principalPortion || '';
+                        scope.interestPortion = data.interestPortion || '';
+                        scope.feeChargesPortion = data.feeChargesPortion || '';
                         scope.formData[scope.modelName] = new Date();
                         if (data.fixedEmiAmount) {
                             scope.formData.fixedEmiAmount = data.fixedEmiAmount;
                             scope.showEMIAmountField = true;
                         }
-                        scope.isLoanDisbursementRequestEnabled = data.isLoanDisbursementRequestEnabled;
+                        scope.isDisbursementPreApprovalRequest = !isApprove;
                     });
-                    scope.title = 'label.heading.disburseloanaccount';
+
+                    scope.title = isApprove ? 'label.heading.approvedisbursement' : 'label.heading.disbursementpreapproval';
                     scope.labelName = 'label.input.disbursedondate';
                     scope.isTransaction = true;
                     scope.showAmountField = true;
+                    scope.principalPortion = true;
+                    scope.interestPortion = true;
+                    scope.feeChargesPortion = true;
+                    scope.noteFieldMandatory = true;
                     scope.taskPermissionName = 'DISBURSE_LOAN';
                     scope.fetchEntities('m_loan', 'DISBURSE');
 
@@ -787,9 +812,8 @@
             scope.submit = function () {
                 scope.processDate = false;
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
-                    scope.formData.note.$setTouched();
-                    window.alert('Note field is mandatory');
+                if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
+                    scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
                 var params = {command: scope.action};
@@ -1041,12 +1065,15 @@
                         });
                     } else if (scope.action === "disbursementpreapprovalrequest" || scope.action === "approveDisbursement") {
                         const isApprove = scope.action === "approveDisbursement";
+
                         const chosenCommand = scope.isReject
                             ? scope.disburseCommands.rejectCommand
                             : scope.disburseCommands.command;
 
                         params.loanId = scope.accountId;
                         params.command = chosenCommand;
+
+                        params.command = isApprove && scope.isCashPayment() ? 'disburse' : params.command;
 
                         scope.filterDisburseFormData();
                         this.formData.locale = scope.optlang.code;
@@ -1061,12 +1088,12 @@
                         });
                     } else {
                         params.loanId = scope.accountId;
-                        params.command = scope.isLoanDisbursementRequestEnabled && !scope.isCashPayment() ? 'disbursementRequest' : params.command;
+                        params.command = scope.isDisbursementPreApprovalRequest ? 'disbursementpreapprovalrequest' : params.command;
                         scope.filterDisburseFormData();
                         resourceFactory.LoanAccountResource.save(params, this.formData, function (data) {
                             location.path('/viewloanaccount/' + data.loanId);
                         });
-                    } 
+                    }
                 }
             };
 
@@ -1180,8 +1207,9 @@
                 }
             }
 
-            scope.$watch('clientId', function () {
-                if ((scope.action === 'approve' || scope.action === 'disburse') && scope.clientId !== undefined) {
+            scope.$watch('clientId', function() {
+                if((scope.action === 'approve' || scope.action ===  'disbursementpreapprovalrequest' || scope.action ===  'approveDisbursement')
+                    && scope.clientId !== undefined) {
                     scope.fetchClientOtherInfo(scope.clientId);
                 }
 
@@ -1190,7 +1218,8 @@
             scope.$watch('formData.paymentTypeId', function () {
                 if (scope.formData.paymentTypeId !== undefined) {
                     const isCashPayment = scope.isCashPayment();
-                    if (scope.isLoanDisbursementRequestEnabled && (scope.action === 'approve' || scope.action === 'disburse') && !isCashPayment) {
+                    if((scope.action === 'approve' || scope.action ===  'disbursementpreapprovalrequest' || scope.action ===  'approveDisbursement')
+                        && !isCashPayment) {
                         scope.showClientOtherInfoForm = true;
                     } else {
                         scope.showClientOtherInfoForm = false;
@@ -1255,9 +1284,8 @@
 
             scope.handleReject = function () {
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && scope.formData.note.$invalid) {
-                    scope.formData.note.$setTouched();
-                    alert("Note field is mandatory");
+                if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
+                    scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
                 switch (scope.action) {

@@ -84,8 +84,11 @@
                     case "undoapproval":
                         location.path('/loanaccount/' + accountId + '/undoapproval');
                         break;
-                    case "disburse":
-                        location.path('/loanaccount/' + accountId + '/disburse');
+                    case "disbursementRequest":
+                        location.path('/loanaccount/' + accountId + '/disbursementpreapprovalrequest');
+                        break;
+                    case "approveDisbursement":
+                        location.path('/loanaccount/' + accountId + '/approveDisbursement');
                         break;
                     case "disbursetosavings":
                         location.path('/loanaccount/' + accountId + '/disbursetosavings');
@@ -483,11 +486,6 @@
                                 name: "button.modifyapplication",
                                 icon: "fa fa-pincel-square-o",
                                 taskPermissionName: 'UPDATE_LOAN'
-                            },
-                            {
-                                name: "button.reject",
-                                icon: "fa fa-times",
-                                taskPermissionName: 'REJECT_LOAN'
                             }
                         ],
                             options: [
@@ -571,11 +569,11 @@
 
                         };
 
-                        if(!data.subStatus || (data.subStatus && data.subStatus.code !== 'loanSubStatus.loanSubStatusType.pending.disbursement')) {
+                        if(!data.subStatus || (data.subStatus && data.subStatus.code !== 'loanSubStatus.loanSubStatusType.pending.disbursement' && data.subStatus.id !==300)) {
                             scope.buttons.singlebuttons.push({
-                                name: "button.disburse",
+                                name: "button.disbursementRequest",
                                 icon: "fa fa-flag",
-                                taskPermissionName: 'DISBURSE_LOAN'
+                                taskPermissionName: 'DISBURSEMENTPREAPPROVAL_LOAN'
                             });
                             scope.buttons.singlebuttons.push({
                                 name: "button.disbursetosavings",
@@ -586,6 +584,14 @@
                                 name: "button.undoapproval",
                                 icon: "fa fa-undo",
                                 taskPermissionName: 'APPROVALUNDO_LOAN'
+                            });
+                        }
+
+                        else if(!data.subStatus || (data.subStatus && data.subStatus.id == 300)) {
+                            scope.buttons.singlebuttons.push({
+                                name: "button.approveDisbursement",
+                                icon: "fa fa-flag",
+                                taskPermissionName: 'DISBURSE_LOAN'
                             });
                         }
                     }

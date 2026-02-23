@@ -214,6 +214,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'reports/XBRLReportController',
             'reports/DisbursementReportController',
             'reports/RunDisbursementReportController',
+            'reports/CRBLoggerHubController',
             'savings/CreateSavingAccountController',
             'savings/ViewSavingDetailsController',
             'savings/ViewSavingDepositAccrualTransactionController',

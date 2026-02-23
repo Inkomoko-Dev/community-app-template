@@ -1,0 +1,407 @@
+<div class="content-container" ng-controller="ViewLoanApprovalMatrixDetailsController">
+    <div class="card">
+        <div class="content">
+            <div class="pull-right">
+                <div class="btn-group" data-ng-show="configurations.isExtendLoanLifeCycleConfig">
+                    <a href="#/updateLoanApprovalMatrix/{{matrixDetails.id}}" class="btn btn-primary" has-permission='UPDATE_LOANAPPROVALMATRIX'><i
+                            class="fa fa-edit "></i>&nbsp;&nbsp;{{'label.button.updateLoanapprovalmatrix' | translate}}</a>
+                    <button class="btn btn-danger" ng-click="deleteLoanApprovalMatrix()" has-permission='DELETE_LOANAPPROVALMATRIX'><i class="fa fa-trash-o" aria-hidden="true"></i>{{'label.button.delete' | translate}}</button>
+
+                </div>
+            </div>
+
+            <br>
+            <hr/>
+
+            <table class="table table-striped">
+                <tr>
+                    <td>{{'label.heading.currency' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.currency}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneUnsecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneUnsecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneUnsecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneUnsecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneUnsecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneUnsecuredSecondCycleMaxTerm}}</td>
+                </tr>
+
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneSecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneSecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneSecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelOne' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneSecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneSecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelOneSecuredSecondCycleMaxTerm}}</td>
+                </tr>
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoUnsecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoUnsecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoUnsecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoUnsecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoUnsecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoUnsecuredSecondCycleMaxTerm}}</td>
+                </tr>
+
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoSecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoSecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoSecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelTwo' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoSecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoSecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelTwoSecuredSecondCycleMaxTerm}}</td>
+                </tr>
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeUnsecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeUnsecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeUnsecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeUnsecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeUnsecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeUnsecuredSecondCycleMaxTerm}}</td>
+                </tr>
+
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeSecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeSecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeSecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelThree' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeSecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeSecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelThreeSecuredSecondCycleMaxTerm}}</td>
+                </tr>
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourUnsecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourUnsecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourUnsecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourUnsecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourUnsecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourUnsecuredSecondCycleMaxTerm}}</td>
+                </tr>
+
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourSecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourSecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourSecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFour' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourSecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourSecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFourSecuredSecondCycleMaxTerm}}</td>
+                </tr>
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveUnsecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveUnsecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveUnsecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveUnsecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveUnsecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveUnsecuredSecondCycleMaxTerm}}</td>
+                </tr>
+
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveSecuredFirstCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveSecuredFirstCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveSecuredFirstCycleMaxTerm}}</td>
+                </tr>
+
+                <tr class="bottomborder">
+                    <td colspan="4">
+                        <strong>{{'label.heading.decisionLevelFive' | translate}} {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{'label.heading.maximumloanprincipalamount' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveSecuredSecondCycleMaxAmount}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.minimumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveSecuredSecondCycleMinTerm}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.maximumloanterm' | translate}} :</td>
+                    <td colspan="3">{{matrixDetails.levelFiveSecuredSecondCycleMaxTerm}}</td>
+                </tr>
+
+
+            </table>
+        </div>
+    </div>
+</div>

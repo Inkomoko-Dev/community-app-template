@@ -7,12 +7,14 @@
                     name: data.name,
                     description: data.description,
                     isCashPayment: data.isCashPayment,
+                    isMobileMoney: data.isMobileMoney,
                     position : data.position
                 };
             });
 
             scope.submit = function () {
                 this.formData.isCashPayment = this.formData.isCashPayment || false;
+                this.formData.isMobileMoney = this.formData.isMobileMoney || false;
                 resourceFactory.paymentTypeResource.update({paymentTypeId: routeParams.id},this.formData, function (data) {
                     location.path('/viewpaymenttype/');
                 });

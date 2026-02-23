@@ -81,6 +81,7 @@
                         <th>{{'label.heading.fullname' | translate}}</th>
                         <th>{{'label.heading.relationship' | translate}}</th>
                         <th>{{'label.heading.guarantortype' | translate}}</th>
+                        <th>{{'label.heading.clientId' | translate}}</th>
                         <th>{{'label.heading.deposit.account' | translate}}</th>
                         <th>{{'label.heading.guarantee.amount' | translate}}</th>
                         <th>{{'label.heading.guarantee.amount.remaining' | translate}}</th>
@@ -98,12 +99,13 @@
                             <div ng-show="loandetails.clientId == guarantor.entityId">{{'label.heading.self' | translate}}</div>
                         </td>
                         <td>{{guarantor.guarantorType.code | translate}}</td>
+                        <td>{{guarantor.clientId}}</td>
                         <td>{{guarantorfund.savingsAccount.accountNo}}</td>
                         <td>{{guarantorfund.amount | number}}</td>
                         <td>{{guarantorfund.amountRemaining | number}}</td>
                         <td>{{guarantorfund.status.code | translate}}</td>
                         <td>
-                            <button class="btn btn-info" data-ng-click="showDetails($parent.$index,$index)"
+                            <button class="btn btn-info" data-ng-click="showDetails(guarantor.id.guarantorfund.id)"
                                     ><i class="fa fa-eye "></i></button>
                             <a has-permission='READ_SAVINGSACCOUNT' id="viewtransactions"
                                href="#/viewguarantortransactions/{{guarantorfund.savingsAccount.id}}/{{guarantorfund.id}}/listguarantors/{{guarantor.loanId}}"
@@ -120,15 +122,16 @@
                         <td>{{guarantor.firstname}} &nbsp; {{guarantor.lastname}}</td>
                         <td>{{guarantor.clientRelationshipType.name}}</td>
                         <td>{{guarantor.guarantorType.code | translate}}</td>
+                        <td>{{guarantor.clientId}}</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td data-ng-show="guarantor.status">{{'guarantorFundStatusType.active' | translate}}</td>
                         <td data-ng-hide="guarantor.status">{{'guarantorFundStatusType.deleted' | translate}}</td>
                         <td>
-                            <button class="btn btn-info" data-ng-click="showDetails($index,null)"
+                            <button class="btn btn-info" data-ng-click="showDetails(guarantor.id,null)"
                                     ><i class="fa fa-eye "></i></button>
-                            <a data-ng-show="guarantor.status && guarantor.guarantorType.id == 3 && guarantor.id"
+                            <a data-ng-show="guarantor.status  && guarantor.id"
                                href="#/editguarantor/{{guarantor.id}}/{{guarantor.loanId}}" class="btn btn-primary"><i
                                     class="fa fa-edit"></i></a>
                             <button class="btn btn-warning" data-ng-click="deleteGuarantor(guarantor.id,null)"
@@ -149,9 +152,17 @@
                                 <td>{{'label.heading.firstname' | translate}}</td>
                                 <td>{{guarantorData.firstname}}</td>
                             </tr>
+                                <tr data-ng-show="guarantorData.middlename">
+                                <td>{{'label.heading.middlename' | translate}}</td>
+                                <td>{{guarantorData.middlename}}</td>
+                            </tr>
                             <tr data-ng-show="guarantorData.lastname">
                                 <td>{{'label.heading.lastname' | translate}}</td>
                                 <td>{{guarantorData.lastname}}</td>
+                            </tr>
+                            <tr data-ng-show="guarantorData.gender">
+                                <td>{{'label.heading.guarantee.gender' | translate}}</td>
+                                <td>{{guarantorData.gender.name | translate}}</td>
                             </tr>
                             <tr data-ng-show="guarantorData.clientRelationshipType.name">
                                 <td>{{'label.heading.relationship' | translate}}</td>
@@ -160,6 +171,10 @@
                             <tr data-ng-show="guarantorData.guarantorType.value">
                                 <td>{{'label.heading.guarantortype' | translate}}</td>
                                 <td>{{guarantorData.guarantorType.value}}</td>
+                            </tr>
+                            <tr data-ng-show="guarantorData.clientId">
+                                <td>{{'label.heading.clientId' | translate}}</td>
+                                <td>{{guarantorData.clientId}}</td>
                             </tr>
                             <tr data-ng-show="guarantorData.joinedDate">
                                 <td>{{'label.heading.joindate' | translate}}</td>
@@ -180,6 +195,10 @@
                             <tr data-ng-show="guarantorData.housePhoneNumber">
                                 <td>{{'label.heading.residence' | translate}}</td>
                                 <td>{{guarantorData.housePhoneNumber}}</td>
+                            </tr>
+                            <tr data-ng-show="guarantorData.email">
+                                <td>{{'label.heading.guarantee.email' | translate}}</td>
+                                <td>{{guarantorData.email}}</td>
                             </tr>
                             <tr data-ng-show="guarantorData.city">
                                 <td>{{'label.heading.city' | translate}}</td>
@@ -204,6 +223,18 @@
                             <tr data-ng-show="guarantorFundDetail && guarantorFundDetail.status">
                                 <td>{{'label.heading.guarantee.status' | translate}}</td>
                                 <td>{{guarantorFundDetail.status.code | translate}}</td>
+                            </tr>
+                            <tr data-ng-show="guarantorData.bvn">
+                                <td>{{'label.heading.guarantee.bvn' | translate}}</td>
+                                <td>{{guarantorData.bvn}}</td>
+                            </tr>
+                            <tr data-ng-show="guarantorData.pep">
+                                <td>{{'label.heading.guarantee.pep' | translate}}</td>
+                                <td>{{guarantorData.pep | YesOrNo}}</td>
+                            </tr>
+                            <tr data-ng-show="!guarantorData.pep">
+                                <td>{{'label.heading.guarantee.pep' | translate}}</td>
+                                <td>{{guarantorData.pep | YesOrNo}}</td>
                             </tr>
                             <tr data-ng-hide="guarantorFundDetail">
                                 <td>{{'label.heading.guarantee.status' | translate}}</td>

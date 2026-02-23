@@ -1,0 +1,62 @@
+<div class="content-container" ng-controller="ManageTasksController">
+    <ul class="breadcrumb">
+        <li ><a href="#/system">{{'label.anchor.system' | translate}}</a></li>
+        <li class="active">{{'label.anchor.mytasks' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="toolbar">
+            <h4>{{ 'label.heading.mytasks' | translate }}</h4>
+        </div>
+        <div class="content">
+            <br>
+            <div class="row">
+                <div class="col-sm-10">
+                    <form name="filtertasks" class="form-horizontal">
+                        <div class="col-md-6">
+                                <div class="input-group">
+                                    <input data-ng-model="searchText" type="text"
+                                           placeholder="{{'label.input.searchtasks' | translate}}"
+                                           class="form-control unstyled"/>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default form-control">
+                                            <span class="fa fa-search"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-2">
+                    <a href="#/mytasks/add" class="btn btn-primary pull-right">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;{{'label.button.createtask' | translate}}
+                    </a>
+                </div>
+            </div>
+            <hr/>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{{'label.heading.id' | translate}}</th>
+                    <th>{{'label.heading.title' | translate}}</th>
+                    <th>{{'label.heading.description' | translate}}</th>
+                    <th>{{'label.heading.status' | translate}}</th>
+                    <th>{{'label.heading.action' | translate}}</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="survey in tasksList | filter: searchText" ng-click="routeTo(survey.id)"  class="pointer-main" >
+                        <td class="pointer">{{ survey.id }}</td>
+                        <td class="pointer">{{ survey.title }}</td>
+                        <td class="pointer">{{ survey.description }}</td>
+                        <td class="pointer">{{ survey.status | translate }}</td>
+                        <td>
+                            <i type="button" class="btn btn-primary"
+                               ng-click="routeTo(survey.id)"><i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;
+                                {{'label.button.edit' | translate}}</i></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+    </div>
+</div>

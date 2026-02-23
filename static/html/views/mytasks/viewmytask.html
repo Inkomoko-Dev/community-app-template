@@ -1,0 +1,46 @@
+<div class="content-container" ng-controller="ViewTasksController">
+    <ul class="breadcrumb">
+        <li ><a href="#/system">{{'label.anchor.system' | translate}}</a></li>
+        <li ><a href="#/surveys">{{'label.anchor.mytasks' | translate}}</a></li>
+        <li class="active">{{'label.heading.mytask' | translate}}</li>
+    </ul>   
+    <div name="viewsurvey">     
+        <div class="card">
+            <div class="card-content">
+              <div class="toolbar">
+                  <h4>{{'label.heading.mytask' | translate}}</h4>
+              </div>
+                <div novalidate="" class="card form-horizontal well" >                 
+                    <div class="alert alert-light form-group">
+                       <label class="control-label col-sm-3">{{'label.heading.title' | translate}}&nbsp; :</label>
+                       <div class="col-sm-3">
+                              <label class="control-label">{{formData.title}}</label>
+                       </div>
+                       <label class="control-label col-sm-3">{{'label.input.description' | translate}}&nbsp; :</label>
+                       <div class="col-sm-3">
+                             <label class="control-label">{{formData.description}}</label>
+                       </div>
+                    </div>
+                    <div class="alert alert-light form-group">
+                       <label class="control-label col-sm-3">{{'label.heading.status' | translate}}&nbsp; :</label>
+                       <div class="col-sm-3">
+                             <label class="control-label">{{formData.status | translate}}</label>
+                       </div>
+                       <label class="control-label col-sm-3">{{'label.input.duedate' | translate}}&nbsp; :</label>
+                       <div class="col-sm-3">
+                            <label class="control-label">{{formData.dueDate | DateFormat}}</label>
+                       </div>
+                    </div>
+                    <div class="alert alert-light form-group">
+<!--                        <div class="col-sm-6"></div>-->
+
+                        <label class="control-label col-sm-3">{{'label.createdon' | translate}}&nbsp; :</label>
+                       <div class="col-sm-3">
+                             <label class="control-label">{{formData.createdDate | DateFormat}}</label>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</div>

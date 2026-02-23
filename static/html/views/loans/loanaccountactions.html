@@ -126,7 +126,6 @@
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
                     </div>
                 </div>
-
                 <div class="form-group" ng-show="principalPortion">
                     <label class="control-label col-sm-2" for="principalPortion">{{ 'label.input.principal' |
                         translate}}</label>
@@ -170,6 +169,16 @@
                     </div>
                 </div>
 
+                <div class="form-group" ng-show="isLoaPayOff">
+                    <label class="control-label col-sm-2" for="payOffAmount">{{ 'label.input.amount' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="payOffAmount" type="text" name="amount" ng-model="payOffAmount"
+                               class="form-control" readonly>
+                    </div>
+                </div>
+
                 <div class="form-group" ng-show="showPenaltyPortionDisplay">
                     <label class="col-sm-3" for="transactionAmount">{{ 'label.input.payspenaltyportion' |
                         translate}}</label>
@@ -207,7 +216,7 @@
                         </div>
                     </div>
                     <div uib-collapse="!showPaymentDetails">
-                        <div class="form-group">
+                        <div class="form-group" ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="accountNumber">{{ 'label.input.accnum' |
                                 translate}}</label>
 
@@ -216,7 +225,7 @@
                                        ng-model="formData.accountNumber">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="checkNumber">{{ 'label.input.checknumber' |
                                 translate}}</label>
 
@@ -225,7 +234,7 @@
                                        ng-model="formData.checkNumber">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="routingCode">{{ 'label.input.routingcode' |
                                 translate}}</label>
 
@@ -234,7 +243,7 @@
                                        ng-model="formData.routingCode">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group"  ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="receiptNumber">{{ 'label.input.receiptnumber' |
                                 translate}}</label>
 
@@ -243,7 +252,7 @@
                                        ng-model="formData.receiptNumber">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group"  ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="bankNumber">{{ 'label.input.banknumber' |
                                 translate}}</label>
 
@@ -251,11 +260,119 @@
                                 <input id="bankNumber" class="form-control" type="text" ng-model="formData.bankNumber">
                             </div>
                         </div>
+
+                        <div class="form-group"  ng-show="showClientOtherInfoForm">
+                            <label class="control-label col-sm-2" for="clientPhoneNumber">
+                                {{ 'label.input.clientPhoneNumber' | translate}}
+                            </label>
+                        
+                            <div class="col-sm-3">
+                                <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text" ng-model="formData.clientPhoneNumber" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="showClientOtherInfoForm">
+                            <label class="control-label col-sm-2" for="clientAccountNumber">
+                                {{ 'label.input.clientAccountNumber' | translate}}
+                            </label>
+                        
+                            <div class="col-sm-3">
+                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="showClientOtherInfoForm">
+                            <label class="control-label col-sm-2" for="clientBankName">
+                                {{ 'label.input.clientBankName' | translate}}
+                            </label>
+                        
+                            <div class="col-sm-3">
+                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="isICReview">
+                <div ng-show="icReviewPreviousRecommendedAmount" ng-repeat="previousRecommendedAmount in icReviewPreviousRecommendedAmount" class="form-group">
+                    <label class="control-label col-sm-2" for="{{previousRecommendedAmount.label}}">{{ 'label.input.' + previousRecommendedAmount.label | translate }}</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{ icreviewTemplate.currency.displaySymbol }}</span>
+                            <input 
+                                id="{{previousRecommendedAmount.label}}"
+                                class="form-control" 
+                                type="text" 
+                                name="{{previousRecommendedAmount.label}}" 
+                                ng-model="previousRecommendedAmount.value" 
+                                number-format readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="icReviewRecommendedAmount">
+                        {{ 'label.input.icReviewRecommendedAmount' | translate }}
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{ icreviewTemplate.currency.displaySymbol }}</span>
+                            <input
+                                id="icReviewRecommendedAmount"
+                                class="form-control"
+                                type="text"
+                                name="icReviewRecommendedAmount"
+                                ng-model="formData.icReviewRecommendedAmount"
+                                number-format />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="icReviewTermFrequency">
+                        {{ 'label.input.icReviewTermFrequency' | translate }}
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-sm-3">
+                        <input 
+                            id="icReviewTermFrequency" 
+                            class="form-control" 
+                            type="text" 
+                            name="icReviewTermFrequency" 
+                            ng-model="formData.icReviewTermFrequency" 
+                            number-format />
+                    </div>
+                    <div class="col-sm-2">
+                        <select 
+                            id="icReviewTermPeriodFrequencyEnum" 
+                            ng-model="formData.icReviewTermPeriodFrequencyEnum" 
+                            class="form-control col=sm-2" 
+                            name="icReviewTermPeriodFrequencyEnum"
+                            ng-options="termFrequencyType.id as termFrequencyType.value for termFrequencyType in icreviewTemplate.termFrequencyTypeOptions"
+                            value="{{frequency.id}}">
+                                <option value="">-- Term Period --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="nextApproverId">
+                        {{ 'label.input.nextApproverId' | translate }}
+<!--                        <span class="required">*</span>-->
+                    </label>
+                    <div class="col-sm-3">
+                        <select
+                                id="nextApproverId"
+                                name="nextApproverUserId"
+                                ng-model="formData.nextApproverUserId"
+                                ng-options="user.id as (user.firstname + ' ' + user.lastname + ' (' + user.username + ')') for user in icreviewTemplate.approverOptions"
+                                class="form-control">
+                            <option value="">-- Select Next Stage Approver --</option>
+                        </select>
                     </div>
                 </div>
             </div>
             <div class="form-group" ng-show="showNoteField">
-                <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate}}</label>
+                <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate}}
+                    <span ng-show="noteFieldMandatory"
+                            class="required">*</span>
+                </label>
 
                 <div class="col-sm-3">
                     <textarea id="note" rows="2" class="form-control" ng-model="formData.note"></textarea>

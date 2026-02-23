@@ -53,12 +53,10 @@
                                 class="required">*</span></label>
 
                         <div class="col-sm-3">
-                            <input id="toClientId" type="text" ng-model="toClientData" class="col-md-4 form-control"
-                                   autocomplete="off"
-                                   typeahead-min-length="3"
-                                   typeahead-editable="false"
-                                   uib-typeahead="client.displayName as client.displayName for client in clientOptions($viewValue)"
-                                   typeahead-on-select="changeClient($item)" required/>
+                            <input ng-if="formData.toOfficeId" id="toClientId" ng-model="toClientData" name="client" class="form-control" type="text"
+                            typeahead-min-length="3"        
+                            uib-typeahead="(toClient.id + ' ' + toClient.displayName) as (toClient.id + ' ' + toClient.displayName) for toClient in toClientOptions($viewValue)"
+                                    typeahead-on-select="changeClient($item)" required>
                             <form-validate valattributeform="accounttransferform" valattribute="client"/>
                         </div>
                     </div>
@@ -120,67 +118,6 @@
                         </div>
                         <div class="col-sm-3">
                             <form-validate valattributeform="accounttransferform" valattribute="transferDescription"/>
-                        </div>
-                    </div>
-                    <div class="form-group" ng-hide = "holdAmount">
-                        <label class="control-label col-sm-2" for="paymentTypeId">{{ 'label.input.paymenttype' | translate}}</label>
-
-                        <div class="col-sm-3">
-                            <select id="paymentTypeId" ng-model="formData.paymentTypeId"
-                                    ng-options="paymentType.id as paymentType.name for paymentType in paymentTypes"
-                                    value="{{paymentType.id}}" class="form-control">
-                                <option value="">{{'label.selectone' | translate}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2">{{ 'label.input.showpaymentdetails' | translate}}</label>
-
-                        <div class="col-sm-3">
-                            <a class="btn btn-primary" ng-click="showPaymentDetails=!showPaymentDetails">
-                                <i ng-show="showPaymentDetails" class="fa fa-minus "></i>
-                                <i ng-show="!showPaymentDetails" class="fa fa-plus "></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div uib-collapse="!showPaymentDetails">
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="accountNumber">{{ 'label.input.accnum' | translate}}</label>
-
-                            <div class="col-sm-3">
-                                <input id="accountNumber" type="text" ng-model="formData.accountNumber" class="form-control"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="checkNumber">{{ 'label.input.checknumber' |
-                                translate}}</label>
-
-                            <div class="col-sm-3">
-                                <input id="checkNumber" type="text" ng-model="formData.checkNumber" class="form-control"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="routingCode">{{ 'label.input.routingcode' |
-                                translate}}</label>
-
-                            <div class="col-sm-3">
-                                <input id="routingCode" type="text" ng-model="formData.routingCode" class="form-control"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="receiptNumber">{{ 'label.input.receiptnumber' |
-                                translate}}</label>
-
-                            <div class="col-sm-3">
-                                <input id="receiptNumber" type="text" ng-model="formData.receiptNumber" class="form-control"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="bankNumber">{{ 'label.input.banknumber' | translate}}</label>
-
-                            <div class="col-sm-3">
-                                <input id="bankNumber" type="text" ng-model="formData.bankNumber" class="form-control"/>
-                            </div>
                         </div>
                     </div>
                     <div class="col-md-offset-3">

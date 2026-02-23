@@ -1,4 +1,4 @@
-<div ng-controller="EditRecurringDepositAccountController">
+<div class ="content-container" ng-controller="EditRecurringDepositAccountController">
 <div>
     <ul class="breadcrumb">
         <li><a href="#/viewrecurringdepositaccount/{{accountId}}">{{'label.anchor.viewrecurringdepositaccount' |
@@ -7,7 +7,7 @@
     </ul>
 </div>
 <api-validate></api-validate>
-<form name="editrecurringdepositaccountform" novalidate="" class="well form-inline" rc-submit="submit()">
+<form name="editrecurringdepositaccountform" novalidate="" class="well form-inline card" rc-submit="submit()">
 <fieldset>
 <legend>{{ 'label.heading.editrecurringdepositapplication' | translate }}</legend>
 <table class="width100">
@@ -42,12 +42,6 @@
                     value="{{fieldOfficer.id}}" class="form-control">
                 <option value="">{{'label.selectfieldofficer' | translate}}</option>
             </select>
-        </td>
-        <td class="width14">
-            <label>{{ 'label.input.nickname' | translate }}:&nbsp;</label>
-        </td>
-        <td class="width36 paddedbottom10">
-            <input id="nickname" ng-model="formData.nickname" class="form-control"/>
         </td>
     </tr>
 </table>
@@ -101,14 +95,11 @@
                     value="{{type.id}}">
             </select>
         </td>
-        <td class="width14"><label class="control-label">{{ 'label.input.daysinyears' | translate }}&nbsp;<span
-                class="required">*</span></label></td>
-
+        <td class="width14"><label class="control-label">{{ 'label.heading.nominalinterestrate' | translate }}&nbsp;
+        </label></td>
         <td class="width36 paddedbottom10">
-            <select id="interestCalculationDaysInYearType" ng-model="formData.interestCalculationDaysInYearType"
-                    ng-options="type.id as type.value for type in data.interestCalculationDaysInYearTypeOptions"
-                    value="{{type.id}}" class="form-control width170px">
-            </select>
+            <input id="nominalInterestRate" ng-model="formData.nominalAnnualInterestRate"
+                   class="form-control width170px" />
         </td>
     </tr>
     <tr>
@@ -127,8 +118,15 @@
                 </select>
             </div>
         </td>
-        <td class="width14"></td>
-        <td class="width36 paddedbottom10"></td>
+        <td class="width14"><label class="control-label">{{ 'label.input.daysinyears' | translate }}&nbsp;<span
+                class="required">*</span></label></td>
+
+        <td class="width36 paddedbottom10">
+            <select id="interestCalculationDaysInYearType" ng-model="formData.interestCalculationDaysInYearType"
+                    ng-options="type.id as type.value for type in data.interestCalculationDaysInYearTypeOptions"
+                    value="{{type.id}}" class="form-control width170px">
+            </select>
+        </td>
     </tr>
     <tr>
         <td colspan="4">
@@ -240,13 +238,6 @@
             </div>
         </td>
     </tr>
-    <tr>
-        <td colspan="4">
-            <div class="form-inline" data-ng-show="formData.preClosureChargeApplicable">
-                <label class="control-label">{{ 'label.checkbox.applypreclosurecharge' | translate }}&nbsp;&nbsp;-&nbsp;&nbsp;{{data.preClosureCharge.name}}</label>
-            </div>
-        </td>
-    </tr>
     <tr ng-show="data.minBalanceForInterestCalculation">
         <td > {{'label.heading.minbalanceforinterestcalculation' | translate}}</td>
         <td>{{data.minBalanceForInterestCalculation | number}}</td>
@@ -261,6 +252,18 @@
                 }}&nbsp;</label></td>
         <td class="width36 paddedbottom10" ng-show="formData.withHoldTax">
             {{data.taxGroup.name}}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="control-label">{{ 'label.input.linksavings' | translate }}</label>
+        </td>
+        <td>
+            <select id="linkAccountId" ng-model="formData.linkAccountId"
+                    ng-options="savingaccount.id as savingaccount.savingsProductName for savingaccount in savingsAccounts" class="form-control width170px"
+                    value="{{savingaccount.id}}">
+                <option value="">{{'label.menu.selectone' | translate}}</option>
+            </select>
         </td>
     </tr>
 </table>

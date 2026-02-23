@@ -4,7 +4,7 @@
 
             scope.formData = {};
             scope.isCashPayment =true;
-
+            scope.isMobileMoney = false;
 
             scope.submit = function () {
                 this.formData.isCashPayment = this.formData.isCashPayment || false;

@@ -56,9 +56,11 @@
                             translate }}</a></li>
                         <li><a href="#/reports/accounting" has-permission='READ_REPORT'>{{ 'label.anchor.accounting'
                             | translate }}</a></li>
-                        <li><a href="#/xbrl" has-permission='READ_REPORT'>{{ 'label.anchor.xbrl' | translate }}</a>
-                        </li>
-
+                        <li><a href="#/xbrl" has-permission='READ_REPORT'>{{ 'label.anchor.xbrl' | translate }}</a></li>
+                        <li><a href="#/disbursement-reports" has-permission='READ_JASPER_REPORT'>{{ 'label.heading.disbursement.report'
+                                | translate }}</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/crbloggerhub" has-permission='READ_REPORT'><i class="fa fa-book"></i> CRB Posting Logger</a></li>
                     </ul>
                 </li>
                 <li class="" uib-dropdown id="preview-menu" is-open="li.admin.status.isopen"
@@ -77,13 +79,6 @@
                             translate }}</a></li>
                     </ul>
                 </li>
-                <li uib-dropdown is-open="li.awaitingApproval.status.isopen"
-                    ng-mouseenter="li.awaitingApproval.status.isopen = true" ng-mouseleave="li.awaitingApproval.status.isopen = false">
-                    <a ng-class="{ activate: isActive('app') }" href="#/tasks">
-                        <i class="fa fa-money"></i> {{ 'label.anchor.awaitingApproval' | translate }}
-                    </a>
-                </li>
-
             </ul>
             <ul class="nav navbar-nav navbar-right" id="main-menu-right">
                 <li class="" uib-dropdown id="notification-icon" ng-controller="NotificationsController" is-open="li.notif.status.isopen"
@@ -95,7 +90,7 @@
                     <div class="numberCircle" ng-hide="numberOfUnreadNotifications == 0">{{ numberOfUnreadNotifications }}</div>
                     <ul class="notification-container" uib-dropdown-menu>
                         <ul class="notification-list" ng-repeat="notification in notifications">
-                            <li ng-click="navigateToAction(notification)">
+                            <li ng-class="notification.isRead ? '' : 'new-notification'" ng-click="navigateToAction(notification)">
                                 <h4>{{ notification.content }}</h4>
                                 <span>{{ notification.createdAt }}</span>
                             </li>

@@ -10,6 +10,7 @@
             $scope.reportGenerated = false;
             $scope.isViewMode = false;
             $scope.loanProducts = [];
+            $scope.authorizedSigners = [];
 
             if ($routeParams.reportId) {
 
@@ -54,6 +55,11 @@
             // Load loan products
             ResourceFactory.loanProductResource.getAllLoanProducts({}, function (data) {
                 $scope.loanProducts = data;
+            });
+
+
+            ResourceFactory.authorizedSignersResource.query(function(data) {
+                $scope.authorizedSigners = data || [];
             });
 
             // Run the report
@@ -102,28 +108,27 @@
                 if ($scope.officeId) {
                     selectedOffice = $scope.offices.find(o => o.id === $scope.officeId);
                 }
-                const paramters = {
+                const parameters = {
                     fileFormat: $scope.fileFormat,
                     start_date: dateFilter($scope.startDate, 'yyyy-MM-dd'),
                     end_date: dateFilter($scope.endDate, 'yyyy-MM-dd'),
                     product_ids: $scope.loanProductIds.join(","),
                     location_name: selectedOffice ? selectedOffice.name : 'All',
                     location_id: $scope.officeId || null,
-                    interest_percentage: $scope.interestPercentage || 10
+                    interest_percentage: $scope.interestPercentage || 10,
+                    notifyUserId: $scope.notifyUserId
                 };
 
                 const payload = {
                     report_name: $scope.reportName,
                     file_format: $scope.fileFormat,
                     'status': 'PENDING',
-                    parameters: paramters
+                    parameters: parameters
                 }
 
                 ResourceFactory.disbursementReportsResource.create(
                     payload,
                     function () {
-                        // $log.info("Report request saved successfully");
-                        // $location.path('/disbursement-reports');
                         setTimeout(() => {
                             $location.path('/disbursement-reports');
                             $route.reload(); // force refresh data

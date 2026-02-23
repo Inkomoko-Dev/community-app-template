@@ -416,7 +416,6 @@
                                 </div>
                             </div>
                         </uib-tab>
-
                         <uib-tab data-ng-show="isExtendLoanLifeCycleConfig" heading="{{'label.heading.icReviewLevelOne' | translate}}" has-permission='READ_LOANICREVIEWDECISIONLEVELONE'>
                             <div class="head-affix">
                                 <table class="table condensed-table">
@@ -522,7 +521,7 @@
                                     <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' |
                                         translate}}
                                     </button>
-                                    <button class="btn btn-primary" ng-click="approve()">{{'label.button.confirm' |
+                                    <button class="btn btn-primary" ng-click="confirm()">{{'label.button.confirm' |
                                         translate}}
                                     </button>
                                 </div>
@@ -792,7 +791,6 @@
                                 </div>
                             </div>
                         </uib-tab>
-
                         <uib-tab data-ng-show="isExtendLoanLifeCycleConfig" heading="{{'label.heading.loanPrepareAndSignContract' | translate}}" has-permission='READ_LOANPREPAREANDSIGNCONTRACT'>
                             <div class="head-affix">
                                 <table class="table condensed-table">
@@ -946,6 +944,25 @@
                                 </div>
                             </div>
                         </uib-tab>
+                        <!-- Modal for disbursement rejection -->
+                        <script type="text/ng-template" id="disbursementrejection.html">
+                            <div class="modal-header silver">
+                                <h3 class="bolder">{{'label.heading.confirm.reject' | translate}}</h3>
+                            </div>
+                            <div class="modal-body">
+                                <api-validate></api-validate>
+                                <br>
+                                <label>{{'label.input.note' | translate}}</label>
+                                <textarea ng-model="reason" class="form-control" rows="3"></textarea>
+                                <br>
+                                <button class="btn btn-default" ng-click="cancel()">
+                                    {{'label.button.cancel' | translate}}
+                                </button>
+                                <button class="btn btn-danger" ng-click="confirm()">
+                                    {{'label.button.confirm' | translate}}
+                                </button>
+                            </div>
+                        </script>
                         <uib-tab heading="{{'label.heading.loandisbursal' | translate}}" has-permission='READ_LOAN'>
                             <div class="head-affix">
                                 <table class="table condensed-table">
@@ -961,6 +978,12 @@
                                                     has-permission='APPROVE_LOAN'><i class="fa fa-check"></i>&nbsp;&nbsp;{{'label.button.disburse'
                                                 | translate}}
                                             </button>
+                                            <button type="button"
+                                                    class="btn btn-danger"
+                                                    data-ng-click="rejectPreDisbursement()"
+                                                    has-permission='APPROVE_LOAN'>
+                                                <i class="fa fa-times"></i>&nbsp;&nbsp;{{'label.button.reject' | translate}}
+                                            </button>
                                         </th>
                                     </tr>
                                     </thead>
@@ -968,7 +991,7 @@
                             </div>
                             <script type="text/ng-template" id="disburseloan.html">
                                 <div class="modal-header silver">
-                                    <h3 class="bolder">{{'label.heading.rescheduleloan' | translate}}</h3>
+                                    <h3 class="bolder">{{'label.heading.loandisbursal' | translate}}</h3>
                                 </div>
                                 <div class="modal-body">
                                     <api-validate></api-validate>
@@ -976,39 +999,168 @@
                                     <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' |
                                         translate}}
                                     </button>
-                                    <button class="btn btn-primary" ng-click="disburse()">{{'label.button.confirm' |
+                                    <button class="btn btn-primary" ng-click="confirm()">{{'label.button.confirm' |
                                         translate}}
                                     </button>
                                 </div>
                             </script>
-                            <div>
+                            <div ng-repeat="office in offices">
+                                <table class="table condensed-table">
+                                    <tr ng-show="office.awaitingDisbursalLoans.length > 0">
+                                        <td><strong>{{office.name}}</strong></td>
+                                    </tr>
+                                    <tr ng-show="office.awaitingDisbursalLoans.length > 0">
+                                        <td>
+                                            <table class="table condensed-table">
+                                                <thead>
+                                                <tr class="graybg">
+                                                    <th>
+                                                        <input type="checkbox"
+                                                               ng-click="loanDisbursalAllCheckBoxesClicked(office)"
+                                                               ng-checked="loanDisbursalAllCheckBoxesMet(office)"/>
+                                                    </th>
+                                                    <th>{{'label.heading.client' | translate}}</th>
+                                                    <th>{{'label.heading.loanaccountnum' | translate}}</th>
+                                                    <th>{{'label.heading.loanproduct' | translate}}</th>
+                                                    <th>{{'label.heading.principal' | translate}}</th>
+                                                </tr>
+                                                </thead>
+                                                    <tbody>
+                                                    <tr dir-paginate="loan in office.awaitingDisbursalLoans | filter:filterText2 | itemsPerPage:itemsPerPage"
+                                                        pagination-id="'loanDisbursal_' + $index">
+                                                        <td><input type="checkbox" ng-model="loanDisbursalTemplate[loan.id]"></td>
+                                                        <td><a href="#/viewclient/{{loan.clientId}}">{{loan.clientName}}</a></td>
+                                                        <td><a href="#/viewloanaccount/{{loan.id}}">{{loan.accountNo}}</a></td>
+                                                        <td><a href="#/viewloanaccount/{{loan.id}}">{{loan.loanProductName}}</a></td>
+                                                        <td>{{loan.principal | number}}</td>
+                                                    </tr>
+                                                    </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="text-center">
+                                    <dir-pagination-controls pagination-id="'loanDisbursal_' + $index"
+                                                             boundary-links="true"
+                                                             template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"/>
+                                </div>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="{{'label.heading.disbursementapproval' | translate}}" has-permission='READ_LOAN'>
+                            <div class="head-affix">
                                 <table class="table condensed-table">
                                     <thead>
-                                    <tr class="graybg">
-                                        <th><input type="checkbox" ng-click="loanDisbursalAllCheckBoxesClicked()"
-                                                   ng-checked="loanDisbursalAllCheckBoxesMet()"/></th>
-                                        <th>{{'label.heading.client' | translate}}</th>
-                                        <th>{{'label.heading.loanaccountnum' | translate}}</th>
-                                        <th>{{'label.heading.loanproduct' | translate}}</th>
-                                        <th>{{'label.heading.principal' | translate}}</th>
+                                    <tr>
+                                        <th>
+                                            <input ng-autofocus="true"
+                                                   ng-model="filterTextDisbursementApproval"
+                                                   type="text"
+                                                   class="input-sm form-control"
+                                                   placeholder="{{'label.input.filterbyname' | translate}}">
+                                        </th>
+                                        <th>
+                                            <button type="button"
+                                                    class="btn btn-success"
+                                                    data-ng-click="approveDisbursement()"
+                                                    has-permission='APPROVE_LOAN'>
+                                                <i class="fa fa-check"></i>&nbsp;&nbsp;{{'label.button.approve' | translate}}
+                                            </button>
+                                            &nbsp;
+                                            <button type="button"
+                                                    class="btn btn-danger"
+                                                    data-ng-click="rejectDisbursement()"
+                                                    has-permission='APPROVE_LOAN'>
+                                                <i class="fa fa-times"></i>&nbsp;&nbsp;{{'label.button.reject' | translate}}
+                                            </button>
+                                        </th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <tr dir-paginate="loan in loans | filter : {status : { waitingForDisbursal :'true' }}| filter:filterText2 | itemsPerPage: itemsPerPage"
-                                        pagination-id="loan-disbursal">
-                                        <td><input type="checkbox" ng-model="loanDisbursalTemplate[loan.id]"></td>
-                                        <td><a href="#/viewclient/{{loan.clientId}}">{{loan.clientName}}</a></td>
-                                        <td><a href="#/viewloanaccount/{{loan.id}}">{{loan.accountNo}}</a></td>
-                                        <td><a href="#/viewloanaccount/{{loan.id}}">{{loan.loanProductName}}</a></td>
-                                        <td>{{loan.principal | number}}</td>
-                                    </tr>
-                                    </tbody>
                                 </table>
                             </div>
-                            <div class="text-center">
-                                <dir-pagination-controls pagination-id="loan-disbursal"
-                                                         boundary-links="true"
-                                                         template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"/>
+
+                            <!-- Modal for disbursement approval -->
+                            <script type="text/ng-template" id="disbursementapproval.html">
+                                <div class="modal-header silver">
+                                    <h3 class="bolder">{{'label.heading.disbursementapproval' | translate}}</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <api-validate></api-validate>
+                                    <br>
+                                    <button class="btn btn-default" ng-click="cancel()">
+                                        {{'label.button.cancel' | translate}}
+                                    </button>
+                                    <button class="btn btn-primary" ng-click="confirm()">
+                                        {{'label.button.confirm' | translate}}
+                                    </button>
+                                </div>
+                            </script>
+                            <!-- Grand total (far right) -->
+                            <div class="row" style="margin-top: 12px;">
+                                <div class="col-xs-12 text-right">
+                                    <strong>{{ 'label.grand.total.netdisbursement' | translate }}:</strong>
+                                    {{ grandTotalDisbursementNet | number:2 }}
+                                </div>
+                            </div>
+
+                            <!-- Grouped by Office (like loan approval tab) -->
+                            <div ng-repeat="office in offices">
+                                <table class="table condensed-table">
+                                    <tr ng-show="office.disbursementLoans.length > 0">
+                                        <td colspan="8">
+                                            <strong>{{office.name}}</strong>
+                                            <span class="pull-right">
+                                                <strong>{{'label.total.netdisbursement' | translate}}:</strong>
+                                                {{office.totalDisbursementNet | number:2}}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="office.disbursementLoans.length > 0">
+                                        <td>
+                                            <table class="table condensed-table">
+                                                <thead>
+                                                <tr class="graybg">
+                                                    <th>
+                                                        <input type="checkbox"
+                                                               ng-click="disbursementApprovalAllCheckBoxesClicked(office)"
+                                                               ng-checked="disbursementApprovalAllCheckBoxesMet(office)"/>
+                                                    </th>
+                                                    <th>{{'label.heading.clientuid' | translate}}</th>
+                                                    <th>{{'label.heading.clientname' | translate}}</th>
+                                                    <th>{{'label.heading.loanaccountnum' | translate}}</th>
+                                                    <th>{{'label.heading.principal' | translate}}</th>
+                                                    <th>{{'label.heading.netdisbursement' | translate}}</th>
+                                                    <th>{{'label.heading.paymenttype' | translate}}</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr dir-paginate="loan in office.disbursementLoans | filter:filterTextDisbursementApproval | itemsPerPage:itemsPerPage"
+                                                    pagination-id="'disbapp_' + $index">
+                                                    <td>
+                                                        <input type="checkbox" ng-model="disbursementApprovalSelected[loan.id]">
+                                                    </td>
+                                                    <td>{{loan.clientUid}}</td>
+                                                    <td class="pointer">
+                                                        <a href="#/viewclient/{{loan.clientId}}">{{loan.clientName}}</a>
+                                                    </td>
+                                                    <td class="pointer">
+                                                        <a href="#/viewloanaccount/{{loan.id}}">{{loan.accountNo}}</a>
+                                                    </td>
+                                                    <td>{{loan.principal | number}}</td>
+                                                    <td>{{loan.expectedNetDisbursalAmount | number}}</td>
+                                                    <td>{{loan.paymentType.name}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <div class="text-center">
+                                    <dir-pagination-controls pagination-id="'disbapp_' + $index"
+                                                             boundary-links="true"
+                                                             template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html">
+                                    </dir-pagination-controls>
+                                </div>
                             </div>
                         </uib-tab>
                         <uib-tab heading="{{'label.heading.rescheduleloan' | translate}}" has-permission='READ_LOAN'>
@@ -1042,7 +1194,7 @@
                                     <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' |
                                         translate}}
                                     </button>
-                                    <button class="btn btn-primary" ng-click="approveLoanReschedule()">
+                                    <button class="btn btn-primary" ng-click="confirm()">
                                         {{'label.button.confirm' | translate}}
                                     </button>
                                 </div>

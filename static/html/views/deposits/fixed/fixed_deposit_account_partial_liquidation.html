@@ -65,14 +65,14 @@
                         <label class="control-label col-sm-2" for="nominalAnnualInterestRate">{{'label.input.nominalannualinterestrate'
                             | translate}}</label>
                         <div class="col-sm-3">
-                            <label id="nominalAnnualInterestRate">{{interestRate | number}}</label>
+                            <label id="nominalAnnualInterestRate">{{data.nominalAnnualInterestRate | number}}</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="interestToBeEarned">{{'label.totalinteresttobeearned'
                             | translate}}</label>
                         <div class="col-sm-3">
-                            <label id="interestToBeEarned">{{interestToBeEarned | number}}</label>
+                            <label id="interestToBeEarned">{{(data.maturityAmount - data.depositAmount)| number}}</label>
                         </div>
                     </div>
 
@@ -80,7 +80,7 @@
                         <label class="control-label col-sm-2" for="maturityAmount">{{'label.account.maturity.amount' |
                             translate}}</label>
                         <div class="col-sm-3">
-                            <label id="maturityAmount">{{maturityAmount | number}}</label>
+                            <label id="maturityAmount">{{data.maturityAmount | number}}</label>
                         </div>
                     </div>
 
