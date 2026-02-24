@@ -3244,6 +3244,7 @@
   "label.input.columnname": "Column name",
   "label.input.codevalue": "Code value",
   "label.input.position": "Position",
+  "label.input.externalCode": "External Code",
   "label.input.isactivejob": "Is job active?",
   "label.input.cornexpression": "Cron expression",
   "label.input.jobname": "Job name",
