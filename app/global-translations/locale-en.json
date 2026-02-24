@@ -3183,6 +3183,7 @@
   "label.heading.questions": "Questions",
   "label.heading.key": "Key",
   "label.heading.countrycode": "Country Code",
+  "label.heading.externalCode": "External Code",
   "#Buttons": "..",
   "label.button.addquestion": "Add Question",
   "label.button.addoption": "Add Option",
