@@ -44,6 +44,7 @@
                         <tr>
                             <th>{{ 'label.heading.name' | translate }}</th>
                             <th>{{ 'label.heading.description' | translate }}</th>
+                            <th>{{ 'label.heading.externalCode' | translate }}</th>
                             <th>{{ 'label.heading.position' | translate }}</th>
                             <th>{{'label.heading.active' | translate}}</th>
                             <th></th>
@@ -61,11 +62,19 @@
                                 <textarea data-ng-show="codevalue.edit" name="description" ng-model="formData[codevalue.id].description"
                                        type="text" class="form-control"/>
                             </td>
+
+                              <td>
+                                <span data-ng-hide="codevalue.edit">{{codevalue.externalCode}}</span>
+                                <input data-ng-show="codevalue.edit" name="externalCode" ng-model="formData[codevalue.id].externalCode"
+                                       type="text" class="form-control"/>
+                            </td>
+
                             <td>
                                 <span data-ng-hide="codevalue.edit">{{codevalue.position}}</span>
                                 <input data-ng-show="codevalue.edit" name="position" ng-model="formData[codevalue.id].position"
                                        type="text" class="form-control"/>
                             </td>
+                          
                             <td>
                                 <span data-ng-hide="codevalue.edit">{{codevalue.active}}</span>
                                 <input data-ng-show="codevalue.edit" id="activeCheckbox" name="isActive" ng-model="formData[codevalue.id].isActive"
@@ -73,7 +82,7 @@
                             </td>
                             <td>
                                 <button data-ng-hide="codevalue.edit" class="btn btn-primary" type="button" has-permission='UPDATE_CODEVALUE'
-                                        data-ng-click="showEdit(codevalue.id,codevalue.name,codevalue.description,codevalue.position,codevalue,codevalue.active)"><i
+                                        data-ng-click="showEdit(codevalue.id,codevalue.name,codevalue.description,codevalue.externalCode,codevalue.position,codevalue,codevalue.active)"><i
                                         class="fa fa-edit "></i></button>
                                 <button data-ng-show="codevalue.edit" class="btn btn-primary" type="button" has-permission='UPDATE_CODEVALUE'
                                         data-ng-click="editCodeValue(codevalue.id,codevalue)">{{'label.button.save' |

@@ -19,10 +19,11 @@
                     controller: CodeDeleteCtrl
                 });
             };
-            scope.showEdit = function (id, name, description,position, cv, isActive) {
+            scope.showEdit = function (id, name, description,externalCode,position, cv, isActive) {
                 scope.formData[id] = {
                     name: name,
                     description:description,
+                    externalCode:externalCode,
                     position: position,
                     isActive: isActive
                 }
