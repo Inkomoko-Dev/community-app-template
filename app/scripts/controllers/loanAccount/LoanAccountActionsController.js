@@ -775,10 +775,9 @@
                     break;
                 case "rejectprepareandsigncontract":
                     scope.taskPermissionName = 'REJECT_LOANPREPAREANDSIGNCONTRACT';
-                    scope.title = 'label.heading.rejectprepareAndSignContractOn';
+                    scope.title = 'label.heading.rejectprepareandsigncontractloanaccount';
                     scope.showDateField = false;
                     scope.noteFieldMandatory = true;
-
 
                     break;
             }
