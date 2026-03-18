@@ -389,7 +389,7 @@
                 scope.loanResource = function () {
                     resourceFactory.loanResource.getAllLoans(
                         {
-                            limit: '1000',
+                            limit: '2000',
                             sqlSearch: 'l.loan_status_id in (100,200) OR l.loan_sub_status_id = 300'
                         },
                         function (loanData) {
