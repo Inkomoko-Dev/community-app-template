@@ -24,6 +24,11 @@
             scope.submittedDatatables = [];
             scope.showClientOtherInfoForm = false;
             scope.clientOtherInfoData = {};
+            scope.paymentToOptions = [
+                {id: 1, name: 'label.input.paymentto.client'},
+                {id: 2, name: 'label.input.paymentto.supplier'}
+            ];
+            scope.formData.paymentTo = 1;
             scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive';
             var submitStatus = [];
 
@@ -210,7 +215,9 @@
                         scope.formData.clientPhoneNumber = data.clientPhoneNumber || '';
                         scope.formData.clientAccountNumber = data.clientAccountNumber || '';
                         scope.formData.clientBankName = data.clientBankName || '';
+                        scope.formData.beneficiaryName = data.beneficiaryName || '';
                         scope.formData.paymentTypeId = Number(data.paymentTypeId);
+                        scope.formData.paymentTo = data.paymentTo ? Number(data.paymentTo) : 1;
                         scope.formData.transactionAmount = data.netDisbursalAmount || '';
                         scope.principalPortion = data.principalPortion || '';
                         scope.interestPortion = data.interestPortion || '';
@@ -815,6 +822,14 @@
                     scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
+                if (scope.isSupplierNonCashPayment() && (!scope.formData.clientPhoneNumber || !scope.formData.clientAccountNumber || !scope.formData.clientBankName)) {
+                    scope.error = 'Supplier payment details are mandatory';
+                    return;
+                }
+                if (scope.isSupplierNonCashPayment() && !scope.formData.beneficiaryName) {
+                    scope.error = 'Beneficiary name is mandatory for supplier payment';
+                    return;
+                }
                 var params = {command: scope.action};
                 if (scope.action == "recoverguarantee") {
                     params.command = "recoverGuarantees";
@@ -1186,9 +1201,7 @@
                 resourceFactory.clientOtherInfoResource.getAll({clientId: clientId}, function (data) {
                     if (data.length > 0) {
                         scope.clientOtherInfoData = data[0];
-                        scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
-                        scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
-                        scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                        scope.setPaymentRecipientInfo();
                     }
                 });
             }
@@ -1199,16 +1212,20 @@
                     delete scope.formData.clientPhoneNumber;
                     delete scope.formData.clientAccountNumber;
                     delete scope.formData.clientBankName;
+                    delete scope.formData.beneficiaryName;
+                    delete scope.formData.paymentTo;
                 } else {
-                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
-                    scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
-                    scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                    if (scope.isPaymentToClient()) {
+                        scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
+                        scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
+                        scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                        delete scope.formData.beneficiaryName;
+                    }
                 }
             }
 
             scope.$watch('clientId', function() {
-                if((scope.action === 'approve' || scope.action ===  'disbursementpreapprovalrequest' || scope.action ===  'approveDisbursement')
-                    && scope.clientId !== undefined) {
+                if(scope.action === 'approve' && scope.clientId !== undefined) {
                     scope.fetchClientOtherInfo(scope.clientId);
                 }
 
@@ -1216,13 +1233,14 @@
 
             scope.$watch('formData.paymentTypeId', function () {
                 if (scope.formData.paymentTypeId !== undefined) {
-                    const isCashPayment = scope.isCashPayment();
-                    if((scope.action === 'approve' || scope.action ===  'disbursementpreapprovalrequest' || scope.action ===  'approveDisbursement')
-                        && !isCashPayment) {
-                        scope.showClientOtherInfoForm = true;
-                    } else {
-                        scope.showClientOtherInfoForm = false;
-                    }
+                    scope.showClientOtherInfoForm = scope.shouldShowPaymentRecipientInfo();
+                    scope.setPaymentRecipientInfo();
+                }
+            });
+
+            scope.$watch('formData.paymentTo', function () {
+                if (scope.formData.paymentTo !== undefined) {
+                    scope.setPaymentRecipientInfo();
                 }
             });
 
@@ -1231,6 +1249,41 @@
                 return scope.paymentTypes.find(function (paymentType) {
                     return paymentTypeId === paymentType.id;
                 })?.isCashPayment || false;
+            };
+
+            scope.isPaymentToClient = function () {
+                return scope.formData.paymentTo !== 2;
+            };
+
+            scope.isPaymentToSupplier = function () {
+                return scope.formData.paymentTo === 2;
+            };
+
+            scope.shouldShowPaymentRecipientInfo = function () {
+                const isNonCashPayment = !scope.isCashPayment();
+                const isApprovalAction = scope.action === 'approve' || scope.action === 'disbursementpreapprovalrequest' || scope.action === 'approveDisbursement';
+                return isApprovalAction && isNonCashPayment;
+            };
+
+            scope.isSupplierNonCashPayment = function () {
+                return scope.shouldShowPaymentRecipientInfo() && scope.isPaymentToSupplier();
+            };
+
+            scope.setPaymentRecipientInfo = function () {
+                if (!scope.shouldShowPaymentRecipientInfo()) {
+                    return;
+                }
+                if (scope.isPaymentToClient()) {
+                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.clientPhoneNumber || '';
+                    scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || '';
+                    scope.formData.clientBankName = scope.clientOtherInfoData.bankName || '';
+                    scope.formData.beneficiaryName = '';
+                } else {
+                    scope.formData.clientPhoneNumber = scope.formData.clientPhoneNumber ||'';
+                    scope.formData.clientAccountNumber = scope.formData.clientAccountNumber|| '';
+                    scope.formData.clientBankName = scope.formData.clientBankName || '';
+                    scope.formData.beneficiaryName = scope.formData.beneficiaryName || '';
+                }
             };
 
             function icReviewLoanDecisionDataObjectToArray(icReviewData) {
