@@ -211,6 +211,16 @@
                                     value="{{paymentType.id}}" ng-disabled="isReadOnly"></select>
                         </div>
                     </div>
+                    <div class="form-group" ng-show="showClientOtherInfoForm">
+                        <label class="control-label col-sm-2" for="paymentTo">{{ 'label.input.paymentto' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <select id="paymentTo" ng-model="formData.paymentTo" class="form-control"
+                                    ng-options="option.id as option.name | translate for option in paymentToOptions"
+                                    value="{{option.id}}" ng-disabled="isReadOnly"></select>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2">{{ 'label.anchor.showpaymentdetails' | translate}}</label>
 
@@ -271,29 +281,44 @@
                         <div class="form-group"  ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientPhoneNumber">
                                 {{ 'label.input.clientPhoneNumber' | translate}}
+                                <span class="required" ng-show="isSupplierNonCashPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
                                 <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text"
-                                       ng-model="formData.clientPhoneNumber" readonly>
+                                       ng-model="formData.clientPhoneNumber" ng-readonly="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientAccountNumber">
                                 {{ 'label.input.clientAccountNumber' | translate}}
+                                <span class="required" ng-show="isSupplierNonCashPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" readonly>
+                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" ng-readonly="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientBankName">
                                 {{ 'label.input.clientBankName' | translate}}
+                                <span class="required" ng-show="isSupplierNonCashPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" readonly>
+                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" ng-readonly="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="showClientOtherInfoForm && isPaymentToSupplier()">
+                            <label class="control-label col-sm-2" for="beneficiaryName">
+                                {{ 'label.input.beneficiaryName' | translate}}
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="col-sm-3">
+                                <input id="beneficiaryName" name="beneficiaryName" class="form-control" type="text"
+                                       ng-model="formData.beneficiaryName" ng-readonly="isReadOnly"
+                                       ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                     </div>
