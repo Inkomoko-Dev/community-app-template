@@ -68,6 +68,22 @@
 					</select>
 				</div>
 			</div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{{ 'label.input.investmentOfficer' | translate }}</label>
+                <div class="col-sm-3">
+                    <select chosen="activeLoanOfficers"
+                            ng-model="selectedInvestmentOfficerIds"
+                            class="form-control"
+                            ng-disabled="isViewMode"
+                            ng-options="officer.id as officer.displayName for officer in activeLoanOfficers"
+                            multiple>
+                    </select>
+                </div>
+                <div class="col-sm-3 help-block text-muted">
+                    {{ 'label.help.investmentOfficer' | translate }}
+                </div>
+            </div>
+            </div>
 
 			<div class="form-group">
 				<label class="col-sm-3 control-label">{{ 'label.input.notifyPerson' | translate }}</label>
