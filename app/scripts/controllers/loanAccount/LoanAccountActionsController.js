@@ -28,7 +28,6 @@
                 {id: 1, name: 'label.input.paymentto.client'},
                 {id: 2, name: 'label.input.paymentto.supplier'}
             ];
-            scope.formData.paymentTo = 1;
             scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive';
             var submitStatus = [];
 
@@ -141,6 +140,7 @@
                         scope.isTransaction = true;
                         scope.formData.approvedLoanAmount = data.approvalAmount;
                         scope.formData.transactionAmount = data.netDisbursalAmount;
+                        scope.formData.paymentTo = 1;
                         scope.paymentTypes = data.paymentTypeOptions;
                         scope.isLoanDisbursementRequestEnabled = true;
                         scope.fetchEntities('m_loan', 'APPROVE');
@@ -208,6 +208,7 @@
                     }, function (data) {
                         scope.paymentTypes = data.paymentTypeOptions;
                         scope.formData.accountNumber = data.accountNumber || '';
+                        scope.formData.paymentTo = 1;
                         scope.formData.checkNumber = data.checkNumber || '';
                         scope.formData.routingCode = data.routingCode || '';
                         scope.formData.receiptNumber = data.receiptNumber || '';
