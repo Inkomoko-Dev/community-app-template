@@ -323,6 +323,11 @@
                     }),
                     employeeResource: defineResource(apiVer + "/staff/:staffId", { staffId: '@staffId', status: "all" }, {
                         getAllEmployees: { method: 'GET', params: {}, isArray: true },
+                        getLoanOfficers: {
+                            method: 'GET',
+                            params: { status: 'active', loanOfficersOnly: true },
+                            isArray: true
+                        },
                         update: { method: 'PUT' }
                     }),
                     globalSearch: defineResource(apiVer + "/search", { query: '@query', resource: '@resource' }, {

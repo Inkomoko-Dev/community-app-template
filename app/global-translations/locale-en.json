@@ -5373,6 +5373,8 @@
   "label.heading.financialRatio.deposits": "Deposits",
   "label.heading.financialRatio.withdrawals": "Withdrawals",
   "label.heading.financialRatio.turnOver": "Monthly Turn Over",
+  "label.input.investmentOfficer" : "Investment Officer",
+  "label.help.investmentOfficer" : "Investment Officer",
   "error.msg.loan.cashflow.data.is.not.available.financialratio.cannot.be.generated": "Financial Ratio report cannot be created. CashFlow data not available.",
   "error.msg.loan.balancesheet.data.is.not.available.financialratio.cannot.be.generated": "Financial Ratio report cannot be created. Balance Sheet data not available.",
   "label.button.generateFinancialRatio": "Financial Ratio",
