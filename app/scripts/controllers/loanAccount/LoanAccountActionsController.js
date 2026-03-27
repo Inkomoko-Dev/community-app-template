@@ -29,7 +29,13 @@
                 {id: 2, name: 'label.input.paymentto.supplier'}
             ];
             scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive';
+            scope.isRecoveryPaymentAction = routeParams.action === 'recoverypayment';
+            scope.transactionDateMinDate = '2000-01-01';
+            scope.recoveryPaymentWriteOffOnDate = null;
+            scope.recoveryPaymentDateErrorCode = null;
+            scope.recoveryPaymentDateErrorArgs = null;
             var submitStatus = [];
+            var recoveryPaymentDateValidationCode = 'error.msg.loan.recovery.payment.date.cannot.be.before.writeoff.date';
 
             rootScope.RequestEntities = function (entity, status, productId) {
                 resourceFactory.entityDatatableChecksResource.getAll({limit: -1}, function (response) {
@@ -122,6 +128,152 @@
                 loop.next();
                 return loop;
             }
+
+            function normalizeDate(value) {
+                if (!value) {
+                    return null;
+                }
+                if (angular.isDate(value)) {
+                    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+                }
+                if (angular.isArray(value) && value.length >= 3) {
+                    return new Date(value[0], value[1] - 1, value[2]);
+                }
+                if (typeof value === 'string') {
+                    var dateParts = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                    if (dateParts) {
+                        return new Date(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3]));
+                    }
+                }
+
+                var parsedDate = new Date(value);
+                if (isNaN(parsedDate.getTime())) {
+                    return null;
+                }
+
+                return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+            }
+
+            function buildRecoveryPaymentDateErrorArgs() {
+                if (!scope.recoveryPaymentWriteOffOnDate) {
+                    return null;
+                }
+
+                return {
+                    params: [{
+                        value: dateFilter(scope.recoveryPaymentWriteOffOnDate, scope.df || 'dd MMMM yyyy')
+                    }]
+                };
+            }
+
+            function clearRecoveryPaymentDateValidation() {
+                scope.recoveryPaymentDateErrorCode = null;
+                scope.recoveryPaymentDateErrorArgs = null;
+            }
+
+            function findRecoveryPaymentBackendError() {
+                if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
+                    return null;
+                }
+
+                for (var i = 0; i < rootScope.errorDetails.length; i++) {
+                    for (var j = 0; j < rootScope.errorDetails[i].length; j++) {
+                        var error = rootScope.errorDetails[i][j];
+                        if (error && error.field === 'transactionDate' && error.code === recoveryPaymentDateValidationCode) {
+                            return error;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            function clearRecoveryPaymentBackendError() {
+                if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
+                    return;
+                }
+
+                var filteredErrors = [];
+                for (var i = 0; i < rootScope.errorDetails.length; i++) {
+                    var remainingErrors = [];
+                    for (var j = 0; j < rootScope.errorDetails[i].length; j++) {
+                        var error = rootScope.errorDetails[i][j];
+                        if (!(error && error.field === 'transactionDate' && error.code === recoveryPaymentDateValidationCode)) {
+                            remainingErrors.push(error);
+                        }
+                    }
+                    if (remainingErrors.length > 0) {
+                        filteredErrors.push(remainingErrors);
+                    }
+                }
+
+                if (filteredErrors.length > 0) {
+                    rootScope.errorDetails = filteredErrors;
+                } else {
+                    delete rootScope.errorDetails;
+                }
+            }
+
+            scope.getRecoveryPaymentDateErrorCode = function () {
+                if (!scope.isRecoveryPaymentAction) {
+                    return null;
+                }
+
+                if (scope.recoveryPaymentDateErrorCode) {
+                    return scope.recoveryPaymentDateErrorCode;
+                }
+
+                var backendError = findRecoveryPaymentBackendError();
+                return backendError ? backendError.code : null;
+            };
+
+            scope.getRecoveryPaymentDateErrorArgs = function () {
+                if (!scope.isRecoveryPaymentAction) {
+                    return null;
+                }
+
+                if (scope.recoveryPaymentDateErrorCode) {
+                    return scope.recoveryPaymentDateErrorArgs;
+                }
+
+                var backendError = findRecoveryPaymentBackendError();
+                return backendError ? backendError.args : null;
+            };
+
+            scope.getRecoveryPaymentWriteOffDateArgs = function () {
+                if (!scope.isRecoveryPaymentAction) {
+                    return null;
+                }
+
+                return buildRecoveryPaymentDateErrorArgs();
+            };
+
+            scope.hasRecoveryPaymentDateError = function () {
+                return !!scope.getRecoveryPaymentDateErrorCode();
+            };
+
+            scope.validateRecoveryPaymentDate = function () {
+                if (!scope.isRecoveryPaymentAction || !scope.recoveryPaymentWriteOffOnDate) {
+                    clearRecoveryPaymentDateValidation();
+                    return true;
+                }
+
+                clearRecoveryPaymentBackendError();
+                var transactionDate = normalizeDate(scope.formData.transactionDate);
+                if (!transactionDate) {
+                    clearRecoveryPaymentDateValidation();
+                    return true;
+                }
+
+                if (transactionDate.getTime() < scope.recoveryPaymentWriteOffOnDate.getTime()) {
+                    scope.recoveryPaymentDateErrorCode = recoveryPaymentDateValidationCode;
+                    scope.recoveryPaymentDateErrorArgs = buildRecoveryPaymentDateErrorArgs();
+                    return false;
+                }
+
+                clearRecoveryPaymentDateValidation();
+                return true;
+            };
 
             switch (scope.action) {
                 case "approve":
@@ -536,12 +688,24 @@
                         loanId: scope.accountId,
                         command: 'recoverypayment'
                     }, function (data) {
+                        var templateTransactionDate = normalizeDate(data.date) || new Date();
+
                         scope.paymentTypes = data.paymentTypeOptions;
                         if (data.paymentTypeOptions.length > 0) {
                             scope.formData.paymentTypeId = data.paymentTypeOptions[0].id;
                         }
                         scope.formData.transactionAmount = data.amount;
-                        scope.formData[scope.modelName] = new Date();
+                        scope.recoveryPaymentWriteOffOnDate = normalizeDate(data.writeOffOnDate);
+
+                        if (scope.recoveryPaymentWriteOffOnDate) {
+                            scope.transactionDateMinDate = new Date(scope.recoveryPaymentWriteOffOnDate.getTime());
+                            if (templateTransactionDate.getTime() < scope.recoveryPaymentWriteOffOnDate.getTime()) {
+                                templateTransactionDate = new Date(scope.recoveryPaymentWriteOffOnDate.getTime());
+                            }
+                        }
+
+                        scope.formData[scope.modelName] = templateTransactionDate;
+                        scope.validateRecoveryPaymentDate();
                     });
                     scope.title = 'label.heading.recoverypayment';
                     scope.labelName = 'label.input.transactiondate';
@@ -818,6 +982,9 @@
 
             scope.submit = function () {
                 scope.processDate = false;
+                if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
+                    return;
+                }
                 // Only validate the note field if it is shown and mandatory
                 if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
                     scope.error = 'Note field is mandatory';
@@ -1156,6 +1323,7 @@
             };
 
             scope.$watch('formData.transactionDate', function () {
+                scope.validateRecoveryPaymentDate();
                 scope.onDateChange();
             });
 
