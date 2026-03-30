@@ -10,7 +10,9 @@
             $scope.reportGenerated = false;
             $scope.isViewMode = false;
             $scope.loanProducts = [];
+            $scope.activeLoanOfficers = [];
             $scope.authorizedSigners = [];
+            $scope.selectedInvestmentOfficerIds = [];
 
             if ($routeParams.reportId) {
 
@@ -57,6 +59,11 @@
                 $scope.loanProducts = data;
             });
 
+            //Load active loan officers
+            ResourceFactory.employeeResource.getLoanOfficers({}, function (data) {
+                $scope.activeLoanOfficers = data;
+            });
+
 
             ResourceFactory.authorizedSignersResource.query(function(data) {
                 $scope.authorizedSigners = data || [];
@@ -74,7 +81,8 @@
                     product_ids: $scope.loanProductIds.join(","),
                     location_name: selectedOffice ? selectedOffice.name : 'All',
                     location_id: $scope.officeId || null,
-                    interest_percentage: $scope.interestPercentage || 10
+                    interest_percentage: $scope.interestPercentage || 10,
+                    investment_officer_ids: ($scope.selectedInvestmentOfficerIds || []).join(",")
                 };
 
                 // Map format to HTTP Accept header
@@ -116,7 +124,8 @@
                     location_name: selectedOffice ? selectedOffice.name : 'All',
                     location_id: $scope.officeId || null,
                     interest_percentage: $scope.interestPercentage || 10,
-                    notifyUserId: $scope.notifyUserId
+                    notifyUserId: $scope.notifyUserId,
+                    investment_officer_ids: ($scope.selectedInvestmentOfficerIds || []).join(",")
                 };
 
                 const payload = {
