@@ -33,6 +33,50 @@
                 scope.isExtendLoanLifeCycleConfig = data.enabled;
             });
 
+            // Fetch configured IC Review Levels from backend
+            scope.configuredIcLevels = {};
+            scope.activeIcReviewLevels = [];
+
+            // Initialize empty data arrays for all possible IC Review Levels (1-10)
+            // These will be populated only for configured levels
+            var levelNames = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+            levelNames.forEach(function(name) {
+                scope['loanPendingIcReviewLevel' + name + 'Data'] = [];
+            });
+
+            resourceFactory.getApprovalMatrixEngineTemplateResource.get(function (data) {
+                if (data && data.activeIcReviewLevels) {
+                    scope.activeIcReviewLevels = data.activeIcReviewLevels;
+
+                    // Process each configured level from backend
+                    data.activeIcReviewLevels.forEach(function(level) {
+                        // Create a map for quick lookup
+                        scope.configuredIcLevels[level.levelNumber] = level;
+
+                        // Get level name from levelNumber (1 -> 'One', 2 -> 'Two', etc.)
+                        var levelName = levelNames[level.levelNumber - 1];
+                        if (!levelName) return;
+
+                        var dataKey = 'loanPendingIcReviewLevel' + levelName + 'Data';
+
+                        // Fetch pending loans for this level using state value from backend
+                        var stateValue = level.stateValue || level.decisionState || level.loanDecisionState;
+                        if (stateValue) {
+                            resourceFactory.getAllLoansPendingDecisionEngineResource.getAll({
+                                nextLoanDecisionState: String(stateValue)
+                            }, function (loansData) {
+                                scope[dataKey] = loansData;
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Helper function to check if an IC level is configured
+            scope.isIcLevelConfigured = function(levelNumber) {
+                return scope.configuredIcLevels[levelNumber] !== undefined;
+            };
+
             //Review Application
             scope.loanPendingReviewApplicationData = [];
             scope.getLoanPendingReviewApplication = function () {
@@ -52,56 +96,6 @@
                 });
             };
             scope.getLoanPendingDueDiligence();
-
-            //IC Review Level One
-            scope.loanPendingIcReviewLevelOneData = [];
-            scope.getLoanPendingIcReviewLevelOne = function () {
-                var nextLoanDecisionStateValue = '1200';
-                resourceFactory.getAllLoansPendingDecisionEngineResource.getAll({nextLoanDecisionState: nextLoanDecisionStateValue}, function (data) {
-                    scope.loanPendingIcReviewLevelOneData = data;
-                });
-            };
-            scope.getLoanPendingIcReviewLevelOne();
-
-            //IC Review Level Two
-            scope.loanPendingIcReviewLevelTwoData = [];
-            scope.getLoanPendingIcReviewLevelTwo = function () {
-                var nextLoanDecisionStateValue = '1500';
-                resourceFactory.getAllLoansPendingDecisionEngineResource.getAll({nextLoanDecisionState: nextLoanDecisionStateValue}, function (data) {
-                    scope.loanPendingIcReviewLevelTwoData = data;
-                });
-            };
-            scope.getLoanPendingIcReviewLevelTwo();
-
-            //IC Review Level Three
-            scope.loanPendingIcReviewLevelThreeData = [];
-            scope.getLoanPendingIcReviewLevelThree = function () {
-                var nextLoanDecisionStateValue = '1600';
-                resourceFactory.getAllLoansPendingDecisionEngineResource.getAll({nextLoanDecisionState: nextLoanDecisionStateValue}, function (data) {
-                    scope.loanPendingIcReviewLevelThreeData = data;
-                });
-            };
-            scope.getLoanPendingIcReviewLevelThree();
-
-            //IC Review Level Four
-            scope.loanPendingIcReviewLevelFourData = [];
-            scope.getLoanPendingIcReviewLevelFour = function () {
-                var nextLoanDecisionStateValue = '1700';
-                resourceFactory.getAllLoansPendingDecisionEngineResource.getAll({nextLoanDecisionState: nextLoanDecisionStateValue}, function (data) {
-                    scope.loanPendingIcReviewLevelFourData = data;
-                });
-            };
-            scope.getLoanPendingIcReviewLevelFour();
-
-            //IC Review Level Five
-            scope.loanPendingIcReviewLevelFiveData = [];
-            scope.getLoanPendingIcReviewLevelFive = function () {
-                var nextLoanDecisionStateValue = '1800';
-                resourceFactory.getAllLoansPendingDecisionEngineResource.getAll({nextLoanDecisionState: nextLoanDecisionStateValue}, function (data) {
-                    scope.loanPendingIcReviewLevelFiveData = data;
-                });
-            };
-            scope.getLoanPendingIcReviewLevelFive();
 
             //Prepare And Sign Contract
             scope.loanPendingPrepareAndSignContractData = [];
@@ -141,11 +135,18 @@
 
             // For loans awaiting approval (grouped by office)
             scope.loanApprovalAllCheckBoxesClicked = function(office) {
+                if (!office || !office.loans) { return; }
                 scope.toggleAllCheckboxes(office.loans, scope.loanTemplate);
             };
 
             scope.loanApprovalAllCheckBoxesMet = function(office) {
+                if (!office || !office.loans) { return false; }
                 return scope.allCheckboxesMet(office.loans, scope.loanTemplate);
+            };
+
+            // Helper function to get IC Review Level data by level name
+            scope.getIcReviewLevelData = function(levelName) {
+                return scope['loanPendingIcReviewLevel' + levelName + 'Data'] || [];
             };
 
             // For loan disbursal

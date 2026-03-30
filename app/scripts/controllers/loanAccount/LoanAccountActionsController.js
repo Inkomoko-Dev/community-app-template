@@ -28,12 +28,10 @@
                 {id: 1, name: 'label.input.paymentto.client'},
                 {id: 2, name: 'label.input.paymentto.supplier'}
             ];
-            scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive';
-            scope.isRecoveryPaymentAction = routeParams.action === 'recoverypayment';
-            scope.transactionDateMinDate = '2000-01-01';
-            scope.recoveryPaymentWriteOffOnDate = null;
-            scope.recoveryPaymentDateErrorCode = null;
-            scope.recoveryPaymentDateErrorArgs = null;
+            // Dynamic IC Review level detection
+            scope.icReviewLevels = ['icreviewlevelone', 'icreviewleveltwo', 'icreviewlevelthree', 'icreviewlevelfour', 'icreviewlevelfive',
+                                     'icreviewlevelsix', 'icreviewlevelseven', 'icreviewleveleight', 'icreviewlevelnine', 'icreviewlevelten'];
+            scope.isICReview = scope.icReviewLevels.indexOf(scope.action) !== -1;
             var submitStatus = [];
             var recoveryPaymentDateValidationCode = 'error.msg.loan.recovery.payment.date.cannot.be.before.writeoff.date';
 
