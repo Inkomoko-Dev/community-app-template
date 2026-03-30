@@ -793,6 +793,87 @@
                             </div>
                         </uib-tab>
 
+                        <!-- Dynamic IC Review Level Tabs (Levels 6-10) -->
+                        <uib-tab ng-repeat="icLevel in icReviewLevels | filter:{levelNumber: '!1'} | filter:{levelNumber: '!2'} | filter:{levelNumber: '!3'} | filter:{levelNumber: '!4'} | filter:{levelNumber: '!5'}"
+                                 data-ng-show="isExtendLoanLifeCycleConfig"
+                                 heading="{{'label.heading.icReviewLevel' + icLevel.name | translate}}"
+                                 has-permission="READ_LOANICREVIEWDECISIONLEVEL{{icLevel.name.toUpperCase()}}">
+                            <div class="head-affix">
+                                <table class="table condensed-table">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            <input ng-autofocus="true" ng-model="filterText1" type="text"
+                                                   class="input-sm form-control"
+                                                   placeholder="{{'label.input.filterbyname' | translate}}">
+                                        </th>
+                                        <th>
+                                            <button type="button" class="btn btn-success" data-ng-click="approveLoan()"
+                                                    has-permission="ACCEPT_LOANICREVIEWDECISIONLEVEL{{icLevel.name.toUpperCase()}}">
+                                                <i class="fa fa-check"></i>&nbsp;&nbsp;{{'label.button.approve' | translate}}
+                                            </button>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+
+                            <script type="text/ng-template" id="approveloan.html">
+                                <div class="modal-header silver">
+                                    <h3 class="bolder">{{'label.heading.approve' | translate}}</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <api-validate></api-validate>
+                                    <br>
+                                    <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+                                    <button class="btn btn-primary" ng-click="approve()">{{'label.button.confirm' | translate}}</button>
+                                </div>
+                            </script>
+
+                            <div>
+                                <table class="table condensed-table">
+                                    <tr>
+                                        <td>
+                                            <table class="table condensed-table">
+                                                <thead>
+                                                <tr class="graybg">
+                                                    <th>
+                                                        <input type="checkbox"
+                                                               ng-click="loanApprovalAllCheckBoxesClicked(office)"
+                                                               ng-checked="loanApprovalAllCheckBoxesMet(office)"/>
+                                                    </th>
+                                                    <th>{{'label.heading.client' | translate}}</th>
+                                                    <th>{{'label.heading.loan' | translate}}</th>
+                                                    <th>{{'label.heading.amount' | translate}}</th>
+                                                    <th>{{'label.heading.loanpurpose' | translate}}</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr dir-paginate="loan in {{icLevel.dataKey}} | filter:filterText1 | itemsPerPage:itemsPerPage"
+                                                    pagination-id="'icLevel_' + icLevel.name">
+                                                    <td><input type="checkbox" ng-model="loanTemplate[loan.id]"></td>
+                                                    <td class="pointer">
+                                                        <a href='#/viewclient/{{loan.clientId}}'>{{loan.clientName}}</a>
+                                                    </td>
+                                                    <td class="pointer">
+                                                        <a href='#/viewloanaccount/{{loan.id}}'>{{loan.loanProductName}}({{loan.accountNo}})</a>
+                                                    </td>
+                                                    <td class="pointer">{{loan.principal | number}}</td>
+                                                    <td class="pointer">{{loan.loanPurposeName}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="text-center">
+                                    <dir-pagination-controls pagination-id="'icLevel_' + icLevel.name"
+                                                             boundary-links="true"
+                                                             template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"/>
+                                </div>
+                            </div>
+                        </uib-tab>
+
                         <uib-tab data-ng-show="isExtendLoanLifeCycleConfig" heading="{{'label.heading.loanPrepareAndSignContract' | translate}}" has-permission='READ_LOANPREPAREANDSIGNCONTRACT'>
                             <div class="head-affix">
                                 <table class="table condensed-table">
