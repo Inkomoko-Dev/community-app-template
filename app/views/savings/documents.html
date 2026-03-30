@@ -3,6 +3,31 @@
         <li><a href="#/viewsavingaccount/{{savingsId}}">{{'label.anchor.viewsavingsaccount' | translate}}</a></li>
         <li class="active">{{'label.heading.accountdocuments' | translate}}</li>
     </ul>
+    <script type="text/ng-template" id="renameDocumentDialog.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.heading.renamedocument' | translate}}</h3>
+        </div>
+        <div class="modal-body">
+            <form name="renameDocumentForm" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="documentName">{{'label.input.name' | translate}}<span class="required">*</span></label>
+                    <div class="col-sm-6">
+                        <input type="text" id="documentName" name="documentName" class="form-control" ng-model="renameData.name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="documentDescription">{{'label.input.description' | translate}}</label>
+                    <div class="col-sm-6">
+                        <textarea id="documentDescription" name="documentDescription" class="form-control" rows="2" ng-model="renameData.description"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+            <button class="btn btn-primary" ng-click="confirm()" ng-disabled="renameDocumentForm.$invalid">{{'label.button.save' | translate}}</button>
+        </div>
+    </script>
     <div class="card">
         <div class="content">
             <div class="toolbar">
@@ -28,9 +53,10 @@
                         <td>{{document.description}}</td>
                         <td>{{document.fileName}}</td>
                         <td>
-                            <a target="_blank" href="{{hostUrl}}{{document.docUrl}}"><i class="fa fa-cloud-download"></i></a>&nbsp;
-                            <a ng-show="document.fileIsImage" ng-click="previewDocument(document.docUrl,document.fileName)"><i class="fa fa-eye"></i></a>
-                            <a ng-click="deleteDocument(document.id,$index)"><i class="fa fa-times"></i></a>
+                            <a target="_blank" href="{{hostUrl}}{{document.docUrl}}" uib-tooltip="{{'label.button.download' | translate}}"><i class="fa fa-cloud-download"></i></a>&nbsp;
+                            <a ng-show="document.fileIsImage" ng-click="previewDocument(document.docUrl,document.fileName)" uib-tooltip="{{'label.button.preview' | translate}}"><i class="fa fa-eye"></i></a>
+                            <a ng-click="renameDocument(document,$index)" has-permission='UPDATE_DOCUMENT' uib-tooltip="{{'label.button.rename' | translate}}"><i class="fa fa-edit"></i></a>&nbsp;
+                            <a ng-click="deleteDocument(document.id,$index)" has-permission='DELETE_DOCUMENT' uib-tooltip="{{'label.button.delete' | translate}}"><i class="fa fa-times"></i></a>
                         </td>
                     </tr>
                 </tbody>

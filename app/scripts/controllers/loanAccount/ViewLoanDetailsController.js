@@ -909,6 +909,47 @@
                 });
             };
 
+            scope.renameDocument = function (document, index) {
+                $uibModal.open({
+                    templateUrl: 'renameDocumentDialog.html',
+                    controller: RenameLoanDocumentCtrl,
+                    resolve: {
+                        documentData: function () {
+                            return {
+                                id: document.id,
+                                name: document.name,
+                                description: document.description,
+                                index: index
+                            };
+                        }
+                    }
+                });
+            };
+
+            var RenameLoanDocumentCtrl = function ($scope, $uibModalInstance, documentData) {
+                $scope.renameData = {
+                    name: documentData.name,
+                    description: documentData.description
+                };
+                $scope.documentId = documentData.id;
+                $scope.documentIndex = documentData.index;
+
+                $scope.confirm = function () {
+                    resourceFactory.LoanDocumentResource.update({
+                        loanId: scope.loandetails.id,
+                        documentId: $scope.documentId
+                    }, $scope.renameData, function (data) {
+                        scope.loandocuments[$scope.documentIndex].name = $scope.renameData.name;
+                        scope.loandocuments[$scope.documentIndex].description = $scope.renameData.description;
+                        $uibModalInstance.close('rename');
+                    });
+                };
+
+                $scope.cancel = function () {
+                    $uibModalInstance.dismiss('cancel');
+                };
+            };
+
             scope.downloadDocument = function (document) {
                 var url = scope.hostUrl + document.docUrl;
                 var sessionData = webStorage.get('sessionData');
