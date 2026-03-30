@@ -28,7 +28,10 @@
                 {id: 1, name: 'label.input.paymentto.client'},
                 {id: 2, name: 'label.input.paymentto.supplier'}
             ];
-            scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive';
+            // Dynamic IC Review level detection
+            scope.icReviewLevels = ['icreviewlevelone', 'icreviewleveltwo', 'icreviewlevelthree', 'icreviewlevelfour', 'icreviewlevelfive',
+                                     'icreviewlevelsix', 'icreviewlevelseven', 'icreviewleveleight', 'icreviewlevelnine', 'icreviewlevelten'];
+            scope.isICReview = scope.icReviewLevels.indexOf(scope.action) !== -1;
             var submitStatus = [];
 
             rootScope.RequestEntities = function (entity, status, productId) {
