@@ -116,9 +116,9 @@
                 // Determine number of levels from existing data or backend config
                 var detectedLevels = 5; // Default
 
-                // Check for NEW backend format with approvalMatrixLevels
-                if (data.approvalMatrixLevels && data.approvalMatrixLevels.length > 0) {
-                    detectedLevels = data.approvalMatrixLevels.length;
+                // Check for NEW backend format with dynamicLevels array
+                if (data.dynamicLevels && data.dynamicLevels.length > 0) {
+                    detectedLevels = data.dynamicLevels.length;
                 }
                 // Check for levels 6-10 data to detect additional levels (using word names)
                 else {
@@ -142,21 +142,44 @@
                 scope.initializeDecisionLevels();
 
                 // Populate form data for all detected levels
-                scope.decisionLevels.forEach(function(level) {
-                    var prefix = 'level' + level.fieldName;
-                    scope.formData[prefix + 'UnsecuredFirstCycleMaxAmount'] = data[prefix + 'UnsecuredFirstCycleMaxAmount'] || 0;
-                    scope.formData[prefix + 'UnsecuredFirstCycleMinTerm'] = data[prefix + 'UnsecuredFirstCycleMinTerm'] || 1;
-                    scope.formData[prefix + 'UnsecuredFirstCycleMaxTerm'] = data[prefix + 'UnsecuredFirstCycleMaxTerm'] || 12;
-                    scope.formData[prefix + 'UnsecuredSecondCycleMaxAmount'] = data[prefix + 'UnsecuredSecondCycleMaxAmount'] || 0;
-                    scope.formData[prefix + 'UnsecuredSecondCycleMinTerm'] = data[prefix + 'UnsecuredSecondCycleMinTerm'] || 1;
-                    scope.formData[prefix + 'UnsecuredSecondCycleMaxTerm'] = data[prefix + 'UnsecuredSecondCycleMaxTerm'] || 12;
-                    scope.formData[prefix + 'SecuredFirstCycleMaxAmount'] = data[prefix + 'SecuredFirstCycleMaxAmount'] || 0;
-                    scope.formData[prefix + 'SecuredFirstCycleMinTerm'] = data[prefix + 'SecuredFirstCycleMinTerm'] || 1;
-                    scope.formData[prefix + 'SecuredFirstCycleMaxTerm'] = data[prefix + 'SecuredFirstCycleMaxTerm'] || 12;
-                    scope.formData[prefix + 'SecuredSecondCycleMaxAmount'] = data[prefix + 'SecuredSecondCycleMaxAmount'] || 0;
-                    scope.formData[prefix + 'SecuredSecondCycleMinTerm'] = data[prefix + 'SecuredSecondCycleMinTerm'] || 1;
-                    scope.formData[prefix + 'SecuredSecondCycleMaxTerm'] = data[prefix + 'SecuredSecondCycleMaxTerm'] || 12;
-                });
+                if (data.dynamicLevels && data.dynamicLevels.length > 0) {
+                    // Use dynamicLevels array (NEW backend format)
+                    data.dynamicLevels.forEach(function(dynamicLevel) {
+                        var levelNumber = dynamicLevel.levelNumber;
+                        var fieldName = scope.getFieldName(levelNumber);
+                        var prefix = 'level' + fieldName;
+
+                        scope.formData[prefix + 'UnsecuredFirstCycleMaxAmount'] = dynamicLevel.unsecuredFirstCycleMaxAmount || 0;
+                        scope.formData[prefix + 'UnsecuredFirstCycleMinTerm'] = dynamicLevel.unsecuredFirstCycleMinTerm || 1;
+                        scope.formData[prefix + 'UnsecuredFirstCycleMaxTerm'] = dynamicLevel.unsecuredFirstCycleMaxTerm || 12;
+                        scope.formData[prefix + 'UnsecuredSecondCycleMaxAmount'] = dynamicLevel.unsecuredSecondCycleMaxAmount || 0;
+                        scope.formData[prefix + 'UnsecuredSecondCycleMinTerm'] = dynamicLevel.unsecuredSecondCycleMinTerm || 1;
+                        scope.formData[prefix + 'UnsecuredSecondCycleMaxTerm'] = dynamicLevel.unsecuredSecondCycleMaxTerm || 12;
+                        scope.formData[prefix + 'SecuredFirstCycleMaxAmount'] = dynamicLevel.securedFirstCycleMaxAmount || 0;
+                        scope.formData[prefix + 'SecuredFirstCycleMinTerm'] = dynamicLevel.securedFirstCycleMinTerm || 1;
+                        scope.formData[prefix + 'SecuredFirstCycleMaxTerm'] = dynamicLevel.securedFirstCycleMaxTerm || 12;
+                        scope.formData[prefix + 'SecuredSecondCycleMaxAmount'] = dynamicLevel.securedSecondCycleMaxAmount || 0;
+                        scope.formData[prefix + 'SecuredSecondCycleMinTerm'] = dynamicLevel.securedSecondCycleMinTerm || 1;
+                        scope.formData[prefix + 'SecuredSecondCycleMaxTerm'] = dynamicLevel.securedSecondCycleMaxTerm || 12;
+                    });
+                } else {
+                    // Fallback to flat format (old backend format)
+                    scope.decisionLevels.forEach(function(level) {
+                        var prefix = 'level' + level.fieldName;
+                        scope.formData[prefix + 'UnsecuredFirstCycleMaxAmount'] = data[prefix + 'UnsecuredFirstCycleMaxAmount'] || 0;
+                        scope.formData[prefix + 'UnsecuredFirstCycleMinTerm'] = data[prefix + 'UnsecuredFirstCycleMinTerm'] || 1;
+                        scope.formData[prefix + 'UnsecuredFirstCycleMaxTerm'] = data[prefix + 'UnsecuredFirstCycleMaxTerm'] || 12;
+                        scope.formData[prefix + 'UnsecuredSecondCycleMaxAmount'] = data[prefix + 'UnsecuredSecondCycleMaxAmount'] || 0;
+                        scope.formData[prefix + 'UnsecuredSecondCycleMinTerm'] = data[prefix + 'UnsecuredSecondCycleMinTerm'] || 1;
+                        scope.formData[prefix + 'UnsecuredSecondCycleMaxTerm'] = data[prefix + 'UnsecuredSecondCycleMaxTerm'] || 12;
+                        scope.formData[prefix + 'SecuredFirstCycleMaxAmount'] = data[prefix + 'SecuredFirstCycleMaxAmount'] || 0;
+                        scope.formData[prefix + 'SecuredFirstCycleMinTerm'] = data[prefix + 'SecuredFirstCycleMinTerm'] || 1;
+                        scope.formData[prefix + 'SecuredFirstCycleMaxTerm'] = data[prefix + 'SecuredFirstCycleMaxTerm'] || 12;
+                        scope.formData[prefix + 'SecuredSecondCycleMaxAmount'] = data[prefix + 'SecuredSecondCycleMaxAmount'] || 0;
+                        scope.formData[prefix + 'SecuredSecondCycleMinTerm'] = data[prefix + 'SecuredSecondCycleMinTerm'] || 1;
+                        scope.formData[prefix + 'SecuredSecondCycleMaxTerm'] = data[prefix + 'SecuredSecondCycleMaxTerm'] || 12;
+                    });
+                }
             });
 
             scope.$watch('formData',function(newVal){
@@ -175,6 +198,27 @@
             scope.goNext = function(form){
                 WizardHandler.wizard().checkValid(form);
                 scope.isClicked = true;
+            };
+
+            // Handle next navigation for dynamic level forms
+            scope.goNextLevel = function($event) {
+                // Get the form from the event target
+                var form = $event.target;
+                if (form && form.checkValidity && form.checkValidity()) {
+                    WizardHandler.wizard().next();
+                } else {
+                    // Trigger HTML5 validation display
+                    if (form && form.reportValidity) {
+                        form.reportValidity();
+                    }
+                }
+                scope.isClicked = true;
+            };
+
+            // Validate level form before allowing step exit (for wizard step clicks)
+            scope.validateLevelForm = function(levelIndex) {
+                // Allow navigation - validation will be done on form submit
+                return true;
             };
 
             scope.cancel = function () {

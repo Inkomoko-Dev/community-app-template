@@ -104,7 +104,28 @@
             scope.goNext = function(form){
                 WizardHandler.wizard().checkValid(form);
                 scope.isClicked = true;
-            }
+            };
+
+            // Handle next navigation for dynamic level forms
+            scope.goNextLevel = function($event) {
+                // Get the form from the event target
+                var form = $event.target;
+                if (form && form.checkValidity && form.checkValidity()) {
+                    WizardHandler.wizard().next();
+                } else {
+                    // Trigger HTML5 validation display
+                    if (form && form.reportValidity) {
+                        form.reportValidity();
+                    }
+                }
+                scope.isClicked = true;
+            };
+
+            // Validate level form before allowing step exit (for wizard step clicks)
+            scope.validateLevelForm = function(levelIndex) {
+                // Allow navigation - validation will be done on form submit
+                return true;
+            };
 
             scope.cancel = function () {
                 location.path('/viewLoanApprovalMatrixDynamic/');
