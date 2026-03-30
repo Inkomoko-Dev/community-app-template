@@ -94,9 +94,10 @@
 
                 <!-- Dynamic Level Steps -->
                 <wz-step ng-repeat="level in decisionLevels"
-                         wz-title="{{ 'label.heading.decisionLevel' | translate}} {{level.name}}">
-                    <form name="LevelForm{{level.index}}" novalidate class="form-horizontal"
-                          ng-submit="goNext(LevelForm{{level.index}})">
+                         wz-title="{{ 'label.heading.decisionLevel' | translate}} {{level.name}}"
+                         canexit="validateLevelForm(level.index)">
+                    <form name="levelForm" novalidate class="form-horizontal"
+                          ng-submit="goNextLevel($event)">
                         <fieldset>
                             <api-validate></api-validate>
                             <br>
@@ -451,8 +452,8 @@
                                 <button class="btn btn-default" ng-click="cancel()">
                                     {{'label.button.cancel' | translate}}
                                 </button>
-                                <button id="save" type="submit" class="btn btn-primary pull-right"
-                                        wz-next has-permission='UPDATE_LOANAPPROVALMATRIX'>
+                                <button id="save" type="button" class="btn btn-primary pull-right"
+                                        ng-click="submit()" has-permission='UPDATE_LOANAPPROVALMATRIX'>
                                     <i class="fa fa-save"></i>&nbsp;&nbsp;{{'label.button.updateLoanapprovalmatrix' | translate}}
                                 </button>
                             </div>

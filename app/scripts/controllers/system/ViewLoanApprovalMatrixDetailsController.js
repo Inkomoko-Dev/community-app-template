@@ -68,18 +68,39 @@
             resourceFactory.getAllApprovalMatrixDetailsEngineResource.get({approvalMatrixId: routeParams.approvalMatrixId}, function (data) {
                 scope.matrixDetails = data;
 
-                // If matrix has approval matrix levels (NEW backend format)
-                if (data.approvalMatrixLevels && data.approvalMatrixLevels.length > 0) {
-                    scope.decisionLevels = data.approvalMatrixLevels.map(function(level, index) {
+                // If matrix has dynamic levels (NEW backend format with dynamicLevels array)
+                if (data.dynamicLevels && data.dynamicLevels.length > 0) {
+                    scope.decisionLevels = data.dynamicLevels.map(function(level, index) {
                         var levelName = getLevelName(level.levelNumber);
                         var fieldName = getFieldName(level.levelNumber);
                         return {
                             index: index,
                             name: levelName,
                             fieldName: fieldName,
-                            displayName: 'Decision Level ' + levelName,
-                            levelNumber: level.levelNumber
+                            displayName: level.icReviewLevelName || ('Decision Level ' + levelName),
+                            levelNumber: level.levelNumber,
+                            dynamicLevelData: level // Store the dynamic level data for display
                         };
+                    });
+
+                    // Populate matrixDetails with dynamic level data in the expected flat format
+                    // This ensures the HTML template can display all levels correctly
+                    data.dynamicLevels.forEach(function(level) {
+                        var fieldName = getFieldName(level.levelNumber);
+                        var prefix = 'level' + fieldName;
+
+                        scope.matrixDetails[prefix + 'UnsecuredFirstCycleMaxAmount'] = level.unsecuredFirstCycleMaxAmount;
+                        scope.matrixDetails[prefix + 'UnsecuredFirstCycleMinTerm'] = level.unsecuredFirstCycleMinTerm;
+                        scope.matrixDetails[prefix + 'UnsecuredFirstCycleMaxTerm'] = level.unsecuredFirstCycleMaxTerm;
+                        scope.matrixDetails[prefix + 'UnsecuredSecondCycleMaxAmount'] = level.unsecuredSecondCycleMaxAmount;
+                        scope.matrixDetails[prefix + 'UnsecuredSecondCycleMinTerm'] = level.unsecuredSecondCycleMinTerm;
+                        scope.matrixDetails[prefix + 'UnsecuredSecondCycleMaxTerm'] = level.unsecuredSecondCycleMaxTerm;
+                        scope.matrixDetails[prefix + 'SecuredFirstCycleMaxAmount'] = level.securedFirstCycleMaxAmount;
+                        scope.matrixDetails[prefix + 'SecuredFirstCycleMinTerm'] = level.securedFirstCycleMinTerm;
+                        scope.matrixDetails[prefix + 'SecuredFirstCycleMaxTerm'] = level.securedFirstCycleMaxTerm;
+                        scope.matrixDetails[prefix + 'SecuredSecondCycleMaxAmount'] = level.securedSecondCycleMaxAmount;
+                        scope.matrixDetails[prefix + 'SecuredSecondCycleMinTerm'] = level.securedSecondCycleMinTerm;
+                        scope.matrixDetails[prefix + 'SecuredSecondCycleMaxTerm'] = level.securedSecondCycleMaxTerm;
                     });
                 }
                 // Fallback: If matrix has its own level configuration (old format)
