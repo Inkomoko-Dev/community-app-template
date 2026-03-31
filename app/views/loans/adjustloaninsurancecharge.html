@@ -1,0 +1,93 @@
+<div class="content-container" ng-controller="AdjustLoanInsuranceChargeController">
+<ul class="breadcrumb">
+        <li><a href="#/viewloanaccount/{{loanId}}">{{'label.anchor.viewloanaccount' | translate}}</a></li>
+        <li class="active">Adjust Insurance Charge</li>
+    </ul>
+
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>Adjust Insurance Charge</h4>
+            </div>
+
+            <div class="alert alert-info" ng-show="charge.name">
+                <strong>{{charge.name}}</strong> &nbsp;|&nbsp;
+                Current Amount: <strong>{{charge.currency.displaySymbol}}{{charge.amount | number}}</strong> &nbsp;|&nbsp;
+                Paid: <strong>{{charge.currency.displaySymbol}}{{charge.amountPaid | number}}</strong>
+            </div>
+
+            <form name="adjustInsuranceChargeForm" class="form-horizontal" novalidate>
+                <api-validate></api-validate>
+
+                <div class="form-group" ng-class="{'has-error': adjustInsuranceChargeForm.amount.$invalid && adjustInsuranceChargeForm.amount.$touched}">
+                    <label class="control-label col-sm-3" for="amount">
+                        New Amount <span class="required">*</span>
+                    </label>
+                    <div class="col-sm-4">
+                        <input type="number"
+                               id="amount"
+                               name="amount"
+                               class="form-control"
+                               ng-model="formData.amount"
+                               required
+                               min="1"/>
+                    </div>
+                    <div class="col-sm-2">
+                        <form-validate valattributeform="adjustInsuranceChargeForm" valattribute="formData.amount"/>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-class="{'has-error': adjustInsuranceChargeForm.transactionDate.$invalid && adjustInsuranceChargeForm.transactionDate.$touched}">
+                    <label class="control-label col-sm-3" for="transactionDate">
+                        Transaction Date <span class="required">*</span>
+                    </label>
+                    <div class="col-sm-4">
+                        <input id="transactionDate"
+                               name="transactionDate"
+                               type="text"
+                               datepicker-pop="dd MMMM yyyy"
+                               class="form-control"
+                               ng-model="formData.transactionDate"
+                               is-open="datePicker.opened"
+                               placeholder="{{today}}"
+                               required/>
+                    </div>
+                    <div class="col-sm-2">
+                        <form-validate valattributeform="adjustInsuranceChargeForm" valattribute="formData.transactionDate"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="notes">Notes</label>
+                    <div class="col-sm-4">
+                        <textarea id="notes"
+                                  name="notes"
+                                  class="form-control"
+                                  ng-model="formData.notes"
+                                  rows="3"
+                                  placeholder="Reason for adjustment (optional)"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-6">
+                        <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">
+                            {{ 'label.button.cancel' | translate }}
+                        </button>
+                        &nbsp;
+                        <button type="submit"
+                                class="btn btn-primary"
+                                ng-click="submit()"
+                                ng-disabled="adjustInsuranceChargeForm.$invalid || isSubmitting">
+                            <span ng-if="!isSubmitting">{{ 'label.button.submit' | translate }}</span>
+                            <span ng-if="isSubmitting">
+                <i class="fa fa-spinner fa-spin"></i> Submitting...
+            </span>
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
