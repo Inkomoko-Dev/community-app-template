@@ -1063,6 +1063,47 @@
                 });
             };
 
+            scope.renameDocument = function (document, index) {
+                $uibModal.open({
+                    templateUrl: 'renameDocumentDialog.html',
+                    controller: RenameDocumentCtrl,
+                    resolve: {
+                        documentData: function () {
+                            return {
+                                id: document.id,
+                                name: document.name,
+                                description: document.description,
+                                index: index
+                            };
+                        }
+                    }
+                });
+            };
+
+            var RenameDocumentCtrl = function ($scope, $uibModalInstance, documentData) {
+                $scope.renameData = {
+                    name: documentData.name,
+                    description: documentData.description
+                };
+                $scope.documentId = documentData.id;
+                $scope.documentIndex = documentData.index;
+
+                $scope.confirm = function () {
+                    resourceFactory.clientDocumentsResource.update({
+                        clientId: routeParams.id,
+                        documentId: $scope.documentId
+                    }, $scope.renameData, function (data) {
+                        scope.clientdocuments[$scope.documentIndex].name = $scope.renameData.name;
+                        scope.clientdocuments[$scope.documentIndex].description = $scope.renameData.description;
+                        $uibModalInstance.close('rename');
+                    });
+                };
+
+                $scope.cancel = function () {
+                    $uibModalInstance.dismiss('cancel');
+                };
+            };
+
             scope.previewDocument = function (url, fileName) {
                 scope.preview =  true;
                 scope.fileUrl = scope.hostUrl + url;
