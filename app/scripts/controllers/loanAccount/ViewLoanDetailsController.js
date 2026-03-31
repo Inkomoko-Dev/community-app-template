@@ -49,6 +49,22 @@
                 }
             };
 
+            // Helper function to get IC review level name from number
+            scope.getIcReviewLevelName = function(levelNumber) {
+                var levelNames = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+                return levelNames[levelNumber - 1] || 'level' + levelNumber;
+            };
+
+            // Helper function to check if action is IC review level
+            scope.isIcReviewLevel = function(action) {
+                return action && action.toLowerCase().indexOf('icreviewlevel') === 0;
+            };
+
+            // Helper function to check if action is reject IC review level
+            scope.isRejectIcReviewLevel = function(action) {
+                return action && action.toLowerCase().indexOf('rejecticreviewlevel') === 0;
+            };
+
             scope.clickEvent = function (eventName, accountId) {
                 eventName = eventName || "";
                 switch (eventName) {
@@ -163,6 +179,13 @@
                         break;
                     case "rejectcollateralreview":
                         location.path('/loanaccount/' + accountId + '/rejectcollateralreview');
+                        break;
+                    // Dynamic IC Review Levels - handles any level (one through ten)
+                    default:
+                        if (scope.isIcReviewLevel(eventName) || scope.isRejectIcReviewLevel(eventName)) {
+                            location.path('/loanaccount/' + accountId + '/' + eventName);
+                            return;
+                        }
                         break;
                     case "icreviewlevelone":
                         location.path('/loanaccount/' + accountId + '/icreviewlevelone');
@@ -338,31 +361,21 @@
                                 icon: "fa fa-check",
                                 taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELONE'
                         };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_ONE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_TWO"))){
+                        }
+                        // Dynamic IC Review Level handling
+                        else if((data.isExtendLoanLifeCycleConfig == true && data.loanDecisionState != null &&
+                                 data.loanDecisionState.value && data.loanDecisionState.value.indexOf('IC_REVIEW_LEVEL_') === 0 &&
+                                 data.nextLoanIcReviewDecisionState && data.nextLoanIcReviewDecisionState.value &&
+                                 data.nextLoanIcReviewDecisionState.value.indexOf('IC_REVIEW_LEVEL_') === 0)){
+                            // Extract level name from next state (e.g., IC_REVIEW_LEVEL_TWO -> two)
+                            var nextLevel = data.nextLoanIcReviewDecisionState.value.replace('IC_REVIEW_LEVEL_', '').toLowerCase();
                             return {
-                            name: "button.icreviewleveltwo",
-                            icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO'
-                        };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_TWO" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_THREE"))){
-                        return {
-                            name: "button.icreviewlevelthree",
-                            icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE'
-                        };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_THREE" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FOUR"))){
-                            return {
-                            name: "button.icreviewlevelfour",
-                            icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR'
-                        };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "IC_REVIEW_LEVEL_FOUR" && data.nextLoanIcReviewDecisionState.value == "IC_REVIEW_LEVEL_FIVE"))){
-                        return {
-                            name: "button.icreviewlevelfive",
-                            icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE'
-                        };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
+                                name: "button.icreviewlevel" + nextLevel.toLowerCase(),
+                                icon: "fa fa-check",
+                                taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVEL' + nextLevel.toUpperCase()
+                            };
+                        }
+                        else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
                             return {
                                 name: "button.prepareandsigncontract",
                                 icon: "fa fa-check",
@@ -393,37 +406,19 @@
                                 icon: "fa fa-check",
                                 taskPermissionName: 'REJECT_DUEDILIGENCE'
                             };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_ONE"))) {
+                        }
+                        // Dynamic IC Review Level rejection handling
+                        else if ((data.isExtendLoanLifeCycleConfig == true && data.loanDecisionState != null &&
+                                  data.loanDecisionState.value && data.loanDecisionState.value.indexOf('IC_REVIEW_LEVEL_') === 0)) {
+                            // Extract level name from current state (e.g., IC_REVIEW_LEVEL_ONE -> one)
+                            var currentLevel = data.loanDecisionState.value.replace('IC_REVIEW_LEVEL_', '').toLowerCase();
                             return {
-                                name: "button.rejecticreviewlevelone",
+                                name: "button.rejecticreviewlevel" + currentLevel.toLowerCase(),
                                 icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELONE'
+                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVEL' + currentLevel.toUpperCase()
                             };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_TWO"))) {
-                            return {
-                                name: "button.rejecticreviewleveltwo",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELTWO'
-                            };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_THREE"))) {
-                            return {
-                                name: "button.rejecticreviewlevelthree",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELTHREE'
-                            };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_FOUR"))) {
-                            return {
-                                name: "button.rejecticreviewlevelfour",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELFOUR'
-                            };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "IC_REVIEW_LEVEL_FIVE"))) {
-                            return {
-                                name: "button.rejecticreviewlevelfive",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVELFIVE'
-                            };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "PREPARE_AND_SIGN_CONTRACT"))) {
+                        }
+                        else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "PREPARE_AND_SIGN_CONTRACT"))) {
                             return {
                                 name: "button.rejectprepareandsigncontract",
                                 icon: "fa fa-check",

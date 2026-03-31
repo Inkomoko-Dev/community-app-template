@@ -813,6 +813,7 @@
                     updateApprovalMatrixDetailsEngineResource: defineResource(apiVer + "/loans/decision/updateApprovalMatrix/:approvalMatrixId", { approvalMatrixId: '@approvalMatrixId' }, {
                         put: { method: 'PUT', params: {} },
                     }),
+                    // Dynamic IC Review Level Resources (Levels One through Ten)
                     icReviewLevelOneLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelOne/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelOne: { method: 'POST', params: {} },
                     }),
@@ -842,6 +843,37 @@
                     }),
                     rejectIcReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFive/reject/:loanId", { loanId: '@loanId' }, {
                         rejectIcReviewLevelFive: { method: 'POST', params: {} },
+                    }),
+                    // Additional IC Review Levels (Six through Ten)
+                    icReviewLevelSixLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSix/:loanId", { loanId: '@loanId' }, {
+                        acceptIcReviewLevelSix: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewLevelSixLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSix/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelSix: { method: 'POST', params: {} },
+                    }),
+                    icReviewLevelSevenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSeven/:loanId", { loanId: '@loanId' }, {
+                        acceptIcReviewLevelSeven: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewLevelSevenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSeven/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelSeven: { method: 'POST', params: {} },
+                    }),
+                    icReviewLevelEightLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelEight/:loanId", { loanId: '@loanId' }, {
+                        acceptIcReviewLevelEight: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewLevelEightLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelEight/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelEight: { method: 'POST', params: {} },
+                    }),
+                    icReviewLevelNineLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelNine/:loanId", { loanId: '@loanId' }, {
+                        acceptIcReviewLevelNine: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewLevelNineLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelNine/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelNine: { method: 'POST', params: {} },
+                    }),
+                    icReviewLevelTenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelTen/:loanId", { loanId: '@loanId' }, {
+                        acceptIcReviewLevelTen: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewLevelTenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelTen/reject/:loanId", { loanId: '@loanId' }, {
+                        rejectIcReviewLevelTen: { method: 'POST', params: {} },
                     }),
                     prepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/prepareAndSignContract/:loanId", { loanId: '@loanId' }, {
                         acceptPrepareAndSignContract: { method: 'POST', params: {} },
