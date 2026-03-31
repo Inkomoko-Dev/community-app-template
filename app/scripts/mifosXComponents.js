@@ -41,6 +41,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'loanAccount/NewJLGLoanAccAppController',
             'loanAccount/LoanDocumentController',
             'loanAccount/ViewLoanTransactionController',
+            'loanAccount/RecoveryPaymentCorrectionModalController',
             'loanAccount/LoanScreenReportController',
             'loanAccount/RescheduleLoansRequestController',
             'loanAccount/ViewRescheduleRequestController',

@@ -1,0 +1,53 @@
+<div class="modal-header silver">
+    <h3 class="bolder">{{'label.heading.reverserecoverypayment' | translate}}</h3>
+</div>
+<div class="modal-body">
+    <api-validate></api-validate>
+    <div class="alert alert-warning" ng-if="correctionAllowed === false">
+        {{'error.msg.loan.transaction.closed.period.corrections.not.allowed' | translate}}
+    </div>
+    <form name="reverseRecoveryForm" class="form-horizontal" novalidate>
+        <div class="form-group">
+            <label class="control-label col-sm-4">{{'label.input.originaltransactionid' | translate}}</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{transaction.id}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4">{{'label.input.originaldate' | translate}}</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{transaction.date | DateFormat}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="reverseTransactionDate">{{'label.input.transactiondate' | translate}}<span class="required">*</span></label>
+            <div class="col-sm-6">
+                <input id="reverseTransactionDate" type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
+                       ng-model="formData.transactionDate" max="restrictDate" required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="reverseNote">{{'label.input.note' | translate}}</label>
+            <div class="col-sm-6">
+                <textarea id="reverseNote" rows="3" class="form-control" ng-model="formData.note"></textarea>
+            </div>
+        </div>
+        <div class="form-group" ng-if="correctionDateRequired">
+            <label class="control-label col-sm-4" for="reverseCorrectionDate">{{'label.input.correctiondate' | translate}}<span class="required">*</span></label>
+            <div class="col-sm-6">
+                <input id="reverseCorrectionDate" type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
+                       ng-model="formData.correctionDate" min="correctionDateMinDate" max="correctionDateMaxDate" required/>
+                <small class="help-block">
+                    {{'label.message.correctiondate.afterlatestclosure' | translate:getLatestClosureArgs()}}
+                </small>
+                <small class="error" ng-if="correctionDateErrorCode">
+                    {{correctionDateErrorCode | translate:correctionDateErrorArgs}}
+                </small>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+    <button class="btn btn-primary" ng-click="submit()" ng-disabled="reverseRecoveryForm.$invalid || correctionAllowed === false">{{'label.button.reverserecoverypayment' | translate}}</button>
+</div>
