@@ -8,6 +8,7 @@
             scope.dateFormat = 'dd MMMM yyyy';
             scope.datePicker = { opened: false };
             scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
+            scope.today = dateFilter(new Date(), 'dd MMMM yyyy');
 
             scope.formData = {
                 amount: null,
@@ -15,6 +16,7 @@
                 notes: ''
             };
 
+            // Load charge details to show current values
             resourceFactory.loanChargesResource.get(
                 { loanId: scope.loanId, chargeId: scope.chargeId },
                 function (data) {
