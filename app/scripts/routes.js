@@ -235,6 +235,9 @@
             .when('/loan/:loanId/editcharge/:id', {
                 templateUrl: 'views/loans/editloancharge.html'
             })
+            .when('/loan/:loanId/adjustinsurancecharge/:chargeId', {
+                templateUrl: 'views/loans/adjustloaninsurancecharge.html'
+            })
             .when('/assignloanofficer/:id', {
                 templateUrl: 'views/loans/assignloanofficer.html'
             })

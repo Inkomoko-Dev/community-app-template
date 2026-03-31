@@ -271,6 +271,13 @@
                         get: { method: 'GET', params: {} }
                     }),
                     loanChargesResource: defineResource(apiVer + "/loans/:loanId/charges/:chargeId", { loanId: '@loanId', chargeId: '@chargeId' }, {
+                        adjust: {
+                            method: 'POST',
+                            params: { command: 'adjust' }
+                        },
+                        get: {
+                            method: 'GET'
+                        }
                     }),
                     loanCollateralTemplateResource: defineResource(apiVer + "/loans/:loanId/collaterals/template", { loanId: '@loanId' }, {
                         get: { method: 'GET', params: {} }
