@@ -1,74 +1,45 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        AdjustLoanInsuranceChargeController: function (scope, routeParams, resourceFactory, location, dateFilter) {
+        AddLoanChargeController: function (scope, resourceFactory, routeParams, location, dateFilter) {
 
-            scope.loanId = routeParams.loanId;
-            scope.chargeId = routeParams.chargeId;
-            scope.isSubmitting = false;
-            scope.dateFormat = 'dd MMMM yyyy';
-            scope.datePicker = { opened: false };
-            scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
+            scope.charges = [];
+            scope.formData = {};
+            scope.isCollapsed = true;
+            scope.loanId = routeParams.id;
+            scope.first = {};
+            scope.first.date = new Date();
+            resourceFactory.loanChargeTemplateResource.get({loanId: scope.loanId}, function (data) {
+                scope.charges = data.chargeOptions;
+            });
 
-            scope.formData = {
-                amount: null,
-                transactionDate: new Date(),
-                notes: ''
-            };
-
-            resourceFactory.loanChargesResource.get(
-                { loanId: scope.loanId, chargeId: scope.chargeId },
-                function (data) {
-                    scope.charge = data;
-                    scope.formData.amount = data.amount;
-                }
-            );
-
-            scope.openDatePicker = function () {
-                scope.datePicker.opened = true;
-            };
-
-            scope.submit = function () {
-                scope.isSubmitting = true;
-
-                var payload = {
-                    amount: scope.formData.amount,
-                    transactionDate: dateFilter(scope.formData.transactionDate, 'dd MMMM yyyy'),
-                    dateFormat: 'dd MMMM yyyy',
-                    locale: scope.optlang.code
-                };
-
-                if (scope.formData.notes && scope.formData.notes.trim() !== '') {
-                    payload.notes = scope.formData.notes;
-                }
-
-                resourceFactory.loanChargesResource.adjust(
-                    { loanId: scope.loanId, chargeId: scope.chargeId },
-                    payload,
-                    function (data) {
-                        scope.isSubmitting = false;
-                        location.path('/viewloanaccount/' + scope.loanId);
-                    },
-                    function (error) {
-                        scope.isSubmitting = false;
+            scope.selectCharge = function(chargeId){
+                for(var i in scope.charges){
+                    if(scope.charges[i].id == chargeId){
+                        scope.isCollapsed = false;
+                        scope.chargeData = scope.charges[i];
+                        scope.formData.amount = scope.charges[i].amount;
                     }
-                );
+                }
             };
 
             scope.cancel = function () {
                 location.path('/viewloanaccount/' + scope.loanId);
             };
+
+            scope.submit = function () {
+                this.formData.locale = scope.optlang.code;
+                this.formData.dateFormat = scope.df;
+                if(scope.chargeData.chargeTimeType.id==2){
+                    this.formData.dueDate = dateFilter(this.first.date, scope.df);
+                }
+                resourceFactory.loanResource.save({resourceType: 'charges', loanId: scope.loanId}, this.formData, function (data) {
+                    location.path('/viewloanaccount/' + data.loanId);
+                });
+            };
+
         }
     });
-
-    mifosX.ng.application.controller('AdjustLoanInsuranceChargeController', [
-        '$scope',
-        '$routeParams',
-        'ResourceFactory',
-        '$location',
-        'dateFilter',
-        mifosX.controllers.AdjustLoanInsuranceChargeController
-    ]).run(function ($log) {
-        $log.info("AdjustLoanInsuranceChargeController initialized");
+    mifosX.ng.application.controller('AddLoanChargeController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', mifosX.controllers.AddLoanChargeController]).run(function ($log) {
+        $log.info("AddLoanChargeController initialized");
     });
-
 }(mifosX.controllers || {}));
