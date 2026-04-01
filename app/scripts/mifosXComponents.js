@@ -30,6 +30,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'loanAccount/NewLoanAccAppController',
             'loanAccount/LoanAccountActionsController',
             'loanAccount/AddLoanChargeController',
+            'loanAccount/AdjustLoanInsuranceChargeController',
             'loanAccount/AddLoanCollateralController',
             'loanAccount/AssignLoanOfficerController',
             'loanAccount/EditLoanAccAppController',
