@@ -69,13 +69,13 @@
                 $scope.authorizedSigners = data || [];
             });
 
-            // Run the report
-            $scope.runReport = function () {
+            // Build shared query params
+            $scope._buildQueryParams = function () {
                 let selectedOffice = null;
                 if ($scope.officeId) {
                     selectedOffice = $scope.offices.find(o => o.id === $scope.officeId);
                 }
-                const queryParams = {
+                return {
                     start_date: dateFilter($scope.startDate, 'yyyy-MM-dd'),
                     end_date: dateFilter($scope.endDate, 'yyyy-MM-dd'),
                     product_ids: $scope.loanProductIds.join(","),
@@ -84,30 +84,47 @@
                     interest_percentage: $scope.interestPercentage || 10,
                     investment_officer_ids: ($scope.selectedInvestmentOfficerIds || []).join(",")
                 };
+            };
 
-                // Map format to HTTP Accept header
-                const acceptMap = {
-                    PDF: "application/pdf",
-                    EXCEL: "application/vnd.ms-excel",
-                };
-                const acceptHeader = acceptMap[$scope.fileFormat] || "application/pdf";
-
+            // Run the report — always previews as PDF
+            $scope.runReport = function () {
                 $http({
                     method: 'GET',
                     url: $rootScope.hostUrl + API_VERSION + "/reports/jasper/disbursement_report",
-                    params: queryParams,
+                    params: $scope._buildQueryParams(),
                     responseType: 'blob',
-                    headers: {
-                        'Accept': acceptHeader
-                    }
+                    headers: { 'Accept': 'application/pdf' }
                 }).then(function (response) {
-                    const blob = new Blob([response.data], { type: acceptHeader });
+                    const blob = new Blob([response.data], { type: 'application/pdf' });
                     const url = URL.createObjectURL(blob);
                     $scope.baseURL = $sce.trustAsResourceUrl(url);
                     $scope.reportGenerated = true;
                 }).catch(function (err) {
                     $log.error("Error fetching report:", err);
                     $scope.reportGenerated = false;
+                });
+            };
+
+            // Download the report as Excel
+            $scope.downloadExcel = function () {
+                $http({
+                    method: 'GET',
+                    url: $rootScope.hostUrl + API_VERSION + "/reports/jasper/disbursement_report",
+                    params: $scope._buildQueryParams(),
+                    responseType: 'blob',
+                    headers: { 'Accept': 'application/vnd.ms-excel' }
+                }).then(function (response) {
+                    const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = ($scope.reportName || 'disbursement_report') + '.xls';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }).catch(function (err) {
+                    $log.error("Error downloading Excel:", err);
                 });
             };
 

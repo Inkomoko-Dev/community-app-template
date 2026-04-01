@@ -419,6 +419,7 @@
   "label.button.save": "Submit",
   "label.button.searchdata": "Search Data",
   "label.button.cancel": "Cancel",
+  "label.button.downloadexcel" : "Download Excel",
   "label.button.edit": "Edit",
   "label.button.rename": "Rename",
   "label.button.download": "Download",
