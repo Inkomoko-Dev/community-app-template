@@ -36,7 +36,7 @@
                 }
 
                 if (angular.isDate(value)) {
-                    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+                    return value;
                 }
 
                 if (angular.isArray(value) && value.length >= 3) {
@@ -56,19 +56,6 @@
                 }
 
                 return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
-            }
-
-            function getLatestClosureDate(data) {
-                var latestClosureDate = null;
-
-                for (var i = 0; i < data.length; i++) {
-                    var closureDate = normalizeDate(data[i].closingDate);
-                    if (closureDate && (!latestClosureDate || closureDate.getTime() > latestClosureDate.getTime())) {
-                        latestClosureDate = closureDate;
-                    }
-                }
-
-                return latestClosureDate;
             }
 
             function buildRecoveryReversalIndex(transactions) {
@@ -113,26 +100,30 @@
                     return null;
                 }
 
-                return normalizeDate(transactionRef.date || transactionRef.transactionDate || transactionRef.submittedOnDate);
-            }
-
-            function loadLatestClosureDate(officeId) {
-                var params = {};
-                if (officeId) {
-                    params.officeId = officeId;
+                var dateFieldName = transactionRef.date ? 'date'
+                    : (transactionRef.transactionDate ? 'transactionDate'
+                        : (transactionRef.submittedOnDate ? 'submittedOnDate' : null));
+                if (!dateFieldName) {
+                    return null;
                 }
 
-                resourceFactory.accountingClosureResource.get(params, function (data) {
-                    scope.latestClosureDate = getLatestClosureDate(data);
-                }, function () {
-                    scope.latestClosureDate = null;
-                });
+                var normalizedDate = normalizeDate(transactionRef[dateFieldName]);
+                if (normalizedDate) {
+                    transactionRef[dateFieldName] = normalizedDate;
+                }
+
+                return normalizedDate;
             }
 
             function loadRelatedRecoveryReversal(transaction) {
                 scope.relatedRecoveryReversal = null;
 
                 if (!scope.isRecoveryPaymentTransaction(transaction) || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
+                    return;
+                }
+
+                if (angular.isObject(transaction.reversalTransaction)) {
+                    scope.relatedRecoveryReversal = transaction.reversalTransaction;
                     return;
                 }
 
@@ -154,7 +145,7 @@
                     scope.transaction.accountId = routeParams.accountId;
                     scope.details = [];
                     scope.generateDetailTable();
-                    loadLatestClosureDate(data.officeId);
+                    scope.latestClosureDate = null;
                     loadRelatedRecoveryReversal(data);
                 });
             }
@@ -196,6 +187,19 @@
 
             scope.getRelatedTransactionDate = function (transactionRef) {
                 return extractTransactionDate(transactionRef);
+            };
+
+            scope.getTransactionCorrectionDate = function (transaction) {
+                if (!transaction || !transaction.correctionDate) {
+                    return null;
+                }
+
+                var normalizedDate = normalizeDate(transaction.correctionDate);
+                if (normalizedDate) {
+                    transaction.correctionDate = normalizedDate;
+                }
+
+                return normalizedDate;
             };
 
             scope.openReverseRecoveryPaymentModal = function (transaction) {

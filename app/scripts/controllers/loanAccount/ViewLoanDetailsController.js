@@ -18,6 +18,12 @@
             scope.financialRatioData = {};
             scope.latestClosureDate = null;
             scope.recoveryReversalTransactionsByOriginalId = {};
+            scope.instructions = { currentPageItems: [] };
+            scope.cblpstatusactive = false;
+            scope.cbIsCreditCheckMandatory = false;
+            scope.cblpstatuses = null;
+            scope.crbReportTransUnion = null;
+            scope.crbReportMetrolpolIdentityVerification = null;
 
 
             scope.interval = interval(function () {
@@ -38,7 +44,7 @@
                 }
 
                 if (angular.isDate(value)) {
-                    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+                    return value;
                 }
 
                 if (angular.isArray(value) && value.length >= 3) {
@@ -77,7 +83,19 @@
                     return null;
                 }
 
-                return normalizeDate(transactionRef.date || transactionRef.transactionDate || transactionRef.submittedOnDate);
+                var dateFieldName = transactionRef.date ? 'date'
+                    : (transactionRef.transactionDate ? 'transactionDate'
+                        : (transactionRef.submittedOnDate ? 'submittedOnDate' : null));
+                if (!dateFieldName) {
+                    return null;
+                }
+
+                var normalizedDate = normalizeDate(transactionRef[dateFieldName]);
+                if (normalizedDate) {
+                    transactionRef[dateFieldName] = normalizedDate;
+                }
+
+                return normalizedDate;
             }
 
             function getTransactionTypeValue(transaction) {
@@ -88,17 +106,12 @@
                 return ((transaction.type.code || '') + ' ' + (transaction.type.value || '')).toLowerCase();
             }
 
-            function getLatestClosureDate(data) {
-                var latestClosureDate = null;
-
-                for (var i = 0; i < data.length; i++) {
-                    var closureDate = normalizeDate(data[i].closingDate);
-                    if (closureDate && (!latestClosureDate || closureDate.getTime() > latestClosureDate.getTime())) {
-                        latestClosureDate = closureDate;
-                    }
+            function getLoanOfficeId(data) {
+                if (!data) {
+                    return null;
                 }
 
-                return latestClosureDate;
+                return data.officeId || data.clientOfficeId || (data.fromOffice && data.fromOffice.id) || (data.fromClient && data.fromClient.officeId) || null;
             }
 
             function buildRecoveryReversalIndex(transactions) {
@@ -116,19 +129,6 @@
                 }
 
                 return recoveryReversalTransactionsByOriginalId;
-            }
-
-            function loadLatestClosureDate(officeId) {
-                var params = {};
-                if (officeId) {
-                    params.officeId = officeId;
-                }
-
-                resourceFactory.accountingClosureResource.get(params, function (data) {
-                    scope.latestClosureDate = getLatestClosureDate(data);
-                }, function () {
-                    scope.latestClosureDate = null;
-                });
             }
 
             scope.isRecoveryPaymentTransaction = function (transaction) {
@@ -162,13 +162,27 @@
                 return extractTransactionDate(transactionRef);
             };
 
+            scope.getTransactionCorrectionDate = function (transaction) {
+                if (!transaction || !transaction.correctionDate) {
+                    return null;
+                }
+
+                var normalizedDate = normalizeDate(transaction.correctionDate);
+                if (normalizedDate) {
+                    transaction.correctionDate = normalizedDate;
+                }
+
+                return normalizedDate;
+            };
+
             scope.getRecoveryReversalTransaction = function (transaction) {
                 var transactionId = extractTransactionId(transaction && transaction.id);
                 if (!transactionId || !scope.isRecoveryPaymentTransaction(transaction) || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
                     return null;
                 }
 
-                return scope.recoveryReversalTransactionsByOriginalId[transactionId] || null;
+                return scope.recoveryReversalTransactionsByOriginalId[transactionId]
+                    || (angular.isObject(transaction && transaction.reversalTransaction) ? transaction.reversalTransaction : null);
             };
 
             scope.canReverseRecoveryPayment = function (transaction) {
@@ -261,8 +275,20 @@
              */
 
             scope.convertDateArrayToObject = function(dateFieldName){
-                for(var i in scope.loandetails.transactions){
-                    scope.loandetails.transactions[i][dateFieldName] = new Date(scope.loandetails.transactions[i].date);
+                if (!scope.loandetails || !angular.isArray(scope.loandetails.transactions)) {
+                    return;
+                }
+
+                for (var i = 0; i < scope.loandetails.transactions.length; i++) {
+                    var transaction = scope.loandetails.transactions[i];
+                    if (!transaction) {
+                        continue;
+                    }
+
+                    var normalizedDate = normalizeDate(transaction[dateFieldName]);
+                    if (normalizedDate) {
+                        transaction[dateFieldName] = normalizedDate;
+                    }
                 }
             };
 
@@ -518,7 +544,8 @@
                     scope.loandetails = data;
                     scope.recoveryReversalTransactionsByOriginalId = buildRecoveryReversalIndex(data.transactions || []);
                     scope.productId = data.loanProductId;
-                    loadLatestClosureDate(data.officeId);
+                    scope.loanOfficeId = getLoanOfficeId(data);
+                    scope.latestClosureDate = null;
                     scope.convertDateArrayToObject('date');
                     scope.recalculateInterest = data.recalculateInterest || true;
                     scope.isWaived = scope.loandetails.repaymentSchedule.totalWaived > 0;
@@ -942,18 +969,26 @@
                     resourceFactory.standingInstructionTemplateResource.get({fromClientId: scope.loandetails.clientId,fromAccountType: 1,fromAccountId: routeParams.id},function (response) {
                         scope.standinginstruction = response;
                         scope.searchTransaction();
+                    }, function () {
+                        scope.standinginstruction = null;
+                        scope.searchTransaction();
                     });
 
                     resourceFactory.creditBureauByLoanProductId.get({loanProductId: scope.productId}, function (data) {
                         scope.cblpstatuses = data;
                         scope.cblpstatusactive = data.isActive;
-                        scope.cbIsCreditCheckMandatory = data.isCreditCheckMandatory
+                        scope.cbIsCreditCheckMandatory = data.isCreditCheckMandatory;
+
+                        if (data.isActive && data.currency && data.currency.code == "RWF") {
+                            scope.getCrbReport();
+                        } else if (data.isActive && data.currency && data.currency.code == "KES") {
+                            scope.crbMetropolIdentityVerification();
+                        }
+                    }, function () {
+                        scope.cblpstatuses = null;
+                        scope.cblpstatusactive = false;
+                        scope.cbIsCreditCheckMandatory = false;
                     });
-                    if((data.currency.code == "RWF")){
-                    scope.getCrbReport();
-                    }else if(data.currency.code == "KES"){
-                    scope.crbMetropolIdentityVerification();
-                    }
 
                     if(data.nextLoanIcReviewDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"){
                         scope.showApprovedICAmount = true;
@@ -1360,11 +1395,15 @@
             scope.getCrbReport = function(){
               resourceFactory.fetchCrbReportForTransUnion.get({loanId: routeParams.id}, function (data) {
                   scope.crbReportTransUnion = data;
+              }, function () {
+                  scope.crbReportTransUnion = null;
               });
           }
            scope.crbMetropolIdentityVerification = function(){
             resourceFactory.crbMetropolIdentityVerification.get({loanId: routeParams.id}, function (data) {
                 scope.crbReportMetrolpolIdentityVerification = data;
+            }, function () {
+                scope.crbReportMetrolpolIdentityVerification = null;
             });
         }
 
