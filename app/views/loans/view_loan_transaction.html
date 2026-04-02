@@ -29,10 +29,14 @@
                     class="btn btn-primary" has-permission='ADJUST_LOAN'><i class="fa fa-pencil "></i>{{ 'label.button.edit' | translate}}</a>
                     <a ng-if="!isRecoveryPaymentTransaction(transaction)" ng-click="undo(transaction.accountId, transaction.id)" class="btn btn-danger" has-permission='ADJUST_LOAN'><i
                     class="fa fa-trash "></i>{{ 'label.button.undo' | translate}}</a>
-                    <a ng-if="canReverseRecoveryPayment(transaction)" ng-click="openReverseRecoveryPaymentModal(transaction)" class="btn btn-warning" has-permission='REVERSERECOVERYPAYMENT_LOAN'><i
-                    class="fa fa-undo "></i>{{ 'label.button.reverserecoverypayment' | translate}}</a>
-                    <a ng-if="canPostCorrectedRecoveryPayment(transaction)" ng-click="openPostCorrectedRecoveryPaymentModal(transaction)" class="btn btn-primary" has-permission='RECOVERYPAYMENT_LOAN'><i
-                    class="fa fa-repeat "></i>{{ 'label.button.postcorrectedrecovery' | translate}}</a>
+                    <a ng-if="canReverseRecoveryPayment(transaction)" ng-click="openReverseRecoveryPaymentModal(transaction)"
+                    class="btn btn-warning" has-permission='REVERSERECOVERYPAYMENT_LOAN'
+                    uib-tooltip="{{ 'label.button.reverserecoverypayment' | translate}}" aria-label="{{ 'label.button.reverserecoverypayment' | translate}}"><i
+                    class="fa fa-undo "></i></a>
+                    <a ng-if="canPostCorrectedRecoveryPayment(transaction)" ng-click="openPostCorrectedRecoveryPaymentModal(transaction)"
+                    class="btn btn-primary" has-permission='RECOVERYPAYMENT_LOAN'
+                    uib-tooltip="{{ 'label.button.postcorrectedrecovery' | translate}}" aria-label="{{ 'label.button.postcorrectedrecovery' | translate}}"><i
+                    class="fa fa-repeat "></i></a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -65,9 +69,9 @@
                         <td>{{ 'label.input.originaldate' | translate}}</td>
                         <td>{{transaction.date | DateFormat}}</td>
                     </tr>
-                    <tr ng-if="transaction.correctionDate">
+                    <tr ng-if="getTransactionCorrectionDate(transaction)">
                         <td>{{ 'label.input.correctiondate' | translate}}</td>
-                        <td>{{transaction.correctionDate | DateFormat}}</td>
+                        <td>{{getTransactionCorrectionDate(transaction) | DateFormat}}</td>
                     </tr>
                     <tr ng-if="transaction.createdByUsername">
                         <td>{{ 'label.createdby' | translate}}</td>

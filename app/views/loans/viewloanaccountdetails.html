@@ -887,7 +887,7 @@
                                     <td class="small" ng-if="isRecoveryPaymentTransaction(transaction)">
                                         <div><strong>{{'label.input.manuallyreversed' | translate}}:</strong> {{transaction.manuallyReversed | YesOrNo}}</div>
                                         <div><strong>{{'label.input.originaldate' | translate}}:</strong> {{transaction.date | DateFormat}}</div>
-                                        <div ng-if="transaction.correctionDate"><strong>{{'label.input.correctiondate' | translate}}:</strong> {{transaction.correctionDate | DateFormat}}</div>
+                                        <div ng-if="getTransactionCorrectionDate(transaction)"><strong>{{'label.input.correctiondate' | translate}}:</strong> {{getTransactionCorrectionDate(transaction) | DateFormat}}</div>
                                         <div ng-if="transaction.originalTransactionId">
                                             <strong>{{'label.input.originaltransactionid' | translate}}:</strong>
                                             <a href ng-click="openRelatedTransaction($event, transaction.originalTransactionId)">{{getRelatedTransactionId(transaction.originalTransactionId)}}</a>
@@ -903,14 +903,18 @@
                                         <button type="button" class="btn btn-xs btn-warning"
                                                 ng-if="canReverseRecoveryPayment(transaction)"
                                                 ng-click="openReverseRecoveryPaymentModal(transaction)"
+                                                uib-tooltip="{{'label.button.reverserecoverypayment' | translate}}"
+                                                aria-label="{{'label.button.reverserecoverypayment' | translate}}"
                                                 has-permission="REVERSERECOVERYPAYMENT_LOAN">
-                                            {{'label.button.reverserecoverypayment' | translate}}
+                                            <i class="fa fa-undo"></i>
                                         </button>
                                         <button type="button" class="btn btn-xs btn-primary"
                                                 ng-if="canPostCorrectedRecoveryPayment(transaction)"
                                                 ng-click="openPostCorrectedRecoveryPaymentModal(transaction)"
+                                                uib-tooltip="{{'label.button.postcorrectedrecovery' | translate}}"
+                                                aria-label="{{'label.button.postcorrectedrecovery' | translate}}"
                                                 has-permission="RECOVERYPAYMENT_LOAN">
-                                            {{'label.button.postcorrectedrecovery' | translate}}
+                                            <i class="fa fa-repeat"></i>
                                         </button>
                                     </td>
                                     <td> <span uib-tooltip="{{'label.heading.viewreceipts' | translate }}" ng-if="transaction.manuallyReversed!=true" ng-click="viewloantransactionreceipts(transaction.id)">
@@ -1145,7 +1149,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="{{'label.anchor.standinginstruction' | translate}}" ng-show="instructions.currentPageItems.length > 0">
+                    <uib-tab heading="{{'label.anchor.standinginstruction' | translate}}" ng-show="instructions && instructions.currentPageItems && instructions.currentPageItems.length > 0">
                         <br>
                         <table class="table">
                             <thead>
