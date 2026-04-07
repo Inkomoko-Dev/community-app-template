@@ -389,7 +389,7 @@
                     idToNodeMap[data[i].id] = data[i];
                 }
                 scope.loanResource = function () {
-                    resourceFactory.loanResource.getAllLoans({limit: '1000', sqlSearch: 'l.loan_status_id in (100,200)'}, function (loanData) {
+                    resourceFactory.loanResource.getAllLoans({limit: '2000', sqlSearch: 'l.loan_status_id in (100,200)'}, function (loanData) {
                         scope.loans = loanData.pageItems;
                         for (var i in scope.loans) {
                             if (scope.loans[i].status.pendingApproval) {
