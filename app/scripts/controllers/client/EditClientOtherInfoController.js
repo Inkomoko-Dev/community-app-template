@@ -1,8 +1,8 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        EditClientOtherInfoController: function (scope, resourceFactory, routeParams,dateFilter, location) {
+        EditClientOtherInfoController: function (scope, resourceFactory, routeParams, dateFilter, location) {
             scope.date = {};
-             scope.restrictDate = new Date();
+            scope.restrictDate = new Date();
             scope.formData = {};
             scope.clientId = routeParams.clientId;
             scope.otherInfoId = routeParams.otherInfoId;
@@ -10,7 +10,7 @@
             scope.yearArrivedRequired = true;
             scope.bankOptions = [];
 
-            resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
+            resourceFactory.clientOtherInfoTemplateResource.get({ clientId: routeParams.clientId }, function (data) {
                 scope.strataOptions = data.strataOptions;
                 scope.nationalityOptions = data.nationalityOptions;
             });
@@ -20,26 +20,29 @@
                 scope.bankOptions = data;
             });
 
-            resourceFactory.otherInfoResource.get({clientId:routeParams.clientId, otherInfoId: routeParams.otherInfoId}, function(data){
+            resourceFactory.otherInfoResource.get({ clientId: routeParams.clientId, otherInfoId: routeParams.otherInfoId }, function (data) {
                 scope.otherInfoData = data;
                 scope.formData = {
-                      strataId: data.strata.id,
-                      nationalityId: data.nationality.id,
-                      yearArrivedInHostCountry: data.yearArrivedInHostCountry,
-                      numberOfDependents: data.numberOfDependents,
-                      numberOfChildren: data.numberOfChildren,
-                      nationalIdentificationNumber: data.nationalIdentificationNumber,
-                      passportNumber: data.passportNumber,
-                      bankAccountNumber: data.bankAccountNumber,
-                      bankName: data.bankName,
-                      bankId: data.bankId,
-                      bankName: data.bankName,
+                    strataId: data.strata.id,
+                    nationalityId: data.nationality.id,
+                    yearArrivedInHostCountry: data.yearArrivedInHostCountry,
+                    numberOfDependents: data.numberOfDependents,
+                    numberOfChildren: data.numberOfChildren,
+                    nationalIdentificationNumber: data.nationalIdentificationNumber,
+                    passportNumber: data.passportNumber,
+                    bankAccountNumber: data.bankAccountNumber,
+                    bankId: data.bankId,
                     telephoneNo: parseInt(data.telephoneNumber)
-                }
-               if (data.yearArrivedInHostCountry) {
+                };
+
+                if (data.yearArrivedInHostCountry) {
                     var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
                     scope.date.submittedOnDate = new Date(submittedOnDate);
                 }
+
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             scope.cancel = function () {
@@ -61,18 +64,17 @@
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
 
-                if(scope.date.submittedOnDate){
-                    this.formData.yearArrivedInHostCountry = dateFilter(scope.date.submittedOnDate,  scope.df);
+                if (scope.date.submittedOnDate) {
+                    this.formData.yearArrivedInHostCountry = dateFilter(scope.date.submittedOnDate, scope.df);
                 }
 
-                resourceFactory.otherInfoResource.put({clientId: scope.clientId, otherInfoId: routeParams.otherInfoId}, this.formData, function (data) {
+                resourceFactory.otherInfoResource.put({ clientId: scope.clientId, otherInfoId: routeParams.otherInfoId }, this.formData, function (data) {
                     location.path('/clientOtherInfo/' + scope.clientId);
                 });
             };
-
         }
     });
-    mifosX.ng.application.controller('EditClientOtherInfoController', ['$scope', 'ResourceFactory', '$routeParams','dateFilter', '$location', mifosX.controllers.EditClientOtherInfoController]).run(function ($log) {
+    mifosX.ng.application.controller('EditClientOtherInfoController', ['$scope', 'ResourceFactory', '$routeParams', 'dateFilter', '$location', mifosX.controllers.EditClientOtherInfoController]).run(function ($log) {
         $log.info("EditClientOtherInfoController initialized");
     });
 }(mifosX.controllers || {}));

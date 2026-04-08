@@ -8,31 +8,49 @@
             scope.otherInfoId = routeParams.otherInfoId;
             scope.otherInfoData = {};
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
             });
 
-            resourceFactory.otherInfoEntityResource.get({clientId:routeParams.clientId, otherInfoId: routeParams.otherInfoId}, function(data){
-                scope.otherInfoData = data;
-                scope.formData = {
-                      strataId: data.strata.id,
-                      businessLocation: data.businessLocation,
-                      taxIdentificationNumber: data.taxIdentificationNumber,
-                      coSignorsName: data.coSignors == "" ? undefined: data.coSignors,
-                      guarantor: data.guarantor == "" ? undefined: data.guarantor,
-                      incomeGeneratingActivity: data.incomeGeneratingActivity == 0 ? undefined: data.incomeGeneratingActivity,
-                      incomeGeneratingActivityMonthlyAmount: data.incomeGeneratingActivityMonthlyAmount,
-                      telephoneNo: parseInt(data.telephoneNumber),
-                      bankAccountNumber: data.bankAccountNumber,
-                      bankName: data.bankName,
-                       yearArrivedInHostCountry: data.yearArrivedInHostCountry,
-                }
-                  if (data.yearArrivedInHostCountry) {
-                var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
-                scope.date.submittedOnDate = new Date(submittedOnDate);
-            }
+
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
             });
+
+            resourceFactory.otherInfoResource.get(
+                { clientId: routeParams.clientId, otherInfoId: routeParams.otherInfoId },
+                function (data) {
+                    console.log('edit prefile data:', data);
+                    scope.otherInfoData = data;
+                    scope.formData = {
+                        strataId: data.strata.id,
+                        businessLocation: data.businessLocation,
+                        taxIdentificationNumber: data.taxIdentificationNumber,
+                        coSignorsName: data.coSignors == "" ? undefined : data.coSignors,
+                        guarantor: data.guarantor == "" ? undefined : data.guarantor,
+                        incomeGeneratingActivity: data.incomeGeneratingActivity == 0 ? undefined : data.incomeGeneratingActivity,
+                        incomeGeneratingActivityMonthlyAmount: data.incomeGeneratingActivityMonthlyAmount,
+                        telephoneNo: parseInt(data.telephoneNumber),
+                        bankAccountNumber: data.bankAccountNumber,
+                        bankId: data.bankId,
+                        yearArrivedInHostCountry: data.yearArrivedInHostCountry,
+                    };
+
+                    if (data.yearArrivedInHostCountry) {
+                        var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
+                        scope.date.submittedOnDate = new Date(submittedOnDate);
+                    }
+
+                    scope.$applyAsync(function () {
+                        angular.element('#bankId').trigger('chosen:updated');
+                    });
+                },
+                function (error) {
+                    console.log('edit prefill error:', error);
+                }
+            );
 
             scope.checkIfHostCommunitySelected = function () {
                 if (scope.strataOptions && this.formData.strataId != undefined) {
