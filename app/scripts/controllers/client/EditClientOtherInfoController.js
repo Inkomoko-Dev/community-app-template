@@ -8,10 +8,16 @@
             scope.otherInfoId = routeParams.otherInfoId;
             scope.otherInfoData = {};
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
                 scope.nationalityOptions = data.nationalityOptions;
+            });
+
+            // Fetch banks for dropdown
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
             });
 
             resourceFactory.otherInfoResource.get({clientId:routeParams.clientId, otherInfoId: routeParams.otherInfoId}, function(data){
@@ -26,7 +32,9 @@
                       passportNumber: data.passportNumber,
                       bankAccountNumber: data.bankAccountNumber,
                       bankName: data.bankName,
-                      telephoneNo: parseInt(data.telephoneNumber)
+                      bankId: data.bankId,
+                      bankName: data.bankName,
+                    telephoneNo: parseInt(data.telephoneNumber)
                 }
                if (data.yearArrivedInHostCountry) {
                     var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);

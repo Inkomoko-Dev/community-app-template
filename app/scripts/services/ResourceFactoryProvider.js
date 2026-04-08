@@ -1113,7 +1113,10 @@
                     reportParamResource: defineResource(apiVer + "/reports/jasper/parameters/:reportName", { reportName: '@reportName' }, {
                         get: { method: 'GET', isArray: true }
                     }),
-
+                    banksResource: defineResource(apiVer + "/banks", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        search: { method: 'GET', params: {}, isArray: true }
+                    }),
                     crbPostingReportsViewResource: defineResource(
                          apiVer + "/crb/posting-logs",
                         {},
