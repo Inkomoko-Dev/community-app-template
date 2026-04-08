@@ -2,7 +2,7 @@ name: Fineract Client Build Production
 
 on:
   push:
-    branches: [ inkomoko-prod ]
+    branches: [ inkomoko-prod-demo ]
 
 jobs:
   
