@@ -31,17 +31,6 @@
                 }
             });
 
-            // resourceFactory.clientOtherInfoEntityResource.getAll({ clientId: routeParams.clientId }, function (data) {
-            //     scope.otherInfoData = data[0];
-            //     if (scope.otherInfoData) {
-            //         scope.exists = true;
-            //     }
-            //     if (data.yearArrivedInHostCountry) {
-            //         var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
-            //         scope.date.submittedOnDate = new Date(submittedOnDate);
-            //     }
-            // });
-
             scope.checkIfHostCommunitySelected = function () {
                 if (scope.strataOptions && this.formData.strataId != undefined) {
                     var selectedObj = scope.strataOptions.filter(x => x.id === this.formData.strataId).at(0);
