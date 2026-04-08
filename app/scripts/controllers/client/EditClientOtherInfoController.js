@@ -20,22 +20,23 @@
                 scope.bankOptions = data;
             });
 
-            resourceFactory.otherInfoResource.get({ clientId: routeParams.clientId, otherInfoId: routeParams.otherInfoId }, function (data) {
+            resourceFactory.otherInfoResource.get({clientId:routeParams.clientId, otherInfoId: routeParams.otherInfoId}, function(data){
                 scope.otherInfoData = data;
                 scope.formData = {
-                    strataId: data.strata.id,
-                    nationalityId: data.nationality.id,
-                    yearArrivedInHostCountry: data.yearArrivedInHostCountry,
-                    numberOfDependents: data.numberOfDependents,
-                    numberOfChildren: data.numberOfChildren,
-                    nationalIdentificationNumber: data.nationalIdentificationNumber,
-                    passportNumber: data.passportNumber,
-                    bankAccountNumber: data.bankAccountNumber,
-                    bankId: data.bankId,
+                      strataId: data.strata.id,
+                      nationalityId: data.nationality.id,
+                      yearArrivedInHostCountry: data.yearArrivedInHostCountry,
+                      numberOfDependents: data.numberOfDependents,
+                      numberOfChildren: data.numberOfChildren,
+                      nationalIdentificationNumber: data.nationalIdentificationNumber,
+                      passportNumber: data.passportNumber,
+                      bankAccountNumber: data.bankAccountNumber,
+                      bankName: data.bankName,
+                      bankId: data.bankId,
+                      bankName: data.bankName,
                     telephoneNo: parseInt(data.telephoneNumber)
-                };
-
-                if (data.yearArrivedInHostCountry) {
+                }
+               if (data.yearArrivedInHostCountry) {
                     var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
                     scope.date.submittedOnDate = new Date(submittedOnDate);
                 }
