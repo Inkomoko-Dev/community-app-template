@@ -1,0 +1,74 @@
+name: Fineract Client Build Pre-Prod
+
+on:
+  push:
+    branches: [ inkomoko-preprod-demo ]
+
+jobs:
+  
+  deploy:
+    
+    name: Deploy archive to ubuntu server
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.13.1'
+      
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '2.7'
+
+    - name: Install Bower dependencies
+      run: |
+        npm install -g bower
+        bower --allow-root install
+    
+    - name: Build and archive app package
+      run: |
+        npm install --legacy-peer-deps
+        npm install -g grunt-cli
+        bundle install
+        grunt prod
+        tar -czvf app.tar.gz dist/community-app
+        
+    - name: Update known hosts
+      run: |
+        mkdir -p ~/.ssh
+        touch ~/.ssh/known_hosts
+        ssh-keyscan -p ${{ secrets.PROD_SERVER_PORT }} -t rsa ${{ secrets.PROD_SERVER_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Copy file using SCP
+      run: |
+        HOST=${{ secrets.PROD_SERVER_HOST }}
+        USER=${{ secrets.PROD_SERVER_USERNAME }}
+        SOURCE_FILE=app.tar.gz
+        DESTINATION_DIR=/home/fiter/inkomoko_deployments/frontend
+        echo "${{ secrets.PROD_SERVER_SSH_KEY }}" > key.pem
+        chmod 400 key.pem
+        scp -i key.pem -P ${{ secrets.PROD_SERVER_PORT }} -o StrictHostKeyChecking=no $SOURCE_FILE $USER@$HOST:$DESTINATION_DIR
+    - name: Update known hosts
+      run: |
+        mkdir -p ~/.ssh
+        touch ~/.ssh/known_hosts
+        ssh-keyscan -p ${{ secrets.VM_PORT_STAG }} -t rsa ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Copy file using SCP
+      run: |
+        HOST=${{ secrets.VM_HOST }}
+        USER=${{ secrets.VM_USER_STAG }}
+        SOURCE_FILE=app.tar.gz
+        DESTINATION_DIR=/home/mifosstaging/fineract_inkomoko/frontend
+        echo "${{ secrets.VM_KEY_STAG }}" > key.pem
+        chmod 400 key.pem
+        scp -i key.pem -P ${{ secrets.VM_PORT_STAG }} -o StrictHostKeyChecking=no $SOURCE_FILE $USER@$HOST:$DESTINATION_DIR
+    
+    - name: Build image on server and deploy
+      run: ssh -i key.pem -p ${{ secrets.VM_PORT_STAG }} -o StrictHostKeyChecking=no -l ${{ secrets.VM_USER_STAG }} ${{ secrets.VM_HOST }} '/home/mifosstaging/fineract_inkomoko/frontend/deploy.sh'    
