@@ -29,6 +29,9 @@
             // Fetch banks for dropdown
             resourceFactory.banksResource.getAll({}, function (data) {
                 scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             scope.cancel = function () {
