@@ -98,13 +98,18 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="bankName">
+                    <label class="control-label col-sm-2" for="bankId">
                         {{ 'label.input.bankName' | translate }}
                     </label>
-                
                     <div class="col-sm-3">
-                        <input id="bankName" name="bankName" type="text" class="form-control" 
-                            ng-model="formData.bankName"  late-validate />
+                        <select chosen="bankOptions"
+                                id="bankId"
+                                name="bankId"
+                                ng-model="formData.bankId"
+                                class="form-control"
+                                ng-options="bank.id as (bank.bankName + ' — ' + bank.country) for bank in bankOptions">
+                            <option value="">-- Select Bank --</option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">
