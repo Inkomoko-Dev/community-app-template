@@ -67,7 +67,8 @@
                         get: { method: 'GET', params: {}, isArray: true }
                     }),
                     clientDocumentsResource: defineResource(apiVer + "/clients/:clientId/documents/:documentId", { clientId: '@clientId', documentId: '@documentId' }, {
-                        getAllClientDocuments: { method: 'GET', params: {}, isArray: true }
+                        getAllClientDocuments: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
                     }),
                     clientAccountResource: defineResource(apiVer + "/clients/:clientId/accounts", { clientId: '@clientId', fields: '@fields' }, {
                         getAllAccounts: { method: 'GET', params: { fields: '@fields' } }
@@ -304,7 +305,8 @@
                         update: { method: 'PUT' }
                     }),
                     LoanDocumentResource: defineResource(apiVer + "/loans/:loanId/documents/:documentId", { loanId: '@loanId', documentId: '@documentId' }, {
-                        getLoanDocuments: { method: 'GET', params: {}, isArray: true }
+                        getLoanDocuments: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
                     }),
                     RecurringDocumentResource: defineResource(apiVer + "/recurring/:accountId/documents/:documentId", { accountId: '@accountId', documentId: '@documentId' }, {
                         getRecurringDocuments: { method: 'GET', params: {}, isArray: true }
@@ -431,7 +433,8 @@
                         update: { method: 'PUT' }
                     }),
                     savingsDocumentsResource: defineResource(apiVer + "/savings/:savingsId/documents/:documentId", { savingsId: '@savingsId', documentId: '@documentId' }, {
-                        getAllSavingsDocuments: { method: 'GET', params: {}, isArray: true }
+                        getAllSavingsDocuments: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
                     }),
                     gsimResource: defineResource(apiVer + "/savingsaccounts/gsim/:parentAccountId", { parentAccountId: '@parentAccountId' }, {
                         post: { method: 'POST', params: {} },
