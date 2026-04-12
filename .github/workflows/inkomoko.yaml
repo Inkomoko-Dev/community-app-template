@@ -1,4 +1,4 @@
-name: Fineract Client Build
+name: Fineract Client Build Dev
 
 on:
   push:
@@ -8,7 +8,7 @@ jobs:
   
   deploy:
     
-    name: Deploy archive to ubuntu server
+    name: Deploy archive to ubuntu server Dev
     runs-on: ubuntu-latest
 
     steps:
