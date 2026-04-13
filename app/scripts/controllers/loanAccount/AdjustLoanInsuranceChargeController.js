@@ -25,6 +25,14 @@
                 }
             );
 
+            // Load income gls
+            resourceFactory.glAccountsResource.getAll({ type: 4, usage: 1, disabled: false }, function (data) {
+                scope.incomeGlAccounts = data;
+                scope.$applyAsync(function () {
+                    angular.element('#glAccountId').trigger('chosen:updated');
+                });
+            });
+
             scope.openDatePicker = function () {
                 scope.datePicker.opened = true;
             };
@@ -36,11 +44,13 @@
                     amount: scope.formData.amount,
                     transactionDate: dateFilter(scope.formData.transactionDate, 'dd MMMM yyyy'),
                     dateFormat: 'dd MMMM yyyy',
-                    locale: scope.optlang.code
+                    locale: scope.optlang.code,
+                    notes: scope.formData.notes
                 };
 
-                if (scope.formData.notes && scope.formData.notes.trim() !== '') {
-                    payload.notes = scope.formData.notes;
+                // Only include glAccountId if selected
+                if (scope.formData.glAccountId) {
+                    payload.glAccountId = scope.formData.glAccountId;
                 }
 
                 resourceFactory.loanChargesResource.adjust(
