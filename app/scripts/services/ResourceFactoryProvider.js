@@ -372,6 +372,12 @@
                         getAllAccountCoas: { method: 'GET', params: {}, isArray: true },
                         update: { method: 'PUT' }
                     }),
+                    glAccountsResource:defineResource(apiVer + '/glaccounts', {}, {
+                        getAll: {
+                            method: 'GET',
+                            isArray: true
+                        }
+                    }),
                     accountCoaTemplateResource: defineResource(apiVer + "/glaccounts/template", {}, {
                         get: { method: 'GET', params: {} }
                     }),
