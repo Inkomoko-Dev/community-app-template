@@ -478,6 +478,7 @@
   "label.heading.clientLevel": "Client Level",
   "label.button.createvalidation": "Create Validation Limit",
   "label.input.dailyWithdrawLimit": "Daily withdraw limit",
+  "label.input.glAccount": "Gl Account",
   "label.input.singleWithdrawLimit": "Single Withdraw Limit",
   "label.button.submit": "Submit",
   "label.heading.confirm.reject": "Confirm Rejection?",
