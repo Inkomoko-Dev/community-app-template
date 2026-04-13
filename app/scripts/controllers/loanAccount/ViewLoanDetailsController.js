@@ -713,6 +713,19 @@
                         }
                     }
 
+                    // Generate Cashflow button - only available during Due Diligence stage
+                    function getGenerateCashflowActionOptions(data) {
+                        if (data.isExtendLoanLifeCycleConfig == true &&
+                            data.loanDecisionState != null &&
+                            data.loanDecisionState.value === "DUE_DILIGENCE") {
+                            return {
+                                name: "button.generatecashflow",
+                                taskPermissionName: 'GENERATE_CASHFLOW_LOAN'
+                            };
+                        }
+                        return undefined;
+                    }
+
                     if (data.status.value == "Submitted and pending approval") {
                         scope.buttons = { singlebuttons: [
                             {
@@ -743,10 +756,6 @@
                                     taskPermissionName: 'DELETE_LOAN'
                                 },
                                 {
-                                    name: "button.generatecashflow",
-                                    taskPermissionName: 'GENERATE_CASHFLOW_LOAN'
-                                },
-                                {
                                     name: "button.generateFinancialRatio",
                                     taskPermissionName: 'GENERATE_FINANCIALRATIO_LOAN'
                                 },
@@ -767,6 +776,7 @@
                                     taskPermissionName: 'READ_LOAN'
                                 },
                                 ...[
+                                    getGenerateCashflowActionOptions(data),
                                     getIdentityVerificationActionOptions(data),
                                     getCreditInfoEnhancedActionOptions(data),
                                     getCreditReportJsonActionOptions(data)
