@@ -30,7 +30,7 @@
                                class="form-control"
                                ng-model="formData.amount"
                                required
-                               min="1"/>
+                               min="0"/>
                     </div>
                     <div class="col-sm-2">
                         <form-validate valattributeform="adjustInsuranceChargeForm" valattribute="formData.amount"/>
@@ -58,7 +58,25 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label col-sm-3" for="notes">Notes</label>
+                    <label class="control-label col-sm-3" for="glAccountId">
+                        GL Account
+                    </label>
+                    <div class="col-sm-4">
+                        <select id="glAccountId" name="glAccountId"
+                                ng-model="formData.glAccountId"
+                                ng-options="gl.id as gl.nameDecorated for gl in incomeGlAccounts"
+                                class="form-control"
+                                chosen
+                                data-placeholder="-- Select GL Account --">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="notes">Notes
+                        <span class="required">*</span>
+                    </label>
                     <div class="col-sm-4">
                         <textarea id="notes"
                                   name="notes"
