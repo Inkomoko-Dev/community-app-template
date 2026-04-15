@@ -479,6 +479,7 @@
                         loanId: scope.accountId,
                         command: 'waiveinterest'
                     }, function (data) {
+                        console.log("waive interest payment types:"+data)
                         scope.paymentTypes = data.paymentTypeOptions;
                         scope.formData.transactionAmount = data.amount;
                         scope.formData[scope.modelName] = new Date(data.date) || new Date();
@@ -1414,10 +1415,13 @@
             });
 
             scope.isCashPayment = function () {
-                const paymentTypeId = scope.formData.paymentTypeId;
-                return scope.paymentTypes.find(function (paymentType) {
-                    return paymentTypeId === paymentType.id;
-                })?.isCashPayment || false;
+                if (!Array.isArray(scope.paymentTypes)) return false;
+
+                const paymentTypeId = scope.formData?.paymentTypeId;
+
+                return scope.paymentTypes
+                    .find(pt => pt.id === paymentTypeId)
+                    ?.isCashPayment || false;
             };
 
             scope.isPaymentToClient = function () {
