@@ -28,7 +28,30 @@
                 {id: 1, name: 'label.input.paymentto.client'},
                 {id: 2, name: 'label.input.paymentto.supplier'}
             ];
-            scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive';
+            // Helper function to extract level number from action name (e.g., 'icreviewlevelsix' -> 6)
+            var icLevelWordToNumber = {
+                'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+                'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+                'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
+                'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20
+            };
+
+            scope.getIcReviewLevelNumber = function(action) {
+                if (!action) return null;
+                var match = action.match(/^(reject)?icreviewlevel(\w+)$/);
+                if (match) {
+                    var levelWord = match[2].toLowerCase();
+                    return icLevelWordToNumber[levelWord] || null;
+                }
+                return null;
+            };
+
+            scope.isDynamicIcReviewLevel = function(action) {
+                var levelNumber = scope.getIcReviewLevelNumber(action);
+                return levelNumber !== null && levelNumber >= 6;
+            };
+
+            scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive' || scope.isDynamicIcReviewLevel(scope.action);
             scope.isRecoveryPaymentAction = routeParams.action === 'recoverypayment';
             scope.transactionDateMinDate = '2000-01-01';
             scope.recoveryPaymentWriteOffOnDate = null;
@@ -938,6 +961,60 @@
 
 
                     break;
+                // Dynamic IC Review Levels (6+)
+                case "icreviewlevelsix":
+                case "icreviewlevelseven":
+                case "icreviewleveleight":
+                case "icreviewlevelnine":
+                case "icreviewlevelten":
+                case "icreviewleveleleven":
+                case "icreviewleveltwelve":
+                case "icreviewlevelthirteen":
+                case "icreviewlevelfourteen":
+                case "icreviewlevelfifteen":
+                case "icreviewlevelsixteen":
+                case "icreviewlevelseventeen":
+                case "icreviewleveleighteen":
+                case "icreviewlevelnineteen":
+                case "icreviewleveltwenty":
+                    var dynamicLevelNumber = scope.getIcReviewLevelNumber(scope.action);
+                    var levelWord = scope.action.replace('icreviewlevel', '').toUpperCase();
+                    scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVEL' + levelWord;
+                    resourceFactory.loanTemplateResource.get({
+                        loanId: scope.accountId,
+                        templateType: 'icreview'
+                    }, function (data) {
+                        scope.title = 'label.heading.icreviewlevel' + scope.action.replace('icreviewlevel', '') + 'loanaccount';
+                        scope.labelName = 'label.input.icReviewOn';
+                        scope.modelName = 'icReviewOn';
+                        scope.formData[scope.modelName] = new Date();
+                        scope.icreviewTemplate = data;
+                        scope.noteFieldMandatory = true;
+                        scope.showRejectButton = true;
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                    });
+                    break;
+                case "rejecticreviewlevelsix":
+                case "rejecticreviewlevelseven":
+                case "rejecticreviewleveleight":
+                case "rejecticreviewlevelnine":
+                case "rejecticreviewlevelten":
+                case "rejecticreviewleveleleven":
+                case "rejecticreviewleveltwelve":
+                case "rejecticreviewlevelthirteen":
+                case "rejecticreviewlevelfourteen":
+                case "rejecticreviewlevelfifteen":
+                case "rejecticreviewlevelsixteen":
+                case "rejecticreviewlevelseventeen":
+                case "rejecticreviewleveleighteen":
+                case "rejecticreviewlevelnineteen":
+                case "rejecticreviewleveltwenty":
+                    var rejectLevelWord = scope.action.replace('rejecticreviewlevel', '').toUpperCase();
+                    scope.taskPermissionName = 'REJECT_LOANICREVIEWDECISIONLEVEL' + rejectLevelWord;
+                    scope.title = 'label.heading.rejecticreviewlevel' + scope.action.replace('rejecticreviewlevel', '') + 'loanaccount';
+                    scope.showDateField = false;
+                    scope.noteFieldMandatory = true;
+                    break;
                 case "prepareandsigncontract":
                     scope.taskPermissionName = 'ACCEPT_LOANPREPAREANDSIGNCONTRACT';
                     resourceFactory.loanTemplateResource.get({
@@ -1184,6 +1261,20 @@
                     resourceFactory.rejectIcReviewLevelFiveLoanDecisionEngineResource.rejectIcReviewLevelFive({loanId: routeParams.id}, this.formData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
                     });
+                } else if (scope.isDynamicIcReviewLevel(scope.action)) {
+                    // Dynamic IC Review Levels (6+) - Use dynamic endpoint
+                    var levelNumber = scope.getIcReviewLevelNumber(scope.action);
+                    var isReject = scope.action.startsWith('reject');
+
+                    if (isReject) {
+                        resourceFactory.rejectIcReviewDynamicLevelResource.reject({levelNumber: levelNumber, loanId: routeParams.id}, this.formData, function (data) {
+                            location.path('/viewloanaccount/' + data.loanId);
+                        });
+                    } else {
+                        resourceFactory.icReviewDynamicLevelResource.accept({levelNumber: levelNumber, loanId: routeParams.id}, this.formData, function (data) {
+                            location.path('/viewloanaccount/' + data.loanId);
+                        });
+                    }
                 } else if (scope.action == "prepareandsigncontract") {
                     resourceFactory.prepareAndSignContractLoanDecisionEngineResource.acceptPrepareAndSignContract({loanId: routeParams.id}, this.formData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
@@ -1486,6 +1577,12 @@
             };
 
             scope.rejectICLevel = function () {
+                // Check if this is a dynamic IC level (6+) - delegate to the proper function
+                if (scope.isDynamicIcReviewLevel(scope.action)) {
+                    scope.rejectDynamicICLevel();
+                    return;
+                }
+
                 var params = {loanId: scope.accountId, command: 'reject'};
 
                 var confirmReject = confirm("Are you sure you want to reject this loan level?");
@@ -1502,6 +1599,29 @@
 
                 // Call backend API to reject disbursement and move back to awaiting approval
                 resourceFactory.LoanAccountResource.save(params, payload, function (data) {
+                    // Redirect to loan view after successful rejection
+                    location.path('/viewloanaccount/' + data.loanId);
+                });
+            };
+
+            // Reject function for dynamic IC Review Levels (6+)
+            scope.rejectDynamicICLevel = function () {
+                var levelNumber = scope.getIcReviewLevelNumber(scope.action);
+
+                var confirmReject = confirm("Are you sure you want to reject this loan at IC Review Level " + levelNumber + "?");
+                if (!confirmReject) {
+                    return;
+                }
+
+                var payload = {
+                    rejectedOnDate: dateFilter(scope.formData[scope.modelName], scope.df) || dateFilter(new Date(), scope.df),
+                    dateFormat: scope.df,
+                    locale: scope.optlang.code,
+                    note: scope.formData.note
+                };
+
+                // Call backend API using the dynamic reject endpoint
+                resourceFactory.rejectIcReviewDynamicLevelResource.reject({levelNumber: levelNumber, loanId: scope.accountId}, payload, function (data) {
                     // Redirect to loan view after successful rejection
                     location.path('/viewloanaccount/' + data.loanId);
                 });
@@ -1524,6 +1644,24 @@
                     case 'icreviewlevelfour':
                     case 'icreviewlevelfive':
                         scope.rejectICLevel();
+                        break;
+                    // Dynamic IC Review Levels (6+)
+                    case 'icreviewlevelsix':
+                    case 'icreviewlevelseven':
+                    case 'icreviewleveleight':
+                    case 'icreviewlevelnine':
+                    case 'icreviewlevelten':
+                    case 'icreviewleveleleven':
+                    case 'icreviewleveltwelve':
+                    case 'icreviewlevelthirteen':
+                    case 'icreviewlevelfourteen':
+                    case 'icreviewlevelfifteen':
+                    case 'icreviewlevelsixteen':
+                    case 'icreviewlevelseventeen':
+                    case 'icreviewleveleighteen':
+                    case 'icreviewlevelnineteen':
+                    case 'icreviewleveltwenty':
+                        scope.rejectDynamicICLevel();
                         break;
                     // add more cases as needed
                     default:
