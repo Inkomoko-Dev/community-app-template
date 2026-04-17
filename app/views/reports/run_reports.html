@@ -1,4 +1,4 @@
-<div class="content-container">
+<div class="content-container" xmlns="http://www.w3.org/1999/html">
     <ul class="breadcrumb">
         <li><a href="#/reports/all">{{'label.anchor.reports' | translate}}</a></li>
         <li class="active">{{'label.anchor.runreport' | translate}}</li>
@@ -86,13 +86,9 @@
 				</div>
 	        </div>
 
-            <span class="col-md-offset-3 paddedleft52px">
-                <a id="run" ng-click="runReport()" class="btn btn-primary control">
-                      &nbsp;&nbsp;{{ 'label.button.runreport' | translate }}
-                </a>
-                 <a ng-show="reportName == 'Loan payments due'" ng-click="exportToCsv()" class="btn btn-success control">
-                     <i class="fa fa-download"></i>&nbsp;&nbsp;Download CSV
-                 </a>
+            <span class="col-md-offset-3 paddedleft52px"><a id="run" ng-click="runReport()" class="btn btn-primary control"></i>
+                &nbsp;&nbsp;{{ 'label.button.runreport' | translate }}</a></span>
+            </span>
             </span>
 	    </div>
 	    <div style="visibility: hidden">
