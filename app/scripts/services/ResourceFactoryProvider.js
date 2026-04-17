@@ -857,36 +857,14 @@
                     rejectIcReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFive/reject/:loanId", { loanId: '@loanId' }, {
                         rejectIcReviewLevelFive: { method: 'POST', params: {} },
                     }),
-                    // Additional IC Review Levels (Six through Ten)
-                    icReviewLevelSixLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSix/:loanId", { loanId: '@loanId' }, {
-                        acceptIcReviewLevelSix: { method: 'POST', params: {} },
+                    // Dynamic IC Review Levels (6+) - Uses new dynamic endpoint pattern
+                    // Accept: POST /loans/decision/icReviewDecision/level/{levelNumber}/{loanId}
+                    // Reject: POST /loans/decision/icReviewDecision/level/{levelNumber}/reject/{loanId}
+                    icReviewDynamicLevelResource: defineResource(apiVer + "/loans/decision/icReviewDecision/level/:levelNumber/:loanId", { levelNumber: '@levelNumber', loanId: '@loanId' }, {
+                        accept: { method: 'POST', params: {} },
                     }),
-                    rejectIcReviewLevelSixLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSix/reject/:loanId", { loanId: '@loanId' }, {
-                        rejectIcReviewLevelSix: { method: 'POST', params: {} },
-                    }),
-                    icReviewLevelSevenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSeven/:loanId", { loanId: '@loanId' }, {
-                        acceptIcReviewLevelSeven: { method: 'POST', params: {} },
-                    }),
-                    rejectIcReviewLevelSevenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelSeven/reject/:loanId", { loanId: '@loanId' }, {
-                        rejectIcReviewLevelSeven: { method: 'POST', params: {} },
-                    }),
-                    icReviewLevelEightLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelEight/:loanId", { loanId: '@loanId' }, {
-                        acceptIcReviewLevelEight: { method: 'POST', params: {} },
-                    }),
-                    rejectIcReviewLevelEightLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelEight/reject/:loanId", { loanId: '@loanId' }, {
-                        rejectIcReviewLevelEight: { method: 'POST', params: {} },
-                    }),
-                    icReviewLevelNineLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelNine/:loanId", { loanId: '@loanId' }, {
-                        acceptIcReviewLevelNine: { method: 'POST', params: {} },
-                    }),
-                    rejectIcReviewLevelNineLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelNine/reject/:loanId", { loanId: '@loanId' }, {
-                        rejectIcReviewLevelNine: { method: 'POST', params: {} },
-                    }),
-                    icReviewLevelTenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelTen/:loanId", { loanId: '@loanId' }, {
-                        acceptIcReviewLevelTen: { method: 'POST', params: {} },
-                    }),
-                    rejectIcReviewLevelTenLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelTen/reject/:loanId", { loanId: '@loanId' }, {
-                        rejectIcReviewLevelTen: { method: 'POST', params: {} },
+                    rejectIcReviewDynamicLevelResource: defineResource(apiVer + "/loans/decision/icReviewDecision/level/:levelNumber/reject/:loanId", { levelNumber: '@levelNumber', loanId: '@loanId' }, {
+                        reject: { method: 'POST', params: {} },
                     }),
                     prepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/prepareAndSignContract/:loanId", { loanId: '@loanId' }, {
                         acceptPrepareAndSignContract: { method: 'POST', params: {} },
