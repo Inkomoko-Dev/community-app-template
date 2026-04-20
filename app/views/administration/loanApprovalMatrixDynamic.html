@@ -1,0 +1,462 @@
+<div class="content-container" ng-controller="LoanApprovalMatrixController">
+    <div class="card well">
+        <div class="toolbar">
+            <h4>{{'label.heading.createLoanApprovalMatrix' | translate}}</h4>
+        </div>
+        <div class="content">
+            <api-validate></api-validate>
+            <br>
+
+            <!-- Level Configuration Section -->
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <i class="fa fa-cog"></i> {{'label.heading.configureLevels' | translate}}
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    {{'label.input.numberOfLevels' | translate}}: <strong>{{numberOfLevels}}</strong>
+                                </label>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success" ng-click="addNewLevel()">
+                                        <i class="fa fa-plus"></i> {{'label.button.addLevel' | translate}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Display configured levels -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>{{'label.heading.configuredLevels' | translate}}:</h5>
+                            <div class="list-group">
+                                <div class="list-group-item" ng-repeat="level in decisionLevels">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <strong>{{level.displayName}}</strong>
+                                            <span class="label label-primary">IC Review Level {{level.name}}</span>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                    ng-click="removeLevel(level.index)"
+                                                    ng-disabled="numberOfLevels <= 1">
+                                                <i class="fa fa-trash"></i> {{'label.button.remove' | translate}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wizard for Level Configuration -->
+            <wizard current-step="step" on-finish="submit()">
+                <!-- Currency Selection -->
+                <wz-step wz-title="{{ 'label.heading.currency' | translate}}">
+                    <form name="CurrencyForm" novalidate class="form-horizontal" ng-submit="goNext(CurrencyForm)">
+                        <fieldset>
+                            <api-validate></api-validate>
+                            <hr>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">{{ 'label.input.currency' | translate }}<span class="required">*</span>
+                                    <i class="fa fa-question-circle"
+                                       uib-tooltip="{{'label.tooltip.loanproduct.currency' | translate}}"
+                                       tooltip-append-to-body="true"></i>
+                                </label>
+                                <div class="col-sm-3">
+                                    <select id="currency" ng-model="formData.currency" class="form-control"
+                                            ng-options="currency.code as currency.name for currency in matrixDetails.currencyOptions"
+                                            value="{{currency.code}}" required>
+                                    </select>
+                                </div>
+                            </div>
+                            <hr>
+                            <button class="btn btn-default pull-left" wz-previous disabled>
+                                <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;{{'label.button.previous' | translate}}
+                            </button>
+                            <button class="btn btn-primary pull-right" type="submit">
+                                {{'label.button.next' | translate}}&nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
+                            </button>
+                        </fieldset>
+                    </form>
+                </wz-step>
+
+                <!-- Dynamic Level Steps -->
+                <wz-step ng-repeat="level in decisionLevels"
+                         wz-title="{{ 'label.heading.decisionLevel' | translate}} {{level.name}}"
+                         canexit="validateLevelForm(level.index)">
+                    <form name="levelForm" novalidate class="form-horizontal"
+                          ng-submit="goNextLevel($event)">
+                        <fieldset>
+                            <api-validate></api-validate>
+                            <br>
+                            <h3 class="text-center">
+                                <i class="fa fa-layer-group"></i> {{level.displayName}}
+                            </h3>
+                            <hr>
+
+                            <!-- Unsecured First Cycle -->
+                            <h4>{{ 'label.heading.unsecuredloanfirstcycle' | translate }}</h4>
+                            <hr>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanprincipalamount' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}UnsecuredFirstCycleMaxAmount"
+                                           name="level{{level.fieldName}}UnsecuredFirstCycleMaxAmount"
+                                           ng-model="formData['level' + level.fieldName + 'UnsecuredFirstCycleMaxAmount']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.minimumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}UnsecuredFirstCycleMinTerm"
+                                           name="level{{level.fieldName}}UnsecuredFirstCycleMinTerm"
+                                           ng-model="formData['level' + level.fieldName + 'UnsecuredFirstCycleMinTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}UnsecuredFirstCycleMaxTerm"
+                                           name="level{{level.fieldName}}UnsecuredFirstCycleMaxTerm"
+                                           ng-model="formData['level' + level.fieldName + 'UnsecuredFirstCycleMaxTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+
+                            <!-- Unsecured Second Cycle -->
+                            <h4>{{ 'label.heading.unsecuredloansecondcycle' | translate }}</h4>
+                            <hr>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanprincipalamount' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}UnsecuredSecondCycleMaxAmount"
+                                           name="level{{level.fieldName}}UnsecuredSecondCycleMaxAmount"
+                                           ng-model="formData['level' + level.fieldName + 'UnsecuredSecondCycleMaxAmount']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.minimumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}UnsecuredSecondCycleMinTerm"
+                                           name="level{{level.fieldName}}UnsecuredSecondCycleMinTerm"
+                                           ng-model="formData['level' + level.fieldName + 'UnsecuredSecondCycleMinTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}UnsecuredSecondCycleMaxTerm"
+                                           name="level{{level.fieldName}}UnsecuredSecondCycleMaxTerm"
+                                           ng-model="formData['level' + level.fieldName + 'UnsecuredSecondCycleMaxTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+
+                            <!-- Secured First Cycle -->
+                            <h4>{{ 'label.heading.securedloanfirstcycle' | translate }}</h4>
+                            <hr>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanprincipalamount' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}SecuredFirstCycleMaxAmount"
+                                           name="level{{level.fieldName}}SecuredFirstCycleMaxAmount"
+                                           ng-model="formData['level' + level.fieldName + 'SecuredFirstCycleMaxAmount']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.minimumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}SecuredFirstCycleMinTerm"
+                                           name="level{{level.fieldName}}SecuredFirstCycleMinTerm"
+                                           ng-model="formData['level' + level.fieldName + 'SecuredFirstCycleMinTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}SecuredFirstCycleMaxTerm"
+                                           name="level{{level.fieldName}}SecuredFirstCycleMaxTerm"
+                                           ng-model="formData['level' + level.fieldName + 'SecuredFirstCycleMaxTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+
+                            <!-- Secured Second Cycle -->
+                            <h4>{{ 'label.heading.securedloansecondcycle' | translate }}</h4>
+                            <hr>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanprincipalamount' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}SecuredSecondCycleMaxAmount"
+                                           name="level{{level.fieldName}}SecuredSecondCycleMaxAmount"
+                                           ng-model="formData['level' + level.fieldName + 'SecuredSecondCycleMaxAmount']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.minimumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}SecuredSecondCycleMinTerm"
+                                           name="level{{level.fieldName}}SecuredSecondCycleMinTerm"
+                                           ng-model="formData['level' + level.fieldName + 'SecuredSecondCycleMinTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                                <label class="control-label col-sm-3">
+                                    {{ 'label.input.maximumloanterm' | translate }}<span class="required">*</span>
+                                </label>
+                                <div class="col-sm-3">
+                                    <input type="text"
+                                           id="level{{level.fieldName}}SecuredSecondCycleMaxTerm"
+                                           name="level{{level.fieldName}}SecuredSecondCycleMaxTerm"
+                                           ng-model="formData['level' + level.fieldName + 'SecuredSecondCycleMaxTerm']"
+                                           class="form-control" number-format required late-validate number=true/>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <button class="btn btn-default pull-left" wz-previous>
+                                <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;{{'label.button.previous' | translate}}
+                            </button>
+                            <button class="btn btn-primary pull-right" type="submit">
+                                {{'label.button.next' | translate}}&nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
+                            </button>
+                        </fieldset>
+                    </form>
+                </wz-step>
+
+                <!-- Review and Submit -->
+                <wz-step wz-title="{{ 'label.heading.review' | translate}}">
+                    <div class="form-horizontal">
+                        <api-validate></api-validate>
+                        <br>
+                        <h3 class="text-center">
+                            <i class="fa fa-check-circle"></i> {{'label.heading.reviewConfiguration' | translate}}
+                        </h3>
+                        <p class="text-center text-muted">
+                            {{'label.message.reviewBeforeSubmit' | translate}}
+                        </p>
+                        <hr>
+
+                        <!-- Summary Panel -->
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="fa fa-info-circle"></i> {{'label.heading.summary' | translate}}
+                                </h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>{{'label.input.currency' | translate}}:</strong>
+                                        <br>
+                                        <span class="text-primary" style="font-size: 18px;">{{formData.currency}}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>{{'label.input.numberOfLevels' | translate}}:</strong>
+                                        <br>
+                                        <span class="text-primary" style="font-size: 18px;">{{numberOfLevels}}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>{{'label.heading.configuredLevels' | translate}}:</strong>
+                                        <br>
+                                        <span ng-repeat="level in decisionLevels">
+                                            <span class="label label-primary" style="margin: 2px;">{{level.name}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Configuration Preview -->
+                        <div class="panel panel-default" ng-if="hasPreviewData()">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="fa fa-list-alt"></i> {{'label.heading.detailedConfiguration' | translate}}
+                                </h4>
+                            </div>
+                            <div class="panel-body">
+                                <!-- Preview for each level -->
+                                <div ng-repeat="level in decisionLevels" class="level-preview">
+                                    <h4 class="bg-primary" style="padding: 10px; margin-top: 20px;">
+                                        <i class="fa fa-layer-group"></i> {{level.displayName}}
+                                        <span class="label label-success pull-right">IC Review Level {{level.name}}</span>
+                                    </h4>
+
+                                    <div class="row" style="margin-top: 15px;">
+                                        <!-- Unsecured First Cycle -->
+                                        <div class="col-md-6">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <strong><i class="fa fa-file-alt"></i> {{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanprincipalamount' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'UnsecuredFirstCycle').maxAmount | number}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.minimumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'UnsecuredFirstCycle').minTerm}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'UnsecuredFirstCycle').maxTerm}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Unsecured Second Cycle -->
+                                        <div class="col-md-6">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <strong><i class="fa fa-file-alt"></i> {{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanprincipalamount' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'UnsecuredSecondCycle').maxAmount | number}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.minimumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'UnsecuredSecondCycle').minTerm}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'UnsecuredSecondCycle').maxTerm}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Secured First Cycle -->
+                                        <div class="col-md-6">
+                                            <div class="panel panel-warning">
+                                                <div class="panel-heading">
+                                                    <strong><i class="fa fa-shield-alt"></i> {{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanprincipalamount' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'SecuredFirstCycle').maxAmount | number}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.minimumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'SecuredFirstCycle').minTerm}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'SecuredFirstCycle').maxTerm}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Secured Second Cycle -->
+                                        <div class="col-md-6">
+                                            <div class="panel panel-warning">
+                                                <div class="panel-heading">
+                                                    <strong><i class="fa fa-shield-alt"></i> {{'label.heading.securedloansecondcycle' | translate}}</strong>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanprincipalamount' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'SecuredSecondCycle').maxAmount | number}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.minimumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'SecuredSecondCycle').minTerm}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>{{'label.input.maximumloanterm' | translate}}:</strong></td>
+                                                            <td class="text-right">{{getPreviewData(level, 'SecuredSecondCycle').maxTerm}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr ng-if="!$last">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="alert alert-warning">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            <strong>{{'label.heading.warning' | translate}}:</strong>
+                            {{'label.message.reviewCarefully' | translate}}
+                        </div>
+
+                        <hr>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <button class="btn btn-default pull-left" wz-previous>
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;{{'label.button.previous' | translate}}
+                                </button>
+                                <button class="btn btn-default" ng-click="cancel()">
+                                    {{'label.button.cancel' | translate}}
+                                </button>
+                                <button id="save" type="button" class="btn btn-primary pull-right"
+                                        ng-click="submit()" has-permission='CREATE_LOANAPPROVALMATRIX'>
+                                    <i class="fa fa-save"></i>&nbsp;&nbsp;{{'label.button.createloanapprovalmatrix' | translate}}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </wz-step>
+            </wizard>
+        </div>
+    </div>
+</div>

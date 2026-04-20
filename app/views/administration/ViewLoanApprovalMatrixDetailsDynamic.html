@@ -1,0 +1,186 @@
+<div class="content-container" ng-controller="ViewLoanApprovalMatrixDetailsController">
+    <div class="card">
+        <div class="toolbar">
+            <h4>
+                <i class="fa fa-file-alt"></i> {{'label.heading.loanApprovalMatrixDetails' | translate}}
+            </h4>
+        </div>
+        <div class="content">
+            <div class="pull-right">
+                <div class="btn-group" data-ng-show="configurations.isExtendLoanLifeCycleConfig">
+                    <a href="#/updateLoanApprovalMatrixDynamic/{{matrixDetails.id}}" class="btn btn-primary"
+                       has-permission='UPDATE_LOANAPPROVALMATRIX'>
+                        <i class="fa fa-edit"></i>&nbsp;&nbsp;{{'label.button.updateLoanapprovalmatrix' | translate}}
+                    </a>
+                    <button class="btn btn-danger" ng-click="deleteLoanApprovalMatrix()"
+                            has-permission='DELETE_LOANAPPROVALMATRIX'>
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>&nbsp;&nbsp;{{'label.button.delete' | translate}}
+                    </button>
+                </div>
+            </div>
+
+            <br><br>
+            <hr/>
+
+            <!-- Summary Section -->
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <i class="fa fa-info-circle"></i> {{'label.heading.summary' | translate}}
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="dl-horizontal">
+                                <dt>{{'label.heading.id' | translate}}:</dt>
+                                <dd><strong>{{matrixDetails.id}}</strong></dd>
+                                <dt>{{'label.heading.currency' | translate}}:</dt>
+                                <dd><span class="label label-info">{{matrixDetails.currency}}</span></dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="dl-horizontal">
+                                <dt>{{'label.heading.numberOfLevels' | translate}}:</dt>
+                                <dd><strong>{{decisionLevels.length}}</strong></dd>
+                                <dt>{{'label.heading.configuredLevels' | translate}}:</dt>
+                                <dd>
+                                    <span ng-repeat="level in decisionLevels">
+                                        <span class="label label-primary">{{level.name}}</span>
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Level Details -->
+            <uib-accordion close-others="false">
+                <div uib-accordion-group class="panel-default" ng-repeat="level in decisionLevels" is-open="level.isOpen" ng-init="level.isOpen = (level.index === 0)">
+                    <uib-accordion-heading>
+                        <i class="fa fa-layer-group"></i>
+                        <strong>{{'label.heading.decisionLevel' | translate}} {{level.name}}</strong>
+                        <span class="label label-success">IC Review Level {{level.name}}</span>
+                        <i class="fa pull-right" ng-class="{'fa-chevron-down': !level.isOpen, 'fa-chevron-up': level.isOpen}"></i>
+                    </uib-accordion-heading>
+                    <div class="panel-body">
+                            <!-- Unsecured First Cycle -->
+                            <div class="well">
+                                <h5 class="text-primary">
+                                    <i class="fa fa-unlock"></i>
+                                    <strong>{{'label.heading.unsecuredloanfirstcycle' | translate}}</strong>
+                                </h5>
+                                <table class="table table-condensed table-bordered">
+                                    <tr>
+                                        <td class="col-md-4"><strong>{{'label.heading.maximumloanprincipalamount' | translate}}</strong></td>
+                                        <td class="col-md-8">
+                                            <span class="text-success">
+                                                <strong>{{matrixDetails['level' + level.fieldName + 'UnsecuredFirstCycleMaxAmount'] | number}}</strong>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.minimumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'UnsecuredFirstCycleMinTerm']}} months</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.maximumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'UnsecuredFirstCycleMaxTerm']}} months</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Unsecured Second Cycle -->
+                            <div class="well">
+                                <h5 class="text-primary">
+                                    <i class="fa fa-unlock"></i>
+                                    <strong>{{'label.heading.unsecuredloansecondcycle' | translate}}</strong>
+                                </h5>
+                                <table class="table table-condensed table-bordered">
+                                    <tr>
+                                        <td class="col-md-4"><strong>{{'label.heading.maximumloanprincipalamount' | translate}}</strong></td>
+                                        <td class="col-md-8">
+                                            <span class="text-success">
+                                                <strong>{{matrixDetails['level' + level.fieldName + 'UnsecuredSecondCycleMaxAmount'] | number}}</strong>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.minimumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'UnsecuredSecondCycleMinTerm']}} months</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.maximumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'UnsecuredSecondCycleMaxTerm']}} months</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Secured First Cycle -->
+                            <div class="well">
+                                <h5 class="text-warning">
+                                    <i class="fa fa-lock"></i>
+                                    <strong>{{'label.heading.securedloanfirstcycle' | translate}}</strong>
+                                </h5>
+                                <table class="table table-condensed table-bordered">
+                                    <tr>
+                                        <td class="col-md-4"><strong>{{'label.heading.maximumloanprincipalamount' | translate}}</strong></td>
+                                        <td class="col-md-8">
+                                            <span class="text-success">
+                                                <strong>{{matrixDetails['level' + level.fieldName + 'SecuredFirstCycleMaxAmount'] | number}}</strong>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.minimumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'SecuredFirstCycleMinTerm']}} months</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.maximumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'SecuredFirstCycleMaxTerm']}} months</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Secured Second Cycle -->
+                            <div class="well">
+                                <h5 class="text-warning">
+                                    <i class="fa fa-lock"></i>
+                                    <strong>{{'label.heading.securedloansecondcycle' | translate}}</strong>
+                                </h5>
+                                <table class="table table-condensed table-bordered">
+                                    <tr>
+                                        <td class="col-md-4"><strong>{{'label.heading.maximumloanprincipalamount' | translate}}</strong></td>
+                                        <td class="col-md-8">
+                                            <span class="text-success">
+                                                <strong>{{matrixDetails['level' + level.fieldName + 'SecuredSecondCycleMaxAmount'] | number}}</strong>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.minimumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'SecuredSecondCycleMinTerm']}} months</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.maximumloanterm' | translate}}</strong></td>
+                                        <td>{{matrixDetails['level' + level.fieldName + 'SecuredSecondCycleMaxTerm']}} months</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            </uib-accordion>
+
+            <!-- Back Button -->
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                    <a href="#/viewLoanApprovalMatrixDynamic" class="btn btn-default">
+                        <i class="fa fa-arrow-left"></i> {{'label.button.back' | translate}}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

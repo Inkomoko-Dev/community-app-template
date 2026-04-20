@@ -271,6 +271,13 @@
                         get: { method: 'GET', params: {} }
                     }),
                     loanChargesResource: defineResource(apiVer + "/loans/:loanId/charges/:chargeId", { loanId: '@loanId', chargeId: '@chargeId' }, {
+                        adjust: {
+                            method: 'POST',
+                            params: { command: 'adjust' }
+                        },
+                        get: {
+                            method: 'GET'
+                        }
                     }),
                     loanCollateralTemplateResource: defineResource(apiVer + "/loans/:loanId/collaterals/template", { loanId: '@loanId' }, {
                         get: { method: 'GET', params: {} }
@@ -325,6 +332,11 @@
                     }),
                     employeeResource: defineResource(apiVer + "/staff/:staffId", { staffId: '@staffId', status: "all" }, {
                         getAllEmployees: { method: 'GET', params: {}, isArray: true },
+                        getLoanOfficers: {
+                            method: 'GET',
+                            params: { status: 'active', loanOfficersOnly: true },
+                            isArray: true
+                        },
                         update: { method: 'PUT' }
                     }),
                     globalSearch: defineResource(apiVer + "/search", { query: '@query', resource: '@resource' }, {
@@ -359,6 +371,12 @@
                     accountCoaResource: defineResource(apiVer + "/glaccounts/:glAccountId", { glAccountId: '@glAccountId' }, {
                         getAllAccountCoas: { method: 'GET', params: {}, isArray: true },
                         update: { method: 'PUT' }
+                    }),
+                    glAccountsResource:defineResource(apiVer + '/glaccounts', {}, {
+                        getAll: {
+                            method: 'GET',
+                            isArray: true
+                        }
                     }),
                     accountCoaTemplateResource: defineResource(apiVer + "/glaccounts/template", {}, {
                         get: { method: 'GET', params: {} }
@@ -808,6 +826,7 @@
                     updateApprovalMatrixDetailsEngineResource: defineResource(apiVer + "/loans/decision/updateApprovalMatrix/:approvalMatrixId", { approvalMatrixId: '@approvalMatrixId' }, {
                         put: { method: 'PUT', params: {} },
                     }),
+                    // Dynamic IC Review Level Resources (Levels One through Ten)
                     icReviewLevelOneLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelOne/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelOne: { method: 'POST', params: {} },
                     }),
@@ -837,6 +856,15 @@
                     }),
                     rejectIcReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFive/reject/:loanId", { loanId: '@loanId' }, {
                         rejectIcReviewLevelFive: { method: 'POST', params: {} },
+                    }),
+                    // Dynamic IC Review Levels (6+) - Uses new dynamic endpoint pattern
+                    // Accept: POST /loans/decision/icReviewDecision/level/{levelNumber}/{loanId}
+                    // Reject: POST /loans/decision/icReviewDecision/level/{levelNumber}/reject/{loanId}
+                    icReviewDynamicLevelResource: defineResource(apiVer + "/loans/decision/icReviewDecision/level/:levelNumber/:loanId", { levelNumber: '@levelNumber', loanId: '@loanId' }, {
+                        accept: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewDynamicLevelResource: defineResource(apiVer + "/loans/decision/icReviewDecision/level/:levelNumber/reject/:loanId", { levelNumber: '@levelNumber', loanId: '@loanId' }, {
+                        reject: { method: 'POST', params: {} },
                     }),
                     prepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/prepareAndSignContract/:loanId", { loanId: '@loanId' }, {
                         acceptPrepareAndSignContract: { method: 'POST', params: {} },
@@ -1118,7 +1146,10 @@
                     reportParamResource: defineResource(apiVer + "/reports/jasper/parameters/:reportName", { reportName: '@reportName' }, {
                         get: { method: 'GET', isArray: true }
                     }),
-
+                    banksResource: defineResource(apiVer + "/banks", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        search: { method: 'GET', params: {}, isArray: true }
+                    }),
                     crbPostingReportsViewResource: defineResource(
                          apiVer + "/crb/posting-logs",
                         {},

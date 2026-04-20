@@ -235,6 +235,9 @@
             .when('/loan/:loanId/editcharge/:id', {
                 templateUrl: 'views/loans/editloancharge.html'
             })
+            .when('/loan/:loanId/adjustinsurancecharge/:chargeId', {
+                templateUrl: 'views/loans/adjustloaninsurancecharge.html'
+            })
             .when('/assignloanofficer/:id', {
                 templateUrl: 'views/loans/assignloanofficer.html'
             })
@@ -1241,14 +1244,26 @@
              .when('/loanApprovalMatrix', {
                  templateUrl: 'views/administration/loanApprovalMatrix.html'
              })
+              .when('/loanApprovalMatrixDynamic', {
+                  templateUrl: 'views/administration/loanApprovalMatrixDynamic.html'
+              })
               .when('/viewLoanApprovalMatrix', {
                   templateUrl: 'views/administration/viewLoanApprovalMatrix.html'
+              })
+              .when('/viewLoanApprovalMatrixDynamic', {
+                  templateUrl: 'views/administration/viewLoanApprovalMatrixDynamic.html'
               })
               .when('/viewLoanApprovalMatrixDetails/:approvalMatrixId', {
                     templateUrl: 'views/administration/ViewLoanApprovalMatrixDetails.html'
               })
+              .when('/viewLoanApprovalMatrixDetailsDynamic/:approvalMatrixId', {
+                    templateUrl: 'views/administration/ViewLoanApprovalMatrixDetailsDynamic.html'
+              })
               .when('/updateLoanApprovalMatrix/:approvalMatrixId', {
                    templateUrl: 'views/administration/updateLoanApprovalMatrix.html'
+              })
+              .when('/updateLoanApprovalMatrixDynamic/:approvalMatrixId', {
+                   templateUrl: 'views/administration/updateLoanApprovalMatrixDynamic.html'
               })
             .otherwise({
                 templateUrl: "views/errors/404.html"
