@@ -971,6 +971,15 @@
             .when('/createprovisioningcriteria', {
                 templateUrl: 'views/organization/provisioning/CreateProvisioningCriteria.html'
             })
+            .when('/viewallprovisioningcategories', {
+                templateUrl: 'views/organization/provisioning/ViewAllProvisioningCategories.html'
+            })
+            .when('/createprovisioningcategory', {
+                templateUrl: 'views/organization/provisioning/CreateProvisioningCategory.html'
+            })
+            .when('/editprovisioningcategory/:categoryId', {
+                templateUrl: 'views/organization/provisioning/EditProvisioningCategory.html'
+            })
             .when('/viewprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/ViewProvisioningCriteria.html'
             })
