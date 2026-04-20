@@ -51,7 +51,7 @@
                 return levelNumber !== null && levelNumber >= 6;
             };
 
-            scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive' || scope.isDynamicIcReviewLevel(scope.action);
+            scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive' || (scope.isDynamicIcReviewLevel(scope.action) && scope.action.indexOf('rejecticreviewlevel') !== 0);
             scope.isRecoveryPaymentAction = routeParams.action === 'recoverypayment';
             scope.transactionDateMinDate = '2000-01-01';
             scope.recoveryPaymentWriteOffOnDate = null;
