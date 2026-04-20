@@ -56,7 +56,7 @@
                     scope.reqFields.push(temp);
 
                     if (temp.displayType === 'select' && temp.parentParameterName === null) {
-                        if (temp.variable === 'currencyId' && scope.reportName === 'Loan payments due') {
+                        if (temp.variable === 'currencyId' && scope.reportName === 'Loan payments due new') {
                             scope.formData[temp.inputName] = '-1';
                         } else {
                             intializeParams(temp, {});
@@ -73,7 +73,7 @@
                         scope.reportTextParams.push(temp);
                     }
                 }
-                if (scope.reportName === 'Loan payments due') {
+                if (scope.reportName === 'Loan payments due new') {
                     for (var i in scope.reqFields) {
                         var field = scope.reqFields[i];
                         if (field.variable === 'loanProductId') {
@@ -174,29 +174,6 @@
             };
 
 
-            scope.exportToCsv = function () {
-                scope.formData.reportSource = scope.reportName;
-                var params = angular.copy(scope.formData);
-                params.exportCSV = true;
-                delete params.limit;
-                delete params.offset;
-
-                var reportURL = $rootScope.hostUrl + API_VERSION + "/runreports/" + encodeURIComponent(scope.reportName);
-
-                http.get(reportURL, { responseType: 'arraybuffer', params: params })
-                    .then(function (response) {
-                        var blob = new Blob([response.data], { type: 'text/csv' });
-                        var link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = scope.reportName + '.csv';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }).catch(function (error) {
-                    console.error('Error downloading CSV:', error);
-                });
-            };
-
             function invalidDate(checkDate) {
                 // validates for yyyy-mm-dd returns true if invalid, false is valid
                 var dateformat = /^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/;
@@ -228,7 +205,7 @@
                     var paramDetails = scope.reqFields[i];
                     switch (paramDetails.displayType) {
                         case "select":
-                            if (paramDetails.variable === 'currencyId' && scope.reportName === 'Loan payments due') {
+                            if (paramDetails.variable === 'currencyId' && scope.reportName === 'Loan payments due new') {
                                 break;
                             }
                             var selectedVal = scope.formData[paramDetails.inputName];
