@@ -4015,6 +4015,7 @@
   "label.heading.provisioningcategorycode": "Category Code",
   "label.heading.displayorder": "Display Order",
   "label.heading.currenteffectivefrom": "Latest Version Effective From",
+  "label.heading.classification": "Classification",
   "label.message.provisioningcategoryrequired": "At least one active provisioning category is required before you can define provisioning criteria.",
   "label.help.provisioning.maxage": "Leave the last bucket blank to make it open-ended.",
   "label.help.provisioning.effectivefrom": "Only required when you are changing bucket definitions for a new criteria version.",
