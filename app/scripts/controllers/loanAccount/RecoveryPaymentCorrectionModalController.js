@@ -27,59 +27,12 @@
         return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
     }
 
-    function addDays(date, days) {
-        if (!date) {
-            return null;
-        }
-
-        var newDate = new Date(date.getTime());
-        newDate.setDate(newDate.getDate() + days);
-        return newDate;
-    }
-
     function transactionDate(transaction) {
         return normalizeDate(transaction && (transaction.date || transaction.transactionDate));
     }
 
-    function buildLatestClosureArgs(latestClosureDate, dateFilter, dateFormat) {
-        if (!latestClosureDate) {
-            return null;
-        }
-
-        return {
-            params: [{
-                value: dateFilter(latestClosureDate, dateFormat || 'dd MMMM yyyy')
-            }]
-        };
-    }
-
-    function buildOpenPeriodArgs(correctionDate, latestClosureDate, dateFilter, dateFormat) {
-        return {
-            params: [{
-                value: correctionDate ? dateFilter(correctionDate, dateFormat || 'dd MMMM yyyy') : ''
-            }, {
-                value: latestClosureDate ? dateFilter(latestClosureDate, dateFormat || 'dd MMMM yyyy') : ''
-            }]
-        };
-    }
-
-    function applyCorrectionMetadata(scope, metadata, fallbackLatestClosureDate) {
+    function applyCorrectionMetadata(scope, metadata) {
         scope.correctionAllowed = !(metadata && metadata.correctionAllowed === false);
-        scope.correctionDateRequired = !!(metadata && metadata.correctionDateRequired === true);
-        scope.latestClosureDate = normalizeDate(metadata && metadata.latestClosedAccountingDate) || normalizeDate(fallbackLatestClosureDate);
-        scope.correctionDateMinDate = normalizeDate(metadata && metadata.earliestCorrectionDate);
-        if (!scope.correctionDateMinDate && scope.latestClosureDate) {
-            scope.correctionDateMinDate = addDays(scope.latestClosureDate, 1);
-        }
-        scope.correctionDateMaxDate = normalizeDate(metadata && metadata.latestCorrectionDate) || new Date();
-
-        if (scope.correctionDateRequired && !normalizeDate(scope.formData.correctionDate) && scope.correctionDateMinDate) {
-            scope.formData.correctionDate = new Date(scope.correctionDateMinDate.getTime());
-        }
-
-        if (!scope.correctionDateRequired) {
-            delete scope.formData.correctionDate;
-        }
     }
 
     function extractTransactionId(transactionRef) {
@@ -105,18 +58,8 @@
             scope.locale = locale;
             scope.restrictDate = new Date();
             scope.correctionAllowed = true;
-            scope.latestClosureDate = normalizeDate(latestClosureDate);
-            scope.correctionDateRequired = false;
-            scope.correctionDateMinDate = null;
-            scope.correctionDateMaxDate = new Date();
-            scope.correctionDateErrorCode = null;
-            scope.correctionDateErrorArgs = null;
 
-            applyCorrectionMetadata(scope, transaction, latestClosureDate);
-
-            scope.getLatestClosureArgs = function () {
-                return buildLatestClosureArgs(scope.latestClosureDate, dateFilter, scope.df);
-            };
+            applyCorrectionMetadata(scope, transaction);
 
             resourceFactory.loanTrxnsResource.get({
                 loanId: loanId,
@@ -124,48 +67,11 @@
                 template: 'true'
             }, function (data) {
                 scope.transaction = angular.extend(scope.transaction, data);
-                applyCorrectionMetadata(scope, data, latestClosureDate);
-            });
-
-            scope.validateCorrectionDate = function () {
-                scope.correctionDateErrorCode = null;
-                scope.correctionDateErrorArgs = null;
-
-                if (scope.correctionAllowed === false) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.closed.period.corrections.not.allowed';
-                    return false;
-                }
-
-                if (!scope.correctionDateRequired) {
-                    if (scope.formData.correctionDate) {
-                        scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.not.allowed';
-                        return false;
-                    }
-                    return true;
-                }
-
-                var correctionDate = normalizeDate(scope.formData.correctionDate);
-                if (!correctionDate) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.required';
-                    return false;
-                }
-
-                if (scope.correctionDateMinDate && correctionDate.getTime() < scope.correctionDateMinDate.getTime()) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.must.be.in.open.period';
-                    scope.correctionDateErrorArgs = buildOpenPeriodArgs(correctionDate, scope.latestClosureDate, dateFilter, scope.df);
-                    return false;
-                }
-
-                if (scope.correctionDateMaxDate && correctionDate.getTime() > scope.correctionDateMaxDate.getTime()) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.cannot.be.future';
-                    return false;
-                }
-
-                return true;
+                applyCorrectionMetadata(scope, data);
             };
 
             scope.submit = function () {
-                if (!scope.validateCorrectionDate()) {
+                if (scope.correctionAllowed === false) {
                     return;
                 }
 
@@ -175,10 +81,6 @@
                     transactionDate: dateFilter(scope.formData.transactionDate, scope.df),
                     note: scope.formData.note
                 };
-
-                if (scope.correctionDateRequired && scope.formData.correctionDate) {
-                    payload.correctionDate = dateFilter(scope.formData.correctionDate, scope.df);
-                }
 
                 resourceFactory.loanTrxnsResource.save({
                     loanId: loanId,
@@ -206,12 +108,6 @@
             scope.restrictDate = new Date();
             scope.paymentTypes = [];
             scope.correctionAllowed = true;
-            scope.latestClosureDate = normalizeDate(latestClosureDate);
-            scope.correctionDateRequired = false;
-            scope.correctionDateMinDate = null;
-            scope.correctionDateMaxDate = new Date();
-            scope.correctionDateErrorCode = null;
-            scope.correctionDateErrorArgs = null;
 
             if (transaction.paymentDetailData) {
                 if (transaction.paymentDetailData.paymentType) {
@@ -224,11 +120,7 @@
                 scope.formData.bankNumber = transaction.paymentDetailData.bankNumber;
             }
 
-            applyCorrectionMetadata(scope, transaction, latestClosureDate);
-
-            scope.getLatestClosureArgs = function () {
-                return buildLatestClosureArgs(scope.latestClosureDate, dateFilter, scope.df);
-            };
+            applyCorrectionMetadata(scope, transaction);
 
             resourceFactory.loanTrxnsTemplateResource.get({
                 loanId: loanId,
@@ -237,7 +129,7 @@
             }, function (data) {
                 scope.paymentTypes = data.paymentTypeOptions || [];
                 scope.formData.originalTransactionId = data.originalTransactionId || scope.formData.originalTransactionId;
-                applyCorrectionMetadata(scope, data, latestClosureDate);
+                applyCorrectionMetadata(scope, data);
 
                 if (!scope.formData.paymentTypeId && scope.paymentTypes.length > 0) {
                     scope.formData.paymentTypeId = scope.paymentTypes[0].id;
@@ -263,45 +155,8 @@
                 });
             }
 
-            scope.validateCorrectionDate = function () {
-                scope.correctionDateErrorCode = null;
-                scope.correctionDateErrorArgs = null;
-
-                if (scope.correctionAllowed === false) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.closed.period.corrections.not.allowed';
-                    return false;
-                }
-
-                if (!scope.correctionDateRequired) {
-                    if (scope.formData.correctionDate) {
-                        scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.not.allowed';
-                        return false;
-                    }
-                    return true;
-                }
-
-                var correctionDate = normalizeDate(scope.formData.correctionDate);
-                if (!correctionDate) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.required';
-                    return false;
-                }
-
-                if (scope.correctionDateMinDate && correctionDate.getTime() < scope.correctionDateMinDate.getTime()) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.must.be.in.open.period';
-                    scope.correctionDateErrorArgs = buildOpenPeriodArgs(correctionDate, scope.latestClosureDate, dateFilter, scope.df);
-                    return false;
-                }
-
-                if (scope.correctionDateMaxDate && correctionDate.getTime() > scope.correctionDateMaxDate.getTime()) {
-                    scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.cannot.be.future';
-                    return false;
-                }
-
-                return true;
-            };
-
             scope.submit = function () {
-                if (!scope.validateCorrectionDate()) {
+                if (scope.correctionAllowed === false) {
                     return;
                 }
 
@@ -332,9 +187,6 @@
                 }
                 if (scope.formData.bankNumber) {
                     payload.bankNumber = scope.formData.bankNumber;
-                }
-                if (scope.formData.originalTransactionId && scope.correctionDateRequired && scope.formData.correctionDate) {
-                    payload.correctionDate = dateFilter(scope.formData.correctionDate, scope.df);
                 }
 
                 resourceFactory.loanTrxnsResource.save({
