@@ -20,6 +20,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="control-label col-sm-2" for="effectiveFrom">{{'label.input.effectivefrom' | translate}}</label>
+                        <div class="col-sm-3">
+                            <input id="effectiveFrom" type="text" class="form-control" datepicker-pop="dd MMMM yyyy" ng-model="formData.effectiveFrom"
+                                   placeholder="{{'label.input.effectivefrom' | translate}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <div class="col-sm-3 col-md-3 col-md-offset-1">
                             <label class="control-label col-sm-9">{{ 'label.input.allproducts' | translate }}</label>
                             <select id="available" ng-model="available" name="available" class="form-control multiselectmin" multiple>
