@@ -7,8 +7,7 @@
             };
 
             scope.submit = function () {
-                this.formData.locale = scope.optlang.code;
-                resourceFactory.provisioningcategory.post(this.formData, function () {
+                resourceFactory.provisioningcategory.post(scope.formData, function () {
                     location.path('/viewallprovisioningcategories');
                 });
             };

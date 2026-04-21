@@ -13,8 +13,7 @@
             });
 
             scope.submit = function () {
-                this.formData.locale = scope.optlang.code;
-                resourceFactory.provisioningcategory.put({ categoryId: routeParams.categoryId }, this.formData, function () {
+                resourceFactory.provisioningcategory.put({ categoryId: routeParams.categoryId }, scope.formData, function () {
                     location.path('/viewallprovisioningcategories');
                 });
             };
