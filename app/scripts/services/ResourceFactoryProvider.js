@@ -975,8 +975,12 @@
                         get: { method: 'GET', params: {} }
                     }),
 
-                    provisioningcategory: defineResource(apiVer + "/provisioningcategory", {}, {
-                        getAll: { method: 'GET', params: {}, isArray: true }
+                    provisioningcategory: defineResource(apiVer + "/provisioningcategory/:categoryId", { categoryId: '@categoryId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
+                        post: { method: 'POST', params: {} },
+                        put: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
                     }),
 
                     floatingrates: defineResource(apiVer + "/floatingrates/:floatingRateId", { floatingRateId: '@floatingRateId' }, {

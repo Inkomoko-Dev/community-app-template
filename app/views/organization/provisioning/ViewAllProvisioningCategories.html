@@ -1,0 +1,46 @@
+<div class="content-container" ng-controller="ViewAllProvisioningCategoriesController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.provisioningcategories' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input ng-model="filterText" type="text" class="form-control" ng-keyup="onFilter()"
+                               placeholder="{{'label.input.filterbyname' | translate}}">
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#/createprovisioningcategory" class="btn btn-primary pull-right" has-permission='CREATE_PROVISIONCATEGORY'>
+                            <i class="fa fa-plus"></i>&nbsp;&nbsp;{{'label.button.createprovisioningcategory' | translate}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                <tr class="graybg">
+                    <th>{{'label.heading.name' | translate}}</th>
+                    <th>{{'label.heading.provisioningcategorycode' | translate}}</th>
+                    <th>{{'label.heading.displayorder' | translate}}</th>
+                    <th>{{'label.heading.status' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="pointer-main"
+                    dir-paginate="category in categories | orderBy:'displayOrder' | filter:filterText | itemsPerPage: categoriesPerPage">
+                    <td class="pointer" data-ng-click="routeToEdit(category.id)">{{category.categoryName}}</td>
+                    <td class="pointer" data-ng-click="routeToEdit(category.id)">{{category.categoryCode}}</td>
+                    <td class="pointer" data-ng-click="routeToEdit(category.id)">{{category.displayOrder}}</td>
+                    <td class="pointer" data-ng-click="routeToEdit(category.id)">
+                        {{category.active ? ('label.active' | translate) : ('label.inactive' | translate)}}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls boundary-links="true"
+                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+<div class="content-container" ng-controller="CreateProvisioningCategoryController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/viewallprovisioningcategories">{{'label.anchor.provisioningcategories' | translate}}</a></li>
+        <li class="active">{{'label.button.createprovisioningcategory' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <form name="createprovisioningcategoryform" novalidate class="form-horizontal" rc-submit="submit()">
+                <api-validate></api-validate>
+                <fieldset>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="categoryname">{{'label.heading.provisioningcategory' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input id="categoryname" name="categoryname" type="text" ng-model="formData.categoryname" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="categorycode">{{'label.heading.provisioningcategorycode' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input id="categorycode" name="categorycode" type="text" ng-model="formData.categorycode" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="displayorder">{{'label.heading.displayorder' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-2">
+                            <input id="displayorder" name="displayorder" type="number" min="0" ng-model="formData.displayorder" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="categorydescription">{{'label.input.description' | translate}}</label>
+                        <div class="col-sm-6">
+                            <textarea id="categorydescription" name="categorydescription" ng-model="formData.categorydescription" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="active">{{'label.input.status' | translate}}</label>
+                        <div class="col-sm-3">
+                            <label class="checkbox-inline">
+                                <input id="active" type="checkbox" ng-model="formData.active">
+                                {{'label.active' | translate}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2">
+                        <a id="cancel" href="#/viewallprovisioningcategories" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
+                        <button id="save" type="submit" class="btn btn-primary" has-permission='CREATE_PROVISIONCATEGORY'>
+                            {{'label.button.save' | translate}}
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
