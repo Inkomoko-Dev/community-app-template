@@ -16,26 +16,13 @@
         });
     };
 
-    var idsMatch = function (left, right) {
-        return left !== null && angular.isDefined(left) && right !== null && angular.isDefined(right) && left.toString() === right.toString();
-    };
-
-    var normalizeCategoryId = function (definition, categories) {
-        angular.forEach(categories, function (category) {
-            if (idsMatch(category.id, definition.categoryId)) {
-                definition.categoryId = category.id;
-            }
-        });
-    };
-
     var applyCategoryMetadata = function (definition, categories) {
-        normalizeCategoryId(definition, categories);
         definition.categoryName = null;
         definition.categoryCode = null;
         definition.displayOrder = null;
         definition.categoryActive = null;
         angular.forEach(categories, function (category) {
-            if (idsMatch(category.id, definition.categoryId)) {
+            if (category.id === definition.categoryId) {
                 definition.categoryName = category.categoryName;
                 definition.categoryCode = category.categoryCode;
                 definition.displayOrder = category.displayOrder;
@@ -44,21 +31,14 @@
         });
     };
 
-    var parseOptionalInteger = function (value) {
-        if (value === null || value === undefined || value === '') {
-            return null;
-        }
-        return parseInt(value, 10);
-    };
-
     var buildDefinitionPayload = function (definitions, categories) {
         var payload = [];
         angular.forEach(definitions, function (definition) {
             applyCategoryMetadata(definition, categories);
             payload.push({
                 categoryId: definition.categoryId,
-                minAge: parseOptionalInteger(definition.minAge),
-                maxAge: parseOptionalInteger(definition.maxAge),
+                minAge: angular.isDefined(definition.minAge) && definition.minAge !== '' ? parseInt(definition.minAge, 10) : null,
+                maxAge: angular.isDefined(definition.maxAge) && definition.maxAge !== '' ? parseInt(definition.maxAge, 10) : null,
                 provisioningPercentage: definition.provisioningPercentage,
                 liabilityAccount: definition.liabilityAccount,
                 expenseAccount: definition.expenseAccount
@@ -81,7 +61,7 @@
             scope.addLoanProduct = function () {
                 angular.forEach(scope.available, function (loanProductId) {
                     for (var i = 0; i < scope.allloanproducts.length; i++) {
-                        if (idsMatch(scope.allloanproducts[i].id, loanProductId)) {
+                        if (scope.allloanproducts[i].id === loanProductId) {
                             scope.selectedloanproducts.push(scope.allloanproducts[i]);
                             scope.allloanproducts.splice(i, 1);
                             break;
@@ -94,7 +74,7 @@
             scope.removeLoanProduct = function () {
                 angular.forEach(scope.selected, function (loanProductId) {
                     for (var i = 0; i < scope.selectedloanproducts.length; i++) {
-                        if (idsMatch(scope.selectedloanproducts[i].id, loanProductId)) {
+                        if (scope.selectedloanproducts[i].id === loanProductId) {
                             scope.allloanproducts.push(scope.selectedloanproducts[i]);
                             scope.selectedloanproducts.splice(i, 1);
                             break;
@@ -106,15 +86,14 @@
 
             scope.availableCategoriesForRow = function (rowIndex) {
                 var currentDefinition = scope.definitions[rowIndex];
-                var currentCategoryId = currentDefinition ? currentDefinition.categoryId : null;
                 return scope.categories.filter(function (category) {
                     var selectedInOtherRow = scope.definitions.some(function (definition, index) {
-                        return index !== rowIndex && idsMatch(definition.categoryId, category.id);
+                        return index !== rowIndex && definition.categoryId === category.id;
                     });
                     if (selectedInOtherRow) {
                         return false;
                     }
-                    return category.active !== false || idsMatch(currentCategoryId, category.id);
+                    return category.active !== false || currentDefinition.categoryId === category.id;
                 });
             };
 
@@ -124,7 +103,7 @@
                         return false;
                     }
                     return !scope.definitions.some(function (definition) {
-                        return idsMatch(definition.categoryId, category.id);
+                        return definition.categoryId === category.id;
                     });
                 });
             };
@@ -133,7 +112,7 @@
                 var nextDefinition = {
                     categoryId: null,
                     minAge: scope.definitions.length === 0 ? 0 : null,
-                    maxAge: null,
+                    maxAge: '',
                     provisioningPercentage: null,
                     liabilityAccount: null,
                     expenseAccount: null
@@ -141,7 +120,7 @@
 
                 if (scope.definitions.length > 0) {
                     var previousDefinition = scope.definitions[scope.definitions.length - 1];
-                    if (previousDefinition.maxAge !== null && previousDefinition.maxAge !== undefined && previousDefinition.maxAge !== '') {
+                    if (angular.isDefined(previousDefinition.maxAge) && previousDefinition.maxAge !== '') {
                         nextDefinition.minAge = parseInt(previousDefinition.maxAge, 10) + 1;
                     }
                 }
@@ -151,7 +130,7 @@
                         return;
                     }
                     var alreadyUsed = scope.definitions.some(function (definition) {
-                        return idsMatch(definition.categoryId, category.id);
+                        return definition.categoryId === category.id;
                     });
                     if (!alreadyUsed) {
                         nextDefinition.categoryId = category.id;
@@ -183,7 +162,7 @@
             scope.doFocus = function (index) {
                 if (index > 0 && !scope.definitions[index].minAge) {
                     var previousMaxAge = scope.definitions[index - 1].maxAge;
-                    if (angular.isDefined(previousMaxAge) && previousMaxAge !== null && previousMaxAge !== '') {
+                    if (angular.isDefined(previousMaxAge) && previousMaxAge !== '') {
                         scope.definitions[index].minAge = parseInt(previousMaxAge, 10) + 1;
                     }
                 }
@@ -193,22 +172,16 @@
                 if (index >= scope.definitions.length - 1) {
                     return;
                 }
-                var maxAge = scope.definitions[index].maxAge;
-                if (maxAge !== null && maxAge !== undefined && maxAge !== '') {
-                    scope.definitions[index + 1].minAge = parseInt(maxAge, 10) + 1;
+                if (angular.isDefined(scope.definitions[index].maxAge) && scope.definitions[index].maxAge !== '') {
+                    scope.definitions[index + 1].minAge = parseInt(scope.definitions[index].maxAge, 10) + 1;
                 }
             };
 
             scope.submit = function () {
                 var payload = angular.copy(scope.formData);
-                var provisioningDateFormat = scope.df || 'dd MMMM yyyy';
                 payload.locale = scope.optlang.code;
                 payload.loanProducts = scope.selectedloanproducts;
                 payload.definitions = buildDefinitionPayload(scope.definitions, scope.categories);
-                if (payload.effectiveFrom) {
-                    payload.dateFormat = provisioningDateFormat;
-                    payload.effectiveFrom = dateFilter(payload.effectiveFrom, provisioningDateFormat);
-                }
                 resourceFactory.provisioningcriteria.post(payload, function (data) {
                     location.path('/viewprovisioningcriteria/' + data.resourceId);
                 });
@@ -220,20 +193,6 @@
                 scope.allloanproducts = (data.loanProducts || []).slice(0);
                 scope.liabilityaccounts = filterAccountsByType(data.glAccounts, 'accountType.liability');
                 scope.expenseaccounts = filterAccountsByType(data.glAccounts, 'accountType.expense');
-                var templateDefs = data.definitions;
-                if (angular.isArray(templateDefs) && templateDefs.length > 0) {
-                    angular.forEach(templateDefs, function (definition) {
-                        var row = angular.copy(definition);
-                        if (row.maxAge === null || row.maxAge === undefined) {
-                            row.maxAge = null;
-                        }
-                        if (!angular.isDefined(row.minAge) || row.minAge === null) {
-                            row.minAge = '';
-                        }
-                        applyCategoryMetadata(row, scope.categories);
-                        scope.definitions.push(row);
-                    });
-                }
                 if (!scope.definitions.length && scope.categories.length) {
                     scope.addDefinition();
                 }
