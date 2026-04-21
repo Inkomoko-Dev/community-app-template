@@ -3,11 +3,19 @@
         ViewProvisioningEntryController: function (scope, routeParams, paginatorService, resourceFactory, location, $uibModal) {
             scope.charge = [];
             scope.choice = 0;
-            var i = 0 ;
-            var temp = 0 ;
             scope.totalReservedAmount;
             scope.formData = {};
             scope.transactions = [];
+
+            scope.formatClassificationType = function (classificationType) {
+                if (classificationType === 'WRITTEN_OFF_PORTFOLIO') {
+                    return 'Written-Off Portfolio';
+                }
+                if (classificationType === 'PROVISION_BUCKET') {
+                    return 'Provision Bucket';
+                }
+                return classificationType;
+            };
 
             resourceFactory.officeResource.getAllOffices(function (data) {
                 scope.offices = data;
