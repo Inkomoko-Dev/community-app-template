@@ -56,6 +56,7 @@
             scope.translate = translate;
             scope.categories = [];
             scope.definitions = [];
+            scope.originalDefinitionsSnapshot = '[]';
 
             scope.addLoanProduct = function () {
                 angular.forEach(scope.available, function (loanProductId) {
@@ -177,11 +178,21 @@
             };
 
             scope.submit = function () {
-                var payload = angular.copy(scope.formData);
-                payload.locale = scope.optlang.code;
-                payload.criteriaId = scope.criteriaId;
-                payload.loanProducts = scope.selectedloanproducts;
-                payload.definitions = buildDefinitionPayload(scope.definitions, scope.categories);
+                var provisioningDateFormat = scope.df || 'dd MMMM yyyy';
+                var payload = {
+                    locale: scope.optlang.code,
+                    criteriaName: scope.formData.criteriaName,
+                    loanProducts: scope.selectedloanproducts
+                };
+                var definitionsPayload = buildDefinitionPayload(scope.definitions, scope.categories);
+                if (angular.toJson(definitionsPayload) !== scope.originalDefinitionsSnapshot) {
+                    payload.definitions = definitionsPayload;
+                    if (scope.formData.effectiveFrom) {
+                        payload.dateFormat = provisioningDateFormat;
+                        payload.effectiveFrom = dateFilter(scope.formData.effectiveFrom, provisioningDateFormat);
+                    }
+                }
+
                 resourceFactory.provisioningcriteria.put({ criteriaId: routeParams.criteriaId }, payload, function (data) {
                     location.path('/viewprovisioningcriteria/' + data.resourceId);
                 });
@@ -196,6 +207,8 @@
                 scope.expenseaccounts = filterAccountsByType(data.glAccounts, 'accountType.expense');
                 scope.formData.criteriaName = data.criteriaName;
                 scope.criteriaId = data.criteriaId;
+                scope.versionNo = data.versionNo;
+                scope.currentEffectiveFrom = data.effectiveFrom;
 
                 angular.forEach((data.definitions || []).slice(0).sort(function (left, right) {
                     var leftOrder = angular.isDefined(left.displayOrder) && left.displayOrder !== null ? left.displayOrder : 0;
@@ -219,6 +232,8 @@
                 if (!scope.definitions.length && scope.categories.length) {
                     scope.addDefinition();
                 }
+
+                scope.originalDefinitionsSnapshot = angular.toJson(buildDefinitionPayload(scope.definitions, scope.categories));
             });
         }
     });

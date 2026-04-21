@@ -179,9 +179,14 @@
 
             scope.submit = function () {
                 var payload = angular.copy(scope.formData);
+                var provisioningDateFormat = scope.df || 'dd MMMM yyyy';
                 payload.locale = scope.optlang.code;
                 payload.loanProducts = scope.selectedloanproducts;
                 payload.definitions = buildDefinitionPayload(scope.definitions, scope.categories);
+                if (payload.effectiveFrom) {
+                    payload.dateFormat = provisioningDateFormat;
+                    payload.effectiveFrom = dateFilter(payload.effectiveFrom, provisioningDateFormat);
+                }
                 resourceFactory.provisioningcriteria.post(payload, function (data) {
                     location.path('/viewprovisioningcriteria/' + data.resourceId);
                 });

@@ -11,7 +11,12 @@
                         <input ng-model="filterText" type="text" class="form-control " ng-keyup="onFilter()" placeholder="{{'label.input.filterbyname' | translate}}">
                     </div>
                     <div class="col-md-6">
-                        <a href="#/createprovisioningcriteria" class="btn btn-primary pull-right" has-permission='CREATE_PROVISIONCRITERIA'><i class="fa fa-plus "></i>&nbsp;&nbsp;{{'label.button.createprovisioningcriteria' | translate}}</a>
+                        <div class="pull-right">
+                            <a href="#/viewallprovisioningcategories" class="btn btn-default" has-permission='READ_PROVISIONCATEGORY'>
+                                {{'label.button.manageprovisioningcategories' | translate}}
+                            </a>
+                            <a href="#/createprovisioningcriteria" class="btn btn-primary" has-permission='CREATE_PROVISIONCRITERIA'><i class="fa fa-plus "></i>&nbsp;&nbsp;{{'label.button.createprovisioningcriteria' | translate}}</a>
+                        </div>
                     </div>
                 </div>
             </div>
