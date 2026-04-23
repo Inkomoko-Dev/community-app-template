@@ -63,6 +63,26 @@
         };
     }
 
+    function resolveAutomaticCorrectionDate(scope) {
+        if (!scope.correctionDateRequired) {
+            delete scope.formData.correctionDate;
+            return null;
+        }
+
+        var correctionDate = normalizeDate(scope.formData.correctionDate) || normalizeDate(scope.correctionDateMinDate);
+
+        if (!correctionDate && scope.latestClosureDate) {
+            correctionDate = addDays(scope.latestClosureDate, 1);
+        }
+
+        if (!correctionDate) {
+            correctionDate = normalizeDate(new Date());
+        }
+
+        scope.formData.correctionDate = correctionDate;
+        return correctionDate;
+    }
+
     function applyCorrectionMetadata(scope, metadata, fallbackLatestClosureDate) {
         scope.correctionAllowed = !(metadata && metadata.correctionAllowed === false);
         scope.correctionDateRequired = !!(metadata && metadata.correctionDateRequired === true);
@@ -72,14 +92,7 @@
             scope.correctionDateMinDate = addDays(scope.latestClosureDate, 1);
         }
         scope.correctionDateMaxDate = normalizeDate(metadata && metadata.latestCorrectionDate) || new Date();
-
-        if (scope.correctionDateRequired && !normalizeDate(scope.formData.correctionDate) && scope.correctionDateMinDate) {
-            scope.formData.correctionDate = new Date(scope.correctionDateMinDate.getTime());
-        }
-
-        if (!scope.correctionDateRequired) {
-            delete scope.formData.correctionDate;
-        }
+        resolveAutomaticCorrectionDate(scope);
     }
 
     function extractTransactionId(transactionRef) {
@@ -144,7 +157,7 @@
                     return true;
                 }
 
-                var correctionDate = normalizeDate(scope.formData.correctionDate);
+                var correctionDate = resolveAutomaticCorrectionDate(scope);
                 if (!correctionDate) {
                     scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.required';
                     return false;
@@ -280,7 +293,7 @@
                     return true;
                 }
 
-                var correctionDate = normalizeDate(scope.formData.correctionDate);
+                var correctionDate = resolveAutomaticCorrectionDate(scope);
                 if (!correctionDate) {
                     scope.correctionDateErrorCode = 'error.msg.loan.transaction.correction.date.required';
                     return false;
