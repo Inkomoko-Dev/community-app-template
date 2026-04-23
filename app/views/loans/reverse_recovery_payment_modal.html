@@ -32,6 +32,19 @@
                 <textarea id="reverseNote" rows="3" class="form-control" ng-model="formData.note"></textarea>
             </div>
         </div>
+        <div class="form-group" ng-if="correctionDateRequired">
+            <label class="control-label col-sm-4" for="reverseCorrectionDate">{{'label.input.correctiondate' | translate}}<span class="required">*</span></label>
+            <div class="col-sm-6">
+                <input id="reverseCorrectionDate" type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
+                       ng-model="formData.correctionDate" min="correctionDateMinDate" max="correctionDateMaxDate" required/>
+                <small class="help-block">
+                    {{'label.message.correctiondate.afterlatestclosure' | translate:getLatestClosureArgs()}}
+                </small>
+                <small class="error" ng-if="correctionDateErrorCode">
+                    {{correctionDateErrorCode | translate:correctionDateErrorArgs}}
+                </small>
+            </div>
+        </div>
     </form>
 </div>
 <div class="modal-footer">
