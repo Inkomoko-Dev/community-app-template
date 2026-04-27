@@ -16,13 +16,26 @@
         });
     };
 
+    var idsMatch = function (left, right) {
+        return left !== null && angular.isDefined(left) && right !== null && angular.isDefined(right) && left.toString() === right.toString();
+    };
+
+    var normalizeCategoryId = function (definition, categories) {
+        angular.forEach(categories, function (category) {
+            if (idsMatch(category.id, definition.categoryId)) {
+                definition.categoryId = category.id;
+            }
+        });
+    };
+
     var applyCategoryMetadata = function (definition, categories) {
+        normalizeCategoryId(definition, categories);
         definition.categoryName = null;
         definition.categoryCode = null;
         definition.displayOrder = null;
         definition.categoryActive = null;
         angular.forEach(categories, function (category) {
-            if (category.id === definition.categoryId) {
+            if (idsMatch(category.id, definition.categoryId)) {
                 definition.categoryName = category.categoryName;
                 definition.categoryCode = category.categoryCode;
                 definition.displayOrder = category.displayOrder;
@@ -61,7 +74,7 @@
             scope.addLoanProduct = function () {
                 angular.forEach(scope.available, function (loanProductId) {
                     for (var i = 0; i < scope.allloanproducts.length; i++) {
-                        if (scope.allloanproducts[i].id === loanProductId) {
+                        if (idsMatch(scope.allloanproducts[i].id, loanProductId)) {
                             scope.selectedloanproducts.push(scope.allloanproducts[i]);
                             scope.allloanproducts.splice(i, 1);
                             break;
@@ -74,7 +87,7 @@
             scope.removeLoanProduct = function () {
                 angular.forEach(scope.selected, function (loanProductId) {
                     for (var i = 0; i < scope.selectedloanproducts.length; i++) {
-                        if (scope.selectedloanproducts[i].id === loanProductId) {
+                        if (idsMatch(scope.selectedloanproducts[i].id, loanProductId)) {
                             scope.allloanproducts.push(scope.selectedloanproducts[i]);
                             scope.selectedloanproducts.splice(i, 1);
                             break;
@@ -86,14 +99,15 @@
 
             scope.availableCategoriesForRow = function (rowIndex) {
                 var currentDefinition = scope.definitions[rowIndex];
+                var currentCategoryId = currentDefinition ? currentDefinition.categoryId : null;
                 return scope.categories.filter(function (category) {
                     var selectedInOtherRow = scope.definitions.some(function (definition, index) {
-                        return index !== rowIndex && definition.categoryId === category.id;
+                        return index !== rowIndex && idsMatch(definition.categoryId, category.id);
                     });
                     if (selectedInOtherRow) {
                         return false;
                     }
-                    return category.active !== false || currentDefinition.categoryId === category.id;
+                    return category.active !== false || idsMatch(currentCategoryId, category.id);
                 });
             };
 
@@ -103,7 +117,7 @@
                         return false;
                     }
                     return !scope.definitions.some(function (definition) {
-                        return definition.categoryId === category.id;
+                        return idsMatch(definition.categoryId, category.id);
                     });
                 });
             };
@@ -130,7 +144,7 @@
                         return;
                     }
                     var alreadyUsed = scope.definitions.some(function (definition) {
-                        return definition.categoryId === category.id;
+                        return idsMatch(definition.categoryId, category.id);
                     });
                     if (!alreadyUsed) {
                         nextDefinition.categoryId = category.id;

@@ -81,7 +81,7 @@
                         <tr ng-repeat="definition in definitions track by $index">
                             <td>
                                 <select class="form-control" ng-model="definition.categoryId"
-                                        ng-options="category.id as (category.categoryName + ' (' + category.categoryCode + ')' + (category.active === false ? ' - Inactive' : '')) for category in availableCategoriesForRow($index) track by category.id"
+                                        ng-options="category.id as (category.categoryName + ' (' + category.categoryCode + ')' + (category.active === false ? ' - Inactive' : '')) for category in availableCategoriesForRow($index)"
                                         ng-change="onCategoryChanged(definition)" required>
                                     <option value="">{{'label.selectprovisioningcategory' | translate}}</option>
                                 </select>
