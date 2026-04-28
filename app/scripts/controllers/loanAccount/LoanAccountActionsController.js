@@ -1620,8 +1620,9 @@
                     note: scope.formData.note
                 };
 
-                // Call backend API using the dynamic reject endpoint
-                resourceFactory.rejectIcReviewDynamicLevelResource.reject({levelNumber: levelNumber, loanId: scope.accountId}, payload, function (data) {
+                // Call backend API using command: 'reject' (same as levels 1-5)
+                var params = {loanId: scope.accountId, command: 'reject'};
+                resourceFactory.LoanAccountResource.save(params, payload, function (data) {
                     // Redirect to loan view after successful rejection
                     location.path('/viewloanaccount/' + data.loanId);
                 });
