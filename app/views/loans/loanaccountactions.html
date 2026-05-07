@@ -228,6 +228,51 @@
                                     value="{{option.id}}" ng-disabled="isReadOnly"></select>
                         </div>
                     </div>
+                    <div class="form-group" ng-show="isSouthSudanSspLoan() && isApprovalAction()">
+                        <label class="control-label col-sm-2" for="disbursementType">Disbursement Type <span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <select id="disbursementType" ng-model="formData.disbursementType" class="form-control"
+                                    ng-options="option.id as option.name for option in disbursementTypeOptions"></select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isSouthSudanSspLoan() && isDisbursementReviewAction()">
+                        <label class="control-label col-sm-2">Disbursement Type</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" type="text" ng-model="formData.disbursementType" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxRate">FX Rate (SSP/USD)</label>
+                        <div class="col-sm-3">
+                            <input id="fxRate" class="form-control" type="text" ng-model="formData.fxRate"
+                                   ng-readonly="isDisbursementReviewAction()" number-format>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="usdAmount">USD Equivalent</label>
+                        <div class="col-sm-3">
+                            <input id="usdAmount" class="form-control" type="text" ng-model="formData.usdAmount" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxSource">FX Source</label>
+                        <div class="col-sm-3">
+                            <input id="fxSource" class="form-control" type="text" ng-model="formData.fxSource" ng-readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxTimestamp">FX Timestamp</label>
+                        <div class="col-sm-3">
+                            <input id="fxTimestamp" class="form-control" type="text" ng-model="formData.fxTimestamp" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isDisbursementReviewAction() && shouldShowFxDetails()">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <div class="alert alert-info" role="alert">
+                                You are reviewing the locked FX conversion before disbursement execution.
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2">{{ 'label.anchor.showpaymentdetails' | translate}}</label>
 

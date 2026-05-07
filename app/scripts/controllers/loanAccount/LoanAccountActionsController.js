@@ -28,6 +28,10 @@
                 {id: 1, name: 'label.input.paymentto.client'},
                 {id: 2, name: 'label.input.paymentto.supplier'}
             ];
+            scope.disbursementTypeOptions = [
+                {id: 'CLIENT', name: 'CLIENT'},
+                {id: 'VENDOR', name: 'VENDOR'}
+            ];
             // Helper function to extract level number from action name (e.g., 'icreviewlevelsix' -> 6)
             var icLevelWordToNumber = {
                 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
@@ -194,6 +198,44 @@
                 scope.recoveryPaymentDateErrorArgs = null;
             }
 
+            scope.isSouthSudanSspLoan = function () {
+                return scope.loanCurrencyCode === 'SSP';
+            };
+
+            scope.isVendorDisbursement = function () {
+                return scope.formData.disbursementType === 'VENDOR';
+            };
+
+            scope.isApprovalOrDisbursementAction = function () {
+                return scope.action === 'approve' || scope.action === 'disbursementpreapprovalrequest' || scope.action === 'approveDisbursement';
+            };
+
+            scope.isApprovalAction = function () {
+                return scope.action === 'approve';
+            };
+
+            scope.isDisbursementReviewAction = function () {
+                return scope.action === 'disbursementpreapprovalrequest' || scope.action === 'approveDisbursement';
+            };
+
+            scope.shouldShowFxDetails = function () {
+                return scope.isSouthSudanSspLoan() && scope.isVendorDisbursement();
+            };
+
+            scope.computeUsdEquivalent = function () {
+                if (!scope.shouldShowFxDetails()) {
+                    scope.formData.usdAmount = null;
+                    return;
+                }
+                var amount = Number(scope.formData.transactionAmount || 0);
+                var rate = Number(scope.formData.fxRate || 0);
+                if (amount > 0 && rate > 0) {
+                    scope.formData.usdAmount = (amount / rate).toFixed(2);
+                } else {
+                    scope.formData.usdAmount = null;
+                }
+            };
+
             function findRecoveryPaymentBackendError() {
                 if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
                     return null;
@@ -316,6 +358,8 @@
                         scope.formData.approvedLoanAmount = data.approvalAmount;
                         scope.formData.transactionAmount = data.netDisbursalAmount;
                         scope.formData.paymentTo = 1;
+                        scope.formData.disbursementType = null;
+                        scope.loanCurrencyCode = data.currency ? data.currency.code : null;
                         scope.paymentTypes = data.paymentTypeOptions;
                         scope.isLoanDisbursementRequestEnabled = true;
                         scope.fetchEntities('m_loan', 'APPROVE');
@@ -325,6 +369,7 @@
                         loanId: routeParams.id,
                         associations: 'multiDisburseDetails'
                     }, function (data) {
+                        scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                         scope.form.expectedDisbursementDate = new Date(data.timeline.expectedDisbursementDate);
                         scope.productId = data.loanProductId;
                         if (data.disbursementDetails != "") {
@@ -381,6 +426,7 @@
                         loanId: scope.accountId,
                         command: command
                     }, function (data) {
+                        scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                         scope.paymentTypes = data.paymentTypeOptions;
                         scope.formData.accountNumber = data.accountNumber || '';
                         scope.formData.paymentTo = 1;
@@ -394,6 +440,11 @@
                         scope.formData.beneficiaryName = data.beneficiaryName || '';
                         scope.formData.paymentTypeId = Number(data.paymentTypeId);
                         scope.formData.paymentTo = data.paymentTo ? Number(data.paymentTo) : 1;
+                        scope.formData.disbursementType = data.disbursementType || (scope.formData.paymentTo === 2 ? 'VENDOR' : 'CLIENT');
+                        scope.formData.fxRate = data.fxRate || null;
+                        scope.formData.fxSource = data.fxSource || 'CBS_DAILY_RATE';
+                        scope.formData.fxTimestamp = data.fxTimestamp || null;
+                        scope.formData.usdAmount = data.usdAmount || null;
                         scope.formData.transactionAmount = data.netDisbursalAmount || '';
                         scope.principalPortion = data.principalPortion || '';
                         scope.interestPortion = data.interestPortion || '';
@@ -404,6 +455,7 @@
                             scope.showEMIAmountField = true;
                         }
                         scope.isDisbursementPreApprovalRequest = !isApprove;
+                        scope.computeUsdEquivalent();
                     });
 
                     scope.title = isApprove ? 'label.heading.approvedisbursement' : 'label.heading.disbursementpreapproval';
@@ -1076,6 +1128,14 @@
                     scope.error = 'Beneficiary name is mandatory for supplier payment';
                     return;
                 }
+                if (scope.action === 'approve' && scope.isSouthSudanSspLoan() && !scope.formData.disbursementType) {
+                    scope.error = 'Disbursement type is mandatory for South Sudan';
+                    return;
+                }
+                if (scope.shouldShowFxDetails() && !scope.formData.fxRate) {
+                    scope.error = 'FX rate is mandatory for vendor disbursement in SSP';
+                    return;
+                }
                 var params = {command: scope.action};
                 if (scope.action == "recoverguarantee") {
                     params.command = "recoverGuarantees";
@@ -1096,6 +1156,19 @@
                     }
                     if (scope.formData.approvedLoanAmount == null) {
                         scope.formData.approvedLoanAmount = scope.showTrancheAmountTotal;
+                    }
+                    if (scope.formData.disbursementType === 'VENDOR') {
+                        scope.formData.paymentTo = 2;
+                    } else if (scope.formData.disbursementType === 'CLIENT') {
+                        scope.formData.paymentTo = 1;
+                    }
+                    if (scope.shouldShowFxDetails()) {
+                        scope.formData.fxSource = scope.formData.fxSource || 'CBS_DAILY_RATE';
+                    } else {
+                        delete scope.formData.fxRate;
+                        delete scope.formData.usdAmount;
+                        delete scope.formData.fxSource;
+                        delete scope.formData.fxTimestamp;
                     }
                 }
 
@@ -1502,7 +1575,25 @@
             scope.$watch('formData.paymentTo', function () {
                 if (scope.formData.paymentTo !== undefined) {
                     scope.setPaymentRecipientInfo();
+                    scope.computeUsdEquivalent();
                 }
+            });
+
+            scope.$watch('formData.disbursementType', function () {
+                if (scope.formData.disbursementType === 'VENDOR') {
+                    scope.formData.paymentTo = 2;
+                } else if (scope.formData.disbursementType === 'CLIENT') {
+                    scope.formData.paymentTo = 1;
+                }
+                scope.computeUsdEquivalent();
+            });
+
+            scope.$watch('formData.transactionAmount', function () {
+                scope.computeUsdEquivalent();
+            });
+
+            scope.$watch('formData.fxRate', function () {
+                scope.computeUsdEquivalent();
             });
 
             scope.isCashPayment = function () {
