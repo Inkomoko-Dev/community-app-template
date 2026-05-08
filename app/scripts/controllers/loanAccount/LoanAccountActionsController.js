@@ -272,6 +272,24 @@
                 }
             };
 
+            scope.isReviewRelatedAction = function () {
+                var reviewActions = [
+                    'reviewapplication', 'rejectduediligence', 'rejectreviewapplication',
+                    'collateralreview', 'rejectcollateralreview',
+                    'prepareandsigncontract', 'rejectprepareandsigncontract'
+                ];
+                var isIcReview = /^icreviewlevel/.test(scope.action) || /^rejecticreviewlevel/.test(scope.action);
+                return reviewActions.indexOf(scope.action) !== -1 || isIcReview;
+            };
+
+            function cleanupFxFields() {
+                delete scope.formData.fxRate;
+                delete scope.formData.usdAmount;
+                delete scope.formData.fxSource;
+                delete scope.formData.fxTimestamp;
+                delete scope.formData.disbursementType;
+            }
+
             function findRecoveryPaymentBackendError() {
                 if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
                     return null;
@@ -1127,16 +1145,9 @@
 
             scope.submit = function () {
                 scope.processDate = false;
-
-                // Prepare form data by filtering based on payment type (Cash vs Bank)
-                scope.filterDisburseFormData();
-
-                // For SSP loans, backend requires `disbursementType`. If user selects Payment to Supplier/Client
-                // but doesn't explicitly pick disbursementType, infer it to keep payload consistent.
-                if (scope.isSouthSudanSspLoan() && !scope.formData.disbursementType && (scope.action === 'approve' || scope.action === 'approveDisbursement' || scope.action === 'disbursementpreapprovalrequest' || scope.action === 'disbursementapproval')) {
-                    scope.formData.disbursementType = (scope.formData.paymentTo === 2) ? 'VENDOR' : 'CLIENT';
+                if (scope.isReviewRelatedAction()) {
+                    cleanupFxFields();
                 }
-
                 if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
                     return;
                 }
