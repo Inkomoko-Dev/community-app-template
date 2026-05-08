@@ -236,6 +236,24 @@
                 }
             };
 
+            scope.isReviewRelatedAction = function () {
+                var reviewActions = [
+                    'reviewapplication', 'rejectduediligence', 'rejectreviewapplication',
+                    'collateralreview', 'rejectcollateralreview',
+                    'prepareandsigncontract', 'rejectprepareandsigncontract'
+                ];
+                var isIcReview = /^icreviewlevel/.test(scope.action) || /^rejecticreviewlevel/.test(scope.action);
+                return reviewActions.indexOf(scope.action) !== -1 || isIcReview;
+            };
+
+            function cleanupFxFields() {
+                delete scope.formData.fxRate;
+                delete scope.formData.usdAmount;
+                delete scope.formData.fxSource;
+                delete scope.formData.fxTimestamp;
+                delete scope.formData.disbursementType;
+            }
+
             function findRecoveryPaymentBackendError() {
                 if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
                     return null;
@@ -1112,6 +1130,9 @@
 
             scope.submit = function () {
                 scope.processDate = false;
+                if (scope.isReviewRelatedAction()) {
+                    cleanupFxFields();
+                }
                 if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
                     return;
                 }
