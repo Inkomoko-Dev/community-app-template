@@ -415,6 +415,10 @@
                         scope.formData.disbursementType = null;
                         scope.loanCurrencyCode = data.currency ? data.currency.code : null;
                         scope.paymentTypes = data.paymentTypeOptions;
+                        scope.formData.fxRate = data.fxRate || null;
+                        scope.formData.fxTimestamp = data.fxTimestamp || null;
+                        scope.formData.fxSource = data.fxSource || 'CBS_DAILY_RATE';
+                        scope.computeUsdEquivalent();
                         scope.isLoanDisbursementRequestEnabled = true;
                         scope.fetchEntities('m_loan', 'APPROVE');
 
@@ -1152,31 +1156,10 @@
                     return;
                 }
 
-                var submitData = angular.copy(scope.formData);
-
-                var isDisbursementReviewAction = scope.action === "approveDisbursement"
-                    || scope.action === "disbursementpreapprovalrequest"
-                    || scope.action === "disbursementapproval";
-
-                // Clean up FX details separately from payment recipient details.
-                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) {
-                    delete submitData.fxRate;
-                    delete submitData.usdAmount;
-                    delete submitData.fxSource;
-                    delete submitData.fxTimestamp;
-
-                    // For South Sudan SSP loans, keep disbursementType if it's a review action, otherwise delete
-                    if (!scope.isSouthSudanSspLoan()) {
-                        delete submitData.disbursementType;
-                    }
-                }
-
-                if (scope.isReviewRelatedAction() || scope.isCashPayment() || isDisbursementReviewAction) {
-                    delete submitData.paymentTo;
-                    delete submitData.beneficiaryName;
-                    delete submitData.clientPhoneNumber;
-                    delete submitData.clientAccountNumber;
-                    delete submitData.clientBankName;
+                // For SSP loans, backend requires `disbursementType`. If user selects Payment to Supplier/Client
+                // but doesn't explicitly pick disbursementType, infer it to keep payload consistent.
+                if (scope.action === 'approve' && scope.isSouthSudanSspLoan() && !scope.formData.disbursementType) {
+                    scope.formData.disbursementType = (scope.formData.paymentTo === 2) ? 'VENDOR' : 'CLIENT';
                 }
 
                 // Only validate the note field if it is shown and mandatory
