@@ -379,6 +379,10 @@
                         scope.formData.disbursementType = null;
                         scope.loanCurrencyCode = data.currency ? data.currency.code : null;
                         scope.paymentTypes = data.paymentTypeOptions;
+                        scope.formData.fxRate = data.fxRate || null;
+                        scope.formData.fxTimestamp = data.fxTimestamp || null;
+                        scope.formData.fxSource = data.fxSource || 'CBS_DAILY_RATE';
+                        scope.computeUsdEquivalent();
                         scope.isLoanDisbursementRequestEnabled = true;
                         scope.fetchEntities('m_loan', 'APPROVE');
 
@@ -1136,6 +1140,13 @@
                 if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
                     return;
                 }
+
+                // For SSP loans, backend requires `disbursementType`. If user selects Payment to Supplier/Client
+                // but doesn't explicitly pick disbursementType, infer it to keep payload consistent.
+                if (scope.action === 'approve' && scope.isSouthSudanSspLoan() && !scope.formData.disbursementType) {
+                    scope.formData.disbursementType = (scope.formData.paymentTo === 2) ? 'VENDOR' : 'CLIENT';
+                }
+
                 // Only validate the note field if it is shown and mandatory
                 if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
                     scope.error = 'Note field is mandatory';
