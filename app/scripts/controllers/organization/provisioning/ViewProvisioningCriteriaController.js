@@ -17,6 +17,7 @@
                 scope.criteriaId = data.criteriaId;
                 scope.versionNo = data.versionNo;
                 scope.effectiveFrom = data.effectiveFrom;
+                scope.policyChangeReason = data.policyChangeReason;
                 scope.formattedProductNames = scope.loanproducts.map(function (loanProduct) {
                     return loanProduct.name;
                 }).join(', ');

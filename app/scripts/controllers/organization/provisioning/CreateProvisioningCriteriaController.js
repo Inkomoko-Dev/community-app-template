@@ -212,6 +212,20 @@
                 scope.allloanproducts = (data.loanProducts || []).slice(0);
                 scope.liabilityaccounts = filterAccountsByType(data.glAccounts, 'accountType.liability');
                 scope.expenseaccounts = filterAccountsByType(data.glAccounts, 'accountType.expense');
+                var templateDefs = data.definitions;
+                if (angular.isArray(templateDefs) && templateDefs.length > 0) {
+                    angular.forEach(templateDefs, function (definition) {
+                        var row = angular.copy(definition);
+                        if (row.maxAge === null || row.maxAge === undefined) {
+                            row.maxAge = '';
+                        }
+                        if (!angular.isDefined(row.minAge) || row.minAge === null) {
+                            row.minAge = '';
+                        }
+                        applyCategoryMetadata(row, scope.categories);
+                        scope.definitions.push(row);
+                    });
+                }
                 if (!scope.definitions.length && scope.categories.length) {
                     scope.addDefinition();
                 }
