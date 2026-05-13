@@ -260,7 +260,7 @@
 
             scope.computeUsdEquivalent = function () {
                 if (!scope.shouldShowFxDetails()) {
-                    scope.formData.usdAmount = null;
+                    delete scope.formData.usdAmount;
                     return;
                 }
                 var amount = Number(scope.formData.transactionAmount || 0);
@@ -268,7 +268,7 @@
                 if (amount > 0 && rate > 0) {
                     scope.formData.usdAmount = (amount / rate).toFixed(2);
                 } else {
-                    scope.formData.usdAmount = null;
+                    delete scope.formData.usdAmount;
                 }
             };
 
@@ -288,6 +288,11 @@
                 delete scope.formData.fxSource;
                 delete scope.formData.fxTimestamp;
                 delete scope.formData.disbursementType;
+                delete scope.formData.paymentTo;
+                delete scope.formData.beneficiaryName;
+                delete scope.formData.clientPhoneNumber;
+                delete scope.formData.clientAccountNumber;
+                delete scope.formData.clientBankName;
             }
 
             function findRecoveryPaymentBackendError() {
@@ -1149,7 +1154,7 @@
 
             scope.submit = function () {
                 scope.processDate = false;
-                if (scope.isReviewRelatedAction()) {
+                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails()) {
                     cleanupFxFields();
                 }
                 if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
