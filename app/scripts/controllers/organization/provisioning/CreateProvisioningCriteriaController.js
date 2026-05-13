@@ -225,7 +225,7 @@
                     angular.forEach(templateDefs, function (definition) {
                         var row = angular.copy(definition);
                         if (row.maxAge === null || row.maxAge === undefined) {
-                            row.maxAge = null;
+                            row.maxAge = '';
                         }
                         if (!angular.isDefined(row.minAge) || row.minAge === null) {
                             row.minAge = '';
