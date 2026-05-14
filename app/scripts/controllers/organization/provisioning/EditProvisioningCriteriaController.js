@@ -70,6 +70,7 @@
             scope.categories = [];
             scope.definitions = [];
             scope.originalDefinitionsSnapshot = '[]';
+            scope.definitionChangeRequiresEffectiveFromError = false;
 
             scope.addLoanProduct = function () {
                 angular.forEach(scope.available, function (loanProductId) {
@@ -192,6 +193,7 @@
             };
 
             scope.submit = function () {
+                scope.definitionChangeRequiresEffectiveFromError = false;
                 var provisioningDateFormat = scope.df || 'dd MMMM yyyy';
                 var payload = {
                     locale: scope.optlang.code,
@@ -199,11 +201,18 @@
                     loanProducts: scope.selectedloanproducts
                 };
                 var definitionsPayload = buildDefinitionPayload(scope.definitions, scope.categories);
-                if (angular.toJson(definitionsPayload) !== scope.originalDefinitionsSnapshot) {
+                var definitionsChanged = angular.toJson(definitionsPayload) !== scope.originalDefinitionsSnapshot;
+                if (definitionsChanged) {
                     payload.definitions = definitionsPayload;
-                    if (scope.formData.effectiveFrom) {
-                        payload.dateFormat = provisioningDateFormat;
-                        payload.effectiveFrom = dateFilter(scope.formData.effectiveFrom, provisioningDateFormat);
+                    if (!scope.formData.effectiveFrom) {
+                        scope.definitionChangeRequiresEffectiveFromError = true;
+                        return;
+                    }
+                    payload.dateFormat = provisioningDateFormat;
+                    payload.effectiveFrom = dateFilter(scope.formData.effectiveFrom, provisioningDateFormat);
+                    var reason = scope.formData.policyChangeReason;
+                    if (reason && String(reason).trim()) {
+                        payload.policyChangeReason = String(reason).trim();
                     }
                 }
 

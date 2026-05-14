@@ -47,6 +47,13 @@
                         </div>
                     </div>
 
+                    <div class="form-group" ng-if="policyChangeReason">
+                        <label class="control-label col-sm-2">{{'label.input.provisioning.policychangereason' | translate}}</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static">{{policyChangeReason}}</p>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="control-label col-sm-2">{{'label.input.loanproduct' | translate}}</label>
                         <div class="col-sm-8">
