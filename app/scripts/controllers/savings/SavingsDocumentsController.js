@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        SavingsDocumentsController: function (scope, resourceFactory, routeParams, location, route, $rootScope, API_VERSION) {
+        SavingsDocumentsController: function (scope, resourceFactory, routeParams, location, route, $rootScope, API_VERSION, $uibModal) {
 
             scope.accountDocuments = [];
             scope.savingsId = routeParams.savingsId;
@@ -27,6 +27,47 @@
                 });
             };
 
+            scope.renameDocument = function (document, index) {
+                $uibModal.open({
+                    templateUrl: 'renameDocumentDialog.html',
+                    controller: RenameSavingsDocumentCtrl,
+                    resolve: {
+                        documentData: function () {
+                            return {
+                                id: document.id,
+                                name: document.name,
+                                description: document.description,
+                                index: index
+                            };
+                        }
+                    }
+                });
+            };
+
+            var RenameSavingsDocumentCtrl = function ($scope, $uibModalInstance, documentData) {
+                $scope.renameData = {
+                    name: documentData.name,
+                    description: documentData.description
+                };
+                $scope.documentId = documentData.id;
+                $scope.documentIndex = documentData.index;
+
+                $scope.confirm = function () {
+                    resourceFactory.savingsDocumentsResource.update({
+                        savingsId: routeParams.savingsId,
+                        documentId: $scope.documentId
+                    }, $scope.renameData, function (data) {
+                        scope.accountDocuments[$scope.documentIndex].name = $scope.renameData.name;
+                        scope.accountDocuments[$scope.documentIndex].description = $scope.renameData.description;
+                        $uibModalInstance.close('rename');
+                    });
+                };
+
+                $scope.cancel = function () {
+                    $uibModalInstance.dismiss('cancel');
+                };
+            };
+
             scope.previewDocument = function (url, fileName) {
                 scope.preview =  true;
                 scope.fileUrl = scope.hostUrl + url;
@@ -40,7 +81,7 @@
 
         }
     });
-    mifosX.ng.application.controller('SavingsDocumentsController', ['$scope', 'ResourceFactory', '$routeParams', '$location', '$route', '$rootScope', 'API_VERSION', mifosX.controllers.SavingsDocumentsController]).run(function ($log) {
+    mifosX.ng.application.controller('SavingsDocumentsController', ['$scope', 'ResourceFactory', '$routeParams', '$location', '$route', '$rootScope', 'API_VERSION', '$uibModal', mifosX.controllers.SavingsDocumentsController]).run(function ($log) {
         $log.info("SavingsDocumentsController initialized");
     });
 }(mifosX.controllers || {}));

@@ -67,7 +67,8 @@
                         get: { method: 'GET', params: {}, isArray: true }
                     }),
                     clientDocumentsResource: defineResource(apiVer + "/clients/:clientId/documents/:documentId", { clientId: '@clientId', documentId: '@documentId' }, {
-                        getAllClientDocuments: { method: 'GET', params: {}, isArray: true }
+                        getAllClientDocuments: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
                     }),
                     clientAccountResource: defineResource(apiVer + "/clients/:clientId/accounts", { clientId: '@clientId', fields: '@fields' }, {
                         getAllAccounts: { method: 'GET', params: { fields: '@fields' } }
@@ -270,6 +271,13 @@
                         get: { method: 'GET', params: {} }
                     }),
                     loanChargesResource: defineResource(apiVer + "/loans/:loanId/charges/:chargeId", { loanId: '@loanId', chargeId: '@chargeId' }, {
+                        adjust: {
+                            method: 'POST',
+                            params: { command: 'adjust' }
+                        },
+                        get: {
+                            method: 'GET'
+                        }
                     }),
                     loanCollateralTemplateResource: defineResource(apiVer + "/loans/:loanId/collaterals/template", { loanId: '@loanId' }, {
                         get: { method: 'GET', params: {} }
@@ -304,7 +312,8 @@
                         update: { method: 'PUT' }
                     }),
                     LoanDocumentResource: defineResource(apiVer + "/loans/:loanId/documents/:documentId", { loanId: '@loanId', documentId: '@documentId' }, {
-                        getLoanDocuments: { method: 'GET', params: {}, isArray: true }
+                        getLoanDocuments: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
                     }),
                     RecurringDocumentResource: defineResource(apiVer + "/recurring/:accountId/documents/:documentId", { accountId: '@accountId', documentId: '@documentId' }, {
                         getRecurringDocuments: { method: 'GET', params: {}, isArray: true }
@@ -362,6 +371,12 @@
                     accountCoaResource: defineResource(apiVer + "/glaccounts/:glAccountId", { glAccountId: '@glAccountId' }, {
                         getAllAccountCoas: { method: 'GET', params: {}, isArray: true },
                         update: { method: 'PUT' }
+                    }),
+                    glAccountsResource:defineResource(apiVer + '/glaccounts', {}, {
+                        getAll: {
+                            method: 'GET',
+                            isArray: true
+                        }
                     }),
                     accountCoaTemplateResource: defineResource(apiVer + "/glaccounts/template", {}, {
                         get: { method: 'GET', params: {} }
@@ -436,7 +451,8 @@
                         update: { method: 'PUT' }
                     }),
                     savingsDocumentsResource: defineResource(apiVer + "/savings/:savingsId/documents/:documentId", { savingsId: '@savingsId', documentId: '@documentId' }, {
-                        getAllSavingsDocuments: { method: 'GET', params: {}, isArray: true }
+                        getAllSavingsDocuments: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
                     }),
                     gsimResource: defineResource(apiVer + "/savingsaccounts/gsim/:parentAccountId", { parentAccountId: '@parentAccountId' }, {
                         post: { method: 'POST', params: {} },
@@ -810,6 +826,7 @@
                     updateApprovalMatrixDetailsEngineResource: defineResource(apiVer + "/loans/decision/updateApprovalMatrix/:approvalMatrixId", { approvalMatrixId: '@approvalMatrixId' }, {
                         put: { method: 'PUT', params: {} },
                     }),
+                    // Dynamic IC Review Level Resources (Levels One through Ten)
                     icReviewLevelOneLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelOne/:loanId", { loanId: '@loanId' }, {
                         acceptIcReviewLevelOne: { method: 'POST', params: {} },
                     }),
@@ -840,6 +857,15 @@
                     rejectIcReviewLevelFiveLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/icReviewDecisionLevelFive/reject/:loanId", { loanId: '@loanId' }, {
                         rejectIcReviewLevelFive: { method: 'POST', params: {} },
                     }),
+                    // Dynamic IC Review Levels (6+) - Uses new dynamic endpoint pattern
+                    // Accept: POST /loans/decision/icReviewDecision/level/{levelNumber}/{loanId}
+                    // Reject: POST /loans/decision/icReviewDecision/level/{levelNumber}/reject/{loanId}
+                    icReviewDynamicLevelResource: defineResource(apiVer + "/loans/decision/icReviewDecision/level/:levelNumber/:loanId", { levelNumber: '@levelNumber', loanId: '@loanId' }, {
+                        accept: { method: 'POST', params: {} },
+                    }),
+                    rejectIcReviewDynamicLevelResource: defineResource(apiVer + "/loans/decision/icReviewDecision/level/:levelNumber/reject/:loanId", { levelNumber: '@levelNumber', loanId: '@loanId' }, {
+                        reject: { method: 'POST', params: {} },
+                    }),
                     prepareAndSignContractLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/prepareAndSignContract/:loanId", { loanId: '@loanId' }, {
                         acceptPrepareAndSignContract: { method: 'POST', params: {} },
                     }),
@@ -854,7 +880,8 @@
                         getAll: { method: 'GET', params: {}, isArray: true },
                         template: { method: 'GET', params: {} },
                         post: { method: 'POST', params: {} },
-                        put: { method: 'PUT', params: {} }
+                        put: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
                     }),
                     provisioningentries: defineResource(apiVer + "/provisioningentries/:entryId", { entryId: '@entryId' }, {
                         get: { method: 'GET', params: {} },
@@ -949,8 +976,12 @@
                         get: { method: 'GET', params: {} }
                     }),
 
-                    provisioningcategory: defineResource(apiVer + "/provisioningcategory", {}, {
-                        getAll: { method: 'GET', params: {}, isArray: true }
+                    provisioningcategory: defineResource(apiVer + "/provisioningcategory/:categoryId", { categoryId: '@categoryId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
+                        post: { method: 'POST', params: {} },
+                        put: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
                     }),
 
                     floatingrates: defineResource(apiVer + "/floatingrates/:floatingRateId", { floatingRateId: '@floatingRateId' }, {
@@ -1115,7 +1146,10 @@
                     reportParamResource: defineResource(apiVer + "/reports/jasper/parameters/:reportName", { reportName: '@reportName' }, {
                         get: { method: 'GET', isArray: true }
                     }),
-
+                    banksResource: defineResource(apiVer + "/banks", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        search: { method: 'GET', params: {}, isArray: true }
+                    }),
                     crbPostingReportsViewResource: defineResource(
                          apiVer + "/crb/posting-logs",
                         {},

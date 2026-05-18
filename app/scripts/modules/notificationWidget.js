@@ -146,7 +146,8 @@ angular.module('notificationWidget', [])
                     //now our data array will hold the return response
                     //either it's a batch response or a normal response
                     var data = [];
-                    if (rejection.config.url.indexOf('batches') > 0) {
+                    var requestUrl = rejection && rejection.config ? rejection.config.url || '' : '';
+                    if (requestUrl.indexOf('batches') > 0) {
                         data = rejection.data;
                     }
                     else {
@@ -156,7 +157,7 @@ angular.module('notificationWidget', [])
                         data.push(res);
                     }
 
-                    if (rejection.status === 0) {
+                    if (!rejection.status || rejection.status === 0 || rejection.status === -1) {
                         $rootScope.errorStatus = 'No connection. Verify application is running.';
                     } else if (rejection.status == 401) {
                         $rootScope.errorStatus = 'Unauthorized';
@@ -167,7 +168,20 @@ angular.module('notificationWidget', [])
                     } else {
                         for(var i = 0; i < data.length; i++) {
                             //console.log(data[i]);
-                            var jsonErrors = JSON.parse(data[i].body);
+                            var jsonErrors = null;
+                            try {
+                                jsonErrors = angular.isString(data[i].body) ? JSON.parse(data[i].body) : data[i].body;
+                            } catch (e) {
+                                jsonErrors = null;
+                            }
+
+                            if (!jsonErrors) {
+                                if (!$rootScope.errorStatus) {
+                                    $rootScope.errorStatus = 'Request failed.';
+                                }
+                                continue;
+                            }
+
                             var valErrors = jsonErrors.errors;
                             var errorArray = new Array();
                             var arrayIndex = 0;

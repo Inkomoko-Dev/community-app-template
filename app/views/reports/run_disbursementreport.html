@@ -16,6 +16,15 @@
 				</div>
 			</div>
 
+			<div class="form-group">
+				<label class="col-sm-3 control-label">{{'label.input.outputtype' | translate}}</label>
+				<div class="col-sm-3">
+                    <select class="form-control" ng-model="fileFormat" ng-disabled="isViewMode">
+                        <option value="PDF">{{'label.input.pdfformat' | translate}}</option>
+                        <option value="EXCEL">{{'label.input.exportexcel' | translate}}</option>
+                    </select>
+				</div>
+			</div>
 
 			<div class="form-group">
 				<label class="col-sm-3 control-label">{{'startDateSelect' | translate}}</label>
@@ -98,6 +107,9 @@
 				<a id="save" ng-click="saveRequest()" class="btn btn-success" ng-disabled="!reportGenerated || isViewMode">
 					<i class="fa fa-save"></i> {{ 'label.button.save' | translate }}
 				</a>
+                <a id="downloadExcel" ng-click="downloadExcel()" class="btn btn-default" ng-show="reportGenerated">
+                    <i class="fa fa-file-excel-o"></i> {{ 'label.button.downloadexcel' | translate }}
+                </a>
 
 			</span>
 

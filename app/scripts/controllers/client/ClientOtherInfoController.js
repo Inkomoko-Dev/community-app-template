@@ -10,6 +10,7 @@
             scope.otherInfoData = {};
             scope.exists= false;
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
@@ -22,6 +23,15 @@
                  scope.exists = true;
                 }
 
+            });
+
+
+            // Fetch banks for dropdown
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             scope.cancel = function () {
