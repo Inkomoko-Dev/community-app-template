@@ -107,7 +107,9 @@
 				<a id="save" ng-click="saveRequest()" class="btn btn-success" ng-disabled="!reportGenerated || isViewMode">
 					<i class="fa fa-save"></i> {{ 'label.button.save' | translate }}
 				</a>
-
+				<a id="downloadExcel" ng-click="downloadExcel()" class="btn btn-default" ng-show="reportGenerated">
+                    <i class="fa fa-file-excel-o"></i> {{ 'label.button.downloadexcel' | translate }}
+                </a>
 			</span>
 
 
@@ -119,3 +121,4 @@
 		</div>
 
 	</div>
+</div>
