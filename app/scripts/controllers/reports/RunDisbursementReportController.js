@@ -33,6 +33,7 @@
                                 $scope.loanProductIds = params.product_ids ? params.product_ids.split(',').map(Number) : [];
                                 $scope.officeId = params.location_id || null;
                                 $scope.interestPercentage = params.interest_percentage || 0;
+                                $scope.selectedInvestmentOfficerIds = params.investment_officer_ids ? params.investment_officer_ids.split(',').map(Number) : [];
                             } catch (e) {
                                 console.error("Error parsing parameters", e);
                             }
