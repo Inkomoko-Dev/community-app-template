@@ -25,10 +25,18 @@
             <div class="toolbar">
                 <h4>{{ 'label.heading.details' | translate}}</h4>
                 <div ng-hide="transaction.type.contra" class="btn-group pull-right">
-                    <a href="#/loanaccount/{{transaction.accountId}}/modifytransaction?transactionId={{transaction.id}}"
+                    <a ng-if="!isRecoveryPaymentTransaction(transaction)" href="#/loanaccount/{{transaction.accountId}}/modifytransaction?transactionId={{transaction.id}}"
                     class="btn btn-primary" has-permission='ADJUST_LOAN'><i class="fa fa-pencil "></i>{{ 'label.button.edit' | translate}}</a>
-                    <a ng-click="undo(transaction.accountId, transaction.id)" class="btn btn-danger" has-permission='ADJUST_LOAN'><i
+                    <a ng-if="!isRecoveryPaymentTransaction(transaction)" ng-click="undo(transaction.accountId, transaction.id)" class="btn btn-danger" has-permission='ADJUST_LOAN'><i
                     class="fa fa-trash "></i>{{ 'label.button.undo' | translate}}</a>
+                    <a ng-if="canReverseRecoveryPayment(transaction)" ng-click="openReverseRecoveryPaymentModal(transaction)"
+                    class="btn btn-warning" has-permission='REVERSERECOVERYPAYMENT_LOAN'
+                    uib-tooltip="{{ 'label.button.reverserecoverypayment' | translate}}" aria-label="{{ 'label.button.reverserecoverypayment' | translate}}"><i
+                    class="fa fa-undo "></i></a>
+                    <a ng-if="canPostCorrectedRecoveryPayment(transaction)" ng-click="openPostCorrectedRecoveryPaymentModal(transaction)"
+                    class="btn btn-primary" has-permission='RECOVERYPAYMENT_LOAN'
+                    uib-tooltip="{{ 'label.button.postcorrectedrecovery' | translate}}" aria-label="{{ 'label.button.postcorrectedrecovery' | translate}}"><i
+                    class="fa fa-repeat "></i></a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -52,6 +60,33 @@
                     <tr>
                         <td>{{ 'label.heading.amount' | translate}}</td>
                         <td>{{transaction.amount | number}}</td>
+                    </tr>
+                    <tr ng-if="isRecoveryPaymentTransaction(transaction)">
+                        <td>{{ 'label.input.manuallyreversed' | translate}}</td>
+                        <td>{{transaction.manuallyReversed | YesOrNo}}</td>
+                    </tr>
+                    <tr ng-if="isRecoveryPaymentTransaction(transaction)">
+                        <td>{{ 'label.input.originaldate' | translate}}</td>
+                        <td>{{transaction.date | DateFormat}}</td>
+                    </tr>
+                    <tr ng-if="getTransactionCorrectionDate(transaction)">
+                        <td>{{ 'label.input.correctiondate' | translate}}</td>
+                        <td>{{getTransactionCorrectionDate(transaction) | DateFormat}}</td>
+                    </tr>
+                    <tr ng-if="transaction.createdByUsername">
+                        <td>{{ 'label.createdby' | translate}}</td>
+                        <td>{{transaction.createdByUsername}}</td>
+                    </tr>
+                    <tr ng-if="transaction.originalTransactionId">
+                        <td>{{ 'label.input.originaltransactionid' | translate}}</td>
+                        <td><a href ng-click="openRelatedTransaction(transaction.originalTransactionId)">{{getRelatedTransactionId(transaction.originalTransactionId)}}</a></td>
+                    </tr>
+                    <tr ng-if="getRelatedTransactionId(relatedRecoveryReversal)">
+                        <td>{{ 'label.input.reversaltransaction' | translate}}</td>
+                        <td>
+                            <a href ng-click="openRelatedTransaction(relatedRecoveryReversal)">{{getRelatedTransactionId(relatedRecoveryReversal)}}</a>
+                            <span ng-if="getRelatedTransactionDate(relatedRecoveryReversal)">({{getRelatedTransactionDate(relatedRecoveryReversal) | DateFormat}})</span>
+                        </td>
                     </tr>
                     <tr class="span2"></tr>
                 </table>

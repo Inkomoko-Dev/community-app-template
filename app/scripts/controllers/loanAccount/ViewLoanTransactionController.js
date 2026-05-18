@@ -2,6 +2,8 @@
     mifosX.controllers = _.extend(module, {
         ViewLoanTransactionController: function (scope, resourceFactory, location, routeParams, dateFilter, $uibModal, $rootScope) {
             scope.details = [];
+            scope.latestClosureDate = null;
+            scope.relatedRecoveryReversal = null;
             //Get loan rates to be defined in transaction details
             scope.rates = $rootScope.rates;
             //Obtain total rate percentage
@@ -28,11 +30,235 @@
               }
             });
 
-            resourceFactory.loanTrxnsResource.get({loanId: routeParams.accountId, transactionId: routeParams.id}, function (data) {
-                scope.transaction = data;
-                scope.transaction.accountId = routeParams.accountId;
-                scope.generateDetailTable();
-            });
+            function normalizeDate(value) {
+                if (!value) {
+                    return null;
+                }
+
+                if (angular.isDate(value)) {
+                    return value;
+                }
+
+                if (angular.isArray(value) && value.length >= 3) {
+                    return new Date(value[0], value[1] - 1, value[2]);
+                }
+
+                if (typeof value === 'string') {
+                    var dateParts = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                    if (dateParts) {
+                        return new Date(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3]));
+                    }
+                }
+
+                var parsedDate = new Date(value);
+                if (isNaN(parsedDate.getTime())) {
+                    return null;
+                }
+
+                return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+            }
+
+            function buildRecoveryReversalIndex(transactions) {
+                var recoveryReversalTransactionsByOriginalId = {};
+                if (!transactions || !transactions.length) {
+                    return recoveryReversalTransactionsByOriginalId;
+                }
+
+                for (var i = 0; i < transactions.length; i++) {
+                    var transaction = transactions[i];
+                    var originalTransactionId = extractTransactionId(transaction && transaction.originalTransactionId);
+                    if (transaction && transaction.reversalTransaction === true && originalTransactionId) {
+                        recoveryReversalTransactionsByOriginalId[originalTransactionId] = transaction;
+                    }
+                }
+
+                return recoveryReversalTransactionsByOriginalId;
+            }
+
+            function getTransactionTypeValue(transaction) {
+                if (!transaction || !transaction.type) {
+                    return '';
+                }
+
+                return ((transaction.type.code || '') + ' ' + (transaction.type.value || '')).toLowerCase();
+            }
+
+            function extractTransactionId(transactionRef) {
+                if (!transactionRef) {
+                    return null;
+                }
+
+                if (angular.isObject(transactionRef)) {
+                    return transactionRef.id || transactionRef.transactionId || transactionRef.resourceId || null;
+                }
+
+                return transactionRef;
+            }
+
+            function extractTransactionDate(transactionRef) {
+                if (!angular.isObject(transactionRef)) {
+                    return null;
+                }
+
+                var dateFieldName = transactionRef.date ? 'date'
+                    : (transactionRef.transactionDate ? 'transactionDate'
+                        : (transactionRef.submittedOnDate ? 'submittedOnDate' : null));
+                if (!dateFieldName) {
+                    return null;
+                }
+
+                var normalizedDate = normalizeDate(transactionRef[dateFieldName]);
+                if (normalizedDate) {
+                    transactionRef[dateFieldName] = normalizedDate;
+                }
+
+                return normalizedDate;
+            }
+
+            function loadRelatedRecoveryReversal(transaction) {
+                scope.relatedRecoveryReversal = null;
+
+                if (!scope.isRecoveryPaymentTransaction(transaction) || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
+                    return;
+                }
+
+                if (angular.isObject(transaction.reversalTransaction)) {
+                    scope.relatedRecoveryReversal = transaction.reversalTransaction;
+                    return;
+                }
+
+                resourceFactory.LoanAccountResource.getLoanAccountDetails({
+                    loanId: routeParams.accountId,
+                    associations: 'all',
+                    exclude: 'guarantors,futureSchedule'
+                }, function (data) {
+                    var recoveryReversalTransactionsByOriginalId = buildRecoveryReversalIndex(data.transactions || []);
+                    scope.relatedRecoveryReversal = recoveryReversalTransactionsByOriginalId[extractTransactionId(transaction.id)] || null;
+                }, function () {
+                    scope.relatedRecoveryReversal = null;
+                });
+            }
+
+            function loadTransaction() {
+                resourceFactory.loanTrxnsResource.get({loanId: routeParams.accountId, transactionId: routeParams.id}, function (data) {
+                    scope.transaction = data;
+                    scope.transaction.accountId = routeParams.accountId;
+                    scope.details = [];
+                    scope.generateDetailTable();
+                    scope.latestClosureDate = null;
+                    loadRelatedRecoveryReversal(data);
+                });
+            }
+
+            scope.isRecoveryPaymentTransaction = function (transaction) {
+                var transactionTypeValue = getTransactionTypeValue(transaction);
+                return !!(transaction && (transaction.isRecoveryPayment === true
+                    || (transaction.type && transaction.type.recoveryRepayment === true)
+                    || transactionTypeValue.indexOf('recovery') !== -1));
+            };
+
+            scope.canReverseRecoveryPayment = function (transaction) {
+                return scope.isRecoveryPaymentTransaction(transaction)
+                    && transaction.reversalTransaction !== true
+                    && transaction.manuallyReversed !== true
+                    && transaction.correctionAllowed !== false;
+            };
+
+            scope.canPostCorrectedRecoveryPayment = function (transaction) {
+                return scope.isRecoveryPaymentTransaction(transaction)
+                    && transaction.reversalTransaction !== true
+                    && transaction.manuallyReversed === true
+                    && transaction.correctionAllowed !== false;
+            };
+
+            scope.openRelatedTransaction = function (transactionRef) {
+                var transactionId = extractTransactionId(transactionRef);
+                if (!transactionId) {
+                    return;
+                }
+
+                $rootScope.rates = scope.rates;
+                location.path('/viewloantrxn/' + routeParams.accountId + '/trxnId/' + transactionId);
+            };
+
+            scope.getRelatedTransactionId = function (transactionRef) {
+                return extractTransactionId(transactionRef);
+            };
+
+            scope.getRelatedTransactionDate = function (transactionRef) {
+                return extractTransactionDate(transactionRef);
+            };
+
+            scope.getTransactionCorrectionDate = function (transaction) {
+                if (!transaction || !transaction.correctionDate) {
+                    return null;
+                }
+
+                var normalizedDate = normalizeDate(transaction.correctionDate);
+                if (normalizedDate) {
+                    transaction.correctionDate = normalizedDate;
+                }
+
+                return normalizedDate;
+            };
+
+            scope.openReverseRecoveryPaymentModal = function (transaction) {
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'views/loans/reverse_recovery_payment_modal.html',
+                    controller: 'ReverseRecoveryPaymentModalController',
+                    resolve: {
+                        loanId: function () {
+                            return transaction.accountId;
+                        },
+                        transaction: function () {
+                            return angular.copy(transaction);
+                        },
+                        latestClosureDate: function () {
+                            return scope.latestClosureDate;
+                        },
+                        dateFormat: function () {
+                            return scope.df;
+                        },
+                        locale: function () {
+                            return scope.optlang.code;
+                        }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    loadTransaction();
+                });
+            };
+
+            scope.openPostCorrectedRecoveryPaymentModal = function (transaction) {
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'views/loans/post_corrected_recovery_payment_modal.html',
+                    controller: 'PostCorrectedRecoveryPaymentModalController',
+                    resolve: {
+                        loanId: function () {
+                            return transaction.accountId;
+                        },
+                        transaction: function () {
+                            return angular.copy(transaction);
+                        },
+                        latestClosureDate: function () {
+                            return scope.latestClosureDate;
+                        },
+                        dateFormat: function () {
+                            return scope.df;
+                        },
+                        locale: function () {
+                            return scope.optlang.code;
+                        }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    loadTransaction();
+                });
+            };
+
+            loadTransaction();
 
             scope.undo = function (accountId, transactionId) {
                 $uibModal.open({

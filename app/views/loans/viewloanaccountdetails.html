@@ -17,6 +17,31 @@
             <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
         </div>
     </script>
+    <script type="text/ng-template" id="renameDocumentDialog.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.heading.renamedocument' | translate}}</h3>
+        </div>
+        <div class="modal-body">
+            <form name="renameDocumentForm" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="documentName">{{'label.input.name' | translate}}<span class="required">*</span></label>
+                    <div class="col-sm-6">
+                        <input type="text" id="documentName" name="documentName" class="form-control" ng-model="renameData.name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="documentDescription">{{'label.input.description' | translate}}</label>
+                    <div class="col-sm-6">
+                        <textarea id="documentDescription" name="documentDescription" class="form-control" rows="2" ng-model="renameData.description"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+            <button class="btn btn-primary" ng-click="confirm()" ng-disabled="renameDocumentForm.$invalid">{{'label.button.save' | translate}}</button>
+        </div>
+    </script>
     <api-validate></api-validate>
 
     <script type="text/ng-template" id="cashFlowProjectionUpdateModal.html">
@@ -804,6 +829,8 @@
                                     <th class="pointer" ng-click="changeTransactionSort('amount')">{{'label.heading.amount' | translate}}</th>
                                     <th class="pointer" colspan="4" scope="colgroup">{{'label.heading.breakdown' | translate}}</th>
                                     <th class="pointer" scope="colgroup">{{'label.heading.loan.balance' | translate}}</th>
+                                    <th>{{'label.heading.audit' | translate}}</th>
+                                    <th>{{'label.heading.actions' | translate}}</th>
                                     <th></th>
                                     <th></th>
                                 </tr>
@@ -817,42 +844,79 @@
                                     <th class="pointer" scope="col" ng-click="changeTransactionSort('interestPortion')">{{'label.heading.interest' | translate}}</th>
                                     <th class="pointer" scope="col" ng-click="changeTransactionSort('feeChargesPortion')">{{'label.heading.fees' | translate}}</th>
                                     <th class="pointer" scope="col" ng-click="changeTransactionSort('penaltyChargesPortion')">{{'label.heading.penalities' | translate}}</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="pointer-main" ng-class="{strikeoff : transaction.manuallyReversed==true}"
                                     ng-repeat="transaction in loandetails.transactions | orderBy:transactionSort.column:transactionSort.descending" ng-hide = "hideAccrualTransactions && transaction.type.accrual">
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.id}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.officeName}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.date | DateFormat}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.type.value}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.amount | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.principalPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.interestPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.feeChargesPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.penaltyChargesPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.outstandingLoanBalance | number}}
                                     </td>
-
+                                    <td class="small" ng-if="isRecoveryPaymentTransaction(transaction)">
+                                        <div><strong>{{'label.input.manuallyreversed' | translate}}:</strong> {{transaction.manuallyReversed | YesOrNo}}</div>
+                                        <div><strong>{{'label.input.originaldate' | translate}}:</strong> {{transaction.date | DateFormat}}</div>
+                                        <div ng-if="getTransactionCorrectionDate(transaction)"><strong>{{'label.input.correctiondate' | translate}}:</strong> {{getTransactionCorrectionDate(transaction) | DateFormat}}</div>
+                                        <div ng-if="transaction.originalTransactionId">
+                                            <strong>{{'label.input.originaltransactionid' | translate}}:</strong>
+                                            <a href ng-click="openRelatedTransaction($event, transaction.originalTransactionId)">{{getRelatedTransactionId(transaction.originalTransactionId)}}</a>
+                                        </div>
+                                        <div ng-if="getRelatedTransactionId(getRecoveryReversalTransaction(transaction))">
+                                            <strong>{{'label.input.reversaltransaction' | translate}}:</strong>
+                                            <a href ng-click="openRelatedTransaction($event, getRecoveryReversalTransaction(transaction))">{{getRelatedTransactionId(getRecoveryReversalTransaction(transaction))}}</a>
+                                            <span ng-if="getRelatedTransactionDate(getRecoveryReversalTransaction(transaction))">({{getRelatedTransactionDate(getRecoveryReversalTransaction(transaction)) | DateFormat}})</span>
+                                        </div>
+                                    </td>
+                                    <td ng-if="!isRecoveryPaymentTransaction(transaction)">&nbsp;</td>
+                                    <td>
+                                        <button type="button" class="btn btn-xs btn-warning"
+                                                ng-if="canReverseRecoveryPayment(transaction)"
+                                                ng-click="openReverseRecoveryPaymentModal(transaction)"
+                                                uib-tooltip="{{'label.button.reverserecoverypayment' | translate}}"
+                                                aria-label="{{'label.button.reverserecoverypayment' | translate}}"
+                                                has-permission="REVERSERECOVERYPAYMENT_LOAN">
+                                            <i class="fa fa-undo"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-primary"
+                                                ng-if="canPostCorrectedRecoveryPayment(transaction)"
+                                                ng-click="openPostCorrectedRecoveryPaymentModal(transaction)"
+                                                uib-tooltip="{{'label.button.postcorrectedrecovery' | translate}}"
+                                                aria-label="{{'label.button.postcorrectedrecovery' | translate}}"
+                                                has-permission="RECOVERYPAYMENT_LOAN">
+                                            <i class="fa fa-repeat"></i>
+                                        </button>
+                                    </td>
                                     <td> <span uib-tooltip="{{'label.heading.viewreceipts' | translate }}" ng-if="transaction.manuallyReversed!=true" ng-click="viewloantransactionreceipts(transaction.id)">
                                         <i class="fa fa-file-text fa fa-large"></i>
                                     </span>
@@ -1008,6 +1072,14 @@
                                     <a class="btn-success" data-ng-show="charge.chargePayable && status=='Active'"
                                        href="#/loanaccountcharge/{{loandetails.id}}/paycharge/{{charge.id}}">{{"label.button.pay" |
                                         translate}}</a>
+                                    <a class="btn-warning btn-sm"
+                                       data-ng-show="charge.chargeTimeType.value === 'Disbursement' && charge.paid === true"
+                                       href="#/loan/{{loandetails.id}}/adjustinsurancecharge/{{charge.id}}"
+                                       has-permission="ADJUSTINSURANCE_LOANCHARGE"
+                                       title="Adjust Insurance Charge">
+                                        <i class="fa fa-pencil"></i> {{'label.button.adjust' | translate}}
+                                    </a>
+                                </td>
                                 </td>
                             </tr>
                         </table>
@@ -1033,9 +1105,10 @@
                                 <td>{{document.description}}</td>
                                 <td>{{document.fileName}}</td>
                                 <td>
-                                    <a ng-click="downloadDocument(document)"><i class="fa fa-cloud-download"></i></a>&nbsp;
-                                    <a ng-show="document.fileIsImage" ng-click="downloadDocument(document)"><i class="fa fa-eye"></i></a>
-                                    <a ng-click="deleteDocument(document.id,$index)"><i class="fa fa-times"></i></a>
+                                    <a ng-click="downloadDocument(document)" uib-tooltip="{{'label.button.download' | translate}}"><i class="fa fa-cloud-download"></i></a>&nbsp;
+                                    <a ng-show="document.fileIsImage" ng-click="downloadDocument(document)" uib-tooltip="{{'label.button.preview' | translate}}"><i class="fa fa-eye"></i></a>
+                                    <a ng-click="renameDocument(document,$index)" has-permission='UPDATE_DOCUMENT' uib-tooltip="{{'label.button.rename' | translate}}"><i class="fa fa-edit"></i></a>&nbsp;
+                                    <a ng-click="deleteDocument(document.id,$index)" has-permission='DELETE_DOCUMENT' uib-tooltip="{{'label.button.delete' | translate}}"><i class="fa fa-times"></i></a>
                                 </td>
                             </tr>
                             </tbody>
@@ -1076,7 +1149,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="{{'label.anchor.standinginstruction' | translate}}" ng-show="instructions.currentPageItems.length > 0">
+                    <uib-tab heading="{{'label.anchor.standinginstruction' | translate}}" ng-show="instructions && instructions.currentPageItems && instructions.currentPageItems.length > 0">
                         <br>
                         <table class="table">
                             <thead>

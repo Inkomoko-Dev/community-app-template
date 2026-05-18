@@ -1,0 +1,86 @@
+<div class="modal-header silver">
+    <h3 class="bolder">{{'label.heading.postcorrectedrecoverypayment' | translate}}</h3>
+</div>
+<div class="modal-body">
+    <api-validate></api-validate>
+    <div class="alert alert-warning" ng-if="correctionAllowed === false">
+        {{'error.msg.loan.transaction.closed.period.corrections.not.allowed' | translate}}
+    </div>
+    <form name="postCorrectedRecoveryForm" class="form-horizontal" novalidate>
+        <div class="form-group">
+            <label class="control-label col-sm-4">{{'label.input.originaltransactionid' | translate}}</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{formData.originalTransactionId}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4">{{'label.input.originaldate' | translate}}</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{transaction.date | DateFormat}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedTransactionDate">{{'label.input.transactiondate' | translate}}<span class="required">*</span></label>
+            <div class="col-sm-6">
+                <input id="correctedTransactionDate" type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
+                       ng-model="formData.transactionDate" max="restrictDate" required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedTransactionAmount">{{'label.input.transactionamount' | translate}}<span class="required">*</span></label>
+            <div class="col-sm-6">
+                <input id="correctedTransactionAmount" type="text" class="form-control" number-format
+                       ng-model="formData.transactionAmount" required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedPaymentTypeId">{{'label.input.paymenttype' | translate}}</label>
+            <div class="col-sm-6">
+                <select id="correctedPaymentTypeId" ng-model="formData.paymentTypeId" class="form-control"
+                        ng-options="paymentType.id as paymentType.name for paymentType in paymentTypes">
+                    <option value="">--{{'label.menu.select' | translate}}--</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedAccountNumber">{{'label.input.accnum' | translate}}</label>
+            <div class="col-sm-6">
+                <input id="correctedAccountNumber" type="text" class="form-control" ng-model="formData.accountNumber"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedCheckNumber">{{'label.input.checknumber' | translate}}</label>
+            <div class="col-sm-6">
+                <input id="correctedCheckNumber" type="text" class="form-control" ng-model="formData.checkNumber"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedRoutingCode">{{'label.input.routingcode' | translate}}</label>
+            <div class="col-sm-6">
+                <input id="correctedRoutingCode" type="text" class="form-control" ng-model="formData.routingCode"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedReceiptNumber">{{'label.input.receiptnumber' | translate}}</label>
+            <div class="col-sm-6">
+                <input id="correctedReceiptNumber" type="text" class="form-control" ng-model="formData.receiptNumber"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedBankNumber">{{'label.input.banknumber' | translate}}</label>
+            <div class="col-sm-6">
+                <input id="correctedBankNumber" type="text" class="form-control" ng-model="formData.bankNumber"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="correctedNote">{{'label.input.note' | translate}}</label>
+            <div class="col-sm-6">
+                <textarea id="correctedNote" rows="3" class="form-control" ng-model="formData.note"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+    <button class="btn btn-primary" ng-click="submit()" ng-disabled="postCorrectedRecoveryForm.$invalid || correctionAllowed === false">{{'label.button.postcorrectedrecovery' | translate}}</button>
+</div>

@@ -6,59 +6,83 @@
     </ul>
     <div class="card">
         <div class="content">
-        <form name="createprovisioningcriteriaform" novalidate="" class="form-horizontal" rc-submit="submit()">
-            <fieldset>
-                <!-- Start -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <h3><strong>{{criterianame}}</strong></h3>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="pull-right">
-                            <a href="#/editprovisioningcriteria/{{criteriaId}}" class="btn btn-primary" has-permission='UPDATE_PROVISIONCRITERIA'><i class="fa fa-edit "></i>&nbsp;&nbsp;{{'label.button.edit' | translate}}</a>
-                            <button type="button" data-ng-click="deleteProvisionigCriteria()" class="btn btn-danger" has-permission='DELETE_PROVISIONCRITERIA'><i
-                                    class="fa fa-trash-o "></i>&nbsp;&nbsp;{{'label.button.delete' | translate}}
-                            </button>
+            <form name="createprovisioningcriteriaform" novalidate class="form-horizontal">
+                <fieldset>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3><strong>{{criterianame}}</strong></h3>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <a href="#/editprovisioningcriteria/{{criteriaId}}" class="btn btn-primary" has-permission='UPDATE_PROVISIONCRITERIA'>
+                                    <i class="fa fa-edit"></i>&nbsp;&nbsp;{{'label.button.edit' | translate}}
+                                </a>
+                                <button type="button" data-ng-click="deleteProvisionigCriteria()" class="btn btn-danger" has-permission='DELETE_PROVISIONCRITERIA'>
+                                    <i class="fa fa-trash-o"></i>&nbsp;&nbsp;{{'label.button.delete' | translate}}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <hr />
-                <script type="text/ng-template" id="deletech.html">
-                    <div class="modal-header silver">
-                        <h3 class="bolder">{{'label.heading.delete' | translate}}</h3>
+                    <hr/>
+                    <script type="text/ng-template" id="deletech.html">
+                        <div class="modal-header silver">
+                            <h3 class="bolder">{{'label.heading.delete' | translate}}</h3>
+                        </div>
+                        <div class="modal-body">
+                            <api-validate></api-validate>
+                            <br>
+                            <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+                            <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+                        </div>
+                    </script>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.version' | translate}}</label>
+                        <div class="col-sm-4">
+                            <p class="form-control-static">{{versionNo}}</p>
+                        </div>
+                        <label class="control-label col-sm-2">{{'label.input.effectivefrom' | translate}}</label>
+                        <div class="col-sm-4">
+                            <p class="form-control-static">{{effectiveFrom | DateFormat}}</p>
+                        </div>
                     </div>
-                    <div class="modal-body ">
-                        <api-validate></api-validate>
-                        <br>
-                        <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
-                        <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+
+                    <div class="form-group" ng-if="policyChangeReason">
+                        <label class="control-label col-sm-2">{{'label.input.provisioning.policychangereason' | translate}}</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static">{{policyChangeReason}}</p>
+                        </div>
                     </div>
-                </script>
-                <!-- end -->
-                <label class="control-label col-sm-2">{{'label.input.loanproduct' | translate}}</label>
-                <div class="col-sm-8">
-                    <textarea type="text" rows="3" name="loanproducts" ng-model="formattedProductNames" class="form-control" disabled></textarea>
-                </div>
-                <table class="table" class="width100" ng-show="definitions.length>0">
-                    <tr class="graybg">
-                        <th>{{'label.heading.provisioningcategory' | translate}}</th>
-                        <th>{{'label.heading.minimumage' | translate}}</th>
-                        <th>{{'label.heading.maximumage' | translate}}</th>
-                        <th>{{'label.heading.provisioningpercentage' | translate}}</th>
-                        <th>{{'label.heading.provisioningliabilityaccount' | translate}}</th>
-                        <th>{{'label.heading.provisioningexpenseaccount' | translate}}</th>
-                    </tr>
-                    <tr ng-repeat="provisioningcategory in definitions | orderBy:'categoryId'">
-                        <td>{{provisioningcategory.categoryName}}</td>
-                        <td>{{provisioningcategory.minAge}}</td>
-                        <td>{{provisioningcategory.maxAge}}</td>
-                        <td>{{provisioningcategory.provisioningPercentage}}</td>
-                        <td>{{provisioningcategory.liabilityName}}</td>
-                        <td>{{provisioningcategory.expenseName}}</td>
-                    </tr>
-                </table>
-            </fieldset>
-        </form>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.loanproduct' | translate}}</label>
+                        <div class="col-sm-8">
+                            <textarea rows="3" name="loanproducts" ng-model="formattedProductNames" class="form-control" disabled></textarea>
+                        </div>
+                    </div>
+
+                    <table class="table width100" ng-show="definitions.length > 0">
+                        <tr class="graybg">
+                            <th>{{'label.heading.provisioningcategory' | translate}}</th>
+                            <th>{{'label.heading.provisioningcategorycode' | translate}}</th>
+                            <th>{{'label.heading.minimumage' | translate}}</th>
+                            <th>{{'label.heading.maximumage' | translate}}</th>
+                            <th>{{'label.heading.provisioningpercentage' | translate}}</th>
+                            <th>{{'label.heading.provisioningliabilityaccount' | translate}}</th>
+                            <th>{{'label.heading.provisioningexpenseaccount' | translate}}</th>
+                        </tr>
+                        <tr ng-repeat="definition in definitions track by $index">
+                            <td>{{definition.categoryName}}</td>
+                            <td>{{definition.categoryCode}}</td>
+                            <td>{{definition.minAge}}</td>
+                            <td>{{formatMaximumAge(definition)}}</td>
+                            <td>{{definition.provisioningPercentage}}</td>
+                            <td>{{definition.liabilityName}}</td>
+                            <td>{{definition.expenseName}}</td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </form>
         </div>
     </div>
 </div>

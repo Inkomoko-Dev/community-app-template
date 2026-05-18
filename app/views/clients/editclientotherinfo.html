@@ -101,12 +101,28 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="bankName">
+                    <label class="control-label col-sm-2" for="bankId">
                         {{ 'label.input.bankName' | translate }}
                     </label>
-
                     <div class="col-sm-3">
-                        <input id="bankName" name="bankName" type="text" class="form-control" ng-model="formData.bankName" late-validate>
+                        <select chosen="bankOptions"
+                                id="bankId"
+                                name="bankId"
+                                ng-model="formData.bankId"
+                                class="form-control"
+                                ng-options="bank.id as (bank.bankName + ' — ' + bank.country) for bank in bankOptions">
+                            <option value="">-- Select Bank --</option>
+                        </select>
+                    </div>
+                    <form-validate valattributeform="editclientotherinfoform" valattribute="bankId"/>
+                </div>
+
+                <div class="form-group" ng-if="!formData.bankId && otherInfoData.bankName">
+                    <label class="control-label col-sm-2"></label>
+                    <div class="col-sm-3">
+                        <p class="form-control-static text-muted">
+                            <small>Previous value: {{otherInfoData.bankName}}</small>
+                        </p>
                     </div>
                 </div>
                 <div class="form-group">
