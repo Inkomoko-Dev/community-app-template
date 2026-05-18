@@ -1204,6 +1204,9 @@
             scope.submit = function () {
                 scope.processDate = false;
 
+                // Prepare form data by filtering based on payment type (Cash vs Bank)
+                scope.filterDisburseFormData();
+
                 // For SSP loans, backend requires `disbursementType`. If user selects Payment to Supplier/Client
                 // but doesn't explicitly pick disbursementType, infer it to keep payload consistent.
                 if (scope.isSouthSudanSspLoan() && !scope.formData.disbursementType && (scope.action === 'approve' || scope.action === 'approveDisbursement' || scope.action === 'disbursementpreapprovalrequest' || scope.action === 'disbursementapproval')) {
@@ -1216,18 +1219,24 @@
 
                 var submitData = angular.copy(scope.formData);
 
-                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails()) {
-                    // Only delete from submitData, not scope.formData to avoid UI flashing
+                // Clean up vendor/FX details if not applicable or not supported for the current action
+                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
                     delete submitData.fxRate;
                     delete submitData.usdAmount;
                     delete submitData.fxSource;
                     delete submitData.fxTimestamp;
-                    
-                    // For South Sudan SSP loans, the backend ALWAYS requires disbursementType
+                    delete submitData.paymentTo;
+                    delete submitData.beneficiaryName;
+                    delete submitData.clientPhoneNumber;
+                    delete submitData.clientAccountNumber;
+                    delete submitData.clientBankName;
+
+                    // For South Sudan SSP loans, keep disbursementType if it's a review action, otherwise delete
                     if (!scope.isSouthSudanSspLoan()) {
                         delete submitData.disbursementType;
                     }
-                    
+                } else if (scope.isCashPayment()) {
+                    // Even if we should show FX details, if it's cash, we don't send recipient info
                     delete submitData.paymentTo;
                     delete submitData.beneficiaryName;
                     delete submitData.clientPhoneNumber;
@@ -1256,12 +1265,14 @@
                 if (scope.action == "recoverguarantee") {
                     params.command = "recoverGuarantees";
                 }
-                if (scope.action == "approve" || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
-                    scope.formData.expectedDisbursementDate = dateFilter(scope.form.expectedDisbursementDate, scope.df);
+                
+                // Fields for approval vs disbursement review
+                if (scope.action === "approve") {
+                    submitData.expectedDisbursementDate = dateFilter(scope.form.expectedDisbursementDate, scope.df);
                     if (scope.disbursementDetails != null) {
-                        scope.formData.disbursementData = [];
+                        submitData.disbursementData = [];
                         for (var i in scope.disbursementDetails) {
-                            scope.formData.disbursementData.push({
+                            submitData.disbursementData.push({
                                 id: scope.disbursementDetails[i].id,
                                 principal: scope.disbursementDetails[i].principal,
                                 expectedDisbursementDate: dateFilter(scope.disbursementDetails[i].expectedDisbursementDate, scope.df),
@@ -1269,37 +1280,49 @@
                             });
                         }
                     }
-                    if (scope.formData.approvedLoanAmount == null) {
-                        scope.formData.approvedLoanAmount = scope.showTrancheAmountTotal;
+                    if (submitData.approvedLoanAmount == null) {
+                        submitData.approvedLoanAmount = scope.showTrancheAmountTotal;
                     }
-                    if (scope.formData.disbursementType === 'VENDOR') {
-                        scope.formData.paymentTo = 2;
-                    } else if (scope.formData.disbursementType === 'CLIENT') {
-                        scope.formData.paymentTo = 1;
+                } else if (scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
+                    // For disbursement review actions, remove fields that are only for initial approval
+                    delete submitData.expectedDisbursementDate;
+                    delete submitData.disbursementData;
+                    delete submitData.approvedLoanAmount;
+                }
+
+                if (scope.action == "approve" || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
+                    // Only send paymentTo for initial approval, other actions use disbursementType
+                    if (scope.action === "approve") {
+                        if (submitData.disbursementType === 'VENDOR') {
+                            submitData.paymentTo = 2;
+                        } else if (submitData.disbursementType === 'CLIENT') {
+                            submitData.paymentTo = 1;
+                        }
+                    } else {
+                        delete submitData.paymentTo;
                     }
 
                     // Ensure paymentTypeId is set if missing but available in template
-                    if (!scope.formData.paymentTypeId && scope.paymentTypes && scope.paymentTypes.length > 0) {
-                        // If only one payment type, default to it, otherwise don't default to avoid wrong selection
+                    if (!submitData.paymentTypeId && scope.paymentTypes && scope.paymentTypes.length > 0) {
                         if (scope.paymentTypes.length === 1) {
-                            scope.formData.paymentTypeId = scope.paymentTypes[0].id;
+                            submitData.paymentTypeId = scope.paymentTypes[0].id;
                         }
                     }
 
                     if (scope.shouldShowFxDetails()) {
-                        scope.formData.fxSource = scope.formData.fxSource || (scope.formData.fxRate ? 'MANUAL_ENTRY' : 'CBS_DAILY_RATE');
+                        submitData.fxSource = submitData.fxSource || (submitData.fxRate ? 'MANUAL_ENTRY' : 'CBS_DAILY_RATE');
                     } else {
-                        delete scope.formData.fxRate;
-                        delete scope.formData.usdAmount;
-                        delete scope.formData.fxSource;
-                        delete scope.formData.fxTimestamp;
+                        delete submitData.fxRate;
+                        delete submitData.usdAmount;
+                        delete submitData.fxSource;
+                        delete submitData.fxTimestamp;
                     }
 
-                    if (scope.isSouthSudanSspLoan() && !scope.formData.disbursementType && (scope.action === 'approve' || scope.action === 'approveDisbursement' || scope.action === 'disbursementpreapprovalrequest' || scope.action === 'disbursementapproval')) {
+                    if (scope.isSouthSudanSspLoan() && !submitData.disbursementType) {
                         // Attempt to infer one last time before failing
-                        scope.formData.disbursementType = (scope.formData.paymentTo === 2) ? 'VENDOR' : 'CLIENT';
+                        submitData.disbursementType = (submitData.paymentTo === 2) ? 'VENDOR' : 'CLIENT';
                         
-                        if (!scope.formData.disbursementType) {
+                        if (!submitData.disbursementType) {
                             scope.errorStatus = 'validation.msg.loanapproval.disbursementType.required';
                             scope.errorDetails = [{
                                 args: [],
@@ -1567,7 +1590,6 @@
 
                         params.command = isApproveAct && scope.isCashPayment() ? 'disburse' : params.command;
 
-                        scope.filterDisburseFormData();
                         if (scope.action === "undoapproval" || scope.action === "undodisbursal") {
                             delete submitData.locale;
                             delete submitData.dateFormat;
@@ -1603,7 +1625,6 @@
                         if (scope.action == "reject") {
                             submitData.rejectReason = scope.rejectReason;
                         }
-                        scope.filterDisburseFormData();
                         resourceFactory.LoanAccountResource.save(params, submitData, function (data) {
                             location.path('/viewloanaccount/' + data.loanId);
                         });
@@ -1709,7 +1730,10 @@
 
             scope.filterDisburseFormData = function () {
                 const isCashPayment = scope.isCashPayment();
-                if (!scope.isLoanDisbursementRequestEnabled || (isCashPayment && scope.isLoanDisbursementRequestEnabled)) {
+                const isSouthSudan = scope.isSouthSudanSspLoan();
+                
+                // For South Sudan, we generally want to preserve these fields unless it's explicitly a cash payment
+                if ((!scope.isLoanDisbursementRequestEnabled && !isSouthSudan) || (isCashPayment && (scope.isLoanDisbursementRequestEnabled || isSouthSudan))) {
                     delete scope.formData.clientPhoneNumber;
                     delete scope.formData.clientAccountNumber;
                     delete scope.formData.clientBankName;
