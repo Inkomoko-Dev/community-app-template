@@ -10,6 +10,12 @@
             scope.exists = false;
             scope.yearArrivedRequired = true;
             scope.bankOptions = [];
+            scope.getBankName = function (otherInfoData) {
+                if (!otherInfoData) {
+                    return '';
+                }
+                return otherInfoData.bank && otherInfoData.bank.bankName ? otherInfoData.bank.bankName : otherInfoData.bankName;
+            };
 
             resourceFactory.clientOtherInfoTemplateResource.get({ clientId: routeParams.clientId }, function (data) {
                 scope.strataOptions = data.strataOptions;
@@ -24,7 +30,7 @@
             });
 
 
-            resourceFactory.clientOtherInfoResource.getAll({ clientId: routeParams.clientId }, function (data) {
+            resourceFactory.clientOtherInfoEntityResource.getAll({ clientId: routeParams.clientId }, function (data) {
                 if (data && data.length > 0) {
                     scope.otherInfoData = data[0];
                     scope.exists = true;
@@ -49,6 +55,7 @@
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
+                delete this.formData.bankName;
 
                 if (scope.first.submitondate) {
                     reqDate = dateFilter(scope.first.submitondate, scope.df);

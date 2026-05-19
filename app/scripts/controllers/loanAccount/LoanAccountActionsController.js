@@ -1078,6 +1078,34 @@
                 if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
                     return;
                 }
+
+                var submitData = angular.copy(scope.formData);
+
+                var isDisbursementReviewAction = scope.action === "approveDisbursement"
+                    || scope.action === "disbursementpreapprovalrequest"
+                    || scope.action === "disbursementapproval";
+
+                // Clean up FX details separately from payment recipient details.
+                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) {
+                    delete submitData.fxRate;
+                    delete submitData.usdAmount;
+                    delete submitData.fxSource;
+                    delete submitData.fxTimestamp;
+
+                    // For South Sudan SSP loans, keep disbursementType if it's a review action, otherwise delete
+                    if (!scope.isSouthSudanSspLoan()) {
+                        delete submitData.disbursementType;
+                    }
+                }
+
+                if (scope.isReviewRelatedAction() || scope.isCashPayment() || isDisbursementReviewAction) {
+                    delete submitData.paymentTo;
+                    delete submitData.beneficiaryName;
+                    delete submitData.clientPhoneNumber;
+                    delete submitData.clientAccountNumber;
+                    delete submitData.clientBankName;
+                }
+
                 // Only validate the note field if it is shown and mandatory
                 if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
                     scope.error = 'Note field is mandatory';
@@ -1498,7 +1526,9 @@
                     if (scope.isPaymentToClient()) {
                         scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
                         scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
-                        scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                        scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
+                            ? scope.clientOtherInfoData.bank.bankName
+                            : scope.clientOtherInfoData.bankName;
                         delete scope.formData.beneficiaryName;
                     }
                 }
@@ -1557,9 +1587,11 @@
                     return;
                 }
                 if (scope.isPaymentToClient()) {
-                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.clientPhoneNumber || '';
+                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber || scope.clientOtherInfoData.clientPhoneNumber || '';
                     scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || '';
-                    scope.formData.clientBankName = scope.clientOtherInfoData.bankName || '';
+                    scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
+                        ? scope.clientOtherInfoData.bank.bankName
+                        : scope.clientOtherInfoData.bankName || '';
                     scope.formData.beneficiaryName = '';
                 } else {
                     scope.formData.clientPhoneNumber = scope.formData.clientPhoneNumber ||'';
