@@ -1075,6 +1075,16 @@
 
             scope.submit = function () {
                 scope.processDate = false;
+
+                // Prepare form data by filtering based on payment type (Cash vs Bank)
+                scope.filterDisburseFormData();
+
+                // For SSP loans, backend requires `disbursementType`. If user selects Payment to Supplier/Client
+                // but doesn't explicitly pick disbursementType, infer it to keep payload consistent.
+                if (scope.isSouthSudanSspLoan() && !scope.formData.disbursementType && (scope.action === 'approve' || scope.action === 'approveDisbursement' || scope.action === 'disbursementpreapprovalrequest' || scope.action === 'disbursementapproval')) {
+                    scope.formData.disbursementType = (scope.formData.paymentTo === 2) ? 'VENDOR' : 'CLIENT';
+                }
+
                 if (scope.isRecoveryPaymentAction && !scope.validateRecoveryPaymentDate()) {
                     return;
                 }
