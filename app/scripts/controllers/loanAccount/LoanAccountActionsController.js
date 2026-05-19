@@ -1219,24 +1219,24 @@
 
                 var submitData = angular.copy(scope.formData);
 
-                // Clean up vendor/FX details if not applicable or not supported for the current action
-                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
+                var isDisbursementReviewAction = scope.action === "approveDisbursement"
+                    || scope.action === "disbursementpreapprovalrequest"
+                    || scope.action === "disbursementapproval";
+
+                // Clean up FX details separately from payment recipient details.
+                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) {
                     delete submitData.fxRate;
                     delete submitData.usdAmount;
                     delete submitData.fxSource;
                     delete submitData.fxTimestamp;
-                    delete submitData.paymentTo;
-                    delete submitData.beneficiaryName;
-                    delete submitData.clientPhoneNumber;
-                    delete submitData.clientAccountNumber;
-                    delete submitData.clientBankName;
 
                     // For South Sudan SSP loans, keep disbursementType if it's a review action, otherwise delete
                     if (!scope.isSouthSudanSspLoan()) {
                         delete submitData.disbursementType;
                     }
-                } else if (scope.isCashPayment()) {
-                    // Even if we should show FX details, if it's cash, we don't send recipient info
+                }
+
+                if (scope.isReviewRelatedAction() || scope.isCashPayment() || isDisbursementReviewAction) {
                     delete submitData.paymentTo;
                     delete submitData.beneficiaryName;
                     delete submitData.clientPhoneNumber;
@@ -1743,7 +1743,9 @@
                     if (scope.isPaymentToClient()) {
                         scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
                         scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
-                        scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                        scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
+                            ? scope.clientOtherInfoData.bank.bankName
+                            : scope.clientOtherInfoData.bankName;
                         delete scope.formData.beneficiaryName;
                     }
                 }
@@ -1846,9 +1848,11 @@
                     return;
                 }
                 if (scope.isPaymentToClient()) {
-                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.clientPhoneNumber || '';
+                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber || scope.clientOtherInfoData.clientPhoneNumber || '';
                     scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || '';
-                    scope.formData.clientBankName = scope.clientOtherInfoData.bankName || '';
+                    scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
+                        ? scope.clientOtherInfoData.bank.bankName
+                        : scope.clientOtherInfoData.bankName || '';
                     scope.formData.beneficiaryName = '';
                 } else {
                     scope.formData.clientPhoneNumber = scope.formData.clientPhoneNumber ||'';

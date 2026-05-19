@@ -9,6 +9,12 @@
             scope.otherInfoData = {};
             scope.yearArrivedRequired = true;
             scope.bankOptions = [];
+            scope.getBankName = function (otherInfoData) {
+                if (!otherInfoData) {
+                    return '';
+                }
+                return otherInfoData.bank && otherInfoData.bank.bankName ? otherInfoData.bank.bankName : otherInfoData.bankName;
+            };
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
@@ -17,9 +23,12 @@
 
             resourceFactory.banksResource.getAll({}, function (data) {
                 scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
-            resourceFactory.otherInfoResource.get(
+            resourceFactory.otherInfoEntityResource.get(
                 { clientId: routeParams.clientId, otherInfoId: routeParams.otherInfoId },
                 function (data) {
                     console.log('edit prefile data:', data);
@@ -64,12 +73,13 @@
             };
 
             scope.cancel = function () {
-                location.path('/clientOtherInfo/' + scope.clientId);
+                location.path('/clientOtherInfoEntity/' + scope.clientId);
             };
 
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
+                delete this.formData.bankName;
 
                if(scope.date.submittedOnDate){
                     this.formData.yearArrivedInHostCountry = dateFilter(scope.date.submittedOnDate,  scope.df);
