@@ -947,6 +947,14 @@
                                     </td>
                                     <td ng-if="!isRecoveryPaymentTransaction(transaction) && !isRepaymentAtDisbursementTransaction(transaction)">&nbsp;</td>
                                     <td>
+                                        <button type="button" class="btn btn-xs btn-primary"
+                                                ng-if="canEditDisbursementInsurance(transaction)"
+                                                ng-click="openEditDisbursementInsuranceModal($event, transaction)"
+                                                uib-tooltip="Edit disbursement insurance"
+                                                aria-label="Edit disbursement insurance"
+                                                has-permission="ADJUST_LOAN">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
                                         <button type="button" class="btn btn-xs btn-warning"
                                                 ng-if="canReverseRecoveryPayment(transaction)"
                                                 ng-click="openReverseRecoveryPaymentModal(transaction)"
@@ -1119,13 +1127,6 @@
                                     <a class="btn-success" data-ng-show="charge.chargePayable && status=='Active'"
                                        href="#/loanaccountcharge/{{loandetails.id}}/paycharge/{{charge.id}}">{{"label.button.pay" |
                                         translate}}</a>
-                                    <a class="btn-warning btn-sm"
-                                       data-ng-show="charge.chargeTimeType.value === 'Disbursement' && charge.paid === true"
-                                       href="#/loan/{{loandetails.id}}/adjustinsurancecharge/{{charge.id}}"
-                                       has-permission="ADJUSTINSURANCE_LOANCHARGE"
-                                       title="Adjust Insurance Charge">
-                                        <i class="fa fa-pencil"></i> {{'label.button.adjust' | translate}}
-                                    </a>
                                 </td>
                                 </td>
                             </tr>
