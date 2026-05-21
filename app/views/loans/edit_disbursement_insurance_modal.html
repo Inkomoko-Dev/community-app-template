@@ -1,0 +1,108 @@
+<div class="modal-header silver">
+    <button type="button" class="close" ng-click="cancel()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h3 class="bolder">Edit Insurance Payment</h3>
+</div>
+<div class="modal-body">
+    <api-validate></api-validate>
+
+    <form name="editDisbursementInsuranceForm" class="form-horizontal" novalidate>
+        <div class="form-group">
+            <label class="control-label col-sm-4">Transaction</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">#{{transaction.id}}</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-sm-4">Current Date</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{transaction.date | DateFormat}}</p>
+            </div>
+        </div>
+
+        <div class="form-group" ng-if="insuranceCharges.length === 1">
+            <label class="control-label col-sm-4">Insurance Charge</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{insuranceCharges[0].name}}</p>
+            </div>
+        </div>
+
+        <div class="form-group" ng-if="insuranceCharges.length > 1"
+             ng-class="{'has-error': editDisbursementInsuranceForm.loanChargeId.$invalid && editDisbursementInsuranceForm.loanChargeId.$touched}">
+            <label class="control-label col-sm-4" for="loanChargeId">Insurance Charge <span class="required">*</span></label>
+            <div class="col-sm-6">
+                <select id="loanChargeId" name="loanChargeId" class="form-control"
+                        ng-model="formData.loanChargeId"
+                        ng-options="charge.id as charge.name for charge in insuranceCharges"
+                        ng-change="onChargeChanged()" required>
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <form-validate valattributeform="editDisbursementInsuranceForm" valattribute="loanChargeId"/>
+            </div>
+        </div>
+
+        <div class="form-group"
+             ng-class="{'has-error': editDisbursementInsuranceForm.amount.$invalid && editDisbursementInsuranceForm.amount.$touched}">
+            <label class="control-label col-sm-4" for="amount">Insurance Amount <span class="required">*</span></label>
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-if="transaction.currency && transaction.currency.displaySymbol">
+                        {{transaction.currency.displaySymbol}}
+                    </span>
+                    <input id="amount" name="amount" type="number" class="form-control"
+                           ng-model="formData.amount" min="0" step="any" required>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <form-validate valattributeform="editDisbursementInsuranceForm" valattribute="amount"/>
+            </div>
+        </div>
+
+        <div class="form-group"
+             ng-class="{'has-error': editDisbursementInsuranceForm.transactionDate.$invalid && editDisbursementInsuranceForm.transactionDate.$touched}">
+            <label class="control-label col-sm-4" for="transactionDate">Effective Date <span class="required">*</span></label>
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <input id="transactionDate" name="transactionDate" type="text" class="form-control"
+                           datepicker-pop="{{dateFormat}}" ng-model="formData.transactionDate"
+                           is-open="datePicker.opened" datepicker-options="dateOptions" required>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"
+                                aria-label="Open calendar">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <form-validate valattributeform="editDisbursementInsuranceForm" valattribute="transactionDate"/>
+            </div>
+        </div>
+
+        <div class="form-group"
+             ng-class="{'has-error': editDisbursementInsuranceForm.note.$invalid && editDisbursementInsuranceForm.note.$touched}">
+            <label class="control-label col-sm-4" for="note">Note <span class="required">*</span></label>
+            <div class="col-sm-6">
+                <textarea id="note" name="note" class="form-control" rows="3"
+                          ng-model="formData.note" maxlength="1000" required></textarea>
+            </div>
+            <div class="col-sm-2">
+                <form-validate valattributeform="editDisbursementInsuranceForm" valattribute="note"/>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">
+        {{'label.button.cancel' | translate}}
+    </button>
+    <button type="button" class="btn btn-primary" ng-click="submit()"
+            ng-disabled="editDisbursementInsuranceForm.$invalid || isSubmitting">
+        <span ng-if="!isSubmitting">{{'label.button.submit' | translate}}</span>
+        <span ng-if="isSubmitting"><i class="fa fa-spinner fa-spin"></i> Submitting...</span>
+    </button>
+</div>
