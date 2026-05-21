@@ -3,7 +3,7 @@
         ViewLoanTransactionController: function (scope, resourceFactory, location, routeParams, dateFilter, $uibModal, $rootScope) {
             scope.details = [];
             scope.latestClosureDate = null;
-            scope.relatedRecoveryReversal = null;
+            scope.relatedReversal = null;
             //Get loan rates to be defined in transaction details
             scope.rates = $rootScope.rates;
             //Obtain total rate percentage
@@ -115,15 +115,15 @@
                 return normalizedDate;
             }
 
-            function loadRelatedRecoveryReversal(transaction) {
-                scope.relatedRecoveryReversal = null;
+            function loadRelatedReversal(transaction) {
+                scope.relatedReversal = null;
 
-                if (!scope.isRecoveryPaymentTransaction(transaction) || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
+                if (!transaction || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
                     return;
                 }
 
                 if (angular.isObject(transaction.reversalTransaction)) {
-                    scope.relatedRecoveryReversal = transaction.reversalTransaction;
+                    scope.relatedReversal = transaction.reversalTransaction;
                     return;
                 }
 
@@ -133,9 +133,9 @@
                     exclude: 'guarantors,futureSchedule'
                 }, function (data) {
                     var recoveryReversalTransactionsByOriginalId = buildRecoveryReversalIndex(data.transactions || []);
-                    scope.relatedRecoveryReversal = recoveryReversalTransactionsByOriginalId[extractTransactionId(transaction.id)] || null;
+                    scope.relatedReversal = recoveryReversalTransactionsByOriginalId[extractTransactionId(transaction.id)] || null;
                 }, function () {
-                    scope.relatedRecoveryReversal = null;
+                    scope.relatedReversal = null;
                 });
             }
 
@@ -146,7 +146,7 @@
                     scope.details = [];
                     scope.generateDetailTable();
                     scope.latestClosureDate = null;
-                    loadRelatedRecoveryReversal(data);
+                    loadRelatedReversal(data);
                 });
             }
 
@@ -169,6 +169,42 @@
                     && transaction.reversalTransaction !== true
                     && transaction.manuallyReversed === true
                     && transaction.correctionAllowed !== false;
+            };
+
+            scope.isRepaymentAtDisbursementTransaction = function (transaction) {
+                var transactionTypeValue = getTransactionTypeValue(transaction);
+                return !!(transaction && transaction.type && (Number(transaction.type.id) === 5 ||
+                    transaction.type.repaymentAtDisbursement === true ||
+                    transactionTypeValue.indexOf('repaymentatdisbursement') !== -1 ||
+                    transactionTypeValue.indexOf('repayment (at time of disbursement)') !== -1));
+            };
+
+            scope.getEditableInsuranceCharges = function (transaction) {
+                var charges = [];
+                if (!transaction || !transaction.loanChargePaidByList) {
+                    return charges;
+                }
+
+                transaction.loanChargePaidByList.forEach(function (chargePaidBy) {
+                    if (chargePaidBy.chargeId) {
+                        charges.push({
+                            id: chargePaidBy.chargeId,
+                            paidById: chargePaidBy.id,
+                            name: chargePaidBy.name || ('Charge #' + chargePaidBy.chargeId),
+                            amount: chargePaidBy.amount
+                        });
+                    }
+                });
+
+                return charges;
+            };
+
+            scope.canEditDisbursementInsurance = function (transaction) {
+                return scope.isRepaymentAtDisbursementTransaction(transaction) &&
+                    transaction.reversalTransaction !== true &&
+                    transaction.reversed !== true &&
+                    transaction.manuallyReversed !== true &&
+                    scope.getEditableInsuranceCharges(transaction).length > 0;
             };
 
             scope.openRelatedTransaction = function (transactionRef) {
@@ -258,6 +294,34 @@
                 });
             };
 
+            scope.openEditDisbursementInsuranceModal = function (transaction) {
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'views/loans/edit_disbursement_insurance_modal.html',
+                    controller: 'EditDisbursementInsuranceModalController',
+                    resolve: {
+                        loanId: function () {
+                            return transaction.accountId;
+                        },
+                        transaction: function () {
+                            return angular.copy(transaction);
+                        },
+                        insuranceCharges: function () {
+                            return angular.copy(scope.getEditableInsuranceCharges(transaction));
+                        },
+                        dateFormat: function () {
+                            return scope.df;
+                        },
+                        locale: function () {
+                            return scope.optlang.code;
+                        }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    location.path('/viewloanaccount/' + transaction.accountId);
+                });
+            };
+
             loadTransaction();
 
             scope.undo = function (accountId, transactionId) {
@@ -278,7 +342,7 @@
             var UndoTransactionModel = function ($scope, $uibModalInstance, accountId, transactionId) {
                 $scope.note = ''; // Bind to textarea in the template
                 $scope.undoTransaction = function () {
-                    if (scope.transaction.type.id == 6) {
+                    if (Number(scope.transaction.type.id) === 6) {
                         var params = { loanId: accountId, command: 'undowriteoff' };
                         resourceFactory.loanTrxnsResource.save(params, this.formData, function(data) {
                             $uibModalInstance.close('delete');
