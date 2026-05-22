@@ -56,7 +56,7 @@
                     scope.reqFields.push(temp);
 
                     if (temp.displayType === 'select' && temp.parentParameterName === null) {
-                        if (temp.variable === 'currencyId' && scope.reportName === 'Loan payments due new') {
+                        if (temp.variable === 'currencyId' && scope.reportName === 'Loan payments due') {
                             scope.formData[temp.inputName] = '-1';
                         } else {
                             intializeParams(temp, {});
@@ -73,7 +73,7 @@
                         scope.reportTextParams.push(temp);
                     }
                 }
-                if (scope.reportName === 'Loan payments due new') {
+                if (scope.reportName === 'Loan payments due') {
                     for (var i in scope.reqFields) {
                         var field = scope.reqFields[i];
                         if (field.variable === 'loanProductId') {
@@ -205,7 +205,7 @@
                     var paramDetails = scope.reqFields[i];
                     switch (paramDetails.displayType) {
                         case "select":
-                            if (paramDetails.variable === 'currencyId' && scope.reportName === 'Loan payments due new') {
+                            if (paramDetails.variable === 'currencyId' && scope.reportName === 'Loan payments due') {
                                 break;
                             }
                             var selectedVal = scope.formData[paramDetails.inputName];
@@ -254,6 +254,15 @@
                                 var errorObj = new Object();
                                 errorObj.field = paramDetails.inputName;
                                 errorObj.code = 'error.message.report.parameter.required';
+                                errorObj.args = {params: []};
+                                errorObj.args.params.push({value: paramDetails.label});
+                                scope.errorDetails.push(errorObj);
+                            } else if (paramDetails.variable === 'gracePeriod' && !/^\d+$/.test(selectedVal)) {
+                                var fieldId = '#' + paramDetails.inputName;
+                                $(fieldId).addClass("validationerror");
+                                var errorObj = new Object();
+                                errorObj.field = paramDetails.inputName;
+                                errorObj.code = 'error.message.report.invalid.value.for.parameter';
                                 errorObj.args = {params: []};
                                 errorObj.args.params.push({value: paramDetails.label});
                                 scope.errorDetails.push(errorObj);
