@@ -713,11 +713,13 @@
                         }
                     }
 
-                    // Generate Cashflow button - only available during Due Diligence stage
+                    // Generate Cashflow button - available during Review Application stage (required before accepting Due Diligence)
+                    // and also during Due Diligence stage (for regeneration if corrections are needed)
                     function getGenerateCashflowActionOptions(data) {
                         if (data.isExtendLoanLifeCycleConfig == true &&
                             data.loanDecisionState != null &&
-                            data.loanDecisionState.value === "DUE_DILIGENCE") {
+                            (data.loanDecisionState.value === "DUE_DILIGENCE" ||
+                             data.loanDecisionState.value === "REVIEW_APPLICATION")) {
                             return {
                                 name: "button.generatecashflow",
                                 taskPermissionName: 'GENERATE_CASHFLOW_LOAN'
