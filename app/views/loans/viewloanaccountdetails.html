@@ -212,7 +212,7 @@
                               {{ 'label.button.more' | translate}}
                               <span class="caret"></span>
                           </a>
-                          <ul style='margin-left:-95px;' class="dropdown dropdown-menu">
+                          <ul class="dropdown dropdown-menu dropdown-menu-right" style="width: max-content;" role="menu">
                               <li class="{{button.icon}}" ng-repeat="button in buttons.options">
                                   <a ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
                                      has-permission='{{button.taskPermissionName}}'>{{'label.'+
