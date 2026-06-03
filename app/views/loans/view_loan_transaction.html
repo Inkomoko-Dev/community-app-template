@@ -29,10 +29,6 @@
                     class="btn btn-primary" has-permission='ADJUST_LOAN'><i class="fa fa-pencil "></i>{{ 'label.button.edit' | translate}}</a>
                     <a ng-if="!isRecoveryPaymentTransaction(transaction) && !isRepaymentAtDisbursementTransaction(transaction)" ng-click="undo(transaction.accountId, transaction.id)" class="btn btn-danger" has-permission='ADJUST_LOAN'><i
                     class="fa fa-trash "></i>{{ 'label.button.undo' | translate}}</a>
-                    <a ng-if="canEditDisbursementInsurance(transaction)" ng-click="openEditDisbursementInsuranceModal(transaction)"
-                    class="btn btn-primary" has-permission='ADJUST_LOAN'
-                    uib-tooltip="Edit disbursement insurance" aria-label="Edit disbursement insurance"><i
-                    class="fa fa-pencil "></i>Edit Insurance</a>
                     <a ng-if="canReverseRecoveryPayment(transaction)" ng-click="openReverseRecoveryPaymentModal(transaction)"
                     class="btn btn-warning" has-permission='REVERSERECOVERYPAYMENT_LOAN'
                     uib-tooltip="{{ 'label.button.reverserecoverypayment' | translate}}" aria-label="{{ 'label.button.reverserecoverypayment' | translate}}"><i
