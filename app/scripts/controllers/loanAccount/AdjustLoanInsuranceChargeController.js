@@ -10,6 +10,7 @@
             scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
             scope.today = dateFilter(new Date(), 'dd MMMM yyyy');
             scope.paymentTypes = [];
+            scope.noAdjustmentSubmitted = false;
 
             scope.formData = {
                 amount: null,
@@ -46,7 +47,25 @@
                 scope.datePicker.opened = true;
             };
 
+            function normalizedAmount(amount) {
+                var parsedAmount = parseFloat(amount);
+                return isNaN(parsedAmount) ? null : Number(parsedAmount.toFixed(6));
+            }
+
+            scope.isNoEffectiveAdjustment = function () {
+                if (!scope.charge) {
+                    return false;
+                }
+                return normalizedAmount(scope.formData.amount) === normalizedAmount(scope.charge.amount) &&
+                    !scope.formData.glAccountId && !scope.formData.paymentTypeId;
+            };
+
             scope.submit = function () {
+                scope.noAdjustmentSubmitted = false;
+                if (scope.isNoEffectiveAdjustment()) {
+                    scope.noAdjustmentSubmitted = true;
+                    return;
+                }
                 scope.isSubmitting = true;
 
                 var payload = {
