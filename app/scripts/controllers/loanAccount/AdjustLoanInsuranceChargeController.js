@@ -9,10 +9,12 @@
             scope.datePicker = { opened: false };
             scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
             scope.today = dateFilter(new Date(), 'dd MMMM yyyy');
+            scope.paymentTypes = [];
 
             scope.formData = {
                 amount: null,
                 transactionDate: new Date(),
+                paymentTypeId: null,
                 notes: ''
             };
 
@@ -30,6 +32,13 @@
                 scope.incomeGlAccounts = data;
                 scope.$applyAsync(function () {
                     angular.element('#glAccountId').trigger('chosen:updated');
+                });
+            });
+
+            resourceFactory.paymentTypeResource.getAll(function (data) {
+                scope.paymentTypes = data || [];
+                scope.$applyAsync(function () {
+                    angular.element('#paymentTypeId').trigger('chosen:updated');
                 });
             });
 
@@ -51,6 +60,9 @@
                 // Only include glAccountId if selected
                 if (scope.formData.glAccountId) {
                     payload.glAccountId = scope.formData.glAccountId;
+                }
+                if (scope.formData.paymentTypeId) {
+                    payload.paymentTypeId = scope.formData.paymentTypeId;
                 }
 
                 resourceFactory.loanChargesResource.adjust(
