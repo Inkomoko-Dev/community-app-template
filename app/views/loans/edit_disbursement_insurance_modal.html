@@ -55,6 +55,7 @@
                     </span>
                     <input id="amount" name="amount" type="number" class="form-control"
                            ng-model="formData.amount" min="0" ng-attr-max="{{maxInsuranceAmount || undefined}}"
+                           ng-change="validateInsuranceAmount()"
                            step="any" required>
                 </div>
                 <span class="help-block" ng-if="editDisbursementInsuranceForm.amount.$error.max">

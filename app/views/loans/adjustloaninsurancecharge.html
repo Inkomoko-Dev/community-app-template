@@ -33,6 +33,7 @@
                                name="amount"
                                class="form-control"
                                ng-model="formData.amount"
+                               ng-change="validateInsuranceAmount()"
                                required
                                min="0"
                                ng-attr-max="{{maxInsuranceAmount || undefined}}"/>
