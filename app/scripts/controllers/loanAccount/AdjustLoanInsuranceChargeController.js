@@ -104,7 +104,7 @@
             }
 
             function loadProductMappings() {
-                resourceFactory.loanResource.get({ loanId: scope.loanId, fields: 'id,loanProductId,loanProductName,approvedPrincipal,principal' }, function (loan) {
+                resourceFactory.loanResource.get({ loanId: scope.loanId }, function (loan) {
                     scope.maxInsuranceAmount = loan.approvedPrincipal || loan.principal || null;
                     resourceFactory.loanProductResource.get({ loanProductId: loan.loanProductId, template: 'true' }, function (product) {
                         scope.paymentTypes = mappedPaymentTypes(product);
