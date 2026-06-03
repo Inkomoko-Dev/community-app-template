@@ -51,22 +51,40 @@
                 scope.datePicker.opened = true;
             };
 
+            function normalizedAmount(amount) {
+                var parsedAmount = parseFloat(amount);
+                return isNaN(parsedAmount) ? null : Number(parsedAmount.toFixed(6));
+            }
+
+            scope.validateInsuranceAmount = function () {
+                if (!scope.editDisbursementInsuranceForm || !scope.editDisbursementInsuranceForm.amount) {
+                    return true;
+                }
+                var amount = normalizedAmount(scope.formData.amount);
+                var maxAmount = normalizedAmount(scope.maxInsuranceAmount);
+                var isValid = amount === null || maxAmount === null || amount <= maxAmount;
+                scope.editDisbursementInsuranceForm.amount.$setValidity('max', isValid);
+                return isValid;
+            };
+            scope.$evalAsync(scope.validateInsuranceAmount);
+
             scope.onChargeChanged = function () {
                 for (var i = 0; i < scope.insuranceCharges.length; i++) {
                     if (Number(scope.insuranceCharges[i].id) === Number(scope.formData.loanChargeId)) {
                         scope.formData.amount = scope.insuranceCharges[i].amount;
+                        scope.validateInsuranceAmount();
                         return;
                     }
                 }
                 scope.formData.amount = null;
+                scope.validateInsuranceAmount();
             };
 
             scope.submit = function () {
                 if (scope.isSubmitting) {
                     return;
                 }
-                if (scope.maxInsuranceAmount !== null && Number(scope.formData.amount) > scope.maxInsuranceAmount) {
-                    scope.editDisbursementInsuranceForm.amount.$setValidity('max', false);
+                if (!scope.validateInsuranceAmount()) {
                     return;
                 }
                 scope.isSubmitting = true;
