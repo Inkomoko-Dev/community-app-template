@@ -104,8 +104,9 @@
             }
 
             function loadProductMappings() {
-                resourceFactory.loanResource.get({ loanId: scope.loanId, fields: 'id,loanProductId,loanProductName,approvedPrincipal,principal' }, function (loan) {
+                resourceFactory.loanResource.get({ loanId: scope.loanId }, function (loan) {
                     scope.maxInsuranceAmount = loan.approvedPrincipal || loan.principal || null;
+                    scope.$evalAsync(scope.validateInsuranceAmount);
                     resourceFactory.loanProductResource.get({ loanProductId: loan.loanProductId, template: 'true' }, function (product) {
                         scope.paymentTypes = mappedPaymentTypes(product);
                         scope.incomeGlAccounts = mappedIncomeGlAccounts(product, scope.charge);
@@ -162,6 +163,17 @@
                 return isNaN(parsedAmount) ? null : Number(parsedAmount.toFixed(6));
             }
 
+            scope.validateInsuranceAmount = function () {
+                if (!scope.adjustInsuranceChargeForm || !scope.adjustInsuranceChargeForm.amount) {
+                    return true;
+                }
+                var amount = normalizedAmount(scope.formData.amount);
+                var maxAmount = normalizedAmount(scope.maxInsuranceAmount);
+                var isValid = amount === null || maxAmount === null || amount <= maxAmount;
+                scope.adjustInsuranceChargeForm.amount.$setValidity('max', isValid);
+                return isValid;
+            };
+
             function normalizedDateTime(date) {
                 var normalizedDate = normalizeDate(date);
                 return normalizedDate ? normalizedDate.getTime() : null;
@@ -182,8 +194,7 @@
                     scope.noAdjustmentSubmitted = true;
                     return;
                 }
-                if (scope.maxInsuranceAmount !== null && Number(scope.formData.amount) > Number(scope.maxInsuranceAmount)) {
-                    scope.adjustInsuranceChargeForm.amount.$setValidity('max', false);
+                if (!scope.validateInsuranceAmount()) {
                     return;
                 }
                 scope.isSubmitting = true;
