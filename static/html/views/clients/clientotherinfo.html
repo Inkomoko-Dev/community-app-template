@@ -28,13 +28,15 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="nationalityId">{{ 'label.input.nationality' | translate }}
-                        <span class="required">*</span></label>
+                        <span class="required">*</span>
+                        <i class="fa fa-info-circle" title="{{ 'label.input.nationality.tooltip' | translate }}"></i>
+                    </label>
 
                     <div class="col-sm-3">
                         <select chosen="nationalityOptions" id="nationalityId" name="nationalityId" ng-model="formData.nationalityId" class="form-control"
                                 ng-options="nationality.id as nationality.name for nationality in nationalityOptions"
                                 value="{{nationality.id}}" required>
-                            <option disabled></option>
+                            <option disabled>{{ 'label.input.nationality.placeholder' | translate }}</option>
                         </select>
                     </div>
                     <form-validate valattributeform="clientotherinfoform" valattribute="nationalityId"/>
