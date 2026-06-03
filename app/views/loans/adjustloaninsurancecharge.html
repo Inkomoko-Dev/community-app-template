@@ -20,7 +20,7 @@
                 <api-validate></api-validate>
 
                 <div class="alert alert-danger" ng-show="noAdjustmentSubmitted && isNoEffectiveAdjustment()">
-                    Change the amount, GL account, or payment type before submitting the insurance adjustment.
+                    Change the amount, transaction date, GL account, or payment type before submitting the insurance adjustment.
                 </div>
 
                 <div class="form-group" ng-class="{'has-error': adjustInsuranceChargeForm.amount.$invalid && adjustInsuranceChargeForm.amount.$touched}">
@@ -71,9 +71,13 @@
                                 ng-options="gl.id as gl.nameDecorated for gl in incomeGlAccounts"
                                 class="form-control"
                                 chosen
+                                ng-disabled="incomeGlAccountsLoading || incomeGlAccounts.length === 0"
                                 data-placeholder="-- Select GL Account --">
                             <option value=""></option>
                         </select>
+                        <span class="help-block" ng-show="!incomeGlAccountsLoading && incomeGlAccounts.length === 0">
+                            No product GL mapping is configured for this charge.
+                        </span>
                     </div>
                 </div>
 
@@ -84,12 +88,16 @@
                     <div class="col-sm-4">
                         <select id="paymentTypeId" name="paymentTypeId"
                                 ng-model="formData.paymentTypeId"
-                                ng-options="paymentType.id as paymentType.name for paymentType in paymentTypes"
+                                ng-options="paymentType.id as paymentType.displayName for paymentType in paymentTypes"
                                 class="form-control"
                                 chosen
+                                ng-disabled="paymentTypesLoading || paymentTypes.length === 0"
                                 data-placeholder="-- Select Payment Type --">
                             <option value=""></option>
                         </select>
+                        <span class="help-block" ng-show="!paymentTypesLoading && paymentTypes.length === 0">
+                            No product payment type mapping is configured for this loan product.
+                        </span>
                     </div>
                 </div>
 
