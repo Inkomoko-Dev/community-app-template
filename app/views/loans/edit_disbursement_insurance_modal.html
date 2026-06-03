@@ -54,8 +54,12 @@
                         {{transaction.currency.displaySymbol}}
                     </span>
                     <input id="amount" name="amount" type="number" class="form-control"
-                           ng-model="formData.amount" min="0" step="any" required>
+                           ng-model="formData.amount" min="0" ng-attr-max="{{maxInsuranceAmount || undefined}}"
+                           step="any" required>
                 </div>
+                <span class="help-block" ng-if="editDisbursementInsuranceForm.amount.$error.max">
+                    Insurance amount cannot be greater than principal {{maxInsuranceAmount | number}}.
+                </span>
             </div>
             <div class="col-sm-2">
                 <form-validate valattributeform="editDisbursementInsuranceForm" valattribute="amount"/>
