@@ -900,14 +900,6 @@
                                     </td>
                                     <td ng-if="!isRecoveryPaymentTransaction(transaction) && !isRepaymentAtDisbursementTransaction(transaction)">&nbsp;</td>
                                     <td>
-                                        <button type="button" class="btn btn-xs btn-primary"
-                                                ng-if="canEditDisbursementInsurance(transaction)"
-                                                ng-click="openEditDisbursementInsuranceModal($event, transaction)"
-                                                uib-tooltip="Edit disbursement insurance"
-                                                aria-label="Edit disbursement insurance"
-                                                has-permission="ADJUST_LOAN">
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
                                         <button type="button" class="btn btn-xs btn-warning"
                                                 ng-if="canReverseRecoveryPayment(transaction)"
                                                 ng-click="openReverseRecoveryPaymentModal(transaction)"
