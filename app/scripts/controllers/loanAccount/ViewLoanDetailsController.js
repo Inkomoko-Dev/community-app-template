@@ -340,6 +340,9 @@
                             insuranceCharges: function () {
                                 return angular.copy(insuranceCharges);
                             },
+                            loanPrincipal: function () {
+                                return scope.loandetails.approvedPrincipal || scope.loandetails.principal;
+                            },
                             dateFormat: function () {
                                 return scope.df;
                             },

@@ -42,6 +42,7 @@
             scope.incomeGlAccountsLoadFailed = false;
             scope.noAdjustmentSubmitted = false;
             scope.originalTransactionDate = null;
+            scope.maxInsuranceAmount = null;
 
             scope.formData = {
                 amount: null,
@@ -103,7 +104,8 @@
             }
 
             function loadProductMappings() {
-                resourceFactory.loanResource.get({ loanId: scope.loanId, fields: 'id,loanProductId,loanProductName' }, function (loan) {
+                resourceFactory.loanResource.get({ loanId: scope.loanId, fields: 'id,loanProductId,loanProductName,approvedPrincipal,principal' }, function (loan) {
+                    scope.maxInsuranceAmount = loan.approvedPrincipal || loan.principal || null;
                     resourceFactory.loanProductResource.get({ loanProductId: loan.loanProductId, template: 'true' }, function (product) {
                         scope.paymentTypes = mappedPaymentTypes(product);
                         scope.incomeGlAccounts = mappedIncomeGlAccounts(product, scope.charge);
@@ -178,6 +180,10 @@
                 scope.noAdjustmentSubmitted = false;
                 if (scope.isNoEffectiveAdjustment()) {
                     scope.noAdjustmentSubmitted = true;
+                    return;
+                }
+                if (scope.maxInsuranceAmount !== null && Number(scope.formData.amount) > Number(scope.maxInsuranceAmount)) {
+                    scope.adjustInsuranceChargeForm.amount.$setValidity('max', false);
                     return;
                 }
                 scope.isSubmitting = true;

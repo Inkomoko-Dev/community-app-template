@@ -28,9 +28,10 @@
     }
 
     mifosX.controllers = _.extend(module, {
-        EditDisbursementInsuranceModalController: function (scope, $uibModalInstance, resourceFactory, dateFilter, loanId, transaction, insuranceCharges, dateFormat, locale) {
+        EditDisbursementInsuranceModalController: function (scope, $uibModalInstance, resourceFactory, dateFilter, loanId, transaction, insuranceCharges, loanPrincipal, dateFormat, locale) {
             scope.transaction = transaction;
             scope.insuranceCharges = insuranceCharges;
+            scope.maxInsuranceAmount = loanPrincipal ? Number(loanPrincipal) : null;
             scope.dateFormat = dateFormat;
             scope.datePicker = { opened: false };
             scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
@@ -64,6 +65,10 @@
                 if (scope.isSubmitting) {
                     return;
                 }
+                if (scope.maxInsuranceAmount !== null && Number(scope.formData.amount) > scope.maxInsuranceAmount) {
+                    scope.editDisbursementInsuranceForm.amount.$setValidity('max', false);
+                    return;
+                }
                 scope.isSubmitting = true;
 
                 var payload = {
@@ -91,7 +96,7 @@
             };
         }
     });
-    mifosX.ng.application.controller('EditDisbursementInsuranceModalController', ['$scope', '$uibModalInstance', 'ResourceFactory', 'dateFilter', 'loanId', 'transaction', 'insuranceCharges', 'dateFormat', 'locale', mifosX.controllers.EditDisbursementInsuranceModalController]).run(function ($log) {
+    mifosX.ng.application.controller('EditDisbursementInsuranceModalController', ['$scope', '$uibModalInstance', 'ResourceFactory', 'dateFilter', 'loanId', 'transaction', 'insuranceCharges', 'loanPrincipal', 'dateFormat', 'locale', mifosX.controllers.EditDisbursementInsuranceModalController]).run(function ($log) {
         $log.info('EditDisbursementInsuranceModalController initialized');
     });
 }(mifosX.controllers || {}));

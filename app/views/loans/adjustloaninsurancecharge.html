@@ -34,7 +34,11 @@
                                class="form-control"
                                ng-model="formData.amount"
                                required
-                               min="0"/>
+                               min="0"
+                               ng-attr-max="{{maxInsuranceAmount || undefined}}"/>
+                        <span class="help-block" ng-if="adjustInsuranceChargeForm.amount.$error.max">
+                            Insurance amount cannot be greater than principal {{maxInsuranceAmount | number}}.
+                        </span>
                     </div>
                     <div class="col-sm-2">
                         <form-validate valattributeform="adjustInsuranceChargeForm" valattribute="formData.amount"/>
