@@ -228,6 +228,55 @@
                                     value="{{option.id}}" ng-disabled="isReadOnly"></select>
                         </div>
                     </div>
+                    <div class="form-group" ng-show="isSouthSudanSspLoan() && isApprovalAction()">
+                        <label class="control-label col-sm-2" for="disbursementType">Disbursement Type <span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <select id="disbursementType" ng-model="formData.disbursementType" class="form-control"
+                                    ng-options="option.id as option.name for option in disbursementTypeOptions"></select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isSouthSudanSspLoan() && isDisbursementReviewAction()">
+                        <label class="control-label col-sm-2">Disbursement Type</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" type="text" ng-model="formData.disbursementType" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxRate">FX Rate (SSP/USD) <span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <input id="fxRate" class="form-control" type="text" ng-model="formData.fxRate"
+                                   ng-disabled="isDisbursementReviewAction()" number-format ng-change="computeUsdEquivalent()">
+                            <div class="help-block text-danger" ng-if="isFxRateMissing() && isApprovalAction()">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                No FX rate found in CBS. Please enter it manually with caution.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="usdAmount">USD Equivalent</label>
+                        <div class="col-sm-3">
+                            <input id="usdAmount" class="form-control" type="text" ng-model="formData.usdAmount" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxSource">FX Source</label>
+                        <div class="col-sm-3">
+                            <input id="fxSource" class="form-control" type="text" ng-model="formData.fxSource" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxTimestamp">FX Timestamp</label>
+                        <div class="col-sm-3">
+                            <input id="fxTimestamp" class="form-control" type="text" ng-model="formData.fxTimestamp" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isDisbursementReviewAction() && shouldShowFxDetails()">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <div class="alert alert-info" role="alert">
+                                You are reviewing the locked FX conversion before disbursement execution.
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2">{{ 'label.anchor.showpaymentdetails' | translate}}</label>
 
@@ -245,7 +294,7 @@
 
                             <div class="col-sm-3">
                                 <input id="accountNumber" type="text" class="form-control"
-                                       ng-model="formData.accountNumber" ng-readonly="isReadOnly">
+                                       ng-model="formData.accountNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
@@ -254,7 +303,7 @@
 
                             <div class="col-sm-3">
                                 <input id="checkNumber" class="form-control" type="text"
-                                       ng-model="formData.checkNumber" ng-readonly="isReadOnly">
+                                       ng-model="formData.checkNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
@@ -263,7 +312,7 @@
 
                             <div class="col-sm-3">
                                 <input id="routingCode" class="form-control" type="text"
-                                       ng-model="formData.routingCode" ng-readonly="isReadOnly">
+                                       ng-model="formData.routingCode" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group"  ng-show="!showClientOtherInfoForm">
@@ -272,7 +321,7 @@
 
                             <div class="col-sm-3">
                                 <input id="receiptNumber" class="form-control" type="text"
-                                       ng-model="formData.receiptNumber" ng-readonly="isReadOnly">
+                                       ng-model="formData.receiptNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group"  ng-show="!showClientOtherInfoForm">
@@ -281,7 +330,7 @@
 
                             <div class="col-sm-3">
                                 <input id="bankNumber" class="form-control" type="text"
-                                       ng-model="formData.bankNumber" ng-readonly="isReadOnly">
+                                       ng-model="formData.bankNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
 
@@ -293,7 +342,7 @@
                         
                             <div class="col-sm-3">
                                 <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text"
-                                       ng-model="formData.clientPhoneNumber" ng-readonly="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                                       ng-model="formData.clientPhoneNumber" ng-disabled="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
@@ -303,7 +352,7 @@
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" ng-readonly="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" ng-disabled="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
@@ -313,7 +362,7 @@
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" ng-readonly="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" ng-disabled="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm && isPaymentToSupplier()">
@@ -324,7 +373,7 @@
 
                             <div class="col-sm-3">
                                 <input id="beneficiaryName" name="beneficiaryName" class="form-control" type="text"
-                                       ng-model="formData.beneficiaryName" ng-readonly="isReadOnly"
+                                       ng-model="formData.beneficiaryName" ng-disabled="isReadOnly"
                                        ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>

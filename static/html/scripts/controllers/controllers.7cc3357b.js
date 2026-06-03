@@ -15544,7 +15544,10 @@
                 if (this.formData[scope.modelName]) {
                     this.formData[scope.modelName] = dateFilter(this.formData[scope.modelName], scope.df);
                 }
-                if (scope.action != "undoapproval" && scope.action != "undodisbursal" || scope.action === "paycharge") {
+                if (scope.action == "undoapproval" || scope.action == "undodisbursal") {
+                    delete this.formData.locale;
+                    delete this.formData.dateFormat;
+                } else if (scope.action === "paycharge" || (scope.action != "undoapproval" && scope.action != "undodisbursal")) {
                     this.formData.locale = scope.optlang.code;
                     this.formData.dateFormat = scope.df;
                 }
@@ -22724,7 +22727,23 @@
 
 			resourceFactory.provisioningcriteria.template({criteriaId: 'template'}, function (data) {
 				scope.template = data;
-				scope.definitions = data.definitions;
+				scope.definitions = [];
+				var templateDefs = data.definitions;
+				if (angular.isArray(templateDefs) && templateDefs.length > 0) {
+					angular.forEach(templateDefs, function (definition) {
+						var row = angular.copy(definition);
+						if (row.maxAge === null || row.maxAge === undefined) {
+							row.maxAge = '';
+						}
+						if (!angular.isDefined(row.minAge) || row.minAge === null) {
+							row.minAge = '';
+						}
+						scope.definitions.push(row);
+					});
+				}
+				if (!scope.definitions.length) {
+					scope.definitions = data.definitions || [];
+				}
 				scope.liabilityaccounts = data.glAccounts;
 				scope.expenseaccounts = data.glAccounts;
 				scope.allLoanProducts = data.loanProducts.slice();

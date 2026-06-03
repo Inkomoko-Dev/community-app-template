@@ -47,6 +47,7 @@
                             <th>{{'label.heading.officeName' | translate}}</th>
                             <th>{{'label.heading.productname' | translate}}</th>
                             <th>{{'label.heading.currencycode' | translate}}</th>
+                            <th>{{'label.heading.classification' | translate}}</th>
                             <th>{{'label.heading.categoryname' | translate}}</th>
                             <th>{{'label.heading.provisioningamount' | translate}}</th>
                             <th>{{'label.input.liabilityaccount' | translate}}</th>
@@ -56,6 +57,7 @@
                             <td>{{provisioningentry.officeName}}</td>
                             <td>{{provisioningentry.productName}}</td>
                             <td>{{provisioningentry.currencyCode}}</td>
+                            <td>{{formatClassificationType(provisioningentry.classificationType)}}</td>
                             <td>{{provisioningentry.categoryName}}</td>
                             <td>{{provisioningentry.amountreserved | number}}</td>
                             <td>{{provisioningentry.liabilityAccountName}}</td>

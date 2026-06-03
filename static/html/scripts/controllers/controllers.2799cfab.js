@@ -4301,6 +4301,13 @@
             scope.otherInfoData = {};
             scope.exists= false;
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
+            scope.getBankName = function (otherInfoData) {
+                if (!otherInfoData) {
+                    return '';
+                }
+                return otherInfoData.bank && otherInfoData.bank.bankName ? otherInfoData.bank.bankName : otherInfoData.bankName;
+            };
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
@@ -4313,6 +4320,13 @@
                  scope.exists = true;
                 }
 
+            });
+
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             scope.cancel = function () {
@@ -4333,6 +4347,7 @@
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
+                delete this.formData.bankName;
 
                 if (scope.first.submitondate) {
                     reqDate = dateFilter(scope.first.submitondate, scope.df);
@@ -4361,9 +4376,23 @@
             scope.otherInfoData = {};
             scope.exists= false;
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
+            scope.getBankName = function (otherInfoData) {
+                if (!otherInfoData) {
+                    return '';
+                }
+                return otherInfoData.bank && otherInfoData.bank.bankName ? otherInfoData.bank.bankName : otherInfoData.bankName;
+            };
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
+            });
+
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             resourceFactory.clientOtherInfoEntityResource.getAll({clientId:routeParams.clientId}, function(data){
@@ -4396,6 +4425,7 @@
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
+                delete this.formData.bankName;
 
             if (scope.first.submitondate) {
                 reqDate = dateFilter(scope.first.submitondate, scope.df);
@@ -5836,10 +5866,24 @@
             scope.otherInfoId = routeParams.otherInfoId;
             scope.otherInfoData = {};
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
+            scope.getBankName = function (otherInfoData) {
+                if (!otherInfoData) {
+                    return '';
+                }
+                return otherInfoData.bank && otherInfoData.bank.bankName ? otherInfoData.bank.bankName : otherInfoData.bankName;
+            };
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
                 scope.nationalityOptions = data.nationalityOptions;
+            });
+
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             resourceFactory.otherInfoResource.get({clientId:routeParams.clientId, otherInfoId: routeParams.otherInfoId}, function(data){
@@ -5853,13 +5897,16 @@
                       nationalIdentificationNumber: data.nationalIdentificationNumber,
                       passportNumber: data.passportNumber,
                       bankAccountNumber: data.bankAccountNumber,
-                      bankName: data.bankName,
+                      bankId: data.bankId,
                       telephoneNo: parseInt(data.telephoneNumber)
                 }
                if (data.yearArrivedInHostCountry) {
                     var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
                     scope.date.submittedOnDate = new Date(submittedOnDate);
                 }
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             scope.cancel = function () {
@@ -5880,6 +5927,7 @@
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
+                delete this.formData.bankName;
 
                 if(scope.date.submittedOnDate){
                     this.formData.yearArrivedInHostCountry = dateFilter(scope.date.submittedOnDate,  scope.df);
@@ -5906,9 +5954,23 @@
             scope.otherInfoId = routeParams.otherInfoId;
             scope.otherInfoData = {};
             scope.yearArrivedRequired = true;
+            scope.bankOptions = [];
+            scope.getBankName = function (otherInfoData) {
+                if (!otherInfoData) {
+                    return '';
+                }
+                return otherInfoData.bank && otherInfoData.bank.bankName ? otherInfoData.bank.bankName : otherInfoData.bankName;
+            };
 
             resourceFactory.clientOtherInfoTemplateResource.get({clientId:routeParams.clientId}, function(data){
                 scope.strataOptions = data.strataOptions;
+            });
+
+            resourceFactory.banksResource.getAll({}, function (data) {
+                scope.bankOptions = data;
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             resourceFactory.otherInfoEntityResource.get({clientId:routeParams.clientId, otherInfoId: routeParams.otherInfoId}, function(data){
@@ -5923,13 +5985,16 @@
                       incomeGeneratingActivityMonthlyAmount: data.incomeGeneratingActivityMonthlyAmount,
                       telephoneNo: parseInt(data.telephoneNumber),
                       bankAccountNumber: data.bankAccountNumber,
-                      bankName: data.bankName,
+                      bankId: data.bankId,
                        yearArrivedInHostCountry: data.yearArrivedInHostCountry,
                 }
                   if (data.yearArrivedInHostCountry) {
                 var submittedOnDate = dateFilter(data.yearArrivedInHostCountry, scope.df);
                 scope.date.submittedOnDate = new Date(submittedOnDate);
             }
+                scope.$applyAsync(function () {
+                    angular.element('#bankId').trigger('chosen:updated');
+                });
             });
 
             scope.checkIfHostCommunitySelected = function () {
@@ -5944,12 +6009,13 @@
             };
 
             scope.cancel = function () {
-                location.path('/clientOtherInfo/' + scope.clientId);
+                location.path('/clientOtherInfoEntity/' + scope.clientId);
             };
 
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 this.formData.dateFormat = scope.df;
+                delete this.formData.bankName;
 
                if(scope.date.submittedOnDate){
                     this.formData.yearArrivedInHostCountry = dateFilter(scope.date.submittedOnDate,  scope.df);
@@ -17529,7 +17595,10 @@
                 if (this.formData[scope.modelName]) {
                     this.formData[scope.modelName] = dateFilter(this.formData[scope.modelName], scope.df);
                 }
-                if (scope.action != "glimApprove" && scope.action != "undoapproval" && scope.action != "undodisbursal" || scope.action === "paycharge") {
+                if (scope.action == "undoapproval" || scope.action == "undodisbursal") {
+                    delete this.formData.locale;
+                    delete this.formData.dateFormat;
+                } else if (scope.action === "paycharge" || (scope.action != "glimApprove" && scope.action != "undoapproval" && scope.action != "undodisbursal")) {
                     this.formData.locale = scope.optlang.code;
                     this.formData.dateFormat = scope.df;
                 }
@@ -18578,7 +18647,10 @@
                 if (this.formData[scope.modelName]) {
                     this.formData[scope.modelName] = dateFilter(this.formData[scope.modelName], scope.df);
                 }
-                if (scope.action != "undoapproval" && scope.action != "undodisbursal" || scope.action === "paycharge") {
+                if (scope.action == "undoapproval" || scope.action == "undodisbursal") {
+                    delete this.formData.locale;
+                    delete this.formData.dateFormat;
+                } else if (scope.action === "paycharge" || (scope.action != "undoapproval" && scope.action != "undodisbursal")) {
                     this.formData.locale = scope.optlang.code;
                     this.formData.dateFormat = scope.df;
                 }
@@ -18843,7 +18915,8 @@
                         scope.clientOtherInfoData = data[0];
                             scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
                             scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
-                            scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                            scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName ?
+                                scope.clientOtherInfoData.bank.bankName : scope.clientOtherInfoData.bankName;
                     }
                 });
             }
@@ -18857,7 +18930,8 @@
                 } else {
                     scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
                     scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
-                    scope.formData.clientBankName = scope.clientOtherInfoData.bankName;
+                    scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName ?
+                        scope.clientOtherInfoData.bank.bankName : scope.clientOtherInfoData.bankName;
                 }
             }
 
@@ -26688,7 +26762,23 @@
             resourceFactory.provisioningcriteria.template({criteriaId:'template'},function (data) {
                 scope.template = data;
                 scope.allloanproducts = data.loanProducts ;
-                scope.definitions = data.definitions;
+                scope.definitions = [];
+                var templateDefs = data.definitions;
+                if (angular.isArray(templateDefs) && templateDefs.length > 0) {
+                    angular.forEach(templateDefs, function (definition) {
+                        var row = angular.copy(definition);
+                        if (row.maxAge === null || row.maxAge === undefined) {
+                            row.maxAge = '';
+                        }
+                        if (!angular.isDefined(row.minAge) || row.minAge === null) {
+                            row.minAge = '';
+                        }
+                        scope.definitions.push(row);
+                    });
+                }
+                if (!scope.definitions.length) {
+                    scope.definitions = data.definitions || [];
+                }
                 scope.liabilityaccounts = data.glAccounts;
                 scope.expenseaccounts = data.glAccounts;
             });
@@ -35498,6 +35588,7 @@
             scope.showErrorModal = function(logEntry) {
                 scope.selectedErrorLog = logEntry;
                 scope.showErrorModal = true;
+            };
             /**
              * View detailed error information for a log entry
              */

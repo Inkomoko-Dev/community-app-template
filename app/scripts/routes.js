@@ -971,14 +971,23 @@
             .when('/viewallprovisionings', {
                 templateUrl: 'views/organization/provisioning/ViewAllProvisioningCriteria.html'
             })
+            .when('/viewallprovisioningcategories', {
+                templateUrl: 'views/organization/provisioning/ViewAllProvisioningCategories.html'
+            })
             .when('/createprovisioningcriteria', {
                 templateUrl: 'views/organization/provisioning/CreateProvisioningCriteria.html'
+            })
+            .when('/createprovisioningcategory', {
+                templateUrl: 'views/organization/provisioning/CreateProvisioningCategory.html'
             })
             .when('/viewprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/ViewProvisioningCriteria.html'
             })
             .when('/editprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/EditProvisioningCriteria.html'
+            })
+            .when('/editprovisioningcategory/:categoryId', {
+                templateUrl: 'views/organization/provisioning/EditProvisioningCategory.html'
             })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'

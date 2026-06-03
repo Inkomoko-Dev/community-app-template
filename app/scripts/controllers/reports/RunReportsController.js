@@ -54,14 +54,37 @@
                         inputName: "R_" + data.data[i].row[1] //model name
                     };
                     scope.reqFields.push(temp);
-                    if (temp.displayType == 'select' && temp.parentParameterName == null) {
-                        intializeParams(temp, {});
-                    } else if (temp.displayType == 'date') {
+
+                    if (temp.displayType === 'select' && temp.parentParameterName === null) {
+                        if (temp.variable === 'currencyId' && scope.reportName === 'Loan payments due') {
+                            scope.formData[temp.inputName] = '-1';
+                        } else {
+                            intializeParams(temp, {});
+                        }
+                    } else if (temp.displayType === 'date') {
+                        if (temp.variable === 'asAtDate') {
+                            scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
+                        }
                         scope.reportDateParams.push(temp);
-                    } else if (temp.displayType == 'text') {
+                    } else if (temp.displayType === 'text') {
+                        if (temp.variable === 'gracePeriod') {
+                            scope.formData[temp.inputName] = '0';
+                        }
                         scope.reportTextParams.push(temp);
                     }
                 }
+                if (scope.reportName === 'Loan payments due') {
+                    for (var i in scope.reqFields) {
+                        var field = scope.reqFields[i];
+                        if (field.variable === 'loanProductId') {
+                            var params = {};
+                            params['R_currencyId'] = '-1';
+                            intializeParams(field, params);
+                            break;
+                        }
+                    }
+                }
+
             });
 
             if (scope.reportType == 'Pentaho') {
@@ -150,6 +173,7 @@
                 });
             };
 
+
             function invalidDate(checkDate) {
                 // validates for yyyy-mm-dd returns true if invalid, false is valid
                 var dateformat = /^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/;
@@ -181,8 +205,11 @@
                     var paramDetails = scope.reqFields[i];
                     switch (paramDetails.displayType) {
                         case "select":
+                            if (paramDetails.variable === 'currencyId' && scope.reportName === 'Loan payments due') {
+                                break;
+                            }
                             var selectedVal = scope.formData[paramDetails.inputName];
-                            if (selectedVal == undefined || selectedVal == 0) {
+                            if (selectedVal === undefined || selectedVal === null || selectedVal === '') {
                                 var fieldId = '#' + paramDetails.inputName;
                                 $(fieldId).addClass("validationerror");
                                 var errorObj = new Object();
@@ -221,12 +248,21 @@
                             break;
                         case "text":
                             var selectedVal = scope.formData[paramDetails.inputName];
-                            if (selectedVal == undefined || selectedVal == 0) {
+                            if (selectedVal === undefined || selectedVal === null || selectedVal === '') {
                                 var fieldId = '#' + paramDetails.inputName;
                                 $(fieldId).addClass("validationerror");
                                 var errorObj = new Object();
                                 errorObj.field = paramDetails.inputName;
                                 errorObj.code = 'error.message.report.parameter.required';
+                                errorObj.args = {params: []};
+                                errorObj.args.params.push({value: paramDetails.label});
+                                scope.errorDetails.push(errorObj);
+                            } else if (paramDetails.variable === 'gracePeriod' && !/^\d+$/.test(selectedVal)) {
+                                var fieldId = '#' + paramDetails.inputName;
+                                $(fieldId).addClass("validationerror");
+                                var errorObj = new Object();
+                                errorObj.field = paramDetails.inputName;
+                                errorObj.code = 'error.message.report.invalid.value.for.parameter';
                                 errorObj.args = {params: []};
                                 errorObj.args.params.push({value: paramDetails.label});
                                 scope.errorDetails.push(errorObj);

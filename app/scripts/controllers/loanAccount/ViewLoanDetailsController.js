@@ -17,6 +17,7 @@
             scope.cashFlowData = { cashFlowDataList: [] };
             scope.financialRatioData = {};
             scope.latestClosureDate = null;
+            scope.reversalTransactionsByOriginalId = {};
             scope.recoveryReversalTransactionsByOriginalId = {};
             scope.instructions = { currentPageItems: [] };
             scope.cblpstatusactive = false;
@@ -138,13 +139,49 @@
                     || transactionTypeValue.indexOf('recovery') !== -1));
             };
 
+            scope.isRepaymentAtDisbursementTransaction = function (transaction) {
+                var transactionTypeValue = getTransactionTypeValue(transaction);
+                return !!(transaction && transaction.type && (Number(transaction.type.id) === 5 ||
+                    transaction.type.repaymentAtDisbursement === true ||
+                    transactionTypeValue.indexOf('repaymentatdisbursement') !== -1 ||
+                    transactionTypeValue.indexOf('repayment (at time of disbursement)') !== -1));
+            };
+
+            scope.getEditableInsuranceCharges = function (transaction) {
+                var charges = [];
+                if (!transaction || !transaction.loanChargePaidByList) {
+                    return charges;
+                }
+
+                transaction.loanChargePaidByList.forEach(function (chargePaidBy) {
+                    if (chargePaidBy.chargeId) {
+                        charges.push({
+                            id: chargePaidBy.chargeId,
+                            paidById: chargePaidBy.id,
+                            name: chargePaidBy.name || ('Charge #' + chargePaidBy.chargeId),
+                            amount: chargePaidBy.amount
+                        });
+                    }
+                });
+
+                return charges;
+            };
+
+            scope.canEditDisbursementInsurance = function (transaction) {
+                return scope.isRepaymentAtDisbursementTransaction(transaction) &&
+                    transaction.reversalTransaction !== true &&
+                    transaction.reversed !== true &&
+                    transaction.manuallyReversed !== true;
+            };
+
             scope.canViewTransaction = function (transaction) {
                 if (!transaction || !transaction.type) {
                     return false;
                 }
 
-                return transaction.type.id == 2 || transaction.type.id == 4 || transaction.type.id == 1 || transaction.type.id == 6
-                    || scope.isRecoveryPaymentTransaction(transaction);
+                var transactionTypeId = Number(transaction.type.id);
+                return transactionTypeId === 2 || transactionTypeId === 4 || transactionTypeId === 1 || transactionTypeId === 6 ||
+                    scope.isRecoveryPaymentTransaction(transaction) || scope.isRepaymentAtDisbursementTransaction(transaction);
             };
 
             scope.routeTo = function (loanId, transaction) {
@@ -175,14 +212,22 @@
                 return normalizedDate;
             };
 
-            scope.getRecoveryReversalTransaction = function (transaction) {
+            scope.getReversalTransaction = function (transaction) {
                 var transactionId = extractTransactionId(transaction && transaction.id);
-                if (!transactionId || !scope.isRecoveryPaymentTransaction(transaction) || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
+                if (!transactionId || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
                     return null;
                 }
 
-                return scope.recoveryReversalTransactionsByOriginalId[transactionId]
+                return scope.reversalTransactionsByOriginalId[transactionId]
                     || (angular.isObject(transaction && transaction.reversalTransaction) ? transaction.reversalTransaction : null);
+            };
+
+            scope.getRecoveryReversalTransaction = function (transaction) {
+                if (!scope.isRecoveryPaymentTransaction(transaction)) {
+                    return null;
+                }
+
+                return scope.getReversalTransaction(transaction);
             };
 
             scope.canReverseRecoveryPayment = function (transaction) {
@@ -265,6 +310,48 @@
 
                 modalInstance.result.then(function () {
                     fetchLoanAccountDetails();
+                });
+            };
+
+            scope.openEditDisbursementInsuranceModal = function ($event, transaction) {
+                if ($event) {
+                    $event.stopPropagation();
+                }
+
+                resourceFactory.loanTrxnsResource.get({
+                    loanId: scope.loandetails.id,
+                    transactionId: transaction.id
+                }, function (data) {
+                    var insuranceCharges = scope.getEditableInsuranceCharges(data);
+                    if (insuranceCharges.length === 0) {
+                        return;
+                    }
+
+                    var modalInstance = $uibModal.open({
+                        templateUrl: 'views/loans/edit_disbursement_insurance_modal.html',
+                        controller: 'EditDisbursementInsuranceModalController',
+                        resolve: {
+                            loanId: function () {
+                                return scope.loandetails.id;
+                            },
+                            transaction: function () {
+                                return angular.copy(data);
+                            },
+                            insuranceCharges: function () {
+                                return angular.copy(insuranceCharges);
+                            },
+                            dateFormat: function () {
+                                return scope.df;
+                            },
+                            locale: function () {
+                                return scope.optlang.code;
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function () {
+                        fetchLoanAccountDetails();
+                    });
                 });
             };
 
@@ -542,7 +629,8 @@
             var fetchLoanAccountDetails = function () {
                 resourceFactory.LoanAccountResource.getLoanAccountDetails({loanId: routeParams.id, associations: 'all',exclude: 'guarantors,futureSchedule'}, function (data) {
                     scope.loandetails = data;
-                    scope.recoveryReversalTransactionsByOriginalId = buildRecoveryReversalIndex(data.transactions || []);
+                    scope.reversalTransactionsByOriginalId = buildRecoveryReversalIndex(data.transactions || []);
+                    scope.recoveryReversalTransactionsByOriginalId = scope.reversalTransactionsByOriginalId;
                     scope.productId = data.loanProductId;
                     scope.loanOfficeId = getLoanOfficeId(data);
                     scope.latestClosureDate = null;
@@ -713,11 +801,13 @@
                         }
                     }
 
-                    // Generate Cashflow button - only available during Due Diligence stage
+                    // Generate Cashflow button - available during Review Application stage (required before accepting Due Diligence)
+                    // and also during Due Diligence stage (for regeneration if corrections are needed)
                     function getGenerateCashflowActionOptions(data) {
                         if (data.isExtendLoanLifeCycleConfig == true &&
                             data.loanDecisionState != null &&
-                            data.loanDecisionState.value === "DUE_DILIGENCE") {
+                            (data.loanDecisionState.value === "DUE_DILIGENCE" ||
+                             data.loanDecisionState.value === "REVIEW_APPLICATION")) {
                             return {
                                 name: "button.generatecashflow",
                                 taskPermissionName: 'GENERATE_CASHFLOW_LOAN'

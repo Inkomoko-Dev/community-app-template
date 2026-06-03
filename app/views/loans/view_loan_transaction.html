@@ -25,10 +25,14 @@
             <div class="toolbar">
                 <h4>{{ 'label.heading.details' | translate}}</h4>
                 <div ng-hide="transaction.type.contra" class="btn-group pull-right">
-                    <a ng-if="!isRecoveryPaymentTransaction(transaction)" href="#/loanaccount/{{transaction.accountId}}/modifytransaction?transactionId={{transaction.id}}"
+                    <a ng-if="!isRecoveryPaymentTransaction(transaction) && !isRepaymentAtDisbursementTransaction(transaction)" href="#/loanaccount/{{transaction.accountId}}/modifytransaction?transactionId={{transaction.id}}"
                     class="btn btn-primary" has-permission='ADJUST_LOAN'><i class="fa fa-pencil "></i>{{ 'label.button.edit' | translate}}</a>
-                    <a ng-if="!isRecoveryPaymentTransaction(transaction)" ng-click="undo(transaction.accountId, transaction.id)" class="btn btn-danger" has-permission='ADJUST_LOAN'><i
+                    <a ng-if="!isRecoveryPaymentTransaction(transaction) && !isRepaymentAtDisbursementTransaction(transaction)" ng-click="undo(transaction.accountId, transaction.id)" class="btn btn-danger" has-permission='ADJUST_LOAN'><i
                     class="fa fa-trash "></i>{{ 'label.button.undo' | translate}}</a>
+                    <a ng-if="canEditDisbursementInsurance(transaction)" ng-click="openEditDisbursementInsuranceModal(transaction)"
+                    class="btn btn-primary" has-permission='ADJUST_LOAN'
+                    uib-tooltip="Edit disbursement insurance" aria-label="Edit disbursement insurance"><i
+                    class="fa fa-pencil "></i>Edit Insurance</a>
                     <a ng-if="canReverseRecoveryPayment(transaction)" ng-click="openReverseRecoveryPaymentModal(transaction)"
                     class="btn btn-warning" has-permission='REVERSERECOVERYPAYMENT_LOAN'
                     uib-tooltip="{{ 'label.button.reverserecoverypayment' | translate}}" aria-label="{{ 'label.button.reverserecoverypayment' | translate}}"><i
@@ -61,11 +65,11 @@
                         <td>{{ 'label.heading.amount' | translate}}</td>
                         <td>{{transaction.amount | number}}</td>
                     </tr>
-                    <tr ng-if="isRecoveryPaymentTransaction(transaction)">
+                    <tr ng-if="isRecoveryPaymentTransaction(transaction) || isRepaymentAtDisbursementTransaction(transaction)">
                         <td>{{ 'label.input.manuallyreversed' | translate}}</td>
                         <td>{{transaction.manuallyReversed | YesOrNo}}</td>
                     </tr>
-                    <tr ng-if="isRecoveryPaymentTransaction(transaction)">
+                    <tr ng-if="isRecoveryPaymentTransaction(transaction) || isRepaymentAtDisbursementTransaction(transaction)">
                         <td>{{ 'label.input.originaldate' | translate}}</td>
                         <td>{{transaction.date | DateFormat}}</td>
                     </tr>
@@ -81,11 +85,11 @@
                         <td>{{ 'label.input.originaltransactionid' | translate}}</td>
                         <td><a href ng-click="openRelatedTransaction(transaction.originalTransactionId)">{{getRelatedTransactionId(transaction.originalTransactionId)}}</a></td>
                     </tr>
-                    <tr ng-if="getRelatedTransactionId(relatedRecoveryReversal)">
+                    <tr ng-if="getRelatedTransactionId(relatedReversal)">
                         <td>{{ 'label.input.reversaltransaction' | translate}}</td>
                         <td>
-                            <a href ng-click="openRelatedTransaction(relatedRecoveryReversal)">{{getRelatedTransactionId(relatedRecoveryReversal)}}</a>
-                            <span ng-if="getRelatedTransactionDate(relatedRecoveryReversal)">({{getRelatedTransactionDate(relatedRecoveryReversal) | DateFormat}})</span>
+                            <a href ng-click="openRelatedTransaction(relatedReversal)">{{getRelatedTransactionId(relatedReversal)}}</a>
+                            <span ng-if="getRelatedTransactionDate(relatedReversal)">({{getRelatedTransactionDate(relatedReversal) | DateFormat}})</span>
                         </td>
                     </tr>
                     <tr class="span2"></tr>
