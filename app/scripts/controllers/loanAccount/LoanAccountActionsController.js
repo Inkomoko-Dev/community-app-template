@@ -283,6 +283,25 @@
                 }
             };
 
+            scope.refreshFxRateForDisbursementDate = function (disbursementDate) {
+                if (!scope.isSouthSudanSspLoan() || !disbursementDate || !scope.isVendorDisbursement()) {
+                    return;
+                }
+
+                resourceFactory.loanTemplateResource.get({
+                    loanId: scope.accountId,
+                    templateType: 'approval',
+                    disbursementDate: dateFilter(disbursementDate, scope.df),
+                    dateFormat: scope.df,
+                    locale: scope.optlang.code
+                }, function (data) {
+                    scope.formData.fxRate = data.fxRate || null;
+                    scope.formData.fxTimestamp = data.fxTimestamp || null;
+                    scope.formData.fxSource = data.fxSource || 'CBS_DAILY_RATE';
+                    scope.computeUsdEquivalent();
+                });
+            };
+
             scope.isReviewRelatedAction = function () {
                 var reviewActions = [
                     'reviewapplication', 'rejectduediligence', 'rejectreviewapplication',
@@ -1810,6 +1829,18 @@
 
             scope.$watch('formData.fxRate', function () {
                 scope.computeUsdEquivalent();
+            });
+
+            scope.$watch('form.expectedDisbursementDate', function (newDate) {
+                if (scope.action === 'approve' && newDate) {
+                    scope.refreshFxRateForDisbursementDate(newDate);
+                }
+            });
+
+            scope.$watch('formData.actualDisbursementDate', function (newDate) {
+                if (scope.isDisbursementReviewAction() && newDate) {
+                    scope.refreshFxRateForDisbursementDate(newDate);
+                }
             });
 
             scope.isCashPayment = function () {
