@@ -1,0 +1,47 @@
+<div class="content-container" ng-controller="ViewProvisioningCriteriaVersionHistoryController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/viewallprovisionings">{{'label.anchor.provisioningcriteria' | translate}}</a></li>
+        <li><a href="#/viewprovisioningcriteria/{{criteriaId}}">{{criteriaName}}</a></li>
+        <li class="active">{{'label.anchor.provisioningcriteriaversionhistory' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <h3 class="bolder">{{criteriaName}} — {{'label.anchor.provisioningcriteriaversionhistory' | translate}}</h3>
+            <hr/>
+            <api-validate></api-validate>
+            <div class="alert alert-danger" ng-show="loadFailed">
+                {{'label.message.provisioning.versionhistory.loadfailed' | translate}}
+            </div>
+            <table class="table width100" ng-show="versions.length > 0">
+                <tr class="graybg">
+                    <th>{{'label.heading.version' | translate}}</th>
+                    <th>{{'label.heading.versionid' | translate}}</th>
+                    <th>{{'label.input.effectivefrom' | translate}}</th>
+                    <th>{{'label.heading.retiredon' | translate}}</th>
+                    <th>{{'label.heading.createdby' | translate}}</th>
+                    <th>{{'label.heading.createdon' | translate}}</th>
+                    <th>{{'label.input.provisioning.policychangereason' | translate}}</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="version in versions">
+                    <td>{{version.versionNo}}</td>
+                    <td>{{version.id}}</td>
+                    <td>{{version.effectiveFrom | DateFormat}}</td>
+                    <td>{{version.retiredOn | DateFormat}}</td>
+                    <td>{{version.createdBy}}</td>
+                    <td>{{version.createdDate | DateFormat}}</td>
+                    <td>{{version.policyChangeReason || '-'}}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" ng-click="viewVersion(version.id)">
+                            {{'label.button.view' | translate}}
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <div class="alert alert-info" ng-hide="versions.length > 0 || loadFailed">
+                {{'label.no.records.found' | translate}}
+            </div>
+        </div>
+    </div>
+</div>
