@@ -3,13 +3,19 @@
         DateFormat: function (dateFilter, localStorageService) {
             return function (input) {
                 if (input) {
-                    // SAFARI is Bad We fix it Issue #3196
-                    // This fix affected transaction
-                    //remove = input.toString().split(",");
-                    //var tDate = new Date(remove[0], remove[1]-1, remove[2]);
-                    //return dateFilter(tDate, localStorageService.getFromLocalStorage('dateformat'));
-
-                    var tDate = new Date(input);
+                    var tDate;
+                    if (angular.isArray(input)) {
+                        if (input.length >= 6) {
+                            tDate = new Date(input[0], input[1] - 1, input[2], input[3] || 0, input[4] || 0, input[5] || 0);
+                        } else if (input.length >= 3) {
+                            tDate = new Date(input[0], input[1] - 1, input[2]);
+                        }
+                    } else {
+                        tDate = new Date(input);
+                    }
+                    if (!tDate || isNaN(tDate.getTime())) {
+                        return '';
+                    }
                     return dateFilter(tDate, localStorageService.getFromLocalStorage('dateformat'));
                 }
                 return '';

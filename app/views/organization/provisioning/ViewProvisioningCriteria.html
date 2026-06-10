@@ -14,6 +14,9 @@
                         </div>
                         <div class="col-md-6">
                             <div class="pull-right">
+                                <a href="#/viewprovisioningcriteria/{{criteriaId}}/versions" class="btn btn-default" has-permission='READ_PROVISIONCRITERIA'>
+                                    <i class="fa fa-history"></i>&nbsp;&nbsp;{{'label.button.viewversionhistory' | translate}}
+                                </a>
                                 <a href="#/editprovisioningcriteria/{{criteriaId}}" class="btn btn-primary" has-permission='UPDATE_PROVISIONCRITERIA'>
                                     <i class="fa fa-edit"></i>&nbsp;&nbsp;{{'label.button.edit' | translate}}
                                 </a>
@@ -36,14 +39,41 @@
                         </div>
                     </script>
 
+                    <div class="alert alert-info" ng-if="versionDisplayStatus === 'SCHEDULED'">
+                        {{'label.message.provisioning.scheduledversion' | translate}}
+                        {{effectiveForTodayVersionNo}} ({{'label.input.effectivefrom' | translate}} {{effectiveForTodayFrom | DateFormat}}).
+                        {{'label.message.provisioning.publishedversion' | translate}} {{versionNo}} ({{effectiveFrom | DateFormat}}).
+                    </div>
+                    <div class="alert alert-success" ng-if="versionDisplayStatus === 'ACTIVE' && effectiveForTodayVersionNo !== versionNo">
+                        {{'label.message.provisioning.activetoday' | translate}} {{effectiveForTodayVersionNo}}.
+                    </div>
+
                     <div class="form-group">
-                        <label class="control-label col-sm-2">{{'label.heading.version' | translate}}</label>
+                        <label class="control-label col-sm-2">{{'label.heading.publishedversion' | translate}}</label>
                         <div class="col-sm-4">
-                            <p class="form-control-static">{{versionNo}}</p>
+                            <p class="form-control-static">{{versionNo}} <span class="label label-default" ng-if="versionDisplayStatus === 'SCHEDULED'">{{'label.status.scheduled' | translate}}</span></p>
                         </div>
                         <label class="control-label col-sm-2">{{'label.input.effectivefrom' | translate}}</label>
                         <div class="col-sm-4">
                             <p class="form-control-static">{{effectiveFrom | DateFormat}}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-if="effectiveForTodayVersionNo && versionDisplayStatus === 'SCHEDULED'">
+                        <label class="control-label col-sm-2">{{'label.heading.activetodayversion' | translate}}</label>
+                        <div class="col-sm-4">
+                            <p class="form-control-static">{{effectiveForTodayVersionNo}}</p>
+                        </div>
+                        <label class="control-label col-sm-2">{{'label.heading.activetodayfrom' | translate}}</label>
+                        <div class="col-sm-4">
+                            <p class="form-control-static">{{effectiveForTodayFrom | DateFormat}}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.versionid' | translate}}</label>
+                        <div class="col-sm-4">
+                            <p class="form-control-static">{{activeVersionId}}</p>
                         </div>
                     </div>
 
