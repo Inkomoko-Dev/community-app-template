@@ -51,6 +51,38 @@
                 return levelNumber !== null && levelNumber >= 6;
             };
 
+            scope.applyIcReviewTemplateDefaults = function (data) {
+                if (!data) {
+                    return;
+                }
+                if (data.dueDiligenceRecommendedAmount != null && scope.formData.icReviewRecommendedAmount == null) {
+                    scope.formData.icReviewRecommendedAmount = data.dueDiligenceRecommendedAmount;
+                }
+                if (data.dueDiligenceTermFrequency != null && scope.formData.icReviewTermFrequency == null) {
+                    scope.formData.icReviewTermFrequency = data.dueDiligenceTermFrequency;
+                }
+                if (data.dueDiligenceTermFrequencyType != null && scope.formData.icReviewTermPeriodFrequencyEnum == null) {
+                    scope.formData.icReviewTermPeriodFrequencyEnum = data.dueDiligenceTermFrequencyType;
+                }
+            };
+
+            scope.loadIcReviewTemplate = function(levelNumber, onLoaded) {
+                var params = {
+                    loanId: scope.accountId,
+                    templateType: 'icreview'
+                };
+                if (levelNumber != null) {
+                    params.approvingLevelNumber = levelNumber;
+                }
+                resourceFactory.loanTemplateResource.get(params, function (data) {
+                    scope.icreviewTemplate = data;
+                    scope.applyIcReviewTemplateDefaults(data);
+                    if (onLoaded) {
+                        onLoaded(data);
+                    }
+                });
+            };
+
             scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive' || (scope.isDynamicIcReviewLevel(scope.action) && scope.action.indexOf('rejecticreviewlevel') !== 0);
             scope.isRecoveryPaymentAction = routeParams.action === 'recoverypayment';
             scope.transactionDateMinDate = '2000-01-01';
@@ -679,17 +711,12 @@
                     break;
                 case "icreviewlevelone":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELONE';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'icreview'
-                    }, function (data) {
-
+                    scope.loadIcReviewTemplate(1, function () {
                         scope.title = 'label.heading.icreviewleveloneloanaccount';
                         scope.labelName = 'label.input.icReviewOn';
                         scope.modelName = 'icReviewOn';
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
-                        scope.icreviewTemplate = data;
                         scope.showRejectButton = true;
                     });
 
@@ -703,19 +730,14 @@
                     break;
                 case "icreviewleveltwo":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'icreview'
-                    }, function (data) {
-
+                    scope.loadIcReviewTemplate(2, function (data) {
                         scope.title = 'label.heading.icreviewleveltwoloanaccount';
                         scope.labelName = 'label.input.icReviewOn';
                         scope.modelName = 'icReviewOn';
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
-                        scope.icreviewTemplate = data;
                         scope.showRejectButton = true;
-                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 2);
                     });
 
                     break;
@@ -728,19 +750,14 @@
                     break;
                 case "icreviewlevelthree":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'icreview'
-                    }, function (data) {
-
+                    scope.loadIcReviewTemplate(3, function (data) {
                         scope.title = 'label.heading.icreviewlevelthreeloanaccount';
                         scope.labelName = 'label.input.icReviewOn';
                         scope.modelName = 'icReviewOn';
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
-                        scope.icreviewTemplate = data;
                         scope.showRejectButton = true;
-                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 3);
                     });
 
                     break;
@@ -753,19 +770,14 @@
                     break;
                 case "icreviewlevelfour":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'icreview'
-                    }, function (data) {
-
+                    scope.loadIcReviewTemplate(4, function (data) {
                         scope.title = 'label.heading.icreviewlevelfourloanaccount';
                         scope.labelName = 'label.input.icReviewOn';
                         scope.modelName = 'icReviewOn';
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
-                        scope.icreviewTemplate = data;
                         scope.showRejectButton = true;
-                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 4);
                     });
 
                     break;
@@ -778,19 +790,14 @@
                     break;
                 case "icreviewlevelfive":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'icreview'
-                    }, function (data) {
-
+                    scope.loadIcReviewTemplate(5, function (data) {
                         scope.title = 'label.heading.icreviewlevelfiveloanaccount';
                         scope.labelName = 'label.input.icReviewOn';
                         scope.modelName = 'icReviewOn';
                         scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
-                        scope.icreviewTemplate = data;
                         scope.showRejectButton = true;
-                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 5);
                     });
 
                     break;
@@ -821,18 +828,14 @@
                     var dynamicLevelNumber = scope.getIcReviewLevelNumber(scope.action);
                     var levelWord = scope.action.replace('icreviewlevel', '').toUpperCase();
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVEL' + levelWord;
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'icreview'
-                    }, function (data) {
+                    scope.loadIcReviewTemplate(dynamicLevelNumber, function (data) {
                         scope.title = 'label.heading.icreviewlevel' + scope.action.replace('icreviewlevel', '') + 'loanaccount';
                         scope.labelName = 'label.input.icReviewOn';
                         scope.modelName = 'icReviewOn';
                         scope.formData[scope.modelName] = new Date();
-                        scope.icreviewTemplate = data;
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
-                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData);
+                        scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, dynamicLevelNumber);
                     });
                     break;
                 case "rejecticreviewlevelsix":
@@ -1387,14 +1390,59 @@
                 }
             };
 
-            function icReviewLoanDecisionDataObjectToArray(icReviewData) {
-                const result = [];
-                const icReviewKeys = Object.keys(icReviewData);
-                icReviewKeys.forEach(function (key) {
-                    if (key.includes('icReviewDecisionLevel')) {
-                        result.push({label: key, value: icReviewData[key]});
+            function icReviewLoanDecisionDataObjectToArray(icReviewData, currentLevelNumber) {
+                if (!icReviewData) {
+                    return [];
+                }
+
+                var levelWordByNumber = {
+                    1: 'One', 2: 'Two', 3: 'Three', 4: 'Four', 5: 'Five',
+                    6: 'Six', 7: 'Seven', 8: 'Eight', 9: 'Nine', 10: 'Ten',
+                    11: 'Eleven', 12: 'Twelve', 13: 'Thirteen', 14: 'Fourteen', 15: 'Fifteen',
+                    16: 'Sixteen', 17: 'Seventeen', 18: 'Eighteen', 19: 'Nineteen', 20: 'Twenty'
+                };
+
+                var legacyFieldByLevel = {
+                    1: 'icReviewDecisionLevelOneRecommendedAmount',
+                    2: 'icReviewDecisionLevelTwoRecommendedAmount',
+                    3: 'icReviewDecisionLevelThreeRecommendedAmount',
+                    4: 'icReviewDecisionLevelFourRecommendedAmount',
+                    5: 'icReviewDecisionLevelFiveRecommendedAmount'
+                };
+
+                var amountByLevel = {};
+                var levelNumber;
+
+                for (levelNumber = 1; levelNumber <= 5; levelNumber++) {
+                    var legacyKey = legacyFieldByLevel[levelNumber];
+                    if (legacyKey && icReviewData[legacyKey] != null) {
+                        amountByLevel[levelNumber] = icReviewData[legacyKey];
+                    }
+                }
+
+                if (icReviewData.decisionLevels && icReviewData.decisionLevels.length) {
+                    icReviewData.decisionLevels.forEach(function (level) {
+                        if (level && level.levelNumber && level.recommendedAmount != null
+                                && level.decision === 'APPROVED') {
+                            amountByLevel[level.levelNumber] = level.recommendedAmount;
+                        }
+                    });
+                }
+
+                var result = [];
+                var maxLevel = currentLevelNumber || 999;
+
+                Object.keys(amountByLevel).map(Number).sort(function (a, b) {
+                    return a - b;
+                }).forEach(function (levelNum) {
+                    if (levelNum < maxLevel && levelWordByNumber[levelNum]) {
+                        result.push({
+                            label: 'icReviewDecisionLevel' + levelWordByNumber[levelNum] + 'RecommendedAmount',
+                            value: amountByLevel[levelNum]
+                        });
                     }
                 });
+
                 return result;
             }
 
