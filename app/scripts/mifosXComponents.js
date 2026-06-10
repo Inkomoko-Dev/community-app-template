@@ -317,6 +317,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/provisioning/ViewAllProvisoningCriteriaController',
             'organization/provisioning/ViewAllProvisioningCategoriesController',
             'organization/provisioning/ViewProvisioningCriteriaController',
+            'organization/provisioning/ViewProvisioningCriteriaVersionHistoryController',
+            'organization/provisioning/ViewProvisioningCriteriaVersionController',
             'organization/provisioning/EditProvisioningCriteriaController',
             'organization/provisioning/EditProvisioningCategoryController',
             'accounting/DefineOpeningBalancesController',

@@ -13,10 +13,24 @@
                 <api-validate></api-validate>
                 <fieldset>
                     <h3 class="bolder">{{'label.heading.createdby' | translate}} {{':  '}} {{createdby}} &nbsp;&nbsp;&nbsp;&nbsp;
-                        {{'label.heading.createdon' | translate}} {{':  '}} {{createdDate | DateFormat}}&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{'label.heading.executedon' | translate}} {{':  '}} {{executedAt | DateFormat}}&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{'label.heading.provisioningasofdate' | translate}} {{':  '}} {{provisioningDate | DateFormat}}&nbsp;&nbsp;&nbsp;&nbsp;
                         {{'label.heading.amounttobereserved' | translate}} {{':  '}} {{totalReservedAmount | number}}
-
                     </h3>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.runscope' | translate}}</label>
+                        <div class="col-sm-8"><p class="form-control-static">{{runScope}}</p></div>
+                    </div>
+                    <div class="form-group" ng-if="criteriaVersions.length > 0">
+                        <label class="control-label col-sm-2">{{'label.heading.criteriaversionsused' | translate}}</label>
+                        <div class="col-sm-8">
+                            <ul class="list-unstyled">
+                                <li ng-repeat="cv in criteriaVersions">
+                                    {{cv.criteriaName}} — {{'label.heading.version' | translate}} {{cv.versionNo}} (ID: {{cv.criteriaVersionId}})
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     <hr>
                     <div class="form-group">
                         <div class="col-sm-3">
@@ -49,19 +63,44 @@
                             <th>{{'label.heading.currencycode' | translate}}</th>
                             <th>{{'label.heading.classification' | translate}}</th>
                             <th>{{'label.heading.categoryname' | translate}}</th>
+                            <th>{{'label.heading.criteriaversion' | translate}}</th>
                             <th>{{'label.heading.provisioningamount' | translate}}</th>
                             <th>{{'label.input.liabilityaccount' | translate}}</th>
                             <th>{{'label.input.expenseaccount' | translate}}</th>
+                            <th></th>
                         </tr>
-                        <tr ng-repeat="provisioningentry in transactions.currentPageItems">
+                        <tr ng-repeat-start="provisioningentry in transactions.currentPageItems">
                             <td>{{provisioningentry.officeName}}</td>
                             <td>{{provisioningentry.productName}}</td>
                             <td>{{provisioningentry.currencyCode}}</td>
                             <td>{{formatClassificationType(provisioningentry.classificationType)}}</td>
                             <td>{{provisioningentry.categoryName}}</td>
+                            <td>{{provisioningentry.criteriaVersionNo}} (ID: {{provisioningentry.criteriaVersionId}})</td>
                             <td>{{provisioningentry.amountreserved | number}}</td>
                             <td>{{provisioningentry.liabilityAccountName}}</td>
                             <td>{{provisioningentry.expenseAccountName}}</td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-if="provisioningentry.loans.length > 0"
+                                        ng-click="toggleLoans(provisioningentry)">
+                                    {{provisioningentry.showLoans ? ('label.button.hide' | translate) : ('label.button.viewloans' | translate)}}
+                                </button>
+                            </td>
+                        </tr>
+                        <tr ng-repeat-end ng-if="provisioningentry.showLoans && provisioningentry.loans.length > 0">
+                            <td colspan="10">
+                                <table class="table table-condensed">
+                                    <tr class="graybg">
+                                        <th>{{'label.heading.loanaccountnum' | translate}}</th>
+                                        <th>{{'label.heading.outstandingamount' | translate}}</th>
+                                        <th>{{'label.heading.provisioningamount' | translate}}</th>
+                                    </tr>
+                                    <tr ng-repeat="loan in provisioningentry.loans">
+                                        <td>{{loan.accountNo}}</td>
+                                        <td>{{loan.outstandingBalance | number}}</td>
+                                        <td>{{loan.provisioningAmount | number}}</td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                     </table>
                     <ul class="pager">

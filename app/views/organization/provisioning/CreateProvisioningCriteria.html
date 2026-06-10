@@ -76,6 +76,10 @@
                         {{'label.message.provisioningcategoryrequired' | translate}}
                     </div>
 
+                    <div class="alert alert-info">
+                        {{'label.help.provisioning.contiguousbands' | translate}}
+                    </div>
+
                     <table class="table width100" ng-show="definitions.length > 0">
                         <tr class="graybg">
                             <th>{{'label.heading.provisioningcategory' | translate}}</th>
@@ -86,37 +90,40 @@
                             <th>{{'label.heading.provisioningexpenseaccount' | translate}}</th>
                             <th></th>
                         </tr>
-                        <tr ng-repeat="definition in definitions track by $index">
+                        <tr ng-repeat="definition in definitions track by $index" ng-form="definitionRow{{$index}}">
                             <td>
-                                <select class="form-control" ng-model="definition.categoryId"
+                                <select class="form-control" name="categoryId{{$index}}" ng-model="definition.categoryId"
                                         ng-options="category.id as (category.categoryName + ' (' + category.categoryCode + ')' + (category.active === false ? ' - Inactive' : '')) for category in availableCategoriesForRow($index)"
                                         ng-change="onCategoryChanged(definition)" required>
                                     <option value="">{{'label.selectprovisioningcategory' | translate}}</option>
                                 </select>
                             </td>
                             <td>
-                                <input class="form-control" type="text" ng-model="definition.minAge"
-                                       placeholder="{{'label.input.indays' | translate}}" number-format required ng-focus="doFocus($index)">
+                                <input class="form-control" type="number" min="0" step="1" name="minAge{{$index}}" ng-model="definition.minAge"
+                                       placeholder="{{'label.input.indays' | translate}}" required ng-focus="doFocus($index)">
+                                <span class="help-block" ng-if="$index === 0">{{'label.help.provisioning.minage' | translate}}</span>
                             </td>
                             <td>
-                                <input class="form-control" type="text" ng-model="definition.maxAge"
+                                <input class="form-control" type="number" min="0" step="1" name="maxAge{{$index}}" ng-model="definition.maxAge"
                                        placeholder="{{isLastDefinition($index) ? ('label.input.openended' | translate) : ('label.input.indays' | translate)}}"
-                                       number-format ng-required="!isLastDefinition($index)" ng-change="onMaxAgeChanged($index)">
+                                       ng-required="!isLastDefinition($index)" ng-change="onMaxAgeChanged($index)">
                                 <span class="help-block" ng-if="isLastDefinition($index)">{{'label.help.provisioning.maxage' | translate}}</span>
                             </td>
                             <td>
-                                <input class="form-control" type="text" ng-model="definition.provisioningPercentage"
+                                <input class="form-control" type="text" name="provisioningPercentage{{$index}}" ng-model="definition.provisioningPercentage"
                                        placeholder="{{'label.input.amount' | translate}}" number-format required>
                             </td>
                             <td>
-                                <select ng-model="definition.liabilityAccount"
+                                <select ng-model="definition.liabilityAccount" name="liabilityAccount{{$index}}"
+                                        chosen="liabilityaccounts"
                                         ng-options="account.id as account.name for account in liabilityaccounts"
                                         class="form-control" required>
                                     <option value="">{{'label.selectliabilitiaccount' | translate}}</option>
                                 </select>
                             </td>
                             <td>
-                                <select ng-model="definition.expenseAccount"
+                                <select ng-model="definition.expenseAccount" name="expenseAccount{{$index}}"
+                                        chosen="expenseaccounts"
                                         ng-options="account.id as account.name for account in expenseaccounts"
                                         class="form-control" required>
                                     <option value="">{{'label.selectexpenseaccount' | translate}}</option>
