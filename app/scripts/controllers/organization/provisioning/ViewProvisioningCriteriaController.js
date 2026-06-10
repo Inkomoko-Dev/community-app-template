@@ -5,7 +5,10 @@
 
             resourceFactory.provisioningcriteria.get({ criteriaId: routeParams.criteriaId }, function (data) {
                 scope.loanproducts = data.loanProducts || [];
-                scope.definitions = (data.definitions || []).slice(0).sort(function (left, right) {
+                scope.definitions = (data.versionDisplayStatus === 'SCHEDULED' && data.effectiveDefinitions && data.effectiveDefinitions.length)
+                    ? data.effectiveDefinitions.slice(0)
+                    : (data.definitions || []).slice(0);
+                scope.definitions.sort(function (left, right) {
                     var leftOrder = angular.isDefined(left.displayOrder) && left.displayOrder !== null ? left.displayOrder : 0;
                     var rightOrder = angular.isDefined(right.displayOrder) && right.displayOrder !== null ? right.displayOrder : 0;
                     if (leftOrder !== rightOrder) {
@@ -18,6 +21,10 @@
                 scope.versionNo = data.versionNo;
                 scope.effectiveFrom = data.effectiveFrom;
                 scope.policyChangeReason = data.policyChangeReason;
+                scope.activeVersionId = data.activeVersionId;
+                scope.effectiveForTodayVersionNo = data.effectiveForTodayVersionNo;
+                scope.effectiveForTodayFrom = data.effectiveForTodayFrom;
+                scope.versionDisplayStatus = data.versionDisplayStatus;
                 scope.formattedProductNames = scope.loanproducts.map(function (loanProduct) {
                     return loanProduct.name;
                 }).join(', ');
