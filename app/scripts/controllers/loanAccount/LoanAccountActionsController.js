@@ -6,10 +6,25 @@
             scope.accountId = routeParams.id;
             
             // Pre-fetch loan details to get currency code for South Sudan logic
+            function extractLoanCountry(data) {
+                if (!data || !data.loanDueDiligenceData || !data.loanDueDiligenceData.country) {
+                    return null;
+                }
+                return data.loanDueDiligenceData.country;
+            }
+
+            function normalizeCountry(country) {
+                if (!country) {
+                    return null;
+                }
+                return String(country).replace(/\s+/g, ' ').trim().toUpperCase();
+            }
+
             resourceFactory.LoanAccountResource.getLoanAccountDetails({
                 loanId: scope.accountId
             }, function (data) {
                 scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
+                scope.loanCountry = extractLoanCountry(data);
             });
 
             scope.formData = {};
@@ -206,8 +221,16 @@
                 scope.recoveryPaymentDateErrorArgs = null;
             }
 
-            scope.isSouthSudanSspLoan = function () {
+            scope.isSouthSudanLoan = function () {
+                var normalizedCountry = normalizeCountry(scope.loanCountry);
+                if (normalizedCountry) {
+                    return normalizedCountry === 'SOUTH SUDAN';
+                }
                 return scope.loanCurrencyCode && scope.loanCurrencyCode.toUpperCase() === 'SSP';
+            };
+
+            scope.isSouthSudanSspLoan = function () {
+                return scope.isSouthSudanLoan() && scope.loanCurrencyCode && scope.loanCurrencyCode.toUpperCase() === 'SSP';
             };
 
             scope.isVendorDisbursement = function () {
@@ -436,6 +459,7 @@
                         associations: 'multiDisburseDetails'
                     }, function (data) {
                         scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
+                        scope.loanCountry = extractLoanCountry(data);
                         scope.form.expectedDisbursementDate = new Date(data.timeline.expectedDisbursementDate);
                         scope.productId = data.loanProductId;
                         if (data.disbursementDetails != "") {
@@ -507,6 +531,7 @@
                         associations: 'multiDisburseDetails'
                     }, function (data) {
                         scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
+                        scope.loanCountry = extractLoanCountry(data);
                         
                         // If template hasn't returned these yet, try to get them from the first disbursement detail
                         if (data.disbursementDetails && data.disbursementDetails.length > 0) {
