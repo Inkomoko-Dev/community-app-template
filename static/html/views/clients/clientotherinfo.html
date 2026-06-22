@@ -96,12 +96,16 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="bankName">
+                    <label class="control-label col-sm-2" for="bankId">
                         {{ 'label.input.bankName' | translate }}
                     </label>
 
                     <div class="col-sm-3">
-                        <input id="bankName" name="bankName" type="text" class="form-control" ng-model="formData.bankName" late-validate>
+                        <select chosen="bankOptions" id="bankId" name="bankId" class="form-control"
+                                ng-model="formData.bankId"
+                                ng-options="bank.id as (bank.bankName + ' - ' + bank.country) for bank in bankOptions track by bank.id">
+                            <option value="">{{'label.menu.selectone' | translate}}</option>
+                        </select>
                     </div>
                 </div>
 
@@ -110,7 +114,7 @@
                         {{ 'label.input.telephoneNo' | translate }}
                         <span class="required">*</span>
                     </label>
-                
+
                     <div class="col-sm-3">
                         <input id="telephoneNo" name="telephoneNo" type="number" class="form-control" ng-model="formData.telephoneNo" required late-validate>
                     </div>
@@ -125,7 +129,7 @@
                 </div>
 
             </fieldset>
-        </form> 
+        </form>
         </div>
     </div>
     <div class="card well" ng-if="exists">
@@ -175,7 +179,7 @@
                     </tr>
                     <tr>
                         <td>{{'label.heading.bankName' | translate}}</td>
-                        <td>{{otherInfoData.bankName}}</td>
+                        <td>{{getBankName(otherInfoData)}}</td>
                     </tr>
                     <tr>
                         <td>{{'label.heading.telephoneNo' | translate}}</td>

@@ -983,6 +983,12 @@
             .when('/viewprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/ViewProvisioningCriteria.html'
             })
+            .when('/viewprovisioningcriteria/:criteriaId/versions', {
+                templateUrl: 'views/organization/provisioning/ViewProvisioningCriteriaVersionHistory.html'
+            })
+            .when('/viewprovisioningcriteria/:criteriaId/versions/:versionId', {
+                templateUrl: 'views/organization/provisioning/ViewProvisioningCriteriaVersion.html'
+            })
             .when('/editprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/EditProvisioningCriteria.html'
             })

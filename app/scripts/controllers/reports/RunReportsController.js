@@ -174,29 +174,6 @@
             };
 
 
-            scope.exportToCsv = function () {
-                scope.formData.reportSource = scope.reportName;
-                var params = angular.copy(scope.formData);
-                params.exportCSV = true;
-                delete params.limit;
-                delete params.offset;
-
-                var reportURL = $rootScope.hostUrl + API_VERSION + "/runreports/" + encodeURIComponent(scope.reportName);
-
-                http.get(reportURL, { responseType: 'arraybuffer', params: params })
-                    .then(function (response) {
-                        var blob = new Blob([response.data], { type: 'text/csv' });
-                        var link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = scope.reportName + '.csv';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }).catch(function (error) {
-                    console.error('Error downloading CSV:', error);
-                });
-            };
-
             function invalidDate(checkDate) {
                 // validates for yyyy-mm-dd returns true if invalid, false is valid
                 var dateformat = /^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/;
@@ -277,6 +254,15 @@
                                 var errorObj = new Object();
                                 errorObj.field = paramDetails.inputName;
                                 errorObj.code = 'error.message.report.parameter.required';
+                                errorObj.args = {params: []};
+                                errorObj.args.params.push({value: paramDetails.label});
+                                scope.errorDetails.push(errorObj);
+                            } else if (paramDetails.variable === 'gracePeriod' && !/^\d+$/.test(selectedVal)) {
+                                var fieldId = '#' + paramDetails.inputName;
+                                $(fieldId).addClass("validationerror");
+                                var errorObj = new Object();
+                                errorObj.field = paramDetails.inputName;
+                                errorObj.code = 'error.message.report.invalid.value.for.parameter';
                                 errorObj.args = {params: []};
                                 errorObj.args.params.push({value: paramDetails.label});
                                 scope.errorDetails.push(errorObj);

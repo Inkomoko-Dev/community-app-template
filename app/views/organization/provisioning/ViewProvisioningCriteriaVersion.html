@@ -1,0 +1,59 @@
+<div class="content-container" ng-controller="ViewProvisioningCriteriaVersionController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/viewallprovisionings">{{'label.anchor.provisioningcriteria' | translate}}</a></li>
+        <li><a href="#/viewprovisioningcriteria/{{criteriaId}}">{{version.criteriaName}}</a></li>
+        <li><a href="#/viewprovisioningcriteria/{{criteriaId}}/versions">{{'label.anchor.provisioningcriteriaversionhistory' | translate}}</a></li>
+        <li class="active">{{'label.heading.version' | translate}} {{version.versionNo}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="form-group">
+                <label class="control-label col-sm-2">{{'label.heading.version' | translate}}</label>
+                <div class="col-sm-4"><p class="form-control-static">{{version.versionNo}} (ID: {{version.id}})</p></div>
+                <label class="control-label col-sm-2">{{'label.input.effectivefrom' | translate}}</label>
+                <div class="col-sm-4"><p class="form-control-static">{{version.effectiveFrom | DateFormat}}</p></div>
+            </div>
+            <div class="form-group" ng-if="version.retiredOn">
+                <label class="control-label col-sm-2">{{'label.heading.retiredon' | translate}}</label>
+                <div class="col-sm-4"><p class="form-control-static">{{version.retiredOn | DateFormat}}</p></div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">{{'label.heading.createdby' | translate}}</label>
+                <div class="col-sm-4"><p class="form-control-static">{{version.createdBy}}</p></div>
+                <label class="control-label col-sm-2">{{'label.heading.createdon' | translate}}</label>
+                <div class="col-sm-4"><p class="form-control-static">{{version.createdDate | DateFormat}}</p></div>
+            </div>
+            <div class="form-group" ng-if="version.policyChangeReason">
+                <label class="control-label col-sm-2">{{'label.input.provisioning.policychangereason' | translate}}</label>
+                <div class="col-sm-8"><p class="form-control-static">{{version.policyChangeReason}}</p></div>
+            </div>
+
+            <h4>{{'label.heading.provisioningbucketsnapshot' | translate}}</h4>
+            <table class="table width100" ng-show="version.definitions.length > 0">
+                <tr class="graybg">
+                    <th>{{'label.heading.provisioningcategory' | translate}}</th>
+                    <th>{{'label.heading.provisioningcategorycode' | translate}}</th>
+                    <th>{{'label.heading.minimumage' | translate}}</th>
+                    <th>{{'label.heading.maximumage' | translate}}</th>
+                    <th>{{'label.heading.provisioningpercentage' | translate}}</th>
+                    <th ng-if="previousVersion">{{'label.heading.previousvalue' | translate}}</th>
+                </tr>
+                <tr ng-repeat="definition in version.definitions track by $index"
+                    ng-class="{'warning': previousVersion && definitionChanged(definition, 'provisioningPercentage')}">
+                    <td>{{definition.categoryName}}</td>
+                    <td>{{definition.categoryCode}}</td>
+                    <td>{{definition.minAge}}</td>
+                    <td>{{formatMaximumAge(definition)}}</td>
+                    <td>{{definition.provisioningPercentage}}</td>
+                    <td ng-if="previousVersion">
+                        <span ng-if="definitionChanged(definition, 'provisioningPercentage')">
+                            {{definition.provisioningPercentage}}% (was {{(previousVersion.definitions | filter:{categoryId: definition.categoryId})[0].provisioningPercentage}}%)
+                        </span>
+                        <span ng-if="!definitionChanged(definition, 'provisioningPercentage')">-</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

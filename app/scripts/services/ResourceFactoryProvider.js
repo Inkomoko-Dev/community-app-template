@@ -289,7 +289,9 @@
                         get: { method: 'GET', params: {} }
                     }),
                     loanTrxnsResource: defineResource(apiVer + "/loans/:loanId/transactions/:transactionId", { loanId: '@loanId', transactionId: '@transactionId' }, {
-                        get: { method: 'GET', params: {} }
+                        get: { method: 'GET', params: {} },
+                        save: { method: 'POST', params: {} },
+                        editDisbursementInsurance: { method: 'POST', params: { command: 'editDisbursementInsurance' } }
                     }),
                     loancollateralResource: defineResource(apiVer + "/loan-collateral-management/:collateralId", { collateralId: '@collateralId' }, {
                         get: { method: 'GET', params: {} },
@@ -882,6 +884,13 @@
                         post: { method: 'POST', params: {} },
                         put: { method: 'PUT', params: {} },
                         delete: { method: 'DELETE', params: {} }
+                    }),
+                    provisioningCriteriaVersions: defineResource(apiVer + "/provisioningcriteria/:criteriaId/versions/:versionId", {
+                        criteriaId: '@criteriaId',
+                        versionId: '@versionId'
+                    }, {
+                        getAll: { method: 'GET', url: baseUrl + apiVer + '/provisioningcriteria/:criteriaId/versions', isArray: true },
+                        get: { method: 'GET', params: {} }
                     }),
                     provisioningentries: defineResource(apiVer + "/provisioningentries/:entryId", { entryId: '@entryId' }, {
                         get: { method: 'GET', params: {} },
