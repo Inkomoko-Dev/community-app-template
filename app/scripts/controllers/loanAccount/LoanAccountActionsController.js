@@ -322,7 +322,10 @@
                     dateFormat: scope.df,
                     locale: scope.optlang.code
                 }, function (data) {
-                    scope.formData.fxRate = data.fxRate || null;
+                    // Only update fxRate from template if user hasn't manually entered one
+                    if (!scope.formData.fxRate) {
+                        scope.formData.fxRate = data.fxRate || null;
+                    }
                     scope.formData.fxTimestamp = data.fxTimestamp || null;
                     scope.formData.fxSource = data.fxSource || 'CBS_DAILY_RATE';
                     scope.computeUsdEquivalent();
@@ -561,7 +564,7 @@
 
                     scope.modelName = 'actualDisbursementDate';
 
-                    // Fetch loan details to ensure currency code and previously captured vendor/FX details are available
+                    // First fetch loan details to get the saved vendor/FX details
                     resourceFactory.LoanAccountResource.getLoanAccountDetails({
                         loanId: routeParams.id,
                         associations: 'multiDisburseDetails'
@@ -569,64 +572,71 @@
                         scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                         scope.loanCountry = extractLoanCountry(data);
                         
-                        // If template hasn't returned these yet, try to get them from the first disbursement detail
+                        var savedDetail = null;
                         if (data.disbursementDetails && data.disbursementDetails.length > 0) {
-                            var detail = data.disbursementDetails[0];
-                            scope.formData.disbursementType = scope.formData.disbursementType || detail.disbursementType;
-                            scope.formData.fxRate = scope.formData.fxRate || detail.fxRate;
-                            scope.formData.usdAmount = scope.formData.usdAmount || detail.usdAmount;
-                            scope.formData.fxSource = scope.formData.fxSource || detail.fxSource;
-                            scope.formData.fxTimestamp = scope.formData.fxTimestamp || detail.fxTimestamp;
-                            scope.formData.paymentTo = scope.formData.paymentTo || detail.paymentTo;
-                            scope.formData.clientPhoneNumber = scope.formData.clientPhoneNumber || detail.clientPhoneNumber;
-                            scope.formData.clientAccountNumber = scope.formData.clientAccountNumber || detail.clientAccountNumber;
-                            scope.formData.clientBankName = scope.formData.clientBankName || detail.clientBankName;
-                            scope.formData.beneficiaryName = scope.formData.beneficiaryName || detail.beneficiaryName;
+                            savedDetail = data.disbursementDetails[0];
                         }
-                    });
-
-                    resourceFactory.loanTrxnsTemplateResource.get({
-                        loanId: scope.accountId,
-                        command: command
-                    }, function (data) {
-                        scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
-                        scope.paymentTypes = data.paymentTypeOptions;
-                        if (scope.paymentTypes && scope.paymentTypes.length > 0) {
-                            scope.formData.paymentTypeId = scope.paymentTypes[0].id;
-                        }
-                        scope.formData.accountNumber = data.accountNumber || '';
-                        scope.formData.paymentTo = 1;
-                        scope.formData.checkNumber = data.checkNumber || '';
-                        scope.formData.routingCode = data.routingCode || '';
-                        scope.formData.receiptNumber = data.receiptNumber || '';
-                        scope.formData.bankNumber = data.bankNumber || '';
-                        scope.formData.clientPhoneNumber = data.clientPhoneNumber || '';
-                        scope.formData.clientAccountNumber = data.clientAccountNumber || '';
-                        scope.formData.clientBankName = data.clientBankName || '';
-                        scope.formData.beneficiaryName = data.beneficiaryName || '';
-                        scope.formData.paymentTypeId = Number(data.paymentTypeId);
-                        scope.formData.paymentTo = data.paymentTo ? Number(data.paymentTo) : 1;
-                        scope.formData.disbursementType = data.disbursementType || (scope.formData.paymentTo === 2 ? 'VENDOR' : 'CLIENT');
-                        scope.formData.fxRate = data.fxRate || null;
-                        scope.formData.fxSource = data.fxSource || 'CBS_DAILY_RATE';
-                        scope.formData.fxTimestamp = data.fxTimestamp || null;
-                        scope.formData.usdAmount = data.usdAmount || null;
-                        scope.formData.transactionAmount = data.netDisbursalAmount || '';
-                        scope.principalPortion = data.principalPortion || '';
-                        scope.interestPortion = data.interestPortion || '';
-                        scope.feeChargesPortion = data.feeChargesPortion || '';
-                        scope.formData[scope.modelName] = new Date();
-                        if (data.fixedEmiAmount) {
-                            scope.formData.fixedEmiAmount = data.fixedEmiAmount;
-                            scope.showEMIAmountField = true;
-                        }
-                        scope.isDisbursementPreApprovalRequest = scope.action === "disbursementpreapprovalrequest";
-                        scope.computeUsdEquivalent();
                         
-                        // Auto-expand payment details for review actions if it's a South Sudan loan
-                        if (scope.isSouthSudanSspLoan()) {
-                            scope.showPaymentDetails = true;
-                        }
+                        // Now fetch the template and apply saved details on top of it
+                        resourceFactory.loanTrxnsTemplateResource.get({
+                            loanId: scope.accountId,
+                            command: command
+                        }, function (templateData) {
+                            scope.loanCurrencyCode = templateData.currency ? templateData.currency.code : scope.loanCurrencyCode;
+                            scope.paymentTypes = templateData.paymentTypeOptions;
+                            if (scope.paymentTypes && scope.paymentTypes.length > 0) {
+                                scope.formData.paymentTypeId = scope.paymentTypes[0].id;
+                            }
+                            scope.formData.accountNumber = templateData.accountNumber || '';
+                            scope.formData.checkNumber = templateData.checkNumber || '';
+                            scope.formData.routingCode = templateData.routingCode || '';
+                            scope.formData.receiptNumber = templateData.receiptNumber || '';
+                            scope.formData.bankNumber = templateData.bankNumber || '';
+                            
+                            // Apply saved disbursement details first
+                            if (savedDetail) {
+                                scope.formData.paymentTo = savedDetail.paymentTo || (templateData.paymentTo ? Number(templateData.paymentTo) : 1);
+                                scope.formData.clientPhoneNumber = savedDetail.clientPhoneNumber || templateData.clientPhoneNumber || '';
+                                scope.formData.clientAccountNumber = savedDetail.clientAccountNumber || templateData.clientAccountNumber || '';
+                                scope.formData.clientBankName = savedDetail.clientBankName || templateData.clientBankName || '';
+                                scope.formData.beneficiaryName = savedDetail.beneficiaryName || templateData.beneficiaryName || '';
+                                scope.formData.paymentTypeId = savedDetail.paymentType ? savedDetail.paymentType.id : Number(templateData.paymentTypeId);
+                                scope.formData.disbursementType = savedDetail.disbursementType || (templateData.disbursementType || (scope.formData.paymentTo === 2 ? 'VENDOR' : 'CLIENT'));
+                                scope.formData.fxRate = savedDetail.fxRate || templateData.fxRate || null;
+                                scope.formData.fxSource = savedDetail.fxSource || templateData.fxSource || 'CBS_DAILY_RATE';
+                                scope.formData.fxTimestamp = savedDetail.fxTimestamp || templateData.fxTimestamp || null;
+                                scope.formData.usdAmount = savedDetail.usdAmount || templateData.usdAmount || null;
+                            } else {
+                                scope.formData.paymentTo = templateData.paymentTo ? Number(templateData.paymentTo) : 1;
+                                scope.formData.clientPhoneNumber = templateData.clientPhoneNumber || '';
+                                scope.formData.clientAccountNumber = templateData.clientAccountNumber || '';
+                                scope.formData.clientBankName = templateData.clientBankName || '';
+                                scope.formData.beneficiaryName = templateData.beneficiaryName || '';
+                                scope.formData.paymentTypeId = Number(templateData.paymentTypeId);
+                                scope.formData.disbursementType = templateData.disbursementType || (scope.formData.paymentTo === 2 ? 'VENDOR' : 'CLIENT');
+                                scope.formData.fxRate = templateData.fxRate || null;
+                                scope.formData.fxSource = templateData.fxSource || 'CBS_DAILY_RATE';
+                                scope.formData.fxTimestamp = templateData.fxTimestamp || null;
+                                scope.formData.usdAmount = templateData.usdAmount || null;
+                            }
+                            
+                            scope.formData.transactionAmount = templateData.netDisbursalAmount || '';
+                            scope.principalPortion = templateData.principalPortion || '';
+                            scope.interestPortion = templateData.interestPortion || '';
+                            scope.feeChargesPortion = templateData.feeChargesPortion || '';
+                            scope.formData[scope.modelName] = new Date();
+                            if (templateData.fixedEmiAmount) {
+                                scope.formData.fixedEmiAmount = templateData.fixedEmiAmount;
+                                scope.showEMIAmountField = true;
+                            }
+                            scope.isDisbursementPreApprovalRequest = scope.action === "disbursementpreapprovalrequest";
+                            scope.computeUsdEquivalent();
+                            
+                            // Auto-expand payment details for review actions if it's a South Sudan loan
+                            if (scope.isSouthSudanSspLoan()) {
+                                scope.showPaymentDetails = true;
+                            }
+                        });
                     });
 
                     scope.title = isDisbursementReviewTitle ? 'label.heading.approvedisbursement' : 'label.heading.disbursementpreapproval';
@@ -1279,7 +1289,8 @@
                 var submitData = angular.copy(scope.formData);
 
                 // Clean up vendor/FX details if not applicable or not supported for the current action
-                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
+                if (!scope.shouldShowFxDetails()) {
+                    // We don't need vendor/FX details
                     delete submitData.fxRate;
                     delete submitData.usdAmount;
                     delete submitData.fxSource;
