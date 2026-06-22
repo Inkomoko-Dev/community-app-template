@@ -1822,7 +1822,12 @@
                 const isCashPayment = scope.isCashPayment();
                 const isSouthSudan = scope.isSouthSudanSspLoan();
                 
-                // For South Sudan, we generally want to preserve these fields unless it's explicitly a cash payment
+                // For South Sudan loans, do NOT filter the vendor details!
+                if (isSouthSudan) {
+                    return;
+                }
+                
+                // Original logic for non-South Sudan loans
                 if ((!scope.isLoanDisbursementRequestEnabled && !isSouthSudan) || (isCashPayment && (scope.isLoanDisbursementRequestEnabled || isSouthSudan))) {
                     delete scope.formData.clientPhoneNumber;
                     delete scope.formData.clientAccountNumber;
