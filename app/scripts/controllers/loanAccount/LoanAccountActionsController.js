@@ -1699,6 +1699,19 @@
                         params.command = chosenCommand;
 
                         params.command = isApproveAct && scope.isCashPayment() ? 'disburse' : params.command;
+                        
+                        // If command is disburse, delete vendor details (endpoint doesn't accept them)
+                        if (params.command === 'disburse') {
+                            delete submitData.clientPhoneNumber;
+                            delete submitData.clientAccountNumber;
+                            delete submitData.clientBankName;
+                            delete submitData.beneficiaryName;
+                            delete submitData.disbursementType;
+                            delete submitData.fxRate;
+                            delete submitData.usdAmount;
+                            delete submitData.fxSource;
+                            delete submitData.fxTimestamp;
+                        }
 
                         if (scope.action === "undoapproval" || scope.action === "undodisbursal") {
                             delete submitData.locale;
