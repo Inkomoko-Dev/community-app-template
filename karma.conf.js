@@ -59,7 +59,7 @@ module.exports = function (config) {
 
         autoWatch : false,
 
-        browsers : ['PhantomJS2'],
+        browsers : ['ChromeHeadless'],
 
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout : 5000,
@@ -69,7 +69,6 @@ module.exports = function (config) {
         singleRun : true
     });
 }
-
 
 
 

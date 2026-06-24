@@ -562,16 +562,19 @@
                         scope.isPendingDisbursement = false;
                     }
                     scope.decimals = data.currency.decimalPlaces;
+                    scope.isResidualPenaltyWaiver = function (charge) {
+                        return charge && charge.penalty && charge.waived && !charge.paid && Number(charge.amountOutstanding) > 0;
+                    };
+                    scope.canWaiveLoanCharge = function (charge) {
+                        if (!charge || scope.loandetails.status.value != 'Active' || charge.paid || charge.chargeTimeType.value == 'Disbursement') {
+                            return false;
+                        }
+                        return !charge.waived || scope.isResidualPenaltyWaiver(charge);
+                    };
                     if (scope.loandetails.charges) {
                         scope.charges = scope.loandetails.charges;
                         for (var i in scope.charges) {
-                            if (scope.charges[i].paid || scope.charges[i].waived || scope.charges[i].chargeTimeType.value == 'Disbursement' || scope.loandetails.status.value != 'Active') {
-                                var actionFlag = true;
-                            }
-                            else {
-                                var actionFlag = false;
-                            }
-                            scope.charges[i].actionFlag = actionFlag;
+                            scope.charges[i].actionFlag = !scope.canWaiveLoanCharge(scope.charges[i]);
                         }
 
                         scope.chargeTableShow = true;
