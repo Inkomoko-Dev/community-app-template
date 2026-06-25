@@ -1785,6 +1785,7 @@
                             delete submitData.clientBankName;
                             delete submitData.beneficiaryName;
                             delete submitData.disbursementType;
+                            delete submitData.paymentTo;
                             delete submitData.fxRate;
                             delete submitData.usdAmount;
                             delete submitData.fxSource;
