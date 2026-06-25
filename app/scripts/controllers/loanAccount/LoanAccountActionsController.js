@@ -351,6 +351,67 @@
                 delete scope.formData.clientBankName;
             }
 
+            function cachePersistedDisbursementRecipientDetails(source) {
+                if (!source) {
+                    return;
+                }
+
+                scope.persistedDisbursementRecipientDetails = angular.copy({
+                    paymentTo: source.paymentTo,
+                    disbursementType: source.disbursementType,
+                    beneficiaryName: source.beneficiaryName,
+                    clientPhoneNumber: source.clientPhoneNumber,
+                    clientAccountNumber: source.clientAccountNumber,
+                    clientBankName: source.clientBankName,
+                    paymentTypeId: source.paymentTypeId,
+                    fxRate: source.fxRate,
+                    usdAmount: source.usdAmount,
+                    fxSource: source.fxSource,
+                    fxTimestamp: source.fxTimestamp
+                });
+            }
+
+            function restorePersistedDisbursementRecipientDetails(target) {
+                var persisted = scope.persistedDisbursementRecipientDetails;
+                if (!persisted || !target) {
+                    return;
+                }
+
+                if (!target.disbursementType && persisted.disbursementType) {
+                    target.disbursementType = persisted.disbursementType;
+                }
+                if (!target.paymentTo && persisted.paymentTo) {
+                    target.paymentTo = persisted.paymentTo;
+                }
+                if (!target.paymentTypeId && persisted.paymentTypeId) {
+                    target.paymentTypeId = persisted.paymentTypeId;
+                }
+                if (!target.clientPhoneNumber && persisted.clientPhoneNumber) {
+                    target.clientPhoneNumber = persisted.clientPhoneNumber;
+                }
+                if (!target.clientAccountNumber && persisted.clientAccountNumber) {
+                    target.clientAccountNumber = persisted.clientAccountNumber;
+                }
+                if (!target.clientBankName && persisted.clientBankName) {
+                    target.clientBankName = persisted.clientBankName;
+                }
+                if (!target.beneficiaryName && persisted.beneficiaryName) {
+                    target.beneficiaryName = persisted.beneficiaryName;
+                }
+                if (!target.fxRate && persisted.fxRate) {
+                    target.fxRate = persisted.fxRate;
+                }
+                if (!target.usdAmount && persisted.usdAmount) {
+                    target.usdAmount = persisted.usdAmount;
+                }
+                if (!target.fxSource && persisted.fxSource) {
+                    target.fxSource = persisted.fxSource;
+                }
+                if (!target.fxTimestamp && persisted.fxTimestamp) {
+                    target.fxTimestamp = persisted.fxTimestamp;
+                }
+            }
+
             function findRecoveryPaymentBackendError() {
                 if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
                     return null;
@@ -497,6 +558,7 @@
                                 fxTimestamp: disbursalData.fxTimestamp,
                                 usdAmount: disbursalData.usdAmount
                             };
+                            cachePersistedDisbursementRecipientDetails(savedVendorDetails);
 
                             // Now fetch approval template
                             resourceFactory.loanTemplateResource.get({
@@ -537,8 +599,13 @@
                                 scope.formData.usdAmount = savedVendorDetails.usdAmount || null;
                                 
                                 scope.computeUsdEquivalent();
-                                scope.showPaymentDetails = false;
-                                scope.showClientOtherInfoForm = false;
+                                if (scope.isSouthSudanSspLoan() && scope.isVendorDisbursement()) {
+                                    scope.showPaymentDetails = true;
+                                    scope.showClientOtherInfoForm = true;
+                                } else {
+                                    scope.showPaymentDetails = false;
+                                    scope.showClientOtherInfoForm = false;
+                                }
                                 scope.isLoanDisbursementRequestEnabled = true;
                                 scope.fetchEntities('m_loan', 'APPROVE');
                                 scope.fetchEntities('m_loan', 'APPROVE', scope.productId);
@@ -652,6 +719,7 @@
                                 scope.formData.fxTimestamp = templateData.fxTimestamp || null;
                                 scope.formData.usdAmount = templateData.usdAmount || null;
                             }
+                            cachePersistedDisbursementRecipientDetails(scope.formData);
                             
                             scope.formData.transactionAmount = templateData.netDisbursalAmount || '';
                             scope.principalPortion = templateData.principalPortion || '';
@@ -1311,14 +1379,23 @@
                     return;
                 }
 
+                if (scope.isSouthSudanSspLoan() && scope.isApprovalAction() && scope.isVendorDisbursement()) {
+                    cachePersistedDisbursementRecipientDetails(scope.formData);
+                }
+
+                if (scope.isSouthSudanSspLoan() && scope.isDisbursementReviewAction()) {
+                    restorePersistedDisbursementRecipientDetails(scope.formData);
+                }
+
                 var submitData = angular.copy(scope.formData);
+                restorePersistedDisbursementRecipientDetails(submitData);
 
                 var isDisbursementReviewAction = scope.action === "approveDisbursement"
                     || scope.action === "disbursementpreapprovalrequest"
                     || scope.action === "disbursementapproval";
 
                 // Clean up FX details separately from payment recipient details.
-                if (scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) {
+                if ((scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) && !(scope.isSouthSudanSspLoan() && (scope.isApprovalAction() || scope.isDisbursementReviewAction()))) {
                     delete submitData.fxRate;
                     delete submitData.usdAmount;
                     delete submitData.fxSource;
@@ -1329,7 +1406,7 @@
                     }
                 }
 
-                if (scope.isReviewRelatedAction() || scope.isCashPayment() || isDisbursementReviewAction) {
+                if ((scope.isReviewRelatedAction() || scope.isCashPayment()) && !(scope.isSouthSudanSspLoan() && (scope.isApprovalAction() || scope.isDisbursementReviewAction()))) {
                     delete submitData.paymentTo;
                     delete submitData.beneficiaryName;
                     delete submitData.clientPhoneNumber;
@@ -1384,14 +1461,11 @@
                 }
 
                 if (scope.action == "approve" || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
-                    // Only send paymentTo for initial approval, other actions use disbursementType
-                    if (scope.action === "approve") {
-                        if (submitData.disbursementType === 'VENDOR') {
-                            submitData.paymentTo = 2;
-                        } else if (submitData.disbursementType === 'CLIENT') {
-                            submitData.paymentTo = 1;
-                        }
-                    } else {
+                    if (submitData.disbursementType === 'VENDOR') {
+                        submitData.paymentTo = 2;
+                    } else if (submitData.disbursementType === 'CLIENT') {
+                        submitData.paymentTo = 1;
+                    } else if (scope.action !== "approve") {
                         delete submitData.paymentTo;
                     }
 
