@@ -1002,7 +1002,7 @@
                                     <a title="{{'label.delete' | translate}}" class="btn btn-primary" class="btn-warning"
                                        data-ng-show="status=='Submitted and pending approval'" data-ng-click="delCharge(charge.id)"
                                        title="delete"><i class="fa fa-trash-o "></i></a>
-                                    <a class="btn-primary" data-ng-hide="charge.actionFlag"
+                                    <a title="{{'label.heading.waiveloancharge' | translate}}" class="btn-primary" data-ng-hide="charge.actionFlag"
                                        href="#/loanaccountcharge/{{loandetails.id}}/waivecharge/{{charge.id}}"><i
                                             class="fa fa-flag "></i></a>
                                     <a class="btn-success" data-ng-show="charge.chargePayable && status=='Active'"

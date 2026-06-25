@@ -3,7 +3,8 @@ describe("LoanAccountActionsController", function () {
 
     beforeEach(function () {
         this.scope = {
-            $watch: jasmine.createSpy('$watch')
+            $watch: jasmine.createSpy('$watch'),
+            $watchGroup: jasmine.createSpy('$watchGroup')
         };
         this.rootScope = {};
         this.routeParams = {
@@ -15,6 +16,13 @@ describe("LoanAccountActionsController", function () {
             return [format, date.getFullYear(), date.getMonth() + 1, date.getDate()].join('|');
         });
         this.resourceFactory = {
+            LoanAccountResource: {
+                getLoanAccountDetails: jasmine.createSpy('LoanAccountResource.getLoanAccountDetails').andCallFake(function (params, callback) {
+                    callback({
+                        currency: {code: 'SSP'}
+                    });
+                })
+            },
             loanTrxnsTemplateResource: {
                 get: jasmine.createSpy('loanTrxnsTemplateResource.get').andCallFake(function (params, callback) {
                     templateCallback = callback;

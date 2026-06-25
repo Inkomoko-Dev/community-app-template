@@ -119,6 +119,10 @@
             var submitStatus = [];
             var recoveryPaymentDateValidationCode = 'error.msg.loan.recovery.payment.date.cannot.be.before.writeoff.date';
 
+            function isResidualPenaltyWaiver(charge) {
+                return charge && charge.penalty && charge.waived && !charge.paid && Number(charge.amountOutstanding) > 0;
+            }
+
             rootScope.RequestEntities = function (entity, status, productId) {
                 resourceFactory.entityDatatableChecksResource.getAll({limit: -1}, function (response) {
                     scope.entityDatatableChecks = _.filter(response.pageItems, function (datatable) {
@@ -886,11 +890,25 @@
                     scope.taskPermissionName = 'RECOVERGUARANTEES_LOAN';
                     break;
                 case "waivecharge":
+                    scope.title = 'label.heading.waiveloancharge';
+                    scope.labelName = 'label.input.installment';
+                    scope.showNoteField = false;
+                    scope.noteFieldMandatory = false;
+                    scope.showExpectedResidualAmount = false;
+                    scope.showDateField = false;
+                    scope.taskPermissionName = 'WAIVE_LOANCHARGE';
                     resourceFactory.LoanAccountResource.get({
                         loanId: routeParams.id,
                         resourceType: 'charges',
                         chargeId: routeParams.chargeId
                     }, function (data) {
+                        scope.residualPenaltyWaiver = isResidualPenaltyWaiver(data);
+                        if (scope.residualPenaltyWaiver) {
+                            scope.formData.expectedResidualAmount = data.amountOutstanding;
+                            scope.showExpectedResidualAmount = true;
+                            scope.showNoteField = true;
+                            scope.noteFieldMandatory = true;
+                        }
                         if (data.chargeTimeType.value !== "Specified due date" && data.installmentChargeData) {
                             scope.installmentCharges = data.installmentChargeData;
                             scope.formData.installmentNumber = data.installmentChargeData[0].installmentNumber;
@@ -900,12 +918,6 @@
                             scope.showwaiveforspecicficduedate = true;
                         }
                     });
-
-                    scope.title = 'label.heading.waiveloancharge';
-                    scope.labelName = 'label.input.installment';
-                    scope.showNoteField = false;
-                    scope.showDateField = false;
-                    scope.taskPermissionName = 'WAIVE_LOANCHARGE';
                     break;
                 case "paycharge":
                     resourceFactory.LoanAccountResource.get({
@@ -1459,6 +1471,10 @@
                         location.path('/viewloanaccount/' + data.loanId);
                     });
                 } else if (scope.action === "waivecharge") {
+                    if (scope.residualPenaltyWaiver) {
+                        submitData.expectedResidualAmount = scope.formData.expectedResidualAmount;
+                        submitData.reason = scope.formData.note;
+                    }
                     resourceFactory.LoanAccountResource.save({
                         loanId: routeParams.id,
                         resourceType: 'charges',
