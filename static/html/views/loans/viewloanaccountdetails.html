@@ -341,7 +341,11 @@
                         </tr>
                         <tr ng-show="showApprovedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.approvedamount' | translate}}</th>
-                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span></td>
+                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span>
+                                <a href="" ng-if="approvalSummary.length" ng-click="openApprovalHistory()" style="margin-left:8px;">
+                                    <small>{{'label.heading.approvalhistory' | translate}}</small>
+                                </a>
+                            </td>
                         </tr>
                         <tr ng-show="showDisbursedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.disburseamount' | translate}}</th>
@@ -408,7 +412,11 @@
                         </tr>
                         <tr ng-show="showApprovedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.approvedamount' | translate}}</th>
-                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span></td>
+                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span>
+                                <a href="" ng-if="approvalSummary.length" ng-click="openApprovalHistory()" style="margin-left:8px;">
+                                    <small>{{'label.heading.approvalhistory' | translate}}</small>
+                                </a>
+                            </td>
                         </tr>
                         <tr ng-show="showDisbursedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.disburseamount' | translate}}</th>
