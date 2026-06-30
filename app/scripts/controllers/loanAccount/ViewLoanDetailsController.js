@@ -1005,8 +1005,74 @@
                     if(data.nextLoanIcReviewDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"){
                         scope.showApprovedICAmount = true;
                     }
+
+                    if(data.isExtendLoanLifeCycleConfig){
+                        fetchLoanDecisionHistory();
+                    }
                 });
             }
+
+            scope.approvalSummary = [];
+            scope.openApprovalHistory = function () {
+                $uibModal.open({
+                    templateUrl: 'views/loans/loan_approval_history_modal.html',
+                    controller: function ($scope, $uibModalInstance, approvalSummary) {
+                        $scope.approvalSummary = approvalSummary;
+                        $scope.cancel = function () {
+                            $uibModalInstance.dismiss('cancel');
+                        };
+                    },
+                    resolve: {
+                        approvalSummary: function () {
+                            return scope.approvalSummary;
+                        }
+                    }
+                });
+            };
+
+            // Collect the approved amount at each IC review level. Prefer the dynamic decision-level
+            // rows (richer: who/when/status); fall back to the hardcoded level columns (older loans).
+            var buildIcReviewLevels = function (decision) {
+                if (decision.decisionLevels && decision.decisionLevels.length > 0) {
+                    return decision.decisionLevels.map(function (level) {
+                        return {
+                            name: level.levelName,
+                            amount: level.recommendedAmount,
+                            decisionByName: level.decisionByName,
+                            decisionOn: level.decisionOn,
+                            decision: level.decision
+                        };
+                    });
+                }
+                var hardcoded = [
+                    { name: 'IC Review Level One', amount: decision.icReviewDecisionLevelOneRecommendedAmount },
+                    { name: 'IC Review Level Two', amount: decision.icReviewDecisionLevelTwoRecommendedAmount },
+                    { name: 'IC Review Level Three', amount: decision.icReviewDecisionLevelThreeRecommendedAmount },
+                    { name: 'IC Review Level Four', amount: decision.icReviewDecisionLevelFourRecommendedAmount },
+                    { name: 'IC Review Level Five', amount: decision.icReviewDecisionLevelFiveRecommendedAmount }
+                ];
+                return hardcoded.filter(function (level) {
+                    return level.amount != null;
+                });
+            };
+
+            // Build the full approved-amount summary across every stage:
+            // Applied -> Due Diligence -> each IC review level -> final Approved.
+            var fetchLoanDecisionHistory = function () {
+                resourceFactory.loanDecisionHistoryResource.get({loanId: routeParams.id}, function (decision) {
+                    if (!decision) { return; }
+                    var rows = [];
+                    rows.push({ key: 'label.heading.appliedamount', amount: scope.loandetails.proposedPrincipal });
+                    if (decision.dueDiligenceRecommendedAmount != null) {
+                        rows.push({ key: 'label.heading.duediligence', amount: decision.dueDiligenceRecommendedAmount });
+                    }
+                    buildIcReviewLevels(decision).forEach(function (level) {
+                        rows.push(level);
+                    });
+                    rows.push({ key: 'label.heading.approvedamount', amount: scope.loandetails.approvedPrincipal });
+                    scope.approvalSummary = rows;
+                });
+            };
 
             fetchLoanAccountDetails();
 
