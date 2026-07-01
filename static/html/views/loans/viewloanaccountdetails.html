@@ -341,7 +341,11 @@
                         </tr>
                         <tr ng-show="showApprovedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.approvedamount' | translate}}</th>
-                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span></td>
+                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span>
+                                <a href="" ng-if="approvalSummary.length" ng-click="openApprovalHistory()" style="margin-left:8px;">
+                                    <small>{{'label.heading.approvalhistory' | translate}}</small>
+                                </a>
+                            </td>
                         </tr>
                         <tr ng-show="showDisbursedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.disburseamount' | translate}}</th>
@@ -408,7 +412,11 @@
                         </tr>
                         <tr ng-show="showApprovedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.approvedamount' | translate}}</th>
-                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span></td>
+                            <td><span class="padded-td">{{loandetails.approvedPrincipal | number}}</span>
+                                <a href="" ng-if="approvalSummary.length" ng-click="openApprovalHistory()" style="margin-left:8px;">
+                                    <small>{{'label.heading.approvalhistory' | translate}}</small>
+                                </a>
+                            </td>
                         </tr>
                         <tr ng-show="showDisbursedAmountBasedOnStatus()">
                             <th class="table-bold-loan">{{'label.heading.disburseamount' | translate}}</th>
@@ -1002,7 +1010,7 @@
                                     <a title="{{'label.delete' | translate}}" class="btn btn-primary" class="btn-warning"
                                        data-ng-show="status=='Submitted and pending approval'" data-ng-click="delCharge(charge.id)"
                                        title="delete"><i class="fa fa-trash-o "></i></a>
-                                    <a class="btn-primary" data-ng-hide="charge.actionFlag"
+                                    <a title="{{'label.heading.waiveloancharge' | translate}}" class="btn-primary" data-ng-hide="charge.actionFlag"
                                        href="#/loanaccountcharge/{{loandetails.id}}/waivecharge/{{charge.id}}"><i
                                             class="fa fa-flag "></i></a>
                                     <a class="btn-success" data-ng-show="charge.chargePayable && status=='Active'"

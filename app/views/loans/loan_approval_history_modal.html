@@ -1,0 +1,31 @@
+<div class="modal-header silver">
+    <h3 class="bolder">{{'label.heading.approvalhistory' | translate}}</h3>
+</div>
+<div class="modal-body">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>{{'label.heading.stage' | translate}}</th>
+                <th>{{'label.heading.amount' | translate}}</th>
+                <th>{{'label.heading.decisionby' | translate}}</th>
+                <th>{{'label.heading.decisionon' | translate}}</th>
+                <th>{{'label.heading.decision' | translate}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in approvalSummary">
+                <td>{{ row.key ? (row.key | translate) : row.name }}</td>
+                <td>{{row.amount | number}}</td>
+                <td>{{row.decisionByName}}</td>
+                <td>{{row.decisionOn | DateFormat}}</td>
+                <td>{{row.decision}}</td>
+            </tr>
+            <tr ng-if="!approvalSummary.length">
+                <td colspan="5" class="text-center">{{'label.heading.notprovided' | translate}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">{{'label.button.close' | translate}}</button>
+</div>

@@ -34,8 +34,33 @@ describe("ViewClientController", function () {
                 })
             },
             clientTemplateResource:{
-                get:jasmine.createSpy('clientTemplateResource.get()').andCallFake(function(query,callback){
-                    clientTemplateResource=callback;
+                get:jasmine.createSpy('clientTemplateResource.get()').andCallFake(function(callback){
+                    callback({
+                        isAddressEnabled: false,
+                        isBusinessOwnerEnabled: false,
+                        isEmploymentInfoEnabled: false,
+                        isClientBusinessDetailEnabled: false,
+                        isClientOtherInfoEnabled: false,
+                        isClientRecruitmentSurveyEnabled: false
+                    });
+                })
+            },
+            clientExpensesTemplateResource: {
+                getOtherExpenses: jasmine.createSpy('clientExpensesTemplateResource.getOtherExpenses()').andCallFake(function(query, callback) {
+                    callback({
+                        otherExpenses: [],
+                        otherExpensesData: []
+                    });
+                })
+            },
+            businessOwners: {
+                get: jasmine.createSpy('businessOwners.get()').andCallFake(function(query, callback) {
+                    callback([]);
+                })
+            },
+            employmentInformation: {
+                get: jasmine.createSpy('employmentInformation.get()').andCallFake(function(query, callback) {
+                    callback([]);
                 })
             },
             configurationResource:{
@@ -45,32 +70,42 @@ describe("ViewClientController", function () {
             },
             clientResource: {
                 get: jasmine.createSpy('clientResource.get()').andCallFake(function (query, callback) {
-                    clientResourceCallback = callback;
+                    clientResourceCallback = function(data) {
+                        data.clientCollateralManagements = data.clientCollateralManagements || [];
+                        data.clientBusinessDetailDataSet = data.clientBusinessDetailDataSet || [];
+                        data.legalForm = data.legalForm || {value: 'Person'};
+                        callback(data);
+                    };
                 })
             },
             clientAccountResource: {
-                get: jasmine.createSpy('clientAccountResource.get()').andCallFake(function (callback) {
+                get: jasmine.createSpy('clientAccountResource.get()').andCallFake(function (query, callback) {
                     clientAccountResourceCallback = callback;
                 })
             },
             clientNotesResource: {
-                getAllNotes: jasmine.createSpy('clientNotesResource.getAllNotes()').andCallFake(function (callback) {
+                getAllNotes: jasmine.createSpy('clientNotesResource.getAllNotes()').andCallFake(function (query, callback) {
                     clientNotesResourceCallback = callback;
                 })
             },
             DataTablesResource: {
-                getAllDataTables: jasmine.createSpy('DataTablesResource.getAllDataTables()').andCallFake(function (callback) {
+                getAllDataTables: jasmine.createSpy('DataTablesResource.getAllDataTables()').andCallFake(function (query, callback) {
                     dataTablesResourceCallback = callback;
                 })
             },
             runReportsResource: {
-                get: jasmine.createSpy('runReportsResource.get()').andCallFake(function (callback) {
+                get: jasmine.createSpy('runReportsResource.get()').andCallFake(function (query, callback) {
                     runReportsResourceCallback = callback;
                 })
             },
             clientChargesResource: {
-                getCharges: jasmine.createSpy('clientChargesResource.getCharges()').andCallFake(function (callback){
+                getCharges: jasmine.createSpy('clientChargesResource.getCharges()').andCallFake(function (query, callback){
                     clientChargesResourceCallback = callback;
+                })
+            },
+            creditBureauTemplate: {
+                get: jasmine.createSpy('creditBureauTemplate.get()').andCallFake(function(callback) {
+                    callback({});
                 })
             }
         };
@@ -83,7 +118,10 @@ describe("ViewClientController", function () {
         });
         this.modal = jasmine.createSpy();
         this.API_VERSION = jasmine.createSpy();
-        this.rootScope = jasmine.createSpy();
+        this.rootScope = {
+            hostUrl: '',
+            tenantIdentifier: 'default'
+        };
         this.upload = jasmine.createSpy();
 
         this.controller = new mifosX.controllers.ViewClientController(this.scope,
@@ -94,6 +132,7 @@ describe("ViewClientController", function () {
             this.http,
             this.modal,
             this.API_VERSION,
+            jasmine.createSpy('$timeout'),
             this.rootScope,
             this.upload);
     }));

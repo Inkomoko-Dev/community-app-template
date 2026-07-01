@@ -17595,7 +17595,10 @@
                 if (this.formData[scope.modelName]) {
                     this.formData[scope.modelName] = dateFilter(this.formData[scope.modelName], scope.df);
                 }
-                if (scope.action != "glimApprove" && scope.action != "undoapproval" && scope.action != "undodisbursal" || scope.action === "paycharge") {
+                if (scope.action == "undoapproval" || scope.action == "undodisbursal") {
+                    delete this.formData.locale;
+                    delete this.formData.dateFormat;
+                } else if (scope.action === "paycharge" || (scope.action != "glimApprove" && scope.action != "undoapproval" && scope.action != "undodisbursal")) {
                     this.formData.locale = scope.optlang.code;
                     this.formData.dateFormat = scope.df;
                 }
@@ -18644,7 +18647,10 @@
                 if (this.formData[scope.modelName]) {
                     this.formData[scope.modelName] = dateFilter(this.formData[scope.modelName], scope.df);
                 }
-                if (scope.action != "undoapproval" && scope.action != "undodisbursal" || scope.action === "paycharge") {
+                if (scope.action == "undoapproval" || scope.action == "undodisbursal") {
+                    delete this.formData.locale;
+                    delete this.formData.dateFormat;
+                } else if (scope.action === "paycharge" || (scope.action != "undoapproval" && scope.action != "undodisbursal")) {
                     this.formData.locale = scope.optlang.code;
                     this.formData.dateFormat = scope.df;
                 }
