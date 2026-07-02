@@ -45,6 +45,19 @@
                     <textarea rows="2"  style="width: 402px; height: 76px;" class="form-control" ng-model="comments" ></textarea>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{ 'label.input.repaidevery' | translate }}</label>
+                <div class="col-sm-2 paddedbottom10 paddedtop">
+                    <input id="repaymentEvery" name="repaymentEvery" class="form-control"
+                           type="text" ng-model="formData.repaymentEvery" late-validate number-only-format />
+                </div>
+                <div class="col-sm-2 paddedbottom10 paddedtop">
+                    <select id="repaymentFrequencyType" class="form-control"
+                            ng-model="formData.repaymentFrequencyType"
+                            ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in repaymentFrequencyTypeOptions">
+                    </select>
+                </div>
+            </div>
 
             <input type="checkbox" ng-model="changeRepaymentDate" > &nbsp;<span
                 class="control-label"><label>{{ 'label.input.changeRepaymentDate' | translate }}&nbsp;</label></span>
@@ -211,7 +224,6 @@
         </fieldset>
     </form>
 </div>
-
 
 
 

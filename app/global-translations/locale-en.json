@@ -3818,6 +3818,7 @@
   "label.input.default": "Default",
   "label.input.numofrepayments": "Number of repayments",
   "label.input.repaidevery": "Repaid every",
+  "label.input.preserveLoanTermDuration": "Preserve Loan Term Duration",
   "label.input.nominalinterestrate": "Nominal interest rate",
   "label.input.floatinginterestrate": "Floating interest rate",
   "label.input.islinedtofloatinginterestrates": "Is Linked to Floating Interest Rates?",
