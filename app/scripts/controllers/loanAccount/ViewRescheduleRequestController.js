@@ -11,6 +11,10 @@
                 scope.rescheduleFromDate = dateFilter(scope.rescheduleFromDate,"dd MMMM yyyy");
                 scope.submittedOnDate = new Date(scope.loanRescheduleDetails.timeline.submittedOnDate);
                 scope.submittedOnDate = dateFilter(scope.submittedOnDate,"dd MMMM yyyy");
+                scope.repaymentFrequencyTypeValue = scope.loanRescheduleDetails.repaymentFrequencyType ?
+                    (scope.loanRescheduleDetails.repaymentFrequencyType.value ||
+                        scope.loanRescheduleDetails.repaymentFrequencyType.name ||
+                        scope.loanRescheduleDetails.repaymentFrequencyType) : '';
                 scope.loanRescheduleDetails.emichange = [];
                 for(var i in scope.loanTermVariationsData) {
 
