@@ -1721,6 +1721,7 @@
   "label.anchor.deleteloancharge": "Delete Loan Charge",
   "label.anchor.unassignloanofficer": "Unassign Loan Officer",
   "label.anchor.showpaymentdetails": "Show Payment Details",
+  "label.anchor.mfiCode": "MFI Code",
   "label.anchor.viewcharge": "View Charge",
   "label.anchor.viewcollateral": "View Collateral",
   "label.anchor.viewschedule": "Schedule",
