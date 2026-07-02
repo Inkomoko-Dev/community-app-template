@@ -1830,6 +1830,7 @@
   "label.button.undodisbursal": "Undo Disbursal",
   "label.button.makerepayment": "Make Repayment",
   "label.button.waiveinterest": "Waive Interest",
+  "label.button.waivepenalty": "Waive Penalty",
   "label.button.writeoff": "Write-Off",
   "label.button.close-rescheduled": "Close (as Rescheduled)",
   "label.button.assignloanofficer": "Assign Loan Officer",
