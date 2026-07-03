@@ -162,6 +162,15 @@ span.required {
   text-decoration-style: double;
 }
 
+/* CGLT-643: keep the "Reversed (Correction)" badge legible even on a struck-through row */
+.reversed-correction-badge{
+  text-decoration: none !important;
+  color: #fff !important;
+  margin-left: 4px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 .breadcrumb{
   padding: 2px;
   margin-bottom: 4px;
@@ -178,6 +187,10 @@ span.required {
     width: 100%;
     max-width: 1124px;
     margin: 0 auto;
+    /* CGLT-643: give the loan account view a bit more room for its wide info tables/transactions */
+    &.loan-account-wide {
+      max-width: 1320px;
+    }
   }
   background-color: #ebeff1;
 }

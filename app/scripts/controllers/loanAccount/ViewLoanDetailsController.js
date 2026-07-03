@@ -185,6 +185,39 @@
                     || (angular.isObject(transaction && transaction.reversalTransaction) ? transaction.reversalTransaction : null);
             };
 
+            // A transaction is reversed if either the backend is_reversed flag (e.g. via undo-disbursal,
+            // which does NOT set manually_adjusted_or_reversed) or manuallyReversed is set. Keying off
+            // only manuallyReversed missed undo-disbursal reversals, making a reversed disbursement look
+            // identical to the live one.
+            scope.isTransactionReversed = function (transaction) {
+                return !!(transaction && (transaction.reversed === true || transaction.manuallyReversed === true));
+            };
+
+            // True when a transaction carries reversal / closed-period-correction context worth
+            // surfacing in the Audit column (e.g. a reversed & re-posted disbursement that would
+            // otherwise look like a duplicate).
+            scope.hasCorrectionContext = function (transaction) {
+                return !!(transaction && (scope.isTransactionReversed(transaction)
+                    || scope.getTransactionCorrectionDate(transaction)
+                    || transaction.originalTransactionId
+                    || scope.getReversalTransaction(transaction)));
+            };
+
+            scope.showTransactionAuditInfo = function (transaction) {
+                return scope.isRecoveryPaymentTransaction(transaction)
+                    || scope.isRepaymentAtDisbursementTransaction(transaction)
+                    || scope.hasCorrectionContext(transaction);
+            };
+
+            // Badge shown on a reversed row: "Reversed (Correction)" when it carries a correction date
+            // (closed-period correction), otherwise a plain "Reversed" — so users don't read a reversed
+            // & re-posted transaction as a duplicate posting.
+            scope.reversedBadgeLabelKey = function (transaction) {
+                return scope.getTransactionCorrectionDate(transaction)
+                    ? 'label.badge.reversedcorrection'
+                    : 'label.badge.reversed';
+            };
+
             scope.canReverseRecoveryPayment = function (transaction) {
                 return scope.isRecoveryPaymentTransaction(transaction)
                     && transaction.reversalTransaction !== true
