@@ -56,6 +56,14 @@
                         <textarea rows="2" style="width: 100%; height: 67px;">{{loanRescheduleDetails.rescheduleReasonComment}}</textarea>
                     </td>
                 </tr>
+                <tr ng-show="loanRescheduleDetails.repaymentEvery != null && repaymentFrequencyTypeValue">
+                    <td class="width14">
+                        <label>{{ 'label.input.repaidevery' | translate }}</label>
+                    </td>
+                    <td class="width36 paddedbottom10 paddedtop">
+                        {{loanRescheduleDetails.repaymentEvery}} {{repaymentFrequencyTypeValue}}
+                    </td>
+                </tr>
                 <tr>
                     <td class="paddedtop">
                         <input type="checkbox" ng-disabled="true" ng-model="changeRepaymentDate"> &nbsp;<span
