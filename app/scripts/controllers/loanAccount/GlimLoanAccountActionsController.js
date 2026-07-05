@@ -24,7 +24,9 @@
 
             var prevLoanAmount;
 
-
+            function isResidualPenaltyWaiver(charge) {
+                return charge && charge.penalty && charge.waived && !charge.paid && Number(charge.amountOutstanding) > 0;
+            }
 
             switch (scope.action) {
                 case "approve":
@@ -408,7 +410,15 @@
                     scope.taskPermissionName = 'RECOVERGUARANTEES_LOAN';
                     break;
                 case "waivecharge":
+                    scope.showExpectedResidualAmount = false;
                     resourceFactory.LoanAccountResource.get({loanId: routeParams.id, resourceType: 'charges', chargeId: routeParams.chargeId}, function (data) {
+                        scope.residualPenaltyWaiver = isResidualPenaltyWaiver(data);
+                        if (scope.residualPenaltyWaiver) {
+                            scope.formData.expectedResidualAmount = data.amountOutstanding;
+                            scope.showExpectedResidualAmount = true;
+                            scope.showNoteField = true;
+                            scope.noteFieldMandatory = true;
+                        }
                         if (data.chargeTimeType.value !== "Specified due date" && data.installmentChargeData) {
                             scope.installmentCharges = data.installmentChargeData;
                             scope.formData.installmentNumber = data.installmentChargeData[0].installmentNumber;
@@ -641,6 +651,10 @@
                         location.path('/viewloanaccount/' + data.loanId);
                     });
                 } else if (scope.action === "waivecharge") {
+                    if (scope.residualPenaltyWaiver) {
+                        this.formData.expectedResidualAmount = scope.formData.expectedResidualAmount;
+                        this.formData.reason = this.formData.note;
+                    }
                     resourceFactory.LoanAccountResource.save({loanId: routeParams.id, resourceType: 'charges', chargeId: routeParams.chargeId, 'command': 'waive'}, this.formData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
                     });

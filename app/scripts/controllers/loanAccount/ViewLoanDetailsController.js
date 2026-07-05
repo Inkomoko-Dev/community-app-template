@@ -454,6 +454,23 @@
                     case "waiveinterest":
                         location.path('/loanaccount/' + accountId + '/waiveinterest');
                         break;
+                    case "waivepenalty":
+                        var penalties = (scope.charges || []).filter(function (c) {
+                            return c.penalty && scope.canWaiveLoanCharge(c);
+                        });
+                        if (penalties.length === 1) {
+                            location.path('/loanaccountcharge/' + accountId + '/waivecharge/' + penalties[0].id);
+                        } else if (penalties.length > 1) {
+                            $uibModal.open({
+                                templateUrl: 'waivepenaltyselect.html',
+                                controller: WaivePenaltyCtrl,
+                                resolve: {
+                                    penalties: function () { return penalties; },
+                                    loanId: function () { return accountId; }
+                                }
+                            });
+                        }
+                        break;
                     case "writeoff":
                         location.path('/loanaccount/' + accountId + '/writeoff');
                         break;
@@ -623,6 +640,18 @@
                         $uibModalInstance.close('delete');
                         route.reload();
                     });
+                };
+                $scope.cancel = function () {
+                    $uibModalInstance.dismiss('cancel');
+                };
+            };
+
+            // CGLT-624: selector shown when a loan has more than one waivable penalty charge.
+            var WaivePenaltyCtrl = function ($scope, $uibModalInstance, penalties, loanId) {
+                $scope.penalties = penalties;
+                $scope.select = function (charge) {
+                    $uibModalInstance.close('select');
+                    location.path('/loanaccountcharge/' + loanId + '/waivecharge/' + charge.id);
                 };
                 $scope.cancel = function () {
                     $uibModalInstance.dismiss('cancel');
@@ -1010,6 +1039,18 @@
                             ]
 
                         };
+
+                        // CGLT-624: expose "Waive Penalty" in the More menu only when the loan
+                        // has at least one penalty charge that can be waived (reuses canWaiveLoanCharge).
+                        var hasWaivablePenalty = (scope.charges || []).some(function (c) {
+                            return c.penalty && scope.canWaiveLoanCharge(c);
+                        });
+                        if (hasWaivablePenalty) {
+                            scope.buttons.options.unshift({
+                                name: "button.waivepenalty",
+                                taskPermissionName: 'WAIVE_LOANCHARGE'
+                            });
+                        }
 
                         if (data.canDisburse) {
                             scope.buttons.singlebuttons.splice(1, 0, {
