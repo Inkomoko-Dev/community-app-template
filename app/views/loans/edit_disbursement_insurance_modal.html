@@ -7,6 +7,13 @@
 <div class="modal-body">
     <api-validate></api-validate>
 
+    <div class="alert alert-warning" ng-if="correctionAllowed === false">
+        {{'error.msg.loan.transaction.closed.period.corrections.not.allowed' | translate}}
+    </div>
+    <div class="alert alert-info" ng-if="correctionAllowed !== false && latestClosureDate">
+        {{'label.insurance.edit.closed.period.autocorrection' | translate}}
+    </div>
+
     <form name="editDisbursementInsuranceForm" class="form-horizontal" novalidate>
         <div class="form-group">
             <label class="control-label col-sm-4">Transaction</label>
@@ -106,7 +113,7 @@
         {{'label.button.cancel' | translate}}
     </button>
     <button type="button" class="btn btn-primary" ng-click="submit()"
-            ng-disabled="editDisbursementInsuranceForm.$invalid || isSubmitting">
+            ng-disabled="editDisbursementInsuranceForm.$invalid || isSubmitting || correctionAllowed === false">
         <span ng-if="!isSubmitting">{{'label.button.submit' | translate}}</span>
         <span ng-if="isSubmitting"><i class="fa fa-spinner fa-spin"></i> Submitting...</span>
     </button>

@@ -364,6 +364,7 @@
   "error.msg.loan.transaction.correction.date.must.be.in.open.period": "Correction date must be after the latest closure date ({{params[1].value}}).",
   "error.msg.loan.transaction.correction.date.cannot.be.future": "Correction date cannot be in the future.",
   "error.msg.loan.transaction.correction.date.not.allowed": "Correction date is only allowed when the transaction falls in a closed accounting period.",
+  "label.insurance.edit.closed.period.autocorrection": "This insurance payment falls in a closed accounting period. The correcting entries will be posted automatically into the next open period.",
   "error.msg.loan.recovery.payment.reverse.date.before.original": "Reversal date cannot be earlier than the original recovery payment date.",
   "error.msg.loan.recovery.payment.reverse.date.future": "Reversal date cannot be in the future.",
   "error.msg.loan.recovery.payment.correction.already.exists": "An active corrected recovery payment already exists for this recovery payment.",
