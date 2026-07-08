@@ -43,6 +43,26 @@
                 note: ''
             };
 
+            // Closed-accounting-period correction handling (CGLT-532/562). When the insurance charge falls in a closed
+            // period the server auto-derives a correction date (latest closure + 1 day) so the GL adjustments post into
+            // the open period; when the "corrections-in-closed-period" configuration is disabled the edit is blocked.
+            scope.correctionAllowed = true;
+            scope.latestClosureDate = null;
+
+            function applyCorrectionMetadata(metadata) {
+                scope.correctionAllowed = !(metadata && metadata.correctionAllowed === false);
+                scope.latestClosureDate = normalizeDate(metadata && metadata.latestClosedAccountingDate);
+            }
+
+            applyCorrectionMetadata(transaction);
+            resourceFactory.loanTrxnsResource.get({
+                loanId: loanId,
+                transactionId: transaction.id,
+                template: 'true'
+            }, function (data) {
+                applyCorrectionMetadata(data);
+            });
+
             scope.openDatePicker = function ($event) {
                 if ($event) {
                     $event.preventDefault();
@@ -82,6 +102,9 @@
 
             scope.submit = function () {
                 if (scope.isSubmitting) {
+                    return;
+                }
+                if (scope.correctionAllowed === false) {
                     return;
                 }
                 if (!scope.validateInsuranceAmount()) {
