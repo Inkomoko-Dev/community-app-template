@@ -43,6 +43,10 @@
             scope.noAdjustmentSubmitted = false;
             scope.originalTransactionDate = null;
             scope.maxInsuranceAmount = null;
+            // Closed-accounting-period correction handling (CGLT-532/562): the server auto-derives the correction date
+            // when the charge falls in a closed period, unless corrections-in-closed-period is disabled (then blocked).
+            scope.correctionAllowed = true;
+            scope.latestClosureDate = null;
 
             scope.formData = {
                 amount: null,
@@ -103,9 +107,35 @@
                 return glAccounts;
             }
 
+            function applyCorrectionMetadata(metadata) {
+                scope.correctionAllowed = !(metadata && metadata.correctionAllowed === false);
+                scope.latestClosureDate = normalizeDate(metadata && metadata.latestClosedAccountingDate);
+            }
+
+            function loadCorrectionMetadata(loan) {
+                var transactions = loan && loan.transactions;
+                if (!transactions || !transactions.length) {
+                    return;
+                }
+                var repaymentAtDisbursement = _.find(transactions, function (transaction) {
+                    return transaction.type && transaction.type.repaymentAtDisbursement === true;
+                });
+                if (!repaymentAtDisbursement) {
+                    return;
+                }
+                resourceFactory.loanTrxnsResource.get({
+                    loanId: scope.loanId,
+                    transactionId: repaymentAtDisbursement.id,
+                    template: 'true'
+                }, function (data) {
+                    applyCorrectionMetadata(data);
+                });
+            }
+
             function loadProductMappings() {
-                resourceFactory.loanResource.get({ loanId: scope.loanId }, function (loan) {
+                resourceFactory.loanResource.get({ loanId: scope.loanId, associations: 'transactions' }, function (loan) {
                     scope.maxInsuranceAmount = loan.approvedPrincipal || loan.principal || null;
+                    loadCorrectionMetadata(loan);
                     scope.$evalAsync(scope.validateInsuranceAmount);
                     resourceFactory.loanProductResource.get({ loanProductId: loan.loanProductId, template: 'true' }, function (product) {
                         scope.paymentTypes = mappedPaymentTypes(product);
@@ -190,6 +220,9 @@
 
             scope.submit = function () {
                 scope.noAdjustmentSubmitted = false;
+                if (scope.correctionAllowed === false) {
+                    return;
+                }
                 if (scope.isNoEffectiveAdjustment()) {
                     scope.noAdjustmentSubmitted = true;
                     return;
