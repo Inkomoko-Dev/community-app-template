@@ -23,6 +23,13 @@
                     Change the amount, transaction date, GL account, or payment type before submitting the insurance adjustment.
                 </div>
 
+                <div class="alert alert-warning" ng-if="correctionAllowed === false">
+                    {{'error.msg.loan.transaction.closed.period.corrections.not.allowed' | translate}}
+                </div>
+                <div class="alert alert-info" ng-if="correctionAllowed !== false && latestClosureDate">
+                    {{'label.insurance.edit.closed.period.autocorrection' | translate}}
+                </div>
+
                 <div class="form-group" ng-class="{'has-error': adjustInsuranceChargeForm.amount.$invalid && adjustInsuranceChargeForm.amount.$touched}">
                     <label class="control-label col-sm-3" for="amount">
                         New Amount <span class="required">*</span>
@@ -130,7 +137,7 @@
                         <button type="submit"
                                 class="btn btn-primary"
                                 ng-click="submit()"
-                                ng-disabled="adjustInsuranceChargeForm.$invalid || isSubmitting">
+                                ng-disabled="adjustInsuranceChargeForm.$invalid || isSubmitting || correctionAllowed === false">
                             <span ng-if="!isSubmitting">{{ 'label.button.submit' | translate }}</span>
                             <span ng-if="isSubmitting">
                 <i class="fa fa-spinner fa-spin"></i> Submitting...
