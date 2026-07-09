@@ -1064,6 +1064,20 @@
                         getByStatus: { method: 'GET', params: {} }
                     }),
 
+                    africasTalkingMessageResource: defineResource(apiVer + "/africastalking/messages", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        save: { method: 'POST', params: {} }
+                    }),
+
+                    africasTalkingVoiceResource: defineResource(apiVer + "/africastalking/voice/calls", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        save: { method: 'POST', params: {} }
+                    }),
+
+                    africasTalkingConnectivityResource: defineResource(apiVer + "/africastalking/connectivity", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+
                     entityDatatableChecksResource: defineResource(apiVer + "/entityDatatableChecks/:entityDatatableCheckId/:additionalParam", { entityDatatableCheckId: '@entityDatatableCheckId', additionalParam: '@additionalParam' }, {
                         getAll: { method: 'GET', params: {} },
                         get: { method: 'GET', params: {} },

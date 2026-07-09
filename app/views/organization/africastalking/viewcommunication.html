@@ -1,0 +1,62 @@
+<div ng-controller="ViewWhatsAppMessageController" class="content-container">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/africastalking">{{'label.anchor.africastalking' | translate}}</a></li>
+        <li class="active">{{'label.heading.viewwhatsappmessage' | translate}}</li>
+    </ul>
+    <api-validate></api-validate>
+    <div class="card" ng-if="message">
+        <div class="content">
+            <div class="toolbar">
+                <h3>{{'label.heading.viewwhatsappmessage' | translate}}</h3>
+            </div>
+            <br/>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <td><strong>{{'label.heading.mobilenumber' | translate}}</strong></td>
+                    <td>{{message.phoneNumber}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.message' | translate}}</strong></td>
+                    <td>{{message.messageBody}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.direction' | translate}}</strong></td>
+                    <td>{{message.direction}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.recipienttype' | translate}}</strong></td>
+                    <td>{{message.recipientType}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.status' | translate}}</strong></td>
+                    <td>{{message.status}}</td>
+                </tr>
+                <tr ng-if="message.statusDetail">
+                    <td><strong>{{'label.heading.sms.errormessage' | translate}}</strong></td>
+                    <td>{{message.statusDetail}}</td>
+                </tr>
+                <tr ng-if="message.clientId">
+                    <td><strong>{{'label.heading.clientid' | translate}}</strong></td>
+                    <td>{{message.clientId}}</td>
+                </tr>
+                <tr ng-if="message.staffId">
+                    <td><strong>{{'label.heading.staffid' | translate}}</strong></td>
+                    <td>{{message.staffId}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.submittedondate' | translate}}</strong></td>
+                    <td>{{message.createdDate}}</td>
+                </tr>
+                <tr ng-if="message.deliveredDate">
+                    <td><strong>{{'label.heading.delivereddate' | translate}}</strong></td>
+                    <td>{{message.deliveredDate}}</td>
+                </tr>
+                <tr ng-if="message.readDate">
+                    <td><strong>{{'label.heading.readdate' | translate}}</strong></td>
+                    <td>{{message.readDate}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

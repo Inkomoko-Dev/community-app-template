@@ -1076,6 +1076,21 @@
             .when('/editsmscampaign/:campaignId', {
                 templateUrl: 'views/organization/smscampaigns/editsmscampaign.html'
             })
+            .when('/africastalking', {
+                templateUrl: 'views/organization/africastalking/africastalking.html'
+            })
+            .when('/createwhatsappmessage', {
+                templateUrl: 'views/organization/africastalking/createwhatsappmessage.html'
+            })
+            .when('/createvoicecall', {
+                templateUrl: 'views/organization/africastalking/createvoicecall.html'
+            })
+            .when('/viewcommunication/:messageId', {
+                templateUrl: 'views/organization/africastalking/viewcommunication.html'
+            })
+            .when('/viewvoicecall/:callId', {
+                templateUrl: 'views/organization/africastalking/viewvoicecall.html'
+            })
             .when('/entitydatatablechecks', {
                 templateUrl: 'views/organization/entitydatatablechecks/entitydatatablechecks.html'
             })
