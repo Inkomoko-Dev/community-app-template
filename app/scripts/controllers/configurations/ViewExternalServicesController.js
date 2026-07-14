@@ -5,6 +5,8 @@
     mifosX.controllers = _.extend(module, {
         ViewExternalServicesController: function ($scope, resourceFactory, $routeParams, location) {
             $scope.Configs = [];
+            $scope.whitelistedNumbers = [];
+            $scope.smsWhitelistEnforced = false;
             $scope.externalServicesType = $routeParams.externalServicesType;
             //$scope.name = $routeParams.name;
             resourceFactory.externalServicesResource.get({id: $scope.externalServicesType}, function (data) {
@@ -12,6 +14,16 @@
                     if(data[i] != null && data[i].name != null) {
                         data[i].name.replace(/ /g, '');
                         if (!angular.equals(data[i].name, "")) {
+                            if (data[i].name === 'sms_whitelist_enforced') {
+                                $scope.smsWhitelistEnforced = data[i].value === 'true';
+                                continue;
+                            }
+                            if (data[i].name === 'sms_whitelist') {
+                                $scope.whitelistedNumbers = (data[i].value || '')
+                                    .split(/[,;\s]+/)
+                                    .map(function (number) { return number.trim(); })
+                                    .filter(function (number) { return number.length > 0; });
+                            }
                             $scope.Configs.push(data[i]);
 
                         }
