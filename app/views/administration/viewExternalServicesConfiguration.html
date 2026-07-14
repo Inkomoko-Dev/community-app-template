@@ -31,14 +31,14 @@
 
         <div ng-if="externalServicesType === 'SMS' && smsWhitelistEnforced" class="alert alert-info" style="margin-top: 15px;">
             <strong>QA SMS whitelist is enforced.</strong>
-            Only the numbers below can receive SMS on this instance. Add more from Edit (comma-separated in <code>sms_whitelist</code>).
+            Only the numbers below can receive SMS. Add more or disable enforcement from Edit.
             <ul style="margin-top: 10px; margin-bottom: 0;">
                 <li ng-repeat="number in whitelistedNumbers">{{number}}</li>
                 <li ng-if="!whitelistedNumbers.length"><em>No numbers configured</em></li>
             </ul>
         </div>
         <div ng-if="externalServicesType === 'SMS' && !smsWhitelistEnforced && whitelistedNumbers.length" class="well well-sm" style="margin-top: 15px;">
-            <strong>Configured SMS whitelist</strong> (not enforced on this instance):
+            <strong>Configured SMS whitelist</strong> (not enforced — toggle <code>sms_whitelist_enabled</code> in Edit to enforce):
             <ul style="margin-top: 10px; margin-bottom: 0;">
                 <li ng-repeat="number in whitelistedNumbers">{{number}}</li>
             </ul>

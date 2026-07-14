@@ -13,7 +13,7 @@
                 for (var i in data) {
                     if(data[i] != null && data[i].name != null) {
                         data[i].name.replace(/ /g, '');
-                        if (!angular.equals(data[i].name, "") && data[i].name !== 'sms_whitelist_enforced') {
+                        if (!angular.equals(data[i].name, "")) {
                             nvObject[data[i].name] = data[i].value;
                             $scope.names.push(data[i].name);
 
