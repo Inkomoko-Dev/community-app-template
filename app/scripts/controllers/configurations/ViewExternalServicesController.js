@@ -14,9 +14,8 @@
                     if(data[i] != null && data[i].name != null) {
                         data[i].name.replace(/ /g, '');
                         if (!angular.equals(data[i].name, "")) {
-                            if (data[i].name === 'sms_whitelist_enforced') {
+                            if (data[i].name === 'sms_whitelist_enabled') {
                                 $scope.smsWhitelistEnforced = data[i].value === 'true';
-                                continue;
                             }
                             if (data[i].name === 'sms_whitelist') {
                                 $scope.whitelistedNumbers = (data[i].value || '')
