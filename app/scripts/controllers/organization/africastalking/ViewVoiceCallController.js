@@ -1,14 +1,13 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        ViewVoiceCallController: function (scope, routeParams, location, resourceFactory) {
-            resourceFactory.africasTalkingVoiceResource.getAll(function (data) {
-                scope.callLog = _.find(data, function (callLog) {
-                    return callLog.id == routeParams.callId;
-                });
+        ViewVoiceCallController: function (scope, routeParams, resourceFactory) {
+            scope.callLog = null;
+            resourceFactory.africasTalkingVoiceResource.get({ callId: routeParams.callId }, function (data) {
+                scope.callLog = data;
             });
         }
     });
-    mifosX.ng.application.controller('ViewVoiceCallController', ['$scope', '$routeParams', '$location', 'ResourceFactory', mifosX.controllers.ViewVoiceCallController]).run(function ($log) {
+    mifosX.ng.application.controller('ViewVoiceCallController', ['$scope', '$routeParams', 'ResourceFactory', mifosX.controllers.ViewVoiceCallController]).run(function ($log) {
         $log.info("ViewVoiceCallController initialized");
     });
 }(mifosX.controllers || {}));

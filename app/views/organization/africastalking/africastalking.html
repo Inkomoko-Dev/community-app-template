@@ -26,6 +26,8 @@
                 </div>
             </div>
             <br>
+            <div class="alert alert-danger" ng-if="loadError">{{loadError}}</div>
+            <div class="alert alert-info" ng-if="loadingMessages || loadingVoiceCalls">Loading communications...</div>
             <uib-tabset tabset-name="africastalkingTabset">
                 <uib-tab heading="{{'label.heading.whatsappmessages' | translate}}" has-permission='READ_COMMUNICATION'>
                     <br>

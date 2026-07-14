@@ -55,7 +55,12 @@
                     payload.staffId = scope.formData.staff.id;
                 }
                 resourceFactory.africasTalkingMessageResource.save(payload, function (data) {
-                    location.path('/viewcommunication/' + data.resourceId);
+                    var messageId = data.resourceId || data.resourceIdentifier || data.id;
+                    if (!messageId) {
+                        location.path('/africastalking');
+                        return;
+                    }
+                    location.path('/viewcommunication/' + messageId);
                 }, function () {
                     scope.isButtonDisabled = false;
                 });
