@@ -1060,22 +1060,38 @@
                         delete: { method: 'DELETE', params: {} }
                     }),
 
+                    whatsAppCampaignTemplateResource: defineResource(apiVer + "/whatsappcampaigns/template", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+
+                    whatsAppCampaignResource: defineResource(apiVer + "/whatsappcampaigns/:campaignId/:additionalParam", { campaignId: '@campaignId', additionalParam: '@additionalParam' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
+                        save: { method: 'POST', params: {} },
+                        update: { method: 'PUT', params: {} },
+                        preview: { method: 'POST', params: {} },
+                        withCommand: { method: 'POST', params: {} },
+                        delete: { method: 'DELETE', params: {} }
+                    }),
+
                     smsResource: defineResource(apiVer + "/sms/:campaignId/messageByStatus", { campaignId: '@campaignId', additionalParam: '@additionalParam' }, {
                         getByStatus: { method: 'GET', params: {} }
                     }),
 
-                    africasTalkingMessageResource: defineResource(apiVer + "/africastalking/messages", {}, {
-                        getAll: { method: 'GET', params: {}, isArray: true },
+                    africasTalkingMessageResource: defineResource(apiVer + "/africastalking/messages/:messageId", { messageId: '@resourceId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
                         save: { method: 'POST', params: {} }
                     }),
 
-                    africasTalkingVoiceResource: defineResource(apiVer + "/africastalking/voice/calls", {}, {
-                        getAll: { method: 'GET', params: {}, isArray: true },
+                    africasTalkingVoiceResource: defineResource(apiVer + "/africastalking/voice/calls/:callId", { callId: '@resourceId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
                         save: { method: 'POST', params: {} }
                     }),
 
                     africasTalkingConnectivityResource: defineResource(apiVer + "/africastalking/connectivity", {}, {
-                        get: { method: 'GET', params: {} }
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
 
                     entityDatatableChecksResource: defineResource(apiVer + "/entityDatatableChecks/:entityDatatableCheckId/:additionalParam", { entityDatatableCheckId: '@entityDatatableCheckId', additionalParam: '@additionalParam' }, {

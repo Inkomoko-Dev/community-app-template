@@ -1076,6 +1076,18 @@
             .when('/editsmscampaign/:campaignId', {
                 templateUrl: 'views/organization/smscampaigns/editsmscampaign.html'
             })
+            .when('/whatsappcampaigns', {
+                templateUrl: 'views/organization/whatsappcampaigns/whatsappcampaigns.html'
+            })
+            .when('/createwhatsappcampaign', {
+                templateUrl: 'views/organization/whatsappcampaigns/createwhatsappcampaign.html'
+            })
+            .when('/viewwhatsappcampaign/:campaignId', {
+                templateUrl: 'views/organization/whatsappcampaigns/viewwhatsappcampaign.html'
+            })
+            .when('/editwhatsappcampaign/:campaignId', {
+                templateUrl: 'views/organization/whatsappcampaigns/editwhatsappcampaign.html'
+            })
             .when('/africastalking', {
                 templateUrl: 'views/organization/africastalking/africastalking.html'
             })
