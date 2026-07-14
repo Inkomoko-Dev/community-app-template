@@ -1379,6 +1379,7 @@
 
             scope.submit = function () {
                 scope.processDate = false;
+                scope.error = null;
 
                 // Prepare form data by filtering based on payment type (Cash vs Bank)
                 scope.filterDisburseFormData();
@@ -1439,6 +1440,15 @@
                 }
                 if (scope.isSupplierNonCashPayment() && !scope.formData.beneficiaryName) {
                     scope.error = 'Beneficiary name is mandatory for vendor disbursement';
+                    return;
+                }
+                // Mirror the backend rule: bank (non-cash, non-mobile-money) payments to the client
+                // require account number + bank name, otherwise approval is rejected server-side
+                if (!scope.isSouthSudanSspLoan() && scope.isLoanDisbursementRequestEnabled
+                        && scope.isClientBankPayment()
+                        && (!scope.formData.clientAccountNumber || !scope.formData.clientBankName)) {
+                    scope.error = 'Client bank details (Account Number, Bank Name) are required for bank disbursement. Enter them under Payment Details or update the client\'s Other Info.';
+                    scope.showPaymentDetails = true;
                     return;
                 }
                 if (scope.shouldShowFxDetails() && !scope.formData.fxRate) {
@@ -1924,6 +1934,10 @@
                         scope.clientOtherInfoData = data[0];
                         scope.setPaymentRecipientInfo();
                     }
+                    // Surface the (possibly empty) bank fields so the user can fill in what's missing
+                    if (scope.showClientOtherInfoForm && scope.isClientBankDetailsMissing()) {
+                        scope.showPaymentDetails = true;
+                    }
                 });
             }
 
@@ -1945,11 +1959,12 @@
                     delete scope.formData.paymentTo;
                 } else {
                     if (scope.isPaymentToClient()) {
-                        scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber;
-                        scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber;
+                        // Prefer the client's stored Other Info, but keep manually entered values when it's blank
+                        scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber || scope.formData.clientPhoneNumber;
+                        scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || scope.formData.clientAccountNumber;
                         scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
                             ? scope.clientOtherInfoData.bank.bankName
-                            : scope.clientOtherInfoData.bankName;
+                            : (scope.clientOtherInfoData.bankName || scope.formData.clientBankName);
                         delete scope.formData.beneficiaryName;
                     }
                 }
@@ -1966,6 +1981,10 @@
                 if (scope.formData.paymentTypeId !== undefined) {
                     scope.showClientOtherInfoForm = scope.shouldShowPaymentRecipientInfo();
                     scope.setPaymentRecipientInfo();
+                    // Auto-expand so missing client bank details are visible and can be entered
+                    if (scope.showClientOtherInfoForm && scope.isClientBankDetailsMissing()) {
+                        scope.showPaymentDetails = true;
+                    }
                 }
             });
 
@@ -2059,6 +2078,47 @@
                 return scope.shouldShowPaymentRecipientInfo() && scope.isPaymentToSupplier();
             };
 
+            scope.isMobileMoneyPayment = function () {
+                if (!Array.isArray(scope.paymentTypes)) return false;
+
+                const paymentTypeId = scope.formData?.paymentTypeId;
+
+                return scope.paymentTypes
+                    .find(pt => pt.id === paymentTypeId)
+                    ?.isMobileMoney || false;
+            };
+
+            scope.clientOtherInfoHas = function (field) {
+                const info = scope.clientOtherInfoData || {};
+                if (field === 'clientPhoneNumber') {
+                    return !!(info.telephoneNumber || info.clientPhoneNumber);
+                }
+                if (field === 'clientBankName') {
+                    return !!((info.bank && info.bank.bankName) || info.bankName);
+                }
+                return !!info[field];
+            };
+
+            // Bank payments (non-cash, non-mobile-money) to the client need account number + bank name,
+            // which normally come from the client's Other Info record. Client Other Info is only
+            // fetched on the approval screen, so all of this is scoped to the approve action.
+            scope.isClientBankPayment = function () {
+                return scope.isApprovalAction() && scope.shouldShowPaymentRecipientInfo()
+                    && scope.isPaymentToClient() && !scope.isMobileMoneyPayment();
+            };
+
+            scope.isClientBankDetailsMissing = function () {
+                return scope.isClientBankPayment()
+                    && (!scope.clientOtherInfoHas('bankAccountNumber') || !scope.clientOtherInfoHas('clientBankName'));
+            };
+
+            scope.isClientPaymentFieldLocked = function (field) {
+                if (!scope.isPaymentToClient()) return false;
+                // Non-approval screens (e.g. disbursement review) keep the fields read-only as before
+                if (!scope.isApprovalAction()) return true;
+                return scope.clientOtherInfoHas(field);
+            };
+
             scope.setPaymentRecipientInfo = function () {
                 if (scope.isSouthSudanSspLoan()) {
                     // For South Sudan loans, leave saved vendor details as is!
@@ -2068,11 +2128,12 @@
                     return;
                 }
                 if (scope.isPaymentToClient()) {
-                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber || scope.clientOtherInfoData.clientPhoneNumber || '';
-                    scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || '';
+                    // Prefer the client's stored Other Info, but keep manually entered values when it's blank
+                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber || scope.clientOtherInfoData.clientPhoneNumber || scope.formData.clientPhoneNumber || '';
+                    scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || scope.formData.clientAccountNumber || '';
                     scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
                         ? scope.clientOtherInfoData.bank.bankName
-                        : scope.clientOtherInfoData.bankName || '';
+                        : (scope.clientOtherInfoData.bankName || scope.formData.clientBankName || '');
                     scope.formData.beneficiaryName = '';
                 } else {
                     scope.formData.clientPhoneNumber = scope.formData.clientPhoneNumber ||'';
