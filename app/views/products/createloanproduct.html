@@ -134,6 +134,22 @@
                                ng-false-value="false">
                 </div>
             </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2">{{ 'label.input.financingPartnerCode' | translate }}
+                    <i class="fa fa-question-circle "
+                       uib-tooltip="{{'label.tooltip.loanproduct.financingPartnerCode' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </label>
+                <div class="col-sm-2">
+                    <select id="financingPartnerCode" name="financingPartnerCode"
+                            ng-model="formData.financingPartnerCode"
+                            ng-options="code for code in product.financingPartnerCodeOptions"
+                            class="form-control">
+                        <option value="">{{'label.selectone' | translate}}</option>
+                    </select>
+                </div>
+            </div>
                     <hr>
                     <button class = "btn btn-default pull-left" wz-previous disabled><i class = "fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
                     <button class = "btn btn-default pull-right" type="submit">Next&nbsp;&nbsp;<i class = "fa fa-arrow-right"></i></button>

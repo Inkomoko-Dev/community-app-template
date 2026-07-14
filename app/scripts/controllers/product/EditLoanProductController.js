@@ -66,6 +66,7 @@
                     description: scope.product.description,
                     includeInBorrowerCycle: scope.product.includeInBorrowerCycle,
                     isIslamic: scope.product.isIslamic,
+                    financingPartnerCode: scope.product.financingPartnerCode,
                     useBorrowerCycle: scope.product.useBorrowerCycle,
                     currencyCode: scope.product.currency.code,
                     digitsAfterDecimal: scope.product.currency.decimalPlaces,
