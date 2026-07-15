@@ -12,9 +12,24 @@
             <div class="form-group" ng-repeat="(names, values) in formData">
                         <label class="control-label col-sm-2" for="configname">{{names}}</label>
 
-                        <div class="col-sm-3">
+                        <div class="col-sm-3" ng-if="names !== 'sms_whitelist' && names !== 'sms_whitelist_enabled'">
                             <input type="text" id="configname" name="configname" ng-model="formData[names]" class="form-control" required
                                    late-Validate/>
+                        </div>
+                        <div class="col-sm-6" ng-if="names === 'sms_whitelist_enabled'">
+                            <label class="checkbox">
+                                <input type="checkbox"
+                                       ng-model="formData[names]"
+                                       ng-true-value="'true'"
+                                       ng-false-value="'false'">
+                                Enforce SMS whitelist (QA)
+                            </label>
+                            <span class="help-block">When enabled, only numbers in sms_whitelist can receive SMS.</span>
+                        </div>
+                        <div class="col-sm-6" ng-if="names === 'sms_whitelist'">
+                            <textarea id="sms_whitelist" name="sms_whitelist" ng-model="formData[names]" class="form-control" rows="3"
+                                      placeholder="+254702719701,+2547XXXXXXXX" late-Validate></textarea>
+                            <span class="help-block">Comma-separated phone numbers allowed when the whitelist is enforced.</span>
                         </div>
             </div>
 
