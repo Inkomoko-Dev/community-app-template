@@ -253,10 +253,14 @@
 
             resourceFactory.whatsAppCampaignTemplateResource.get(function (data) {
                 scope.triggerTypeOptions = data.triggerTypeOptions;
-                scope.businessRuleOptions = data.businessRulesOptions;
+                scope.businessRuleOptions = data.businessRulesOptions || [];
                 scope.frequencyTypeOptions = data.frequencyTypeOptions;
                 scope.weekDays = data.weekDays;
                 scope.filterBusinessRule();
+                // Re-apply filter if the user already chose a trigger before options arrived.
+                if (scope.campaignData.triggerType) {
+                    scope.getBusinessRule();
+                }
             });
 
             scope.selectedPeriod = function (period) {

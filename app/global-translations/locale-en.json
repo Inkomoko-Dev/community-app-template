@@ -3178,6 +3178,8 @@
   "label.input.languageCode": "Language Code",
   "label.input.atTemplateName.placeholder": "e.g. payment_due_today",
   "label.input.languageCode.placeholder": "e.g. en",
+  "label.input.whatsapptemplatemsg.placeholder": "Paste the approved Meta/AT template body text here (for audit and preview)",
+  "label.input.whatsapptemplatemsg.help": "Optional. Stored for reference; outbound send still uses the Africa's Talking template name and body variable mapping.",
   "label.button.removemapping": "Remove",
   "label.view.africastalking": "Manage WhatsApp messages and voice calls via AfricasTalking",
   "label.anchor.africastalking": "Communications",

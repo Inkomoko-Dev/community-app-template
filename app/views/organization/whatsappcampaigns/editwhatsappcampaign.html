@@ -97,6 +97,16 @@
                             <form-validate valattributeform="editwhatsappform" valattribute="languageCode"/>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.templatemsg' | translate}}</label>
+                        <div class="col-sm-8">
+                            <textarea id="campaignMessage" name="campaignMessage" rows="5"
+                                      ng-model="campaignData.campaignMessage"
+                                      class="form-control"
+                                      placeholder="{{'label.input.whatsapptemplatemsg.placeholder' | translate}}"></textarea>
+                            <p class="help-block">{{'label.input.whatsapptemplatemsg.help' | translate}}</p>
+                        </div>
+                    </div>
 
                     <h3>{{'label.heading.bodyVariableMapping' | translate}}</h3>
                     <p>{{'label.heading.templateparameters' | translate}}</p>
