@@ -138,6 +138,33 @@
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
                     </div>
                 </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <div class="alert alert-info" role="alert">
+                            <strong>Kenya Capital defaults applied</strong>
+                            <div>Department: {{kenyaCapitalDefaults.departmentName || 'Investment'}}</div>
+                            <div>Investments budget: {{formData.budgetLocation || kenyaCapitalDefaults.budgetLocation}}</div>
+                        </div>
+                        <div class="alert alert-warning" role="alert" ng-if="kenyaCapitalDefaults.budgetReviewRequired">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Current month's investments budget was not found. This disbursement is flagged for review.
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2">{{'label.heading.department' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="text" ng-model="kenyaCapitalDefaults.departmentName" ng-disabled="true">
+                        <div class="help-block">Defaulted for Inkomoko Kenya Capital disbursements.</div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2" for="budgetLocation">Investments Budget</label>
+                    <div class="col-sm-3">
+                        <input id="budgetLocation" class="form-control" type="text" ng-model="formData.budgetLocation"
+                               ng-disabled="isReadOnly">
+                    </div>
+                </div>
                 <div class="form-group" ng-show="principalPortion">
                     <label class="control-label col-sm-2" for="principalPortion">{{ 'label.input.principal' |
                         translate}}</label>

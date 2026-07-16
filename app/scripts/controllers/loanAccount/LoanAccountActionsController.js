@@ -285,6 +285,31 @@
                 return scope.action === 'disbursementpreapprovalrequest' || scope.action === 'approveDisbursement' || scope.action === 'disbursementapproval';
             };
 
+            scope.applyKenyaCapitalDisbursementDefaults = function (templateData) {
+                scope.isKenyaCapitalDisbursement = templateData && templateData.kenyaCapitalDisbursementDefaults === true;
+                if (!scope.isKenyaCapitalDisbursement) {
+                    return;
+                }
+                scope.kenyaCapitalDefaults = {
+                    departmentName: templateData.defaultDepartmentName,
+                    budgetLocation: templateData.defaultBudgetLocation,
+                    budgetReviewRequired: templateData.budgetReviewRequired === true
+                };
+                scope.formData.budgetLocation = templateData.defaultBudgetLocation;
+            };
+
+            scope.refreshKenyaCapitalBudgetForDisbursementDate = function (disbursementDate) {
+                if (!scope.isKenyaCapitalDisbursement || !disbursementDate) {
+                    return;
+                }
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                const budgetLocation = 'Investments - ' + monthNames[disbursementDate.getMonth()] + ' ' + disbursementDate.getFullYear();
+                scope.formData.budgetLocation = budgetLocation;
+                if (scope.kenyaCapitalDefaults) {
+                    scope.kenyaCapitalDefaults.budgetLocation = budgetLocation;
+                }
+            };
+
             scope.shouldShowFxDetails = function () {
                 return scope.isSouthSudanSspLoan() && scope.isVendorDisbursement();
             };
@@ -737,6 +762,7 @@
                                 scope.showEMIAmountField = true;
                             }
                             scope.isDisbursementPreApprovalRequest = scope.action === "disbursementpreapprovalrequest";
+                            scope.applyKenyaCapitalDisbursementDefaults(templateData);
                             scope.computeUsdEquivalent();
                             
                             // Auto-expand payment details for review actions if it's a South Sudan loan
@@ -1486,6 +1512,9 @@
                 }
 
                 if (scope.action == "approve" || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
+                    if (scope.isKenyaCapitalDisbursement && scope.formData.budgetLocation) {
+                        submitData.budgetLocation = scope.formData.budgetLocation;
+                    }
                     if (submitData.disbursementType === 'VENDOR') {
                         submitData.paymentTo = 2;
                     } else if (submitData.disbursementType === 'CLIENT') {
@@ -2043,6 +2072,7 @@
             scope.$watch('formData.actualDisbursementDate', function (newDate) {
                 if (scope.isDisbursementReviewAction() && newDate) {
                     scope.refreshFxRateForDisbursementDate(newDate);
+                    scope.refreshKenyaCapitalBudgetForDisbursementDate(newDate);
                 }
             });
 
