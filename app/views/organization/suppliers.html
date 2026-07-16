@@ -1,0 +1,95 @@
+<div class="content-container" ng-controller="SupplierController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.suppliers' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.heading.suppliers' | translate}}</h4>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    <input ng-autofocus="true" ng-model="filters.q" type="text" class="form-control"
+                           placeholder="{{'label.input.searchsuppliers' | translate}}"
+                           ng-keyup="$event.keyCode == 13 && refreshSuppliers()"/>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" ng-model="filters.businessSector"
+                            ng-options="sector for sector in businessSectorOptions"
+                            ng-change="refreshSuppliers()">
+                        <option value="">{{'label.input.allsectors' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" ng-model="filters.supplierType"
+                            ng-options="type for type in supplierTypeOptions"
+                            ng-change="refreshSuppliers()">
+                        <option value="">{{'label.input.allsuppliertypes' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" ng-model="filters.country"
+                            ng-options="country for country in countryOptions"
+                            ng-change="refreshSuppliers()">
+                        <option value="">{{'label.input.allcountries' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" ng-model="filters.syncStatus"
+                            ng-options="status for status in syncStatusOptions"
+                            ng-change="refreshSuppliers()">
+                        <option value="">{{'label.input.allsyncstatuses' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-primary btn-block" ng-click="refreshSuppliers()">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <br/>
+            <table class="table">
+                <thead>
+                <tr class="graybg">
+                    <th>{{'label.heading.name' | translate}}</th>
+                    <th>{{'label.heading.displayname' | translate}}</th>
+                    <th>{{'label.heading.businesslicensenumber' | translate}}</th>
+                    <th>{{'label.heading.suppliertype' | translate}}</th>
+                    <th>{{'label.heading.businesssector' | translate}}</th>
+                    <th>{{'label.heading.category' | translate}}</th>
+                    <th>{{'label.heading.country' | translate}}</th>
+                    <th>{{'label.heading.tin' | translate}}</th>
+                    <th>{{'label.heading.externalId' | translate}}</th>
+                    <th>{{'label.heading.syncstatus' | translate}}</th>
+                    <th>{{'label.heading.lastmodifieddate' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="pointer-main" ng-repeat="supplier in suppliers.currentPageItems">
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.name}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.displayName}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.businessLicenseNumber}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.supplierType}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.businessSector}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.category}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.country}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.tin}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.externalId}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.syncStatus}}</td>
+                    <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.lastModifiedDate}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <ul class="pager">
+                <li class="previous">
+                    <a id="prev" ng-click="suppliers.previous()" href="" ng-disabled="!suppliers.hasPrevious()">&larr; {{'label.button.previous' | translate}}</a>
+                </li>
+                <li class="next">
+                    <a id="next" ng-click="suppliers.next()" href="" ng-disabled="!suppliers.hasNext()">{{'label.button.next' | translate}} &rarr;</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

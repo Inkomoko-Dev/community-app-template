@@ -1162,6 +1162,11 @@
                         getAll: { method: 'GET', params: {}, isArray: true },
                         search: { method: 'GET', params: {}, isArray: true }
                     }),
+                    suppliersResource: defineResource(apiVer + "/suppliers/:supplierId", { supplierId: '@supplierId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: { supplierId: '@supplierId' } },
+                        template: { method: 'GET', params: { supplierId: 'template' } }
+                    }),
                     crbPostingReportsViewResource: defineResource(
                          apiVer + "/crb/posting-logs",
                         {},

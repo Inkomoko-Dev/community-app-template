@@ -1,0 +1,86 @@
+<div class="content-container" ng-controller="ViewSupplierController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/suppliers">{{'label.anchor.suppliers' | translate}}</a></li>
+        <li class="active">{{supplier.name}}</li>
+    </ul>
+
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{supplier.name}}</h4>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <td width="35%">{{'label.heading.id' | translate}}</td>
+                            <td width="65%">{{supplier.id}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.name' | translate}}</td>
+                            <td>{{supplier.name}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.displayname' | translate}}</td>
+                            <td>{{supplier.displayName}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.sourcesystem' | translate}}</td>
+                            <td>{{supplier.sourceSystem}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.externalId' | translate}}</td>
+                            <td>{{supplier.externalId}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.businesslicensenumber' | translate}}</td>
+                            <td>{{supplier.businessLicenseNumber}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.suppliertype' | translate}}</td>
+                            <td>{{supplier.supplierType}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.businesssector' | translate}}</td>
+                            <td>{{supplier.businessSector}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.category' | translate}}</td>
+                            <td>{{supplier.category}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.country' | translate}}</td>
+                            <td>{{supplier.country}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.tin' | translate}}</td>
+                            <td>{{supplier.tin}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.status' | translate}}</td>
+                            <td>{{supplier.status}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.syncstatus' | translate}}</td>
+                            <td>{{supplier.syncStatus}}</td>
+                        </tr>
+                        <tr ng-if="supplier.syncStatus === 'FAILED'">
+                            <td>{{'label.heading.lastsyncerror' | translate}}</td>
+                            <td>{{supplier.lastSyncError}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.createddate' | translate}}</td>
+                            <td>{{supplier.createdDate}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{'label.heading.lastmodifieddate' | translate}}</td>
+                            <td>{{supplier.lastModifiedDate}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
