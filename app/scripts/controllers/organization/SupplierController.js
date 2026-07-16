@@ -1,7 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        SupplierController: function (scope, resourceFactory, location) {
-            scope.suppliers = [];
+        SupplierController: function (scope, resourceFactory, paginatorService, location) {
             scope.filters = {
                 q: '',
                 businessSector: '',
@@ -19,8 +18,11 @@
                 location.path('/viewsupplier/' + id);
             };
 
-            scope.loadSuppliers = function () {
-                var params = {};
+            var fetchFunction = function (offset, limit, callback) {
+                var params = {
+                    offset: offset,
+                    limit: limit
+                };
                 if (scope.filters.q) {
                     params.q = scope.filters.q;
                 }
@@ -36,9 +38,11 @@
                 if (scope.filters.syncStatus) {
                     params.syncStatus = scope.filters.syncStatus;
                 }
-                resourceFactory.suppliersResource.getAll(params, function (data) {
-                    scope.suppliers = data;
-                });
+                resourceFactory.suppliersResource.getAll(params, callback);
+            };
+
+            scope.refreshSuppliers = function () {
+                scope.suppliers = paginatorService.paginate(fetchFunction, scope.SuppliersPerPage);
             };
 
             resourceFactory.suppliersResource.template(function (data) {
@@ -47,10 +51,10 @@
                 scope.countryOptions = data.countryOptions || [];
             });
 
-            scope.loadSuppliers();
+            scope.refreshSuppliers();
         }
     });
-    mifosX.ng.application.controller('SupplierController', ['$scope', 'ResourceFactory', '$location', mifosX.controllers.SupplierController]).run(function ($log) {
+    mifosX.ng.application.controller('SupplierController', ['$scope', 'ResourceFactory', 'PaginatorService', '$location', mifosX.controllers.SupplierController]).run(function ($log) {
         $log.info("SupplierController initialized");
     });
 }(mifosX.controllers || {}));
