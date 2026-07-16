@@ -141,6 +141,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/EditEmployeeController',
             'organization/EmployeeController',
             'organization/CreateEmployeeController',
+            'organization/SupplierController',
+            'organization/ViewSupplierController',
             'organization/ManageFundsController',
             'organization/ViewPaymentTypeController',
             'organization/CreatePaymentTypeController',

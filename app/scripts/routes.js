@@ -401,6 +401,12 @@
             .when('/employees', {
                 templateUrl: 'views/organization/employees.html'
             })
+            .when('/suppliers', {
+                templateUrl: 'views/organization/suppliers.html'
+            })
+            .when('/viewsupplier/:id', {
+                templateUrl: 'views/organization/viewsupplier.html'
+            })
             .when('/viewemployee/:id', {
                 templateUrl: 'views/organization/viewemployee.html'
             })
