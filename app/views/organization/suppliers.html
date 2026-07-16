@@ -13,38 +13,38 @@
                 <div class="col-md-3">
                     <input ng-autofocus="true" ng-model="filters.q" type="text" class="form-control"
                            placeholder="{{'label.input.searchsuppliers' | translate}}"
-                           ng-keyup="$event.keyCode == 13 && loadSuppliers()"/>
+                           ng-keyup="$event.keyCode == 13 && refreshSuppliers()"/>
                 </div>
                 <div class="col-md-2">
                     <select class="form-control" ng-model="filters.businessSector"
                             ng-options="sector for sector in businessSectorOptions"
-                            ng-change="loadSuppliers()">
+                            ng-change="refreshSuppliers()">
                         <option value="">{{'label.input.allsectors' | translate}}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <select class="form-control" ng-model="filters.supplierType"
                             ng-options="type for type in supplierTypeOptions"
-                            ng-change="loadSuppliers()">
+                            ng-change="refreshSuppliers()">
                         <option value="">{{'label.input.allsuppliertypes' | translate}}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <select class="form-control" ng-model="filters.country"
                             ng-options="country for country in countryOptions"
-                            ng-change="loadSuppliers()">
+                            ng-change="refreshSuppliers()">
                         <option value="">{{'label.input.allcountries' | translate}}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <select class="form-control" ng-model="filters.syncStatus"
                             ng-options="status for status in syncStatusOptions"
-                            ng-change="loadSuppliers()">
+                            ng-change="refreshSuppliers()">
                         <option value="">{{'label.input.allsyncstatuses' | translate}}</option>
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <button type="button" class="btn btn-primary btn-block" ng-click="loadSuppliers()">
+                    <button type="button" class="btn btn-primary btn-block" ng-click="refreshSuppliers()">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
@@ -67,7 +67,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="pointer-main" dir-paginate="supplier in suppliers | itemsPerPage: SuppliersPerPage">
+                <tr class="pointer-main" ng-repeat="supplier in suppliers.currentPageItems">
                     <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.name}}</td>
                     <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.displayName}}</td>
                     <td class="pointer" data-ng-click="routeTo(supplier.id)">{{supplier.businessLicenseNumber}}</td>
@@ -82,8 +82,14 @@
                 </tr>
                 </tbody>
             </table>
-            <dir-pagination-controls boundary-links="true"
-                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
+            <ul class="pager">
+                <li class="previous">
+                    <a id="prev" ng-click="suppliers.previous()" href="" ng-disabled="!suppliers.hasPrevious()">&larr; {{'label.button.previous' | translate}}</a>
+                </li>
+                <li class="next">
+                    <a id="next" ng-click="suppliers.next()" href="" ng-disabled="!suppliers.hasNext()">{{'label.button.next' | translate}} &rarr;</a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
