@@ -319,12 +319,6 @@
                 return scope.action === 'disbursementpreapprovalrequest' || scope.action === 'approveDisbursement' || scope.action === 'disbursementapproval';
             };
 
-            scope.getRepaymentAtDisbursementAmount = function () {
-                var approvedAmount = Number(String(scope.formData.approvedLoanAmount || 0).replace(/,/g, ''));
-                var netDisbursalAmount = Number(String(scope.formData.transactionAmount || 0).replace(/,/g, ''));
-                return Math.max(approvedAmount - netDisbursalAmount, 0);
-            };
-
             scope.applyKenyaCapitalDisbursementDefaults = function (templateData) {
                 scope.isKenyaCapitalDisbursement = templateData && templateData.kenyaCapitalDisbursementDefaults === true;
                 if (!scope.isKenyaCapitalDisbursement) {
@@ -882,6 +876,7 @@
                                 scope.showEMIAmountField = true;
                             }
                             scope.isDisbursementPreApprovalRequest = scope.action === "disbursementpreapprovalrequest";
+                            scope.applyKenyaCapitalDisbursementDefaults(templateData);
                             scope.computeUsdEquivalent();
                             
                             // Expand payment details for review (SS vendor, third-party partner instruction, or client bank payment)
@@ -1788,6 +1783,9 @@
                 }
 
                 if (scope.action == "approve" || scope.action === "approveDisbursement" || scope.action === "disbursementpreapprovalrequest" || scope.action === "disbursementapproval") {
+                    if (scope.isKenyaCapitalDisbursement && scope.formData.budgetLocation) {
+                        submitData.budgetLocation = scope.formData.budgetLocation;
+                    }
                     if (submitData.disbursementType === 'VENDOR') {
                         submitData.paymentTo = 2;
                     } else if (submitData.disbursementType === 'CLIENT') {
@@ -2389,6 +2387,7 @@
             scope.$watch('formData.actualDisbursementDate', function (newDate) {
                 if (scope.isDisbursementReviewAction() && newDate) {
                     scope.refreshFxRateForDisbursementDate(newDate);
+                    scope.refreshKenyaCapitalBudgetForDisbursementDate(newDate);
                 }
             });
 
