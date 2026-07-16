@@ -116,8 +116,11 @@
                     isBnplLoanProduct : scope.product.isBnplLoanProduct,
                     requiresEquityContribution : scope.product.requiresEquityContribution,
                     equityContributionLoanPercentage : scope.product.equityContributionLoanPercentage,
+                    enableThirdPartyDisbursement : scope.product.enableThirdPartyDisbursement,
+                    thirdPartyDisbursementProvider : scope.product.thirdPartyDisbursementProvider,
                     allowableDSCR : scope.product.allowableDSCR,
                 };
+                scope.thirdPartyDisbursementProviderOptions = scope.product.thirdPartyDisbursementProviderOptions || ['KIFIYA'];
 
                 if (scope.product.isInterestRecalculationEnabled) {
                     scope.formData.interestRecalculationCompoundingMethod = scope.product.interestRecalculationData.interestRecalculationCompoundingType.id;
@@ -293,6 +296,12 @@
             scope.bnplValueChanged = () => {
                 scope.formData.requiresEquityContribution = scope.product.requiresEquityContribution;
                 scope.formData.equityContributionLoanPercentage = scope.product.equityContributionLoanPercentage;
+            };
+
+            scope.thirdPartyDisbursementChanged = () => {
+                if (!scope.formData.enableThirdPartyDisbursement) {
+                    scope.formData.thirdPartyDisbursementProvider = null;
+                }
             };
 
             //Rate
