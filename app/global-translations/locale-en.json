@@ -325,6 +325,8 @@
   "label.input.groupuid": "Group UID",
   "label.input.kivaId": " Kiva ID",
   "label.input.department": "Department",
+  "label.input.investments.budget": "Investments Budget",
+  "label.message.kenya.capital.budget.review.required": "The current month's investments budget is not configured. This disbursement has been flagged for review.",
   "label.input.isKivaProfileImage": "Is Kiva Loan Profile Image",
   "label.input.active": "Active",
   "label.input.enablepaymenttypes": "Enable",
