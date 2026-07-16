@@ -1826,6 +1826,7 @@
   "label.tooltip.loanproduct.closedate": "The date that the loan product will become inactive and unavailable to clients. If blank, the load product will never become inactive.",
   "label.tooltip.loanproduct.includeborrower": "A borrower loan counter (cycle) is used for tracking how many time the client has taken this particular product.",
   "label.tooltip.loanproduct.islamic": "This product will be used for Islamic Banking When this is checked",
+  "label.tooltip.loanproduct.enableThirdPartyDisbursement": "When enabled, loan disbursement for this product is routed through a third-party disbursement service provider. Inkomoko remains the lender; the provider is not the financier.",
   "label.tooltip.loanproduct.currency": "The currency in which the loan will be disbursed.",
   "label.tooltip.loanproduct.decimalplaces": "The number of decimal places to be used to track and report on loans.",
   "label.tooltip.loanproduct.currencyinmultiplesof": "You can enter multiples of currency value. For example, if you put multiples of 100, the currency value will be rounded off to 200, 300, 400, etc.",
@@ -3701,6 +3702,8 @@
   "label.input.productCategory": "Product Category",
   "label.input.includeinborrowerloancounter": "Include in customer loan counter",
   "label.input.islamic": "Is Islamic Banking",
+  "label.input.thirdPartyDisbursementProvider": "Third-Party Disbursement Provider",
+  "label.input.enableThirdPartyDisbursement": "Enable Third-Party Disbursement",
   "label.input.decimalplace": "Decimal places",
   "label.input.principal": "Principal",
   "label.input.principalamount": "Principal Amount",
@@ -5358,5 +5361,7 @@
   "error.msg.client.other.info.clientId.invalid": "Client Other Info does not exist",
   "label.heading.creditScore": "Metro Score",
   "error.msg.loan.fundsource.kiva.desc.more.than.150" : "Description must be less than 150 words for KIVA fund source",
-  "----End---": "--End of file--- "
+    "label.heading.enableThirdPartyDisbursement": "Enable Third-Party Disbursement",
+  "label.heading.thirdPartyDisbursementProvider": "Third-Party Disbursement Provider",
+"----End---": "--End of file--- "
 }
