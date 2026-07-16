@@ -1,0 +1,73 @@
+<div class="content-container" ng-controller="CreateVoiceCallController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/africastalking">{{'label.anchor.africastalking' | translate}}</a></li>
+        <li class="active">{{'label.anchor.initiatevoicecall' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.heading.initiatevoicecall' | translate}}</h4>
+            </div>
+            <br>
+            <form name="createvoicecallform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                <api-validate></api-validate>
+                <fieldset>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.recipienttype' | translate}}</label>
+                        <div class="col-sm-6">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="recipientType" value="phone"> {{'label.input.phonenumber' | translate}}
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="recipientType" value="client"> {{'label.input.client' | translate}}
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="recipientType" value="staff"> {{'label.input.staff' | translate}}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-if="recipientType === 'phone'">
+                        <label class="control-label col-sm-2">{{'label.input.phonenumber' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" name="phoneNumber" ng-model="formData.phoneNumber" class="form-control" required/>
+                        </div>
+                        <div class="col-sm-3">
+                            <form-validate valattributeform="createvoicecallform" valattribute="phoneNumber"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-if="recipientType === 'client'">
+                        <label class="control-label col-sm-2">{{'label.input.client' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="client"
+                                   ng-model="formData.client"
+                                   uib-typeahead="client as client.displayName for client in clientOptions($viewValue) | limitTo:8"
+                                   typeahead-on-select="formData.client = $item"
+                                   placeholder="{{'label.input.searchclient' | translate}}" required/>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-if="recipientType === 'staff'">
+                        <label class="control-label col-sm-2">{{'label.input.staff' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="staff"
+                                   ng-model="formData.staff"
+                                   uib-typeahead="staff as staff.displayName for staff in staffOptions($viewValue) | limitTo:8"
+                                   typeahead-on-select="formData.staff = $item"
+                                   placeholder="{{'label.input.searchstaff' | translate}}" required/>
+                        </div>
+                    </div>
+
+                    <div class="col-md-offset-2">
+                        <a id="cancel" href="#/africastalking" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
+                        <button id="save" type="submit" class="btn btn-primary" has-permission='CREATE_COMMUNICATION'
+                                ng-disabled="isButtonDisabled">{{'label.button.call' | translate}}
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

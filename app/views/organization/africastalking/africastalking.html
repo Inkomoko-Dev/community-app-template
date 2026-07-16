@@ -1,0 +1,166 @@
+
+<div class="content-container" ng-controller="AfricasTalkingCommunicationsController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.africastalking' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.anchor.africastalking' | translate}}</h4>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-12 col-md-8">
+                    <div class="btn-group">
+                        <a href="#/createwhatsappmessage" class="btn btn-primary" has-permission='CREATE_COMMUNICATION'>
+                            <i class="fa fa-whatsapp"></i>&nbsp;&nbsp;{{'label.button.sendwhatsapp' | translate}}
+                        </a>
+                        <a href="#/createvoicecall" class="btn btn-primary" has-permission='CREATE_COMMUNICATION'>
+                            <i class="fa fa-phone"></i>&nbsp;&nbsp;{{'label.button.initiatevoicecall' | translate}}
+                        </a>
+                        <button type="button" class="btn btn-default" data-ng-click="refreshAll()">
+                            <i class="fa fa-refresh"></i>&nbsp;&nbsp;{{'label.button.refresh' | translate}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="alert alert-danger" ng-if="loadError">{{loadError}}</div>
+            <div class="alert alert-info" ng-if="loadingMessages || loadingVoiceCalls">Loading communications...</div>
+            <uib-tabset tabset-name="africastalkingTabset">
+                <uib-tab heading="{{'label.heading.whatsappmessages' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <input ng-model="filterText" type="text" class="form-control"
+                                   placeholder="{{'label.input.filterbyname' | translate}}">
+                        </div>
+                    </div>
+                    <br>
+                    <ul class="nav nav-pills">
+                        <li ng-repeat="tab in statusTabs" ng-class="{active: selectedStatus === tab.id}">
+                            <a href="" ng-click="selectedStatus = tab.id">{{tab.name}}</a>
+                        </li>
+                    </ul>
+                    <br>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.mobilenumber' | translate}}</th>
+                            <th>{{'label.heading.message' | translate}}</th>
+                            <th>{{'label.heading.direction' | translate}}</th>
+                            <th>{{'label.heading.recipienttype' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.submittedondate' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="pointer-main"
+                            dir-paginate="message in messages | filter:filterMessages | itemsPerPage: messagesPerPage"
+                            pagination-id="messagesPagination">
+                            <td class="pointer" data-ng-click="routeToMessage(message.id)">{{message.phoneNumber}}</td>
+                            <td class="pointer" data-ng-click="routeToMessage(message.id)">{{message.messageBody}}</td>
+                            <td class="pointer" data-ng-click="routeToMessage(message.id)">{{message.direction}}</td>
+                            <td class="pointer" data-ng-click="routeToMessage(message.id)">{{message.recipientType}}</td>
+                            <td class="pointer" data-ng-click="routeToMessage(message.id)">{{message.status}}</td>
+                            <td class="pointer" data-ng-click="routeToMessage(message.id)">{{message.createdDate}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls boundary-links="true"
+                                             template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"
+                                             pagination-id="messagesPagination"></dir-pagination-controls>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.voicecalls' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <input ng-model="voiceFilterText" type="text" class="form-control"
+                                   placeholder="{{'label.input.filterbyname' | translate}}">
+                        </div>
+                    </div>
+                    <br>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.destination' | translate}}</th>
+                            <th>{{'label.heading.direction' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.duration' | translate}}</th>
+                            <th>{{'label.heading.submittedondate' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="pointer-main"
+                            dir-paginate="callLog in voiceCalls | filter:filterVoiceCalls | itemsPerPage: voiceCallsPerPage"
+                            pagination-id="voicePagination">
+                            <td class="pointer" data-ng-click="routeToVoiceCall(callLog.id)">{{callLog.callerNumber}}</td>
+                            <td class="pointer" data-ng-click="routeToVoiceCall(callLog.id)">{{callLog.destinationNumber}}</td>
+                            <td class="pointer" data-ng-click="routeToVoiceCall(callLog.id)">{{callLog.direction}}</td>
+                            <td class="pointer" data-ng-click="routeToVoiceCall(callLog.id)">{{callLog.status}}</td>
+                            <td class="pointer" data-ng-click="routeToVoiceCall(callLog.id)">{{callLog.durationSeconds}}</td>
+                            <td class="pointer" data-ng-click="routeToVoiceCall(callLog.id)">{{callLog.createdDate}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls boundary-links="true"
+                                             template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"
+                                             pagination-id="voicePagination"></dir-pagination-controls>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.connectivity' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-8">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary" data-ng-click="testConnectivity('all')">
+                                    {{'label.button.testallchannels' | translate}}
+                                </button>
+                                <button type="button" class="btn btn-default" data-ng-click="testConnectivity('whatsapp')">
+                                    {{'label.button.testwhatsapp' | translate}}
+                                </button>
+                                <button type="button" class="btn btn-default" data-ng-click="testConnectivity('voice')">
+                                    {{'label.button.testvoice' | translate}}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div ng-if="connectivityResult">
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <td><strong>{{'label.heading.integrationenabled' | translate}}</strong></td>
+                                <td>{{connectivityResult.integrationEnabled}}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>{{'label.heading.configured' | translate}}</strong></td>
+                                <td>{{connectivityResult.configured}}</td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered table-striped" ng-if="connectivityResult.channels.length">
+                            <thead>
+                            <tr>
+                                <th>{{'label.heading.channel' | translate}}</th>
+                                <th>{{'label.heading.status' | translate}}</th>
+                                <th>{{'label.heading.latency' | translate}}</th>
+                                <th>{{'label.heading.message' | translate}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="channel in connectivityResult.channels">
+                                <td>{{channel.channel}}</td>
+                                <td>{{channel.connected}}</td>
+                                <td>{{channel.latencyMillis}}</td>
+                                <td>{{channel.message}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+</div>
