@@ -787,15 +787,16 @@
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'DISBURSETOSAVINGS_LOAN';
                     break;
-                case "repayment":
+                    case "repayment":
                     scope.modelName = 'transactionDate';
                     resourceFactory.loanTrxnsTemplateResource.get({
                         loanId: scope.accountId,
                         command: 'repayment'
                     }, function (data) {
-                        scope.paymentTypes = data.paymentTypeOptions;
-                        if (data.paymentTypeOptions.length > 0) {
-                            scope.formData.paymentTypeId = data.paymentTypeOptions[0].id;
+                        // Guard undefined/null paymentTypeOptions so a broken template never blanks the form silently.
+                        scope.paymentTypes = data.paymentTypeOptions || [];
+                        if (scope.paymentTypes.length > 0) {
+                            scope.formData.paymentTypeId = scope.paymentTypes[0].id;
                         }
                         scope.formData.transactionAmount = data.amount;
                         scope.formData[scope.modelName] = new Date(data.date) || new Date();
