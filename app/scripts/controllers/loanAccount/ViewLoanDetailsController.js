@@ -697,6 +697,33 @@
                     scope.reversalTransactionsByOriginalId = buildRecoveryReversalIndex(data.transactions || []);
                     scope.recoveryReversalTransactionsByOriginalId = scope.reversalTransactionsByOriginalId;
                     scope.productId = data.loanProductId;
+                    resourceFactory.loanProductResource.get({ loanProductId: data.loanProductId }, function (product) {
+                        scope.loanProduct = product;
+                    });
+                    scope.getSupplierDisbursementDetail = function () {
+                        if (!scope.loandetails || !scope.loandetails.disbursementDetails || !scope.loandetails.disbursementDetails.length) {
+                            return null;
+                        }
+                        return scope.loandetails.disbursementDetails[0];
+                    };
+                    scope.hasSupplierDisbursementData = function () {
+                        var detail = scope.getSupplierDisbursementDetail();
+                        return detail && (detail.supplierId || detail.beneficiaryName || detail.paymentTo === 2
+                                || detail.clientPhoneNumber || detail.clientAccountNumber || detail.clientBankName);
+                    };
+                    scope.isThirdPartyDisbursementLoan = function () {
+                        return scope.loanProduct && scope.loanProduct.enableThirdPartyDisbursement === true;
+                    };
+                    scope.shouldShowSupplierDisbursementPanel = function () {
+                        if (!scope.loandetails || !scope.loandetails.status || scope.loandetails.status.id !== 100) {
+                            return false;
+                        }
+                        if (scope.isThirdPartyDisbursementLoan()) {
+                            return true;
+                        }
+                        var detail = scope.getSupplierDisbursementDetail();
+                        return detail && (detail.paymentTo === 2 || detail.supplierId);
+                    };
                     scope.loanOfficeId = getLoanOfficeId(data);
                     scope.latestClosureDate = null;
                     scope.convertDateArrayToObject('date');

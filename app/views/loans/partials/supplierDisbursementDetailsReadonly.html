@@ -1,0 +1,56 @@
+<div class="panel panel-info" ng-if="shouldShowSupplierDisbursementPanel()">
+    <div class="panel-heading">
+        <strong>{{ 'label.heading.supplierDisbursementDetails' | translate }}</strong>
+        <span ng-if="loanProduct.thirdPartyDisbursementProvider" class="text-muted" style="margin-left: 8px;">
+            ({{ loanProduct.thirdPartyDisbursementProvider }})
+        </span>
+    </div>
+    <div class="panel-body">
+        <p class="text-muted" ng-if="!hasSupplierDisbursementData()">
+            {{ 'label.message.supplierDisbursementDetails.notConfigured' | translate }}
+        </p>
+        <p class="text-muted" ng-if="hasSupplierDisbursementData()">
+            {{ 'label.message.supplierDisbursementDetails.readOnly' | translate }}
+        </p>
+        <table class="table table-bordered table-striped" ng-if="hasSupplierDisbursementData()">
+            <tbody>
+            <tr ng-if="getSupplierDisbursementDetail().supplierId">
+                <th class="table-bold-loan">{{ 'label.heading.supplierCbsId' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().supplierId }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().supplierName">
+                <th class="table-bold-loan">{{ 'label.heading.name' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().supplierName }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().supplierExternalId">
+                <th class="table-bold-loan">{{ 'label.heading.externalId' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().supplierExternalId }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().supplierSourceSystem">
+                <th class="table-bold-loan">{{ 'label.heading.sourcesystem' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().supplierSourceSystem }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().beneficiaryName">
+                <th class="table-bold-loan">{{ 'label.input.beneficiaryName' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().beneficiaryName }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().paymentTypeName">
+                <th class="table-bold-loan">{{ 'label.input.paymenttype' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().paymentTypeName }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().clientPhoneNumber">
+                <th class="table-bold-loan">{{ 'label.input.clientPhoneNumber' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().clientPhoneNumber }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().clientAccountNumber">
+                <th class="table-bold-loan">{{ 'label.input.clientAccountNumber' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().clientAccountNumber }}</td>
+            </tr>
+            <tr ng-if="getSupplierDisbursementDetail().clientBankName">
+                <th class="table-bold-loan">{{ 'label.input.clientBankName' | translate }}</th>
+                <td>{{ getSupplierDisbursementDetail().clientBankName }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -493,6 +493,8 @@
             </div>
 
             <div class="paddedleft" style="margin-left:-1px;margin-top: -20px; margin-right: 1px; padding: 10px;">
+                <div ng-include="'views/loans/partials/supplierDisbursementDetailsReadonly.html'"
+                     ng-if="shouldShowSupplierDisbursementPanel()"></div>
                 <hr class="marginbottom"/>
                 <uib-tabset class = "scrollable" tabset-name="loanAccountDetails" scrollable>
                     <uib-tab heading="{{'label.heading.accountdetail' | translate}}">

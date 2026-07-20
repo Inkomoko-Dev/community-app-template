@@ -206,7 +206,10 @@
                     </div>
                 </div>
 
-                <div ng-show="isTransaction">
+                <div ng-include="'views/loans/partials/supplierDisbursementDetailsReadonly.html'"
+                     ng-if="shouldShowSupplierDisbursementPanel()"></div>
+
+                <div ng-show="isTransaction && !shouldShowSupplierDisbursementPanel()">
 
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
