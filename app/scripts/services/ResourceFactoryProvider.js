@@ -1163,7 +1163,7 @@
                         search: { method: 'GET', params: {}, isArray: true }
                     }),
                     suppliersResource: defineResource(apiVer + "/suppliers/:supplierId", { supplierId: '@supplierId' }, {
-                        getAll: { method: 'GET', params: {}, isArray: true },
+                        getAll: { method: 'GET', params: {}, isArray: false },
                         get: { method: 'GET', params: { supplierId: '@supplierId' } },
                         template: { method: 'GET', params: { supplierId: 'template' } }
                     }),
