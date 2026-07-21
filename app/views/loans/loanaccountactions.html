@@ -138,6 +138,35 @@
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
                     </div>
                 </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <div class="alert alert-info" role="alert">
+                            <strong>{{'label.heading.department' | translate}}</strong>:
+                            {{kenyaCapitalDefaults.departmentName || 'Investment'}}
+                            <div>
+                                <strong>{{'label.input.investments.budget' | translate}}</strong>:
+                                {{formData.budgetLocation || kenyaCapitalDefaults.budgetLocation}}
+                            </div>
+                        </div>
+                        <div class="alert alert-warning" role="alert" ng-if="kenyaCapitalDefaults.budgetReviewRequired">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            {{'label.message.kenya.capital.budget.review.required' | translate}}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2">{{'label.heading.department' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="text" ng-model="kenyaCapitalDefaults.departmentName" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2" for="budgetLocation">{{'label.input.investments.budget' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input id="budgetLocation" class="form-control" type="text" ng-model="formData.budgetLocation"
+                               ng-disabled="isReadOnly">
+                    </div>
+                </div>
                 <div class="form-group" ng-show="principalPortion">
                     <label class="control-label col-sm-2" for="principalPortion">{{ 'label.input.principal' |
                         translate}}</label>
