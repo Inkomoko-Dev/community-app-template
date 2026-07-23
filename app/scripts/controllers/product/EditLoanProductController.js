@@ -120,7 +120,7 @@
                     thirdPartyDisbursementProvider : scope.product.thirdPartyDisbursementProvider,
                     allowableDSCR : scope.product.allowableDSCR,
                 };
-                scope.thirdPartyDisbursementProviderOptions = scope.product.thirdPartyDisbursementProviderOptions || ['KIFIYA'];
+                scope.thirdPartyDisbursementProviderOptions = scope.product.thirdPartyDisbursementProviderOptions || [];
 
                 if (scope.product.isInterestRecalculationEnabled) {
                     scope.formData.interestRecalculationCompoundingMethod = scope.product.interestRecalculationData.interestRecalculationCompoundingType.id;
