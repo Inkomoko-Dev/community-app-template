@@ -877,6 +877,7 @@
                         scope.writeOffAmount = data.amount;
                         scope.formData.transactionAmount = data.amount;
                         scope.isLoanWriteOff = true;
+                        scope.futureInterestCancelled = data.futureInterestCancelled;
                     });
                     scope.title = 'label.heading.payoffloanaccount';
                     scope.labelName = 'label.input.payoffondate';
