@@ -297,10 +297,10 @@
                         </div>
                     </div>
                     <div uib-collapse="!showPaymentDetails">
-                        <div class="form-group" ng-show="showClientOtherInfoForm && isClientBankDetailsMissing()">
+                        <div class="form-group" ng-show="showClientOtherInfoForm && (isClientBankDetailsMissing() || isReviewBankDetailsMissing())">
                             <div class="col-sm-offset-2 col-sm-6">
                                 <div class="alert alert-warning" role="alert">
-                                    {{ 'label.message.client.bank.details.missing' | translate }}
+                                    {{ (isReviewBankDetailsMissing() ? 'label.message.client.bank.details.not.captured' : 'label.message.client.bank.details.missing') | translate }}
                                 </div>
                             </div>
                         </div>
