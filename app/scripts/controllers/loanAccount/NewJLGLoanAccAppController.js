@@ -63,6 +63,11 @@
                     scope.termFrequency = data.termFrequency;
                     scope.termPeriodFrequencyType = data.termPeriodFrequencyType;
                     scope.datatables = data.datatables;
+                    scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
+                    scope.thirdPartyDisbursementProviderOptions = data.thirdPartyDisbursementProviderOptions || [];
+                    if (!scope.enableThirdPartyDisbursement) {
+                        scope.loanApplicationCommonData.thirdPartyDisbursementProvider = null;
+                    }
                     scope.handleDatatables(scope.datatables);
                 });
             };
@@ -161,6 +166,10 @@
 
             /* Submit button action */
             scope.submit = function () {
+                if (scope.enableThirdPartyDisbursement && !scope.loanApplicationCommonData.thirdPartyDisbursementProvider) {
+                    scope.error = 'Third-party disbursement provider is required for this product.';
+                    return;
+                }
                 if (!_.isUndefined(scope.datatables) && scope.datatables.length > 0) {
                     angular.forEach(scope.datatables, function (datatable, index) {
                         scope.columnHeaders = datatable.columnHeaderData;
@@ -222,6 +231,9 @@
                         loanApplication.submittedOnDate =  dateFilter(scope.loanApplicationCommonData.submittedOnDate, scope.df);
                         loanApplication.syncDisbursementWithMeeting = scope.loanApplicationCommonData.syncDisbursementWithMeeting;
 
+                        if (scope.enableThirdPartyDisbursement && scope.loanApplicationCommonData.thirdPartyDisbursementProvider) {
+                            loanApplication.thirdPartyDisbursementProvider = scope.loanApplicationCommonData.thirdPartyDisbursementProvider;
+                        }
 
                         loanApplication.charges = [];
 

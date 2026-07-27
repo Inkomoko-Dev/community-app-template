@@ -227,6 +227,28 @@
             <br>
 
             <div class="col-sm-12 col-md-12 primarydiv">
+                <div class="alert alert-info pull-left" style="margin: 0 12px 0 0; padding: 8px 12px;"
+                     ng-show="isAwaitingPartnerDisbursementInstruction">
+                    <i class="fa fa-hourglass-half"></i>
+                    <strong>{{'label.heading.awaitingPartnerDisbursementInstruction' | translate}}</strong>
+                    —
+                    {{'label.msg.loan.awaitingPartnerDisbursementInstruction' | translate}}
+                    <span ng-show="thirdPartyDisbursementProvider">
+                        ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                        <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                    </span>
+                </div>
+                <div class="alert alert-success pull-left" style="margin: 0 12px 0 0; padding: 8px 12px;"
+                     ng-show="isReadyForStaffThirdPartyDisbursement">
+                    <i class="fa fa-check-circle"></i>
+                    <strong>{{'label.heading.readyForStaffDisbursementApproval' | translate}}</strong>
+                    —
+                    {{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}
+                    <span ng-show="thirdPartyDisbursementProvider">
+                        ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                        <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                    </span>
+                </div>
                 <div class="pull-right btn-group">
                     <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary">{{'label.button.creditcheck' | translate}}</a>
 
@@ -295,11 +317,112 @@
                             <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
                         </tr>
+                        <tr ng-show="isAwaitingPartnerDisbursementInstruction">
+                            <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
+                            <td>
+                                <span class="padded-td">{{'label.heading.awaitingPartnerDisbursementInstruction' | translate}}</span>
+                                <span ng-show="thirdPartyDisbursementProvider">
+                                    — {{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                                    <strong>{{thirdPartyDisbursementProvider}}</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr ng-show="isAwaitingPartnerDisbursementInstruction">
+                            <th class="table-bold-loan">{{'label.heading.nextStep' | translate}}</th>
+                            <td><span class="padded-td">{{'label.msg.loan.awaitingPartnerDisbursementInstruction' | translate}}</span></td>
+                        </tr>
+                        <tr ng-show="isReadyForStaffThirdPartyDisbursement">
+                            <th class="table-bold-loan">{{'label.heading.nextStep' | translate}}</th>
+                            <td><span class="padded-td">{{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}</span></td>
+                        </tr>
+                        <tr ng-show="partnerSupplierDisbursementDetail">
+                            <th class="table-bold-loan">{{'label.heading.partnerSupplierPaymentDetails' | translate}}</th>
+                            <td>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.supplierName">
+                                    {{'label.heading.supplierName' | translate}}:
+                                    <strong>{{partnerSupplierDisbursementDetail.supplierName}}</strong>
+                                    <span ng-show="partnerSupplierDisbursementDetail.supplierExternalId">
+                                        ({{partnerSupplierDisbursementDetail.supplierExternalId}})
+                                    </span>
+                                    <br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.beneficiaryName">
+                                    {{'label.input.beneficiaryName' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.beneficiaryName}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId">
+                                    {{'label.input.paymenttype' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.clientPhoneNumber">
+                                    {{'label.input.clientPhoneNumber' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.clientPhoneNumber}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.clientAccountNumber">
+                                    {{'label.input.clientAccountNumber' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.clientAccountNumber}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.clientBankName">
+                                    {{'label.input.clientBankName' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.clientBankName}}
+                                </span>
+                            </td>
+                        </tr>
                         <tr ng-show="loandetails.loanWithAnotherInstitutionAmount">
                             <th class="table-bold-loan">{{'label.heading.loan.with.another.institution.amount' | translate}}</th>
                             <td>{{loandetails.loanWithAnotherInstitutionAmount | number}}</td>
                         </tr>
                     </table>
+                    <div class="alert alert-info" ng-show="isAwaitingPartnerDisbursementInstruction && loandetails.summary">
+                        <strong>{{'label.heading.awaitingPartnerDisbursementInstruction' | translate}}</strong>
+                        <span ng-show="thirdPartyDisbursementProvider">
+                            ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                            <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                        </span>
+                        <br>
+                        {{'label.msg.loan.awaitingPartnerDisbursementInstruction' | translate}}
+                    </div>
+                    <div class="alert alert-success" ng-show="isReadyForStaffThirdPartyDisbursement && loandetails.summary">
+                        <strong>{{'label.heading.readyForStaffDisbursementApproval' | translate}}</strong>
+                        <span ng-show="thirdPartyDisbursementProvider">
+                            ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                            <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                        </span>
+                        <br>
+                        {{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}
+                    </div>
+                    <div class="alert alert-info" ng-show="partnerSupplierDisbursementDetail && loandetails.summary">
+                        <strong>{{'label.heading.partnerSupplierPaymentDetails' | translate}}</strong>
+                        <br>
+                        <span ng-show="partnerSupplierDisbursementDetail.supplierName">
+                            {{'label.heading.supplierName' | translate}}:
+                            {{partnerSupplierDisbursementDetail.supplierName}}
+                            <span ng-show="partnerSupplierDisbursementDetail.supplierExternalId">
+                                ({{partnerSupplierDisbursementDetail.supplierExternalId}})
+                            </span>
+                            <br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.beneficiaryName">
+                            {{'label.input.beneficiaryName' | translate}}:
+                            {{partnerSupplierDisbursementDetail.beneficiaryName}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId">
+                            {{'label.input.paymenttype' | translate}}:
+                            {{partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.clientPhoneNumber">
+                            {{'label.input.clientPhoneNumber' | translate}}:
+                            {{partnerSupplierDisbursementDetail.clientPhoneNumber}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.clientAccountNumber">
+                            {{'label.input.clientAccountNumber' | translate}}:
+                            {{partnerSupplierDisbursementDetail.clientAccountNumber}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.clientBankName">
+                            {{'label.input.clientBankName' | translate}}:
+                            {{partnerSupplierDisbursementDetail.clientBankName}}
+                        </span>
+                    </div>
                     <div ng-show="loandetails.summary">
                         <h3>{{'label.heading.currentBalance' | translate}}: {{loandetails.currency.displaySymbol}} {{loandetails.summary.totalOutstanding | number}}</h3>
                         <br>

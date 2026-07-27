@@ -1,4 +1,4 @@
-<div class="content-container" ng-controller="ViewLoanDetailsController">
+<div class="content-container loan-account-wide" ng-controller="ViewLoanDetailsController">
     <ul class="breadcrumb">
         <li ng-show="loandetails.clientName"><a
                 ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
@@ -15,6 +15,59 @@
             <br>
             <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
             <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+        </div>
+    </script>
+    <script type="text/ng-template" id="waivepenaltyselect.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.button.waivepenalty' | translate}}</h3>
+        </div>
+        <div class="modal-body">
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>{{'label.heading.name' | translate}}</th>
+                    <th>{{'label.heading.date' | translate}}</th>
+                    <th>{{'label.heading.outstanding' | translate}}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="charge in penalties">
+                    <td>{{charge.name}}</td>
+                    <td>{{charge.dueDate | dateFormat}}</td>
+                    <td>{{charge.amountOutstanding | number}}</td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" ng-click="select(charge)"><i class="fa fa-flag"></i>&nbsp;{{'label.button.waivecharge' | translate}}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+        </div>
+    </script>
+    <script type="text/ng-template" id="renameDocumentDialog.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.heading.renamedocument' | translate}}</h3>
+        </div>
+        <div class="modal-body">
+            <form name="renameDocumentForm" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="documentName">{{'label.input.name' | translate}}<span class="required">*</span></label>
+                    <div class="col-sm-6">
+                        <input type="text" id="documentName" name="documentName" class="form-control" ng-model="renameData.name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="documentDescription">{{'label.input.description' | translate}}</label>
+                    <div class="col-sm-6">
+                        <textarea id="documentDescription" name="documentDescription" class="form-control" rows="2" ng-model="renameData.description"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+            <button class="btn btn-primary" ng-click="confirm()" ng-disabled="renameDocumentForm.$invalid">{{'label.button.save' | translate}}</button>
         </div>
     </script>
     <api-validate></api-validate>
@@ -174,6 +227,28 @@
             <br>
 
             <div class="col-sm-12 col-md-12 primarydiv">
+                <div class="alert alert-info pull-left" style="margin: 0 12px 0 0; padding: 8px 12px;"
+                     ng-show="isAwaitingPartnerDisbursementInstruction">
+                    <i class="fa fa-hourglass-half"></i>
+                    <strong>{{'label.heading.awaitingPartnerDisbursementInstruction' | translate}}</strong>
+                    —
+                    {{'label.msg.loan.awaitingPartnerDisbursementInstruction' | translate}}
+                    <span ng-show="thirdPartyDisbursementProvider">
+                        ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                        <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                    </span>
+                </div>
+                <div class="alert alert-success pull-left" style="margin: 0 12px 0 0; padding: 8px 12px;"
+                     ng-show="isReadyForStaffThirdPartyDisbursement">
+                    <i class="fa fa-check-circle"></i>
+                    <strong>{{'label.heading.readyForStaffDisbursementApproval' | translate}}</strong>
+                    —
+                    {{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}
+                    <span ng-show="thirdPartyDisbursementProvider">
+                        ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                        <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                    </span>
+                </div>
                 <div class="pull-right btn-group">
                     <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary">{{'label.button.creditcheck' | translate}}</a>
 
@@ -187,7 +262,7 @@
                               {{ 'label.button.more' | translate}}
                               <span class="caret"></span>
                           </a>
-                          <ul style='margin-left:-95px;' class="dropdown dropdown-menu">
+                          <ul class="dropdown dropdown-menu dropdown-menu-right" style="width: max-content;" role="menu">
                               <li class="{{button.icon}}" ng-repeat="button in buttons.options">
                                   <a ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
                                      has-permission='{{button.taskPermissionName}}'>{{'label.'+
@@ -242,11 +317,112 @@
                             <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
                         </tr>
+                        <tr ng-show="isAwaitingPartnerDisbursementInstruction">
+                            <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
+                            <td>
+                                <span class="padded-td">{{'label.heading.awaitingPartnerDisbursementInstruction' | translate}}</span>
+                                <span ng-show="thirdPartyDisbursementProvider">
+                                    — {{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                                    <strong>{{thirdPartyDisbursementProvider}}</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr ng-show="isAwaitingPartnerDisbursementInstruction">
+                            <th class="table-bold-loan">{{'label.heading.nextStep' | translate}}</th>
+                            <td><span class="padded-td">{{'label.msg.loan.awaitingPartnerDisbursementInstruction' | translate}}</span></td>
+                        </tr>
+                        <tr ng-show="isReadyForStaffThirdPartyDisbursement">
+                            <th class="table-bold-loan">{{'label.heading.nextStep' | translate}}</th>
+                            <td><span class="padded-td">{{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}</span></td>
+                        </tr>
+                        <tr ng-show="partnerSupplierDisbursementDetail">
+                            <th class="table-bold-loan">{{'label.heading.partnerSupplierPaymentDetails' | translate}}</th>
+                            <td>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.supplierName">
+                                    {{'label.heading.supplierName' | translate}}:
+                                    <strong>{{partnerSupplierDisbursementDetail.supplierName}}</strong>
+                                    <span ng-show="partnerSupplierDisbursementDetail.supplierExternalId">
+                                        ({{partnerSupplierDisbursementDetail.supplierExternalId}})
+                                    </span>
+                                    <br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.beneficiaryName">
+                                    {{'label.input.beneficiaryName' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.beneficiaryName}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId">
+                                    {{'label.input.paymenttype' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.clientPhoneNumber">
+                                    {{'label.input.clientPhoneNumber' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.clientPhoneNumber}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.clientAccountNumber">
+                                    {{'label.input.clientAccountNumber' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.clientAccountNumber}}<br>
+                                </span>
+                                <span class="padded-td" ng-show="partnerSupplierDisbursementDetail.clientBankName">
+                                    {{'label.input.clientBankName' | translate}}:
+                                    {{partnerSupplierDisbursementDetail.clientBankName}}
+                                </span>
+                            </td>
+                        </tr>
                         <tr ng-show="loandetails.loanWithAnotherInstitutionAmount">
                             <th class="table-bold-loan">{{'label.heading.loan.with.another.institution.amount' | translate}}</th>
                             <td>{{loandetails.loanWithAnotherInstitutionAmount | number}}</td>
                         </tr>
                     </table>
+                    <div class="alert alert-info" ng-show="isAwaitingPartnerDisbursementInstruction && loandetails.summary">
+                        <strong>{{'label.heading.awaitingPartnerDisbursementInstruction' | translate}}</strong>
+                        <span ng-show="thirdPartyDisbursementProvider">
+                            ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                            <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                        </span>
+                        <br>
+                        {{'label.msg.loan.awaitingPartnerDisbursementInstruction' | translate}}
+                    </div>
+                    <div class="alert alert-success" ng-show="isReadyForStaffThirdPartyDisbursement && loandetails.summary">
+                        <strong>{{'label.heading.readyForStaffDisbursementApproval' | translate}}</strong>
+                        <span ng-show="thirdPartyDisbursementProvider">
+                            ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                            <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                        </span>
+                        <br>
+                        {{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}
+                    </div>
+                    <div class="alert alert-info" ng-show="partnerSupplierDisbursementDetail && loandetails.summary">
+                        <strong>{{'label.heading.partnerSupplierPaymentDetails' | translate}}</strong>
+                        <br>
+                        <span ng-show="partnerSupplierDisbursementDetail.supplierName">
+                            {{'label.heading.supplierName' | translate}}:
+                            {{partnerSupplierDisbursementDetail.supplierName}}
+                            <span ng-show="partnerSupplierDisbursementDetail.supplierExternalId">
+                                ({{partnerSupplierDisbursementDetail.supplierExternalId}})
+                            </span>
+                            <br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.beneficiaryName">
+                            {{'label.input.beneficiaryName' | translate}}:
+                            {{partnerSupplierDisbursementDetail.beneficiaryName}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId">
+                            {{'label.input.paymenttype' | translate}}:
+                            {{partnerSupplierDisbursementDetail.paymentTypeName || partnerSupplierDisbursementDetail.paymentTypeId}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.clientPhoneNumber">
+                            {{'label.input.clientPhoneNumber' | translate}}:
+                            {{partnerSupplierDisbursementDetail.clientPhoneNumber}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.clientAccountNumber">
+                            {{'label.input.clientAccountNumber' | translate}}:
+                            {{partnerSupplierDisbursementDetail.clientAccountNumber}}<br>
+                        </span>
+                        <span ng-show="partnerSupplierDisbursementDetail.clientBankName">
+                            {{'label.input.clientBankName' | translate}}:
+                            {{partnerSupplierDisbursementDetail.clientBankName}}
+                        </span>
+                    </div>
                     <div ng-show="loandetails.summary">
                         <h3>{{'label.heading.currentBalance' | translate}}: {{loandetails.currency.displaySymbol}} {{loandetails.summary.totalOutstanding | number}}</h3>
                         <br>
@@ -812,6 +988,8 @@
                                     <th class="pointer" ng-click="changeTransactionSort('amount')">{{'label.heading.amount' | translate}}</th>
                                     <th class="pointer" colspan="4" scope="colgroup">{{'label.heading.breakdown' | translate}}</th>
                                     <th class="pointer" scope="colgroup">{{'label.heading.loan.balance' | translate}}</th>
+                                    <th>{{'label.heading.audit' | translate}}</th>
+                                    <th>{{'label.heading.actions' | translate}}</th>
                                     <th></th>
                                     <th></th>
                                 </tr>
@@ -825,43 +1003,85 @@
                                     <th class="pointer" scope="col" ng-click="changeTransactionSort('interestPortion')">{{'label.heading.interest' | translate}}</th>
                                     <th class="pointer" scope="col" ng-click="changeTransactionSort('feeChargesPortion')">{{'label.heading.fees' | translate}}</th>
                                     <th class="pointer" scope="col" ng-click="changeTransactionSort('penaltyChargesPortion')">{{'label.heading.penalities' | translate}}</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
+                                    <th scope="col">&nbsp;</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="pointer-main" ng-class="{strikeoff : transaction.manuallyReversed==true}"
+                                <tr class="pointer-main" ng-class="{strikeoff : isTransactionReversed(transaction)}"
                                     ng-repeat="transaction in loandetails.transactions | orderBy:transactionSort.column:transactionSort.descending" ng-hide = "hideAccrualTransactions && transaction.type.accrual">
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.id}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.officeName}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.date | DateFormat}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.type.value}}
+                                        <span class="label label-warning reversed-correction-badge" ng-if="isTransactionReversed(transaction)"
+                                              uib-tooltip="{{'tooltip.transaction.reversedcorrection' | translate}}" tooltip-placement="top">
+                                            {{reversedBadgeLabelKey(transaction) | translate}}
+                                        </span>
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.amount | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.principalPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.interestPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.feeChargesPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.penaltyChargesPortion | number}}
                                     </td>
-                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction.id,transaction.type.id)">
+                                    <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.outstandingLoanBalance | number}}
                                     </td>
-
-                                    <td> <span uib-tooltip="{{'label.heading.viewreceipts' | translate }}" ng-if="transaction.manuallyReversed!=true" ng-click="viewloantransactionreceipts(transaction.id)">
+                                    <td class="small" ng-if="showTransactionAuditInfo(transaction)">
+                                        <div ng-if="isTransactionReversed(transaction)" class="text-danger"><strong>{{reversedBadgeLabelKey(transaction) | translate}}</strong></div>
+                                        <div><strong>{{'label.input.manuallyreversed' | translate}}:</strong> {{transaction.manuallyReversed | YesOrNo}}</div>
+                                        <div><strong>{{'label.input.originaldate' | translate}}:</strong> {{transaction.date | DateFormat}}</div>
+                                        <div ng-if="getTransactionCorrectionDate(transaction)"><strong>{{'label.input.correctiondate' | translate}}:</strong> {{getTransactionCorrectionDate(transaction) | DateFormat}}</div>
+                                        <div ng-if="transaction.originalTransactionId">
+                                            <strong>{{'label.input.originaltransactionid' | translate}}:</strong>
+                                            <a href ng-click="openRelatedTransaction($event, transaction.originalTransactionId)">{{getRelatedTransactionId(transaction.originalTransactionId)}}</a>
+                                        </div>
+                                        <div ng-if="getRelatedTransactionId(getReversalTransaction(transaction))">
+                                            <strong>{{'label.input.reversaltransaction' | translate}}:</strong>
+                                            <a href ng-click="openRelatedTransaction($event, getReversalTransaction(transaction))">{{getRelatedTransactionId(getReversalTransaction(transaction))}}</a>
+                                            <span ng-if="getRelatedTransactionDate(getReversalTransaction(transaction))">({{getRelatedTransactionDate(getReversalTransaction(transaction)) | DateFormat}})</span>
+                                        </div>
+                                    </td>
+                                    <td ng-if="!showTransactionAuditInfo(transaction)">&nbsp;</td>
+                                    <td>
+                                        <button type="button" class="btn btn-xs btn-warning"
+                                                ng-if="canReverseRecoveryPayment(transaction)"
+                                                ng-click="openReverseRecoveryPaymentModal(transaction)"
+                                                uib-tooltip="{{'label.button.reverserecoverypayment' | translate}}"
+                                                aria-label="{{'label.button.reverserecoverypayment' | translate}}"
+                                                has-permission="REVERSERECOVERYPAYMENT_LOAN">
+                                            <i class="fa fa-undo"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-primary"
+                                                ng-if="canPostCorrectedRecoveryPayment(transaction)"
+                                                ng-click="openPostCorrectedRecoveryPaymentModal(transaction)"
+                                                uib-tooltip="{{'label.button.postcorrectedrecovery' | translate}}"
+                                                aria-label="{{'label.button.postcorrectedrecovery' | translate}}"
+                                                has-permission="RECOVERYPAYMENT_LOAN">
+                                            <i class="fa fa-repeat"></i>
+                                        </button>
+                                    </td>
+                                    <td> <span uib-tooltip="{{'label.heading.viewreceipts' | translate }}" ng-if="!isTransactionReversed(transaction)" ng-click="viewloantransactionreceipts(transaction.id)">
                                         <i class="fa fa-file-text fa fa-large"></i>
                                     </span>
                                     </td>
@@ -1016,6 +1236,14 @@
                                     <a class="btn-success" data-ng-show="charge.chargePayable && status=='Active'"
                                        href="#/loanaccountcharge/{{loandetails.id}}/paycharge/{{charge.id}}">{{"label.button.pay" |
                                         translate}}</a>
+                                    <a class="btn-warning btn-sm"
+                                       data-ng-show="charge.chargeTimeType.value === 'Disbursement' && charge.paid === true"
+                                       href="#/loan/{{loandetails.id}}/adjustinsurancecharge/{{charge.id}}"
+                                       has-permission="ADJUST_LOAN"
+                                       title="Adjust Insurance Charge">
+                                        <i class="fa fa-pencil"></i> {{'label.button.adjust' | translate}}
+                                    </a>
+                                </td>
                                 </td>
                             </tr>
                         </table>
@@ -1041,9 +1269,10 @@
                                 <td>{{document.description}}</td>
                                 <td>{{document.fileName}}</td>
                                 <td>
-                                    <a ng-click="downloadDocument(document)"><i class="fa fa-cloud-download"></i></a>&nbsp;
-                                    <a ng-show="document.fileIsImage" ng-click="downloadDocument(document)"><i class="fa fa-eye"></i></a>
-                                    <a ng-click="deleteDocument(document.id,$index)"><i class="fa fa-times"></i></a>
+                                    <a ng-click="downloadDocument(document)" uib-tooltip="{{'label.button.download' | translate}}"><i class="fa fa-cloud-download"></i></a>&nbsp;
+                                    <a ng-show="document.fileIsImage" ng-click="downloadDocument(document)" uib-tooltip="{{'label.button.preview' | translate}}"><i class="fa fa-eye"></i></a>
+                                    <a ng-click="renameDocument(document,$index)" has-permission='UPDATE_DOCUMENT' uib-tooltip="{{'label.button.rename' | translate}}"><i class="fa fa-edit"></i></a>&nbsp;
+                                    <a ng-click="deleteDocument(document.id,$index)" has-permission='DELETE_DOCUMENT' uib-tooltip="{{'label.button.delete' | translate}}"><i class="fa fa-times"></i></a>
                                 </td>
                             </tr>
                             </tbody>
@@ -1084,7 +1313,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="{{'label.anchor.standinginstruction' | translate}}" ng-show="instructions.currentPageItems.length > 0">
+                    <uib-tab heading="{{'label.anchor.standinginstruction' | translate}}" ng-show="instructions && instructions.currentPageItems && instructions.currentPageItems.length > 0">
                         <br>
                         <table class="table">
                             <thead>

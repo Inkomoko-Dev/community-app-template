@@ -635,6 +635,8 @@
                         scope.multiDisburseLoan = !!loanData.multiDisburseLoan;
                         scope.form.expectedDisbursementDate = normalizeDate(loanData.timeline.expectedDisbursementDate);
                         scope.productId = loanData.loanProductId;
+                        scope.enableThirdPartyDisbursement = !!loanData.enableThirdPartyDisbursement;
+                        scope.thirdPartyDisbursementProvider = loanData.thirdPartyDisbursementProvider || null;
                         if (loanData.disbursementDetails != "") {
                             scope.disbursementDetails = loanData.disbursementDetails;
                             scope.approveTranches = true;
@@ -680,25 +682,10 @@
                                 scope.showApprovalAmount = true;
                                 scope.showAmountField = true;
                                 scope.isTransaction = !scope.enableThirdPartyDisbursement;
-                                scope.showMfiCode = scope.isTransaction;
                                 scope.formData.approvedLoanAmount = data.approvalAmount;
                                 scope.formData.transactionAmount = data.netDisbursalAmount;
-                                scope.formData.paymentTo = savedVendorDetails.paymentTo || 1;
-                                scope.formData.disbursementType = savedVendorDetails.disbursementType || null;
                                 scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                                 scope.paymentTypes = data.paymentTypeOptions;
-
-                                if (scope.approveTranches && !scope.enableThirdPartyDisbursement) {
-                                    angular.forEach(scope.disbursementDetails, function (detail) {
-                                        if (!detail.paymentTypeId && scope.paymentTypes && scope.paymentTypes.length === 1) {
-                                            detail.paymentTypeId = scope.paymentTypes[0].id;
-                                        }
-                                        if (!detail.paymentTo) {
-                                            detail.paymentTo = 1;
-                                        }
-                                    });
-                                    scope.populateFirstTrancheFromClient();
-                                }
 
                                 // Partner instruction supplies payout details for third-party products.
                                 if (!scope.enableThirdPartyDisbursement) {
@@ -732,7 +719,7 @@
                                     scope.showPaymentDetails = false;
                                     scope.showClientOtherInfoForm = false;
                                 }
-                                scope.isLoanDisbursementRequestEnabled = true;
+                                scope.isLoanDisbursementRequestEnabled = !scope.enableThirdPartyDisbursement;
                                 scope.fetchEntities('m_loan', 'APPROVE');
                                 scope.fetchEntities('m_loan', 'APPROVE', scope.productId);
                             });
@@ -797,13 +784,9 @@
                     }, function (data) {
                         scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                         scope.loanCountry = extractLoanCountry(data);
-                        scope.clientName = data.clientName || scope.clientName;
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
-
-                        scope.showMfiCode = !scope.enableThirdPartyDisbursement;
-
-
+                        
                         var savedDetail = null;
                         if (data.disbursementDetails && data.disbursementDetails.length > 0) {
                             var undisbursedDetails = data.disbursementDetails.filter(function (detail) {
@@ -847,7 +830,8 @@
                                 scope.formData.clientAccountNumber = savedDetail.clientAccountNumber || templateData.clientAccountNumber || '';
                                 scope.formData.clientBankName = savedDetail.clientBankName || templateData.clientBankName || '';
                                 scope.formData.beneficiaryName = savedDetail.beneficiaryName || templateData.beneficiaryName || '';
-                                scope.formData.paymentTypeId = savedDetail.paymentType ? savedDetail.paymentType.id : Number(templateData.paymentTypeId);
+                                scope.formData.paymentTypeId = savedDetail.paymentType ? savedDetail.paymentType.id
+                                    : (savedDetail.paymentTypeId || Number(templateData.paymentTypeId));
                                 scope.formData.disbursementType = savedDetail.disbursementType || (templateData.disbursementType || (scope.formData.paymentTo === 2 ? 'VENDOR' : 'CLIENT'));
                                 scope.formData.fxRate = savedDetail.fxRate || templateData.fxRate || null;
                                 scope.formData.fxSource = savedDetail.fxSource || templateData.fxSource || 'CBS_DAILY_RATE';
@@ -884,9 +868,14 @@
                             scope.isDisbursementPreApprovalRequest = scope.action === "disbursementpreapprovalrequest";
                             scope.computeUsdEquivalent();
                             
-                            // Expand payment details for review (SS vendor, third-party partner instruction, or client bank payment)
-                            if (scope.isSouthSudanSspLoan() || scope.enableThirdPartyDisbursement || scope.isClientBankPaymentReview()) {
+                            // Expand payment details for review (SS vendor + third-party partner instruction)
+                            if (scope.isSouthSudanSspLoan() || scope.enableThirdPartyDisbursement) {
                                 scope.showPaymentDetails = true;
+                                scope.showClientOtherInfoForm = true;
+                            }
+                            // Third-party: staff confirms and disburses; do not use Kenya-style reject-disbursement here.
+                            if (scope.enableThirdPartyDisbursement && isDisbursementReviewTitle) {
+                                scope.showRejectButton = false;
                             }
                         });
                     });
@@ -1725,11 +1714,6 @@
                 
                 // Fields for approval vs disbursement review
                 if (scope.action === "approve") {
-                    scope.addTrancheAmounts();
-                    if (!scope.validateApprovalTranchePrincipalTotal()) {
-                        scope.error = 'Total tranche amount must equal the approved loan principal.';
-                        return;
-                    }
                     if (scope.enableThirdPartyDisbursement) {
                         delete submitData.paymentTypeId;
                         delete submitData.paymentTo;
@@ -2121,7 +2105,8 @@
                         params.loanId = scope.accountId;
                         params.command = chosenCommand;
 
-                        params.command = isApproveAct && scope.isCashPayment() ? 'disburse' : params.command;
+                        params.command = isApproveAct && (scope.isCashPayment() || scope.enableThirdPartyDisbursement)
+                            ? 'disburse' : params.command;
                         
                         // If command is disburse, delete vendor details (endpoint doesn't accept them)
                         if (params.command === 'disburse') {
@@ -2136,6 +2121,10 @@
                             delete submitData.fxSource;
                             delete submitData.fxTimestamp;
                             delete submitData.mfiCode;
+                            // Third-party payout fields live on the loan already; omit so staff submit cannot overwrite them.
+                            if (scope.enableThirdPartyDisbursement) {
+                                delete submitData.paymentTypeId;
+                            }
                         }
 
                         if (scope.action === "undoapproval" || scope.action === "undodisbursal") {
@@ -2283,6 +2272,9 @@
             }
 
             scope.filterDisburseFormData = function () {
+                if (scope.enableThirdPartyDisbursement) {
+                    return;
+                }
                 const isCashPayment = scope.isCashPayment();
                 const isSouthSudan = scope.isSouthSudanSspLoan();
                 
@@ -2423,6 +2415,11 @@
                 
                 // For South Sudan vendor disbursements, always show recipient info regardless of cash payment flag
                 if (scope.isSouthSudanSspLoan() && scope.isVendorDisbursement() && isApprovalAction) {
+                    return true;
+                }
+
+                // Third-party: show partner-supplied supplier payout details on staff review
+                if (scope.enableThirdPartyDisbursement && scope.isDisbursementReviewAction()) {
                     return true;
                 }
                 

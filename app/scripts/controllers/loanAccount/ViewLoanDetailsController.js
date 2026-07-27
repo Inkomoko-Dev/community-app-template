@@ -828,16 +828,16 @@
                         && data.subStatus && data.subStatus.id === 200;
                     scope.partnerSupplierDisbursementDetail = null;
                     if (scope.enableThirdPartyDisbursement && data.disbursementDetails && data.disbursementDetails.length > 0) {
-                        var applicableDetail = applicableDisbursementDetail(data);
-                        if (applicableDetail
-                            && (applicableDetail.supplierId
-                                || applicableDetail.supplierName
-                                || applicableDetail.beneficiaryName
-                                || applicableDetail.clientPhoneNumber
-                                || applicableDetail.clientAccountNumber
-                                || applicableDetail.paymentTypeId
-                                || applicableDetail.paymentTypeName)) {
-                            scope.partnerSupplierDisbursementDetail = applicableDetail;
+                        var firstDisbursementDetail = data.disbursementDetails[0];
+                        if (firstDisbursementDetail
+                            && (firstDisbursementDetail.supplierId
+                                || firstDisbursementDetail.supplierName
+                                || firstDisbursementDetail.beneficiaryName
+                                || firstDisbursementDetail.clientPhoneNumber
+                                || firstDisbursementDetail.clientAccountNumber
+                                || firstDisbursementDetail.paymentTypeId
+                                || firstDisbursementDetail.paymentTypeName)) {
+                            scope.partnerSupplierDisbursementDetail = firstDisbursementDetail;
                         }
                     }
                     scope.decimals = data.currency.decimalPlaces;
@@ -1104,7 +1104,24 @@
 
                         };
 
-                        if(!data.subStatus || (data.subStatus && data.subStatus.code !== 'loanSubStatus.loanSubStatusType.pending.disbursement' && data.subStatus.id !==300)) {
+                        if (scope.isAwaitingPartnerDisbursementInstruction) {
+                            scope.buttons.singlebuttons.push({
+                                name: "button.undoapproval",
+                                icon: "fa fa-undo",
+                                taskPermissionName: 'APPROVALUNDO_LOAN'
+                            });
+                        } else if (scope.isReadyForStaffThirdPartyDisbursement) {
+                            scope.buttons.singlebuttons.push({
+                                name: "button.approveDisbursement",
+                                icon: "fa fa-flag",
+                                taskPermissionName: 'DISBURSE_LOAN'
+                            });
+                            scope.buttons.singlebuttons.push({
+                                name: "button.undoapproval",
+                                icon: "fa fa-undo",
+                                taskPermissionName: 'APPROVALUNDO_LOAN'
+                            });
+                        } else if(!data.subStatus || (data.subStatus && data.subStatus.code !== 'loanSubStatus.loanSubStatusType.pending.disbursement' && data.subStatus.id !==300)) {
                             scope.buttons.singlebuttons.push({
                                 name: "button.disbursementRequest",
                                 icon: "fa fa-flag",
@@ -1212,9 +1229,6 @@
                         }
 
                         if (data.canDisburse && !scope.enableThirdPartyDisbursement) {
-                            var pendingDisbursementApproval = data.subStatus
-                                && (data.subStatus.id === 300
-                                    || data.subStatus.code === 'loanSubStatus.loanSubStatusType.pre.disbursement');
                             scope.buttons.singlebuttons.splice(1, 0, {
                                 name: pendingDisbursementApproval ? "button.approveDisbursement" : "button.disbursementRequest",
                                 icon: "fa fa-flag",
