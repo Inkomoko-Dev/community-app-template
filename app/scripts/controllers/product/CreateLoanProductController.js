@@ -93,8 +93,6 @@
                 scope.formData.isBnplLoanProduct = false;
                 scope.formData.requiresEquityContribution = false;
                 scope.formData.enableThirdPartyDisbursement = false;
-                scope.formData.thirdPartyDisbursementProvider = null;
-                scope.thirdPartyDisbursementProviderOptions = scope.product.thirdPartyDisbursementProviderOptions || [];
                 scope.formData.allowableDSCR = null;
                 scope.product.interestRecalculationNthDayTypeOptions.push({"code" : "onDay", "id" : -2, "value" : "on day"});
                 scope.loanproduct = angular.copy(scope.formData);
@@ -287,12 +285,6 @@
             scope.bnplValueChanged = () => {
                 scope.formData.requiresEquityContribution = false;
                 scope.formData.equityContributionLoanPercentage = null;
-            };
-
-            scope.thirdPartyDisbursementChanged = () => {
-                if (!scope.formData.enableThirdPartyDisbursement) {
-                    scope.formData.thirdPartyDisbursementProvider = null;
-                }
             };
 
             scope.isAccrualAccountingEnabled = function () {

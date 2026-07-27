@@ -149,7 +149,27 @@
             </td>
         </tr>
     </table>
-    <!-- bnpl ends -->
+    <!-- third party disbursement -->
+    <table class=" width100" ng-if="formData.productId && enableThirdPartyDisbursement">
+        <tr>
+            <td class="width14">
+                <label>{{ 'label.input.thirdPartyDisbursementProvider' | translate }}<span class="required">*</span>
+                    <i class="fa fa-question-circle"
+                       uib-tooltip="{{'label.tooltip.loan.thirdPartyDisbursementProvider' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </label>
+            </td>
+            <td class="width36">
+                <select id="thirdPartyDisbursementProvider" name="thirdPartyDisbursementProvider" class="form-control"
+                        ng-model="formData.thirdPartyDisbursementProvider"
+                        ng-options="provider for provider in thirdPartyDisbursementProviderOptions"
+                        required>
+                    <option value="">{{'label.selectone' | translate}}</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <!-- third party disbursement ends -->
 
 <div>
     <div ng-show="loanaccountinfo">
