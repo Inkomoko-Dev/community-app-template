@@ -70,6 +70,24 @@
                                                datepicker-pop="dd MMMM yyyy" ng-model="loanApplicationCommonData.expectedDisbursementDate" is-open="opened1" class="form-control"/>
                                     </td>
                                 </tr>
+                                <tr ng-if="enableThirdPartyDisbursement">
+                                    <td class="width14">
+                                        <label>{{ 'label.input.thirdPartyDisbursementProvider' | translate }}<span class="required">*</span>
+                                            <i class="fa fa-question-circle"
+                                               uib-tooltip="{{'label.tooltip.loan.thirdPartyDisbursementProvider' | translate}}"
+                                               tooltip-append-to-body="true"></i>
+                                        </label>
+                                    </td>
+                                    <td class="paddedbottom10" colspan="3">
+                                        <select id="thirdPartyDisbursementProvider" name="thirdPartyDisbursementProvider"
+                                                class="form-control width170px"
+                                                ng-model="loanApplicationCommonData.thirdPartyDisbursementProvider"
+                                                ng-options="provider for provider in thirdPartyDisbursementProviderOptions"
+                                                required>
+                                            <option value="">{{'label.selectone' | translate}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>
