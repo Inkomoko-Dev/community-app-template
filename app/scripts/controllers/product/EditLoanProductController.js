@@ -55,6 +55,9 @@
                         scope.overduecharges.push(scope.penaltyOptions[i]);
                     }
                 }
+                if (!scope.product.interestRecalculationNthDayTypeOptions) {
+                    scope.product.interestRecalculationNthDayTypeOptions = [];
+                }
                 scope.product.interestRecalculationNthDayTypeOptions.push({"code" : "onDay", "id" : -2, "value" : "on day"});
                 scope.formData = {
                     name: scope.product.name,
@@ -639,7 +642,7 @@
                 }
 
                 resourceFactory.loanProductResource.put({loanProductId: routeParams.id}, this.formData, function (data) {
-                    location.path('/viewloanproduct/' + data.resourceId);
+                    location.path('/viewloanproduct/' + (data.resourceId || routeParams.id));
                 });
             }
 
