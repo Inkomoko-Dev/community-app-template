@@ -19,6 +19,15 @@
                 <span ng-repeat="table in submittedDatatables"><i class="fa fa-check"></i>Entry in ` {{table}} ` has been made successfully. If the inputs are changed, the datatable entries will be updated.<br></span>
             </div>
             <api-validate></api-validate>
+            <div class="alert alert-info" ng-show="(action === 'approve' || action === 'approveDisbursement') && enableThirdPartyDisbursement">
+                <strong>{{'label.heading.thirdPartyDisbursement' | translate}}:</strong>
+                <span ng-show="action === 'approve'">{{'label.msg.approve.disbursementDetailsFromProvider' | translate}}</span>
+                <span ng-show="action === 'approveDisbursement'">{{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}</span>
+                <span ng-show="thirdPartyDisbursementProvider">
+                    ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                    <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                </span>
+            </div>
             <table width="100%">
                 <tr>
                     <td>

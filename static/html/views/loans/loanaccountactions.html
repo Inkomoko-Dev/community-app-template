@@ -8,15 +8,29 @@
     <wizard on-finish="submitDatatable()" current-step = "step" class="card well">
         <wz-step wz-title="{{ title | translate}}">
     <form class="form-horizontal" name="loanactionform" novalidate="" >
+        <div ng-if="error" class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Error:</strong> {{ error }}
+            </div>
         <fieldset>
             <div ng-show="submittedDatatables.length > 0" uib-alert type="success">
                 <span ng-repeat="table in submittedDatatables"><i class="fa fa-check"></i>Entry in ` {{table}} ` has been made successfully. If the inputs are changed, the datatable entries will be updated.<br></span>
             </div>
             <api-validate></api-validate>
+            <div class="alert alert-info" ng-show="(action === 'approve' || action === 'approveDisbursement') && enableThirdPartyDisbursement">
+                <strong>{{'label.heading.thirdPartyDisbursement' | translate}}:</strong>
+                <span ng-show="action === 'approve'">{{'label.msg.approve.disbursementDetailsFromProvider' | translate}}</span>
+                <span ng-show="action === 'approveDisbursement'">{{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}</span>
+                <span ng-show="thirdPartyDisbursementProvider">
+                    ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                    <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                </span>
+            </div>
             <table width="100%">
                 <tr>
                     <td>
-                        <!--<legend>{{ title | translate}}</legend>-->
                     </td>
                     <td ng-show="addDisburseDetails" align="right">
                         <legend>
@@ -27,14 +41,21 @@
                     </td>
                 </tr>
             </table>
-            
-            <div class="form-group" ng-show="showDateField">
+
+            <div class="form-group" ng-show="showDateField" ng-class="{'has-error': hasRecoveryPaymentDateError()}">
                 <label class="control-label col-sm-2" for="modelName">{{labelName | translate}}<span
                         class="required">*</span></label>
 
                 <div class="col-sm-3">
                     <input id="{{modelName}}" sort type="text" datepicker-pop="dd MMMM yyyy" class="form-control"
-                           ng-model="formData[modelName]" min="'2000-01-01'" max="restrictDate"/>
+                           ng-model="formData[modelName]" min="transactionDateMinDate" max="restrictDate"/>
+                    <div class="help-block text-warning" ng-show="isRecoveryPaymentAction && recoveryPaymentWriteOffOnDate">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        {{ 'label.warning.recoverypayment.minimumdate' | translate:getRecoveryPaymentWriteOffDateArgs() }}
+                    </div>
+                    <small class="error" ng-show="hasRecoveryPaymentDateError()">
+                        {{ getRecoveryPaymentDateErrorCode() | translate:getRecoveryPaymentDateErrorArgs() }}
+                    </small>
                 </div>
             </div>
             <div class="form-group" ng-show="showApprovalAmount">
@@ -101,13 +122,13 @@
             </div>
             <div ng-show="disbursementDetails">
                 <div class="form-group" ng-show="showApprovalAmount">
-                    <label class="control-label col-sm-2" for="approvedAmount">{{ 'label.input.transactionamount' |
+                    <label class="control-label col-sm-2" for="approvedAmount">{{ 'label.heading.approvedamount' |
                         translate}}<span class="required">*</span></label>
 
                     <div class="col-sm-3">
                         <input id="approvedAmount" type="text" name="amount" ng-model="formData.approvedLoanAmount"
                                class="form-control"
-                               number-format required late-Validate>
+                               number-format required late-Validate ng-readonly="isReadOnly">
                     </div>
                     <div class="col-sm-3">
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
@@ -120,10 +141,39 @@
                     <div class="col-sm-3">
                         <input id="transactionAmount" type="text" name="amount" ng-model="formData.transactionAmount"
                                class="form-control"
-                               number-format required late-Validate>
+                               number-format required late-Validate ng-readonly="isReadOnly">
                     </div>
                     <div class="col-sm-3">
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <div class="alert alert-info" role="alert">
+                            <strong>{{'label.heading.department' | translate}}</strong>:
+                            {{kenyaCapitalDefaults.departmentName || 'Investment'}}
+                            <div>
+                                <strong>{{'label.input.investments.budget' | translate}}</strong>:
+                                {{formData.budgetLocation || kenyaCapitalDefaults.budgetLocation}}
+                            </div>
+                        </div>
+                        <div class="alert alert-warning" role="alert" ng-if="kenyaCapitalDefaults.budgetReviewRequired">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            {{'label.message.kenya.capital.budget.review.required' | translate}}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2">{{'label.heading.department' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="text" ng-model="kenyaCapitalDefaults.departmentName" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2" for="budgetLocation">{{'label.input.investments.budget' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input id="budgetLocation" class="form-control" type="text" ng-model="formData.budgetLocation"
+                               ng-disabled="isReadOnly">
                     </div>
                 </div>
                 <div class="form-group" ng-show="principalPortion">
@@ -194,16 +244,16 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="control-label col-sm-2">{{ 'label.anchor.mfiCode' | translate}} jjjj</label>
-
-                    <div class="col-sm-3">
-                            <input id="mfiCode" type="text" class="form-control"
-                                    ng-model="formData.mfiCode">
-                    </div>
-                </div>
-
                 <div ng-show="isTransaction">
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
+                        <div class="col-sm-3">
+                            <input id="mfiCode" type="text" name="mfiCode" ng-model="formData.mfiCode"
+                                   class="form-control" ng-disabled="isReadOnly">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="paymentTypeId">{{ 'label.input.paymenttype' |
                             translate}}</label>
@@ -211,11 +261,71 @@
                         <div class="col-sm-3">
                             <select id="paymentTypeId" ng-model="formData.paymentTypeId" class="form-control"
                                     ng-options="paymentType.id as paymentType.name for paymentType in paymentTypes"
-                                    value="{{paymentType.id}}"></select>
+                                    value="{{paymentType.id}}" ng-disabled="isReadOnly"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-show="showClientOtherInfoForm">
+                        <label class="control-label col-sm-2" for="paymentTo">{{ 'label.input.paymentto' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <select id="paymentTo" ng-model="formData.paymentTo" class="form-control"
+                                    ng-options="option.id as option.name | translate for option in paymentToOptions"
+                                    value="{{option.id}}" ng-disabled="isReadOnly"></select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isSouthSudanSspLoan() && isApprovalAction()">
+                        <label class="control-label col-sm-2" for="disbursementType">Disbursement Type <span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <select id="disbursementType" ng-model="formData.disbursementType" class="form-control"
+                                    ng-options="option.id as option.name for option in disbursementTypeOptions"></select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isSouthSudanSspLoan() && isDisbursementReviewAction()">
+                        <label class="control-label col-sm-2">Disbursement Type</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" type="text" ng-model="formData.disbursementType" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxRate">FX Rate (SSP/USD) <span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <input id="fxRate" class="form-control" type="text" ng-model="formData.fxRate"
+                                   ng-disabled="isDisbursementReviewAction()" number-format ng-change="computeUsdEquivalent()">
+                            <div class="help-block text-danger" ng-if="isFxRateMissing() && isApprovalAction()">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                No FX rate found in CBS. Please enter it manually with caution.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="usdAmount">USD Equivalent</label>
+                        <div class="col-sm-3">
+                            <input id="usdAmount" class="form-control" type="text" ng-model="formData.usdAmount" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxSource">FX Source</label>
+                        <div class="col-sm-3">
+                            <input id="fxSource" class="form-control" type="text" ng-model="formData.fxSource" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="shouldShowFxDetails()">
+                        <label class="control-label col-sm-2" for="fxTimestamp">FX Timestamp</label>
+                        <div class="col-sm-3">
+                            <input id="fxTimestamp" class="form-control" type="text" ng-model="formData.fxTimestamp" ng-disabled="true">
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="isDisbursementReviewAction() && shouldShowFxDetails()">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <div class="alert alert-info" role="alert">
+                                You are reviewing the locked FX conversion before disbursement execution.
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-2">{{ 'label.anchor.showpaymentdetails' | translate}} jjjj</label>
+                        <label class="control-label col-sm-2">{{ 'label.anchor.showpaymentdetails' | translate}}</label>
 
                         <div class="col-sm-3">
                             <a class="btn btn-primary" ng-click="showPaymentDetails=!showPaymentDetails">
@@ -225,13 +335,20 @@
                         </div>
                     </div>
                     <div uib-collapse="!showPaymentDetails">
+                        <div class="form-group" ng-show="showClientOtherInfoForm && isClientBankDetailsMissing()">
+                            <div class="col-sm-offset-2 col-sm-6">
+                                <div class="alert alert-warning" role="alert">
+                                    {{ 'label.message.client.bank.details.missing' | translate }}
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="accountNumber">{{ 'label.input.accnum' |
                                 translate}}</label>
 
                             <div class="col-sm-3">
                                 <input id="accountNumber" type="text" class="form-control"
-                                       ng-model="formData.accountNumber">
+                                       ng-model="formData.accountNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
@@ -240,7 +357,7 @@
 
                             <div class="col-sm-3">
                                 <input id="checkNumber" class="form-control" type="text"
-                                       ng-model="formData.checkNumber">
+                                       ng-model="formData.checkNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
@@ -249,7 +366,7 @@
 
                             <div class="col-sm-3">
                                 <input id="routingCode" class="form-control" type="text"
-                                       ng-model="formData.routingCode">
+                                       ng-model="formData.routingCode" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group"  ng-show="!showClientOtherInfoForm">
@@ -258,7 +375,7 @@
 
                             <div class="col-sm-3">
                                 <input id="receiptNumber" class="form-control" type="text"
-                                       ng-model="formData.receiptNumber">
+                                       ng-model="formData.receiptNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
                         <div class="form-group"  ng-show="!showClientOtherInfoForm">
@@ -266,42 +383,60 @@
                                 translate}}</label>
 
                             <div class="col-sm-3">
-                                <input id="bankNumber" class="form-control" type="text" ng-model="formData.bankNumber">
+                                <input id="bankNumber" class="form-control" type="text"
+                                       ng-model="formData.bankNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
 
                         <div class="form-group"  ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientPhoneNumber">
                                 {{ 'label.input.clientPhoneNumber' | translate}}
+                                <span class="required" ng-show="isSupplierNonCashPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text" ng-model="formData.clientPhoneNumber" readonly>
+                                <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text"
+                                       ng-model="formData.clientPhoneNumber" ng-disabled="isReadOnly || isClientPaymentFieldLocked('clientPhoneNumber')" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientAccountNumber">
                                 {{ 'label.input.clientAccountNumber' | translate}}
+                                <span class="required" ng-show="isSupplierNonCashPayment() || isClientBankPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" readonly>
+                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" ng-disabled="isReadOnly || isClientPaymentFieldLocked('bankAccountNumber')" ng-required="isSupplierNonCashPayment() || isClientBankPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientBankName">
                                 {{ 'label.input.clientBankName' | translate}}
+                                <span class="required" ng-show="isSupplierNonCashPayment() || isClientBankPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" readonly>
+                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" ng-disabled="isReadOnly || isClientPaymentFieldLocked('clientBankName')" ng-required="isSupplierNonCashPayment() || isClientBankPayment()">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="showClientOtherInfoForm && isPaymentToSupplier()">
+                            <label class="control-label col-sm-2" for="beneficiaryName">
+                                {{ 'label.input.beneficiaryName' | translate}}
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="col-sm-3">
+                                <input id="beneficiaryName" name="beneficiaryName" class="form-control" type="text"
+                                       ng-model="formData.beneficiaryName" ng-disabled="isReadOnly"
+                                       ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
             <div ng-show="isICReview">
-                <div ng-show="icReviewPreviousRecommendedAmount" ng-repeat="previousRecommendedAmount in icReviewPreviousRecommendedAmount" class="form-group">
+                <div ng-show="icReviewPreviousRecommendedAmount && icReviewPreviousRecommendedAmount.length" ng-repeat="previousRecommendedAmount in icReviewPreviousRecommendedAmount" class="form-group">
                     <label class="control-label col-sm-2" for="{{previousRecommendedAmount.label}}">{{ 'label.input.' + previousRecommendedAmount.label | translate }}</label>
                     <div class="col-sm-3">
                         <div class="input-group">
@@ -330,8 +465,17 @@
                                 type="text"
                                 name="icReviewRecommendedAmount"
                                 ng-model="formData.icReviewRecommendedAmount"
-                                number-format />
+                                number-format
+                                ng-required="true" />
                         </div>
+                        <p class="help-block"
+                           ng-show="icreviewTemplate.maxRecommendedAmount != null">
+                            {{ 'label.hint.icReviewMaxRecommendedAmount' | translate }} {{ icreviewTemplate.maxRecommendedAmount | number }}
+                        </p>
+                        <p class="help-block"
+                           ng-show="icreviewTemplate.dueDiligenceRecommendedAmount != null">
+                            {{ 'label.hint.icReviewDueDiligenceRecommendedAmount' | translate }} {{ icreviewTemplate.dueDiligenceRecommendedAmount | number }}
+                        </p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -355,15 +499,16 @@
                             class="form-control col=sm-2" 
                             name="icReviewTermPeriodFrequencyEnum"
                             ng-options="termFrequencyType.id as termFrequencyType.value for termFrequencyType in icreviewTemplate.termFrequencyTypeOptions"
+                            ng-required="true"
                             value="{{frequency.id}}">
                                 <option value="">-- Term Period --</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-show="icreviewTemplate && icreviewTemplate.nextApproverRequired">
                     <label class="control-label col-sm-2" for="nextApproverId">
                         {{ 'label.input.nextApproverId' | translate }}
-<!--                        <span class="required">*</span>-->
+                        <span class="required">*</span>
                     </label>
                     <div class="col-sm-3">
                         <select
@@ -371,28 +516,35 @@
                                 name="nextApproverUserId"
                                 ng-model="formData.nextApproverUserId"
                                 ng-options="user.id as (user.firstname + ' ' + user.lastname + ' (' + user.username + ')') for user in icreviewTemplate.approverOptions"
+                                ng-required="icreviewTemplate.nextApproverRequired && icreviewTemplate.approverOptions.length"
                                 class="form-control">
                             <option value="">-- Select Next Stage Approver --</option>
                         </select>
+                        <p class="help-block text-warning"
+                           ng-show="icreviewTemplate.approverOptions.length === 0">
+                            {{ 'label.hint.icReviewNoApproversConfigured' | translate }}
+                        </p>
                     </div>
                 </div>
-            </div>
-            <div class="form-group" ng-show="showNoteField">
-                <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate}}
-                    <span ng-show="noteFieldMandatory"
-                            class="required">*</span>
-                </label>
-
-                <div class="col-sm-3">
-                    <textarea id="note" rows="2" class="form-control" ng-model="formData.note"></textarea>
+                <div class="form-group" ng-show="icreviewTemplate && icreviewTemplate.nextApproverRequired === false">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <p class="help-block">{{ 'label.hint.icReviewProceedToPrepareAndSignContract' | translate }}</p>
+                    </div>
                 </div>
             </div>
             <div class="form-group" ng-show="showExpectedResidualAmount">
                 <label class="control-label col-sm-2" for="expectedResidualAmount">{{ 'label.heading.outstanding' | translate}}</label>
-
                 <div class="col-sm-3">
                     <input id="expectedResidualAmount" class="form-control" type="text"
                            ng-model="formData.expectedResidualAmount" readonly>
+                </div>
+            </div>
+            <div class="form-group" ng-show="showNoteField">
+                <label class="control-label col-sm-2" for="note">{{ 'label.input.note' | translate}}
+                    <span ng-show="noteFieldMandatory" class="required" >*</span>
+                </label>
+                <div class="col-sm-3">
+                    <textarea id="note" rows="2" class="form-control" ng-model="formData.note" ng-required="noteFieldMandatory"></textarea>
                 </div>
             </div>
             <div class="form-group" ng-show="installmentchargeField">
@@ -514,32 +666,71 @@
                 </tbody>
             </table>
             <div class="">
-                <button id="save1"  wz-next class="btn btn-primary pull-right" ng-show="isEntityDatatables">
-                    {{'label.button.proceed' | translate}}
+
+                <!-- PROCEED BUTTON FOR DATATABLES -->
+                <button id="save1" wz-next class="btn btn-primary pull-right"
+                        ng-show="isEntityDatatables">
+                    {{ 'label.button.proceed' | translate }}
                 </button>
+
                 <div ng-hide="isEntityDatatables">
-                    <div class="form-group" ng-show="showDelete || showwaiveforspecicficduedate">
-                        <label class="control-label col-sm-2 col-md-offset-10">{{ 'label.areyousure' | translate}}</label>
+
+                    <!-- DELETE / WAIVE SECTION -->
+                    <div ng-show="showDelete || showwaiveforspecicficduedate" class="row">
+
+                        <div class="col-md-12 text-right m-b-10">
+                            <label class="control-label">
+                                {{ 'label.areyousure' | translate }}
+                            </label>
+                        </div>
+
+                        <div class="col-md-12 text-right">
+                            <button type="reset" ng-click="cancel()" class="btn btn-default">
+                                {{ 'label.button.cancel' | translate }}
+                            </button>
+
+                            <button type="submit" has-permission='{{taskPermissionName}}'
+                                    wz-next class="btn btn-primary">
+                                {{ 'label.button.confirm' | translate }}
+                            </button>
+                        </div>
+
                     </div>
-                    <div class="col-md-offset-2 col-md-offset-10" ng-show="showDelete || showwaiveforspecicficduedate">
-                        <button type="reset" ng-click="cancel()" class="btn btn-default">{{ 'label.button.cancel' |
-                            translate}}
-                        </button>
-                        <button type="submit" has-permission='{{taskPermissionName}}' wz-next
-                                class="btn btn-primary">{{
-                            'label.button.confirm' |
-                            translate}}
-                        </button>
+
+                    <!-- NORMAL ACTION SECTION -->
+                    <div ng-hide="showDelete || showwaiveforspecicficduedate" class="row">
+
+                        <div class="col-md-12 text-right">
+
+                            <button id="cancel" type="reset"
+                                    class="btn btn-default"
+                                    ng-click="cancel()">
+                                {{ 'label.button.cancel' | translate }}
+                            </button>
+
+                            <!-- REJECT BUTTON -->
+                            <button
+                                    ng-if="showRejectButton"
+                                    id="reject"
+                                    type="button"
+                                    class="btn btn-danger"
+                                    ng-click="handleReject()">
+                                {{ 'label.button.reject' | translate }}
+                            </button>
+
+
+                            <button id="save" type="submit"
+                                    has-permission='{{taskPermissionName}}'
+                                    wz-next class="btn btn-primary">
+                                {{ 'label.button.save' | translate }}
+                            </button>
+
+                        </div>
+
                     </div>
-                    <div class="col-md-offset-2 col-md-offset-10" ng-hide="showDelete || showwaiveforspecicficduedate">
-                        <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' |
-                            translate}}
-                        </button>
-                        <button id="save" type="submit" has-permission='{{taskPermissionName}}' wz-next class="btn btn-primary">{{
-                            'label.button.save' | translate}}
-                        </button>
-                    </div>
+
                 </div>
+
             </div>
         </fieldset>
     </form>

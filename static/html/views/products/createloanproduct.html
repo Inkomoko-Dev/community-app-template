@@ -142,18 +142,7 @@
                 </label>
                 <div class="col-sm-2">
                     <input type="checkbox" ng-model="formData.enableThirdPartyDisbursement" ng-true-value="true"
-                           ng-false-value="false" ng-change="thirdPartyDisbursementChanged()">
-                </div>
-                <label class="control-label col-sm-4" ng-show="formData.enableThirdPartyDisbursement">
-                    {{ 'label.input.thirdPartyDisbursementProvider' | translate }}<span class="required">*</span>
-                </label>
-                <div class="col-sm-4" ng-show="formData.enableThirdPartyDisbursement">
-                    <select id="thirdPartyDisbursementProvider" name="thirdPartyDisbursementProvider"
-                            class="form-control" ng-model="formData.thirdPartyDisbursementProvider"
-                            ng-options="provider for provider in thirdPartyDisbursementProviderOptions"
-                            required>
-                        <option value="">{{'label.selectone' | translate}}</option>
-                    </select>
+                           ng-false-value="false">
                 </div>
             </div>
                     <hr>

@@ -213,6 +213,13 @@
                 scope.formData.isBnplLoan = scope.loanaccountinfo.isBnplLoan;
                 scope.formData.equityContributionLoanPercentage = scope.loanaccountinfo.equityContributionLoanPercentage;
                 scope.formData.requiresEquityContribution = scope.loanaccountinfo.requiresEquityContribution;
+                scope.enableThirdPartyDisbursement = !!scope.loanaccountinfo.enableThirdPartyDisbursement;
+                scope.thirdPartyDisbursementProviderOptions = scope.loanaccountinfo.thirdPartyDisbursementProviderOptions || [];
+                if (scope.enableThirdPartyDisbursement) {
+                    scope.formData.thirdPartyDisbursementProvider = scope.loanaccountinfo.thirdPartyDisbursementProvider || null;
+                } else {
+                    scope.formData.thirdPartyDisbursementProvider = null;
+                }
                 scope.toVendorClients = scope.loanaccountinfo.vendorClientOptions;
             };
 
@@ -515,6 +522,9 @@
                 this.formData.loanTermIncludesToppedUpLoanTerm = scope.loanaccountinfo.product.loanTermIncludesToppedUpLoanTerm;
                 }
                 delete this.formData.syncRepaymentsWithMeeting;
+                if (!scope.enableThirdPartyDisbursement) {
+                    delete this.formData.thirdPartyDisbursementProvider;
+                }
                 this.formData.interestChargedFromDate = reqThirdDate;
                 this.formData.repaymentsStartingFromDate = reqFourthDate;
                 this.formData.locale = scope.optlang.code;

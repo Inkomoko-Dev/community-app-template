@@ -212,6 +212,13 @@
                 scope.formData.isBnplLoan = scope.loanaccountinfo.isBnplLoan;
                 scope.formData.equityContributionLoanPercentage = scope.loanaccountinfo.equityContributionLoanPercentage;
                 scope.formData.requiresEquityContribution = scope.loanaccountinfo.requiresEquityContribution;
+                scope.enableThirdPartyDisbursement = !!scope.loanaccountinfo.enableThirdPartyDisbursement;
+                scope.thirdPartyDisbursementProviderOptions = scope.loanaccountinfo.thirdPartyDisbursementProviderOptions || [];
+                if (scope.enableThirdPartyDisbursement) {
+                    scope.formData.thirdPartyDisbursementProvider = scope.loanaccountinfo.thirdPartyDisbursementProvider || null;
+                } else {
+                    scope.formData.thirdPartyDisbursementProvider = null;
+                }
                 scope.toVendorClients = scope.loanaccountinfo.vendorClientOptions;
                 scope.vendorSavingsAccountOptions = scope.loanaccountinfo.vendorSavingsAccountOptions;
                 if(scope.loanaccountinfo.vendorClientOptions != null && scope.loanaccountinfo.linkedVendorAccount != null){
@@ -493,6 +500,9 @@
                 delete this.formData.syncRepaymentsWithMeeting;
                 delete this.formData.interestRateFrequencyType;
                 delete this.formData.applicationDate;
+                if (!scope.enableThirdPartyDisbursement) {
+                    delete this.formData.thirdPartyDisbursementProvider;
+                }
                 if(!scope.loanaccountinfo.isLoanProductLinkedToFloatingRate) {
                     delete this.formData.interestRateDifferential ;
                     delete this.formData.isFloatingInterestRate ;
