@@ -773,8 +773,8 @@
                             scope.applyKenyaCapitalDisbursementDefaults(templateData);
                             scope.computeUsdEquivalent();
                             
-                            // Expand payment details for review (SS vendor + third-party partner instruction)
-                            if (scope.isSouthSudanSspLoan() || scope.enableThirdPartyDisbursement) {
+                            // Expand payment details for review (SS vendor, third-party partner instruction, or client bank payment)
+                            if (scope.isSouthSudanSspLoan() || scope.enableThirdPartyDisbursement || scope.isClientBankPaymentReview()) {
                                 scope.showPaymentDetails = true;
                                 scope.showClientOtherInfoForm = true;
                             }
@@ -1998,7 +1998,7 @@
                         scope.setPaymentRecipientInfo();
                     }
                     // Surface the (possibly empty) bank fields so the user can fill in what's missing
-                    if (scope.showClientOtherInfoForm && scope.isClientBankDetailsMissing()) {
+                    if (scope.showClientOtherInfoForm && scope.shouldRevealClientBankDetails()) {
                         scope.showPaymentDetails = true;
                     }
                 });
@@ -2048,7 +2048,7 @@
                     scope.showClientOtherInfoForm = scope.shouldShowPaymentRecipientInfo();
                     scope.setPaymentRecipientInfo();
                     // Auto-expand so missing client bank details are visible and can be entered
-                    if (scope.showClientOtherInfoForm && scope.isClientBankDetailsMissing()) {
+                    if (scope.showClientOtherInfoForm && scope.shouldRevealClientBankDetails()) {
                         scope.showPaymentDetails = true;
                     }
                 }
@@ -2182,6 +2182,20 @@
             scope.isClientBankDetailsMissing = function () {
                 return scope.isClientBankPayment()
                     && (!scope.clientOtherInfoHas('bankAccountNumber') || !scope.clientOtherInfoHas('clientBankName'));
+            };
+
+            scope.isClientBankPaymentReview = function () {
+                return scope.isDisbursementReviewAction() && scope.shouldShowPaymentRecipientInfo()
+                    && scope.isPaymentToClient() && !scope.isMobileMoneyPayment();
+            };
+
+            scope.isReviewBankDetailsMissing = function () {
+                return scope.isClientBankPaymentReview()
+                    && (!scope.formData.clientAccountNumber || !scope.formData.clientBankName);
+            };
+
+            scope.shouldRevealClientBankDetails = function () {
+                return scope.isClientBankDetailsMissing() || scope.isClientBankPaymentReview();
             };
 
             scope.isClientPaymentFieldLocked = function (field) {
