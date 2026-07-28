@@ -12,7 +12,7 @@
         <div class="content">
             <div class="pull-right">
                 <div class="btn-group">
-                    <a href="#/editloanproduct/{{loanproduct.id}}" class="btn btn-primary" has-permission='UPDATE_LOANPRODUCT'><i
+                    <a href="#/editloanproduct/{{loanproduct.id}}" ng-if="loanproduct.id" class="btn btn-primary" has-permission='UPDATE_LOANPRODUCT'><i
                        class="fa fa-edit "></i>&nbsp;&nbsp;{{'label.button.edit' | translate}}</a>
                 </div>
             </div>
