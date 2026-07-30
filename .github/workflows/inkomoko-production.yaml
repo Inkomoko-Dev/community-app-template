@@ -51,6 +51,6 @@ jobs:
         USER=${{ secrets.PROD_SERVER_USERNAME }}
         SOURCE_FILE=app.tar.gz
         DESTINATION_DIR=/home/fiter/inkomoko_deployments/frontend
-        echo "${{ secrets.PROD_SERVER_SSH_KEY }}" > key.pem
-        chmod 400 key.pem
-        scp -i key.pem -P ${{ secrets.PROD_SERVER_PORT }} -o StrictHostKeyChecking=no $SOURCE_FILE $USER@$HOST:$DESTINATION_DIR
+        echo "${{ secrets.PROD_SERVER_SSH_KEY }}" > /tmp/key.pem
+        chmod 400 /tmp/key.pem
+        scp -i /tmp/key.pem -P ${{ secrets.PROD_SERVER_PORT }} -o StrictHostKeyChecking=no $SOURCE_FILE $USER@$HOST:$DESTINATION_DIR
