@@ -238,6 +238,9 @@
             .when('/loan/:loanId/adjustinsurancecharge/:chargeId', {
                 templateUrl: 'views/loans/adjustloaninsurancecharge.html'
             })
+            .when('/loan/:loanId/historicalpenaltywaiver/:chargeId', {
+                templateUrl: 'views/loans/historicalpenaltywaiver.html'
+            })
             .when('/assignloanofficer/:id', {
                 templateUrl: 'views/loans/assignloanofficer.html'
             })

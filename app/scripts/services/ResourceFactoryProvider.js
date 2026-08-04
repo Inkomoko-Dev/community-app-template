@@ -275,9 +275,25 @@
                             method: 'POST',
                             params: { command: 'adjust' }
                         },
+                        historicalWaive: {
+                            method: 'POST',
+                            params: { command: 'historicalwaive' }
+                        },
                         get: {
                             method: 'GET'
                         }
+                    }),
+                    historicalPenaltyWaiverPreviewResource: defineResource(apiVer + "/loans/:loanId/charges/:chargeId/historicalwaiver/preview", { loanId: '@loanId', chargeId: '@chargeId' }, {
+                        get: { method: 'GET' }
+                    }),
+                    historicalPenaltyWaiverResource: defineResource(apiVer + "/loans/historicalpenaltywaivers/:waiverId", { waiverId: '@waiverId' }, {
+                        getAll: { method: 'GET', isArray: true },
+                        get: { method: 'GET' },
+                        approve: { method: 'POST', params: { command: 'approve' } },
+                        reject: { method: 'POST', params: { command: 'reject' } }
+                    }),
+                    historicalPenaltyWaiversByLoanResource: defineResource(apiVer + "/loans/historicalpenaltywaivers/loans/:loanId", { loanId: '@loanId' }, {
+                        getAll: { method: 'GET', isArray: true }
                     }),
                     loanCollateralTemplateResource: defineResource(apiVer + "/loans/:loanId/collaterals/template", { loanId: '@loanId' }, {
                         get: { method: 'GET', params: {} }
