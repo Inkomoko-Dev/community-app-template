@@ -229,13 +229,74 @@
                     </div>
                 </div>
 
-                <div class="form-group" ng-show="futureInterestCancelled > 0">
+                <div class="form-group" ng-show="futureInterestCancelled > 0 && !isWriteOffAction">
                     <label class="control-label col-sm-2" for="futureInterestCancelled">{{ 'label.heading.futureinterestcancelled' |
                         translate}}</label>
 
                     <div class="col-sm-3">
                         <input id="futureInterestCancelled" type="text" ng-model="futureInterestCancelled"
                                class="form-control" number-format readonly>
+                    </div>
+                </div>
+
+                <div ng-show="isWriteOffAction">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="productBasis">{{ 'label.heading.productbasis' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="productBasis" type="text" ng-model="productBasis" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffPrincipal">{{ 'label.heading.outstandingprincipal' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffPrincipal" type="text" ng-model="writeOffPrincipal"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffRecognisedInterest">{{ 'label.heading.recognisedinterest' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffRecognisedInterest" type="text" ng-model="writeOffRecognisedInterest"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffFutureInterest">{{ 'label.heading.futureinterestcancelled' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffFutureInterest" type="text" ng-model="futureInterestCancelled"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffFees">{{ 'label.heading.outstandingfeespenalties' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffFees" type="text" ng-model="writeOffFees"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <div class="help-block">
+                                <div>&#10003; {{ 'label.help.writeoff.principal' | translate}}</div>
+                                <div>&#10003; {{ 'label.help.writeoff.recognisedinterest' | translate}}</div>
+                                <div>&#10003; {{ 'label.help.writeoff.futureinterest' | translate}}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
