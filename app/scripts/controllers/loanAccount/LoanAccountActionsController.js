@@ -520,6 +520,40 @@
                 return true;
             };
 
+            // CGLT-632: the breakdown is calculated as at the write-off date, so re-fetch whenever the user changes it.
+            scope.onWriteOffDateChange = function () {
+                if (!scope.isWriteOffAction || !scope.formData.transactionDate) {
+                    return;
+                }
+                var selectedDate = dateFilter(scope.formData.transactionDate, scope.df);
+                if (selectedDate !== scope.writeOffBreakdownDate) {
+                    scope.loadWriteOffBreakdown(selectedDate);
+                }
+            };
+
+            scope.loadWriteOffBreakdown = function (selectedDate) {
+                var params = {loanId: scope.accountId, command: 'writeoff'};
+                if (selectedDate) {
+                    params.locale = scope.optlang.code;
+                    params.dateFormat = scope.df;
+                    params.transactionDate = selectedDate;
+                }
+                resourceFactory.loanTrxnsTemplateResource.get(params, function (data) {
+                    scope.writeOffBreakdownDate = selectedDate || dateFilter(new Date(data.date), scope.df);
+                    if (!scope.formData[scope.modelName]) {
+                        scope.formData[scope.modelName] = new Date(data.date) || new Date();
+                    }
+                    scope.writeOffAmount = data.amount;
+                    scope.writeOffPrincipal = data.principalPortion;
+                    scope.writeOffRecognisedInterest = data.interestPortion;
+                    scope.writeOffFees = data.feeChargesPortion;
+                    scope.writeOffPenalties = data.penaltyChargesPortion;
+                    scope.futureInterestCancelled = data.futureInterestCancelled;
+                    scope.productBasis = data.productBasis;
+                    scope.isLoanWriteOff = true;
+                });
+            };
+
             switch (scope.action) {
                 case "approve":
                     scope.taskPermissionName = 'APPROVE_LOAN';
@@ -855,14 +889,8 @@
                     break;
                 case "writeoff":
                     scope.modelName = 'transactionDate';
-                    resourceFactory.loanTrxnsTemplateResource.get({
-                        loanId: scope.accountId,
-                        command: 'writeoff'
-                    }, function (data) {
-                        scope.formData[scope.modelName] = new Date(data.date) || new Date();
-                        scope.writeOffAmount = data.amount;
-                        scope.isLoanWriteOff = true;
-                    });
+                    scope.isWriteOffAction = true;
+                    scope.loadWriteOffBreakdown();
                     scope.title = 'label.heading.writeoffloanaccount';
                     scope.labelName = 'label.input.writeoffondate';
                     scope.taskPermissionName = 'WRITEOFF_LOAN';
@@ -1890,6 +1918,7 @@
             scope.$watch('formData.transactionDate', function () {
                 scope.validateRecoveryPaymentDate();
                 scope.onDateChange();
+                scope.onWriteOffDateChange();
             });
 
 
