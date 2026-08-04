@@ -1,9 +1,17 @@
 <div class="content-container loan-account-wide" ng-controller="ViewLoanDetailsController">
+    <div ng-show="isCrbVerificationInProgress"
+         style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: wait;">
+        <div style="background: #fff; padding: 24px 32px; border-radius: 4px; text-align: center;">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+            <div style="margin-top: 12px;">{{'label.button.crbVerification' | translate}}...</div>
+        </div>
+    </div>
     <ul class="breadcrumb">
         <li ng-show="loandetails.clientName"><a
                 ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
         <li ng-show="loandetails.group"><a ng-href="#/viewgroup/{{loandetails.group.id}}">{{loandetails.group.name}}</a></li>
         <li class="active">{{loandetails.loanProductName}}({{loandetails.accountNo}})</li>
+        <li>again</li>
     </ul>
 
     <script type="text/ng-template" id="delcharge.html">

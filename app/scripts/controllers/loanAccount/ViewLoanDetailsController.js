@@ -24,7 +24,7 @@
             scope.cblpstatuses = null;
             scope.crbReportTransUnion = null;
             scope.crbReportMetrolpolIdentityVerification = null;
-
+            scope.isCrbVerificationInProgress = false;
 
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement){
@@ -71,7 +71,7 @@
                     return null;
                 }
 
-                if (angular.isObject(transactionRef)) {
+                if (angular.isObject(transactionRef) && (transactionRef.id || transactionRef.transactionId || transactionRef.resourceId)) {
                     return transactionRef.id || transactionRef.transactionId || transactionRef.resourceId || null;
                 }
 
@@ -517,16 +517,29 @@
                         location.path('/loanaccount/' + accountId + '/rejectprepareandsigncontract');
                         break;
                     case "crbVerification":
+                        if (scope.isCrbVerificationInProgress) {
+                            return;
+                        }
+                        scope.isCrbVerificationInProgress = true;
                         resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId}, function (data) {
                             scope.getCrbReport();
+                            scope.isCrbVerificationInProgress = false;
                             location.path('/viewloanaccount/' + accountId);
+                        }, function (error) {
+                            scope.isCrbVerificationInProgress = false;
                         });
-
-                            break;
+                        break;
                       case "crbVerificationKenya":
-                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId},function (data) {
+                            if (scope.isCrbVerificationInProgress) {
+                                return;
+                            }
+                            scope.isCrbVerificationInProgress = true;
+                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId}, function (data) {
                                  scope.crbMetropolIdentityVerification();
+                                 scope.isCrbVerificationInProgress = false;
                                  location.path('/viewloanaccount/' + accountId);
+                             }, function (error) {
+                                 scope.isCrbVerificationInProgress = false;
                              });
                             break;
                       case "verifyLoanCreditInfoEnhancedOnMetropolKenya":
@@ -579,7 +592,6 @@
             var DelChargeCtrl = function ($scope, $uibModalInstance, ids) {
                 $scope.delete = function () {
                     resourceFactory.LoanAccountResource.delete({loanId: routeParams.id, resourceType: 'charges', chargeId: ids}, {}, function (data) {
-
                         $uibModalInstance.close('delete');
                         route.reload();
                     });
@@ -1649,8 +1661,17 @@
                 };
             };
 
+            // New buttons for credit bureau summary and different verification types
+            scope.creditBureauButton = `<div class="pull-right btn-group">
+                <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary" ng-disabled="isCrbVerificationInProgress">{{'label.button.creditcheck' | translate}}</a>
+                <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
+                   class="btn btn-primary" has-permission='{{button.taskPermissionName}}' 
+                   ng-disabled="isCrbVerificationInProgress && (button.name === 'button.crbVerification' || button.name === 'button.crbVerificationKenya')">
+                        <i class="{{button.icon}} "></i>&nbsp;{{'label.' + button.name | translate}} 
+                        <i ng-show="isCrbVerificationInProgress && (button.name === 'button.crbVerification' || button.name === 'button.crbVerificationKenya')" class="fa fa-spinner fa-spin"></i>
+                </a>
+            </div>`;
         }
-
 
     });
     mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', 'localStorageService', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
