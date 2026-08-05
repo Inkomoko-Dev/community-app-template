@@ -1257,6 +1257,16 @@
                                        title="Adjust Insurance Charge">
                                         <i class="fa fa-pencil"></i> {{'label.button.adjust' | translate}}
                                     </a>
+                                    <!-- has-permission uses raw jQuery show/hide, so it must sit on a wrapper and
+                                         never on the same element as ng-show. -->
+                                    <span has-permission="HISTORICALWAIVE_LOANCHARGE">
+                                        <a class="btn-warning btn-sm"
+                                           data-ng-show="canHistoricallyWaive(charge)"
+                                           href="#/loan/{{loandetails.id}}/historicalpenaltywaiver/{{charge.id}}"
+                                           title="{{'label.heading.historicalpenaltywaiver' | translate}}">
+                                            <i class="fa fa-history"></i> {{'label.button.historicalwaive' | translate}}
+                                        </a>
+                                    </span>
                                 </td>
                                 </td>
                             </tr>

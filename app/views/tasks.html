@@ -1449,6 +1449,50 @@
                                 </div>
                             </div>
                         </uib-tab>
+                        <uib-tab heading="{{'label.heading.pendinghistoricalcorrections' | translate}}"
+                                 has-permission='READ_HISTORICALPENALTYWAIVER' select="getPendingHistoricalCorrections()">
+                            <div>
+                                <table class="table condensed-table">
+                                    <thead>
+                                    <tr class="graybg">
+                                        <th>{{'label.input.correctionreference' | translate}}</th>
+                                        <th>{{'label.heading.loanaccountnum' | translate}}</th>
+                                        <th>{{'label.input.amount' | translate}}</th>
+                                        <th>{{'label.input.waivereffectivedate' | translate}}</th>
+                                        <th>{{'label.input.reason' | translate}}</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="waiver in pendingHistoricalCorrections">
+                                        <td>{{waiver.correctionReference}}</td>
+                                        <td><a href="#/viewloanaccount/{{waiver.loanId}}">{{waiver.loanId}}</a></td>
+                                        <td>{{waiver.waiverAmount | number:2}}</td>
+                                        <td>{{waiver.waiverEffectiveDate | dateFormat}}</td>
+                                        <td>{{waiver.reason}}</td>
+                                        <td>
+                                            <span has-permission='APPROVE_HISTORICALPENALTYWAIVER'>
+                                                <button type="button" class="btn btn-success btn-sm"
+                                                        ng-click="approveHistoricalCorrection(waiver)">
+                                                    <i class="fa fa-check"></i>&nbsp;{{'label.button.approve' | translate}}
+                                                </button>
+                                            </span>
+                                            <span has-permission='REJECT_HISTORICALPENALTYWAIVER'>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                        ng-click="rejectHistoricalCorrection(waiver)">
+                                                    <i class="fa fa-times"></i>&nbsp;{{'label.button.reject' | translate}}
+                                                </button>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="pendingHistoricalCorrections.length === 0">
+                                        <td colspan="6">{{'label.message.nodataavailable' | translate}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </uib-tab>
+
                         <uib-tab heading="{{'label.heading.rescheduleloan' | translate}}" has-permission='READ_LOAN'>
                             <div class="head-affix">
                                 <table class="table condensed-table">

@@ -752,6 +752,15 @@
                     scope.isResidualPenaltyWaiver = function (charge) {
                         return charge && charge.penalty && charge.waived && !charge.paid && Number(charge.amountOutstanding) > 0;
                     };
+                    // Deliberately the complement of canWaiveLoanCharge, which returns false once a charge is paid:
+                    // the two actions are mutually exclusive by construction (CGLT-656).
+                    scope.canHistoricallyWaive = function (charge) {
+                        if (!charge || scope.loandetails.status.value != 'Active' || !charge.penalty
+                            || charge.chargeTimeType.value == 'Disbursement') {
+                            return false;
+                        }
+                        return Number(charge.amountPaid) > 0;
+                    };
                     scope.canWaiveLoanCharge = function (charge) {
                         if (!charge || scope.loandetails.status.value != 'Active' || charge.paid || charge.chargeTimeType.value == 'Disbursement') {
                             return false;

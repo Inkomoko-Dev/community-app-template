@@ -18,6 +18,31 @@
             //this value will be changed within each specific tab
             scope.requestIdentifier = "loanId";
             scope.isExtendLoanLifeCycleConfig = false;
+            scope.pendingHistoricalCorrections = [];
+
+            // CGLT-656: historical penalty waivers held for approval. Loaded on tab select rather than up front,
+            // matching the other queues on this screen.
+            scope.getPendingHistoricalCorrections = function () {
+                resourceFactory.historicalPenaltyWaiverResource.getAll({}, function (data) {
+                    scope.pendingHistoricalCorrections = data || [];
+                });
+            };
+
+            scope.approveHistoricalCorrection = function (waiver) {
+                resourceFactory.historicalPenaltyWaiverResource.approve({ waiverId: waiver.id }, {}, function () {
+                    scope.getPendingHistoricalCorrections();
+                });
+            };
+
+            scope.rejectHistoricalCorrection = function (waiver) {
+                var reason = window.prompt('Reason for rejecting this historical penalty waiver');
+                if (!reason) {
+                    return;
+                }
+                resourceFactory.historicalPenaltyWaiverResource.reject({ waiverId: waiver.id }, { reason: reason }, function () {
+                    scope.getPendingHistoricalCorrections();
+                });
+            };
 
             scope.itemsPerPage = 15;
 
