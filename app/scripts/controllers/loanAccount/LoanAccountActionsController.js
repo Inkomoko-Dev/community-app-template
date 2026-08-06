@@ -936,6 +936,22 @@
                     scope.fetchEntities('m_loan', 'WRITE_OFF');
                     break;
 
+                case "partialwriteoff":
+                    scope.modelName = 'transactionDate';
+                    resourceFactory.loanTrxnsTemplateResource.get({
+                        loanId: scope.accountId,
+                        command: 'partialwriteoff'
+                    }, function (data) {
+                        scope.formData[scope.modelName] = new Date(data.date) || new Date();
+                        scope.outstandingBalance = data.outstandingLoanBalance || data.amount;
+                        scope.isPartialWriteOff = true;
+                    });
+                    scope.title = 'label.heading.partialwriteoffloanaccount';
+                    scope.labelName = 'label.input.partialwriteoffondate';
+                    scope.taskPermissionName = 'PARTIALWRITEOFF_LOAN';
+                    scope.showComponentFields = true;
+                    break;
+
                 case "payoff":
                     scope.modelName = 'transactionDate';
                     resourceFactory.loanTrxnsTemplateResource.get({
@@ -1623,7 +1639,7 @@
                     submitData.locale = scope.optlang.code;
                     submitData.dateFormat = scope.df;
                 }
-                if (scope.action == "repayment" || scope.action == "waiveinterest" || scope.action == "payoff" || scope.action == "writeoff" || scope.action == "close-rescheduled"
+                if (scope.action == "repayment" || scope.action == "waiveinterest" || scope.action == "payoff" || scope.action == "writeoff" || scope.action == "partialwriteoff" || scope.action == "close-rescheduled"
                     || scope.action == "close" || scope.action == "modifytransaction" || scope.action == "recoverypayment" || scope.action == "prepayloan") {
                     if (scope.action == "modifytransaction") {
                         params.command = 'modify';
