@@ -37,6 +37,7 @@
             scope.error = false;
             // Transaction UI Related
             scope.isTransaction = false;
+            scope.showMfiCode = false;
             scope.showPaymentDetails = false;
             scope.paymentTypes = [];
             scope.form = {};
@@ -609,7 +610,8 @@
                                 scope.formData[scope.modelName] = new Date();
                                 scope.showApprovalAmount = true;
                                 scope.showAmountField = true;
-                                scope.isTransaction = true;
+                                scope.isTransaction = !scope.enableThirdPartyDisbursement;
+                                scope.showMfiCode = scope.isTransaction;
                                 scope.formData.approvedLoanAmount = data.approvalAmount;
                                 scope.formData.transactionAmount = data.netDisbursalAmount;
                                 scope.formData.paymentTo = savedVendorDetails.paymentTo || 1;
@@ -686,6 +688,8 @@
                     // These actions should be read-only
                     scope.isReadOnly = true;
 
+                    scope.showMfiCode = true;
+
                     var command = "";
                     var rejectCommand = "";
                     
@@ -709,7 +713,12 @@
                     }, function (data) {
                         scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                         scope.loanCountry = extractLoanCountry(data);
-                        
+                        scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
+                        scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
+
+                        scope.showMfiCode = !scope.enableThirdPartyDisbursement;
+
+
                         var savedDetail = null;
                         if (data.disbursementDetails && data.disbursementDetails.length > 0) {
                             savedDetail = data.disbursementDetails[0];
@@ -1439,6 +1448,10 @@
                     || scope.action === "disbursementpreapprovalrequest"
                     || scope.action === "disbursementapproval";
 
+                if (!scope.isMfiCodeAccepted()) {
+                    delete submitData.mfiCode;
+                }
+
                 // Clean up FX details separately from payment recipient details.
                 if ((scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) && !(scope.isSouthSudanSspLoan() && (scope.isApprovalAction() || scope.isDisbursementReviewAction()))) {
                     delete submitData.fxRate;
@@ -2075,6 +2088,13 @@
                     scope.refreshFxRateForDisbursementDate(newDate);
                 }
             });
+
+            scope.isMfiCodeAccepted = function () {
+                if (!scope.showMfiCode) return false;
+                var isDisbursementApprovalAction = scope.action === "approveDisbursement"
+                    || scope.action === "disbursementapproval";
+                return !(isDisbursementApprovalAction && (scope.isCashPayment() || scope.enableThirdPartyDisbursement));
+            };
 
             scope.isCashPayment = function () {
                 if (!Array.isArray(scope.paymentTypes)) return false;
