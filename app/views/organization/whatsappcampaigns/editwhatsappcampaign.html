@@ -39,6 +39,16 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.recipientType' | translate}}</label>
+                        <div class="col-sm-3">
+                            <select id="recipientType" name="recipientType" ng-model="campaignData.recipientType"
+                                    class="form-control"
+                                    ng-options="recipientTypeOption.id as recipientTypeOption.value for recipientTypeOption in recipientTypeOptions track by recipientTypeOption.id"
+                                    ng-disabled="true">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="control-label col-sm-2">{{'label.input.businessRule' | translate}}</label>
                         <div class="col-sm-3">
                             <select id="businessRule" name="businessRule" chosen="businessRuleOptions" ng-model="campaignData.report"
