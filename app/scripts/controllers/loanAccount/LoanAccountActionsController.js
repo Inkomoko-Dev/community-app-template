@@ -1530,13 +1530,25 @@
                     scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
-                if (scope.isSupplierNonCashPayment() && (!scope.formData.clientPhoneNumber || !scope.formData.clientAccountNumber || !scope.formData.clientBankName)) {
-                    scope.error = 'Supplier payment details (Phone, Account, Bank) are mandatory for vendor disbursement';
-                    return;
-                }
-                if (scope.isSupplierNonCashPayment() && !scope.formData.beneficiaryName) {
-                    scope.error = 'Beneficiary name is mandatory for vendor disbursement';
-                    return;
+                // Skip supplier payment validation for third-party disbursement - details come from partner instruction
+                if (scope.isSupplierNonCashPayment() && !scope.enableThirdPartyDisbursement) {
+                    // Phone number is always required for supplier payments
+                    if (!scope.formData.clientPhoneNumber) {
+                        scope.error = 'Phone number is mandatory for vendor disbursement';
+                        return;
+                    }
+                    // Bank details only required for non-mobile-money payments
+                    if (!scope.isMobileMoneyPayment()) {
+                        if (!scope.formData.clientAccountNumber || !scope.formData.clientBankName) {
+                            scope.error = 'Account number and bank name are mandatory for bank vendor disbursement';
+                            return;
+                        }
+                    }
+                    // Beneficiary name is always required
+                    if (!scope.formData.beneficiaryName) {
+                        scope.error = 'Beneficiary name is mandatory for vendor disbursement';
+                        return;
+                    }
                 }
                 // Mirror the backend rule: bank (non-cash, non-mobile-money) payments to the client
                 // require account number + bank name, otherwise approval is rejected server-side
