@@ -25,7 +25,7 @@
             scope.cblpstatuses = null;
             scope.crbReportTransUnion = null;
             scope.crbReportMetrolpolIdentityVerification = null;
-
+            scope.isCrbVerificationInProgress = false;
 
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement){
@@ -72,7 +72,7 @@
                     return null;
                 }
 
-                if (angular.isObject(transactionRef)) {
+                if (angular.isObject(transactionRef) && (transactionRef.id || transactionRef.transactionId || transactionRef.resourceId)) {
                     return transactionRef.id || transactionRef.transactionId || transactionRef.resourceId || null;
                 }
 
@@ -230,6 +230,39 @@
                 return scope.getReversalTransaction(transaction);
             };
 
+            // A transaction is reversed if either the backend is_reversed flag (e.g. via undo-disbursal,
+            // which does NOT set manually_adjusted_or_reversed) or manuallyReversed is set. Keying off
+            // only manuallyReversed missed undo-disbursal reversals, making a reversed disbursement look
+            // identical to the live one.
+            scope.isTransactionReversed = function (transaction) {
+                return !!(transaction && (transaction.reversed === true || transaction.manuallyReversed === true));
+            };
+
+            // True when a transaction carries reversal / closed-period-correction context worth
+            // surfacing in the Audit column (e.g. a reversed & re-posted disbursement that would
+            // otherwise look like a duplicate).
+            scope.hasCorrectionContext = function (transaction) {
+                return !!(transaction && (scope.isTransactionReversed(transaction)
+                    || scope.getTransactionCorrectionDate(transaction)
+                    || transaction.originalTransactionId
+                    || scope.getReversalTransaction(transaction)));
+            };
+
+            scope.showTransactionAuditInfo = function (transaction) {
+                return scope.isRecoveryPaymentTransaction(transaction)
+                    || scope.isRepaymentAtDisbursementTransaction(transaction)
+                    || scope.hasCorrectionContext(transaction);
+            };
+
+            // Badge shown on a reversed row: "Reversed (Correction)" when it carries a correction date
+            // (closed-period correction), otherwise a plain "Reversed" — so users don't read a reversed
+            // & re-posted transaction as a duplicate posting.
+            scope.reversedBadgeLabelKey = function (transaction) {
+                return scope.getTransactionCorrectionDate(transaction)
+                    ? 'label.badge.reversedcorrection'
+                    : 'label.badge.reversed';
+            };
+
             scope.canReverseRecoveryPayment = function (transaction) {
                 return scope.isRecoveryPaymentTransaction(transaction)
                     && transaction.reversalTransaction !== true
@@ -339,6 +372,9 @@
                             },
                             insuranceCharges: function () {
                                 return angular.copy(insuranceCharges);
+                            },
+                            loanPrincipal: function () {
+                                return scope.loandetails.approvedPrincipal || scope.loandetails.principal;
                             },
                             dateFormat: function () {
                                 return scope.df;
@@ -451,8 +487,28 @@
                     case "waiveinterest":
                         location.path('/loanaccount/' + accountId + '/waiveinterest');
                         break;
+                    case "waivepenalty":
+                        var penalties = (scope.charges || []).filter(function (c) {
+                            return c.penalty && scope.canWaiveLoanCharge(c);
+                        });
+                        if (penalties.length === 1) {
+                            location.path('/loanaccountcharge/' + accountId + '/waivecharge/' + penalties[0].id);
+                        } else if (penalties.length > 1) {
+                            $uibModal.open({
+                                templateUrl: 'waivepenaltyselect.html',
+                                controller: WaivePenaltyCtrl,
+                                resolve: {
+                                    penalties: function () { return penalties; },
+                                    loanId: function () { return accountId; }
+                                }
+                            });
+                        }
+                        break;
                     case "writeoff":
                         location.path('/loanaccount/' + accountId + '/writeoff');
+                        break;
+                    case "partialwriteoff":
+                        location.path('/loanaccount/' + accountId + '/partialwriteoff');
                         break;
                     case "recoverypayment":
                         location.path('/loanaccount/' + accountId + '/recoverypayment');
@@ -554,16 +610,29 @@
                         location.path('/loanaccount/' + accountId + '/rejectprepareandsigncontract');
                         break;
                     case "crbVerification":
+                        if (scope.isCrbVerificationInProgress) {
+                            return;
+                        }
+                        scope.isCrbVerificationInProgress = true;
                         resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId}, function (data) {
                             scope.getCrbReport();
+                            scope.isCrbVerificationInProgress = false;
                             location.path('/viewloanaccount/' + accountId);
+                        }, function (error) {
+                            scope.isCrbVerificationInProgress = false;
                         });
-
-                            break;
+                        break;
                       case "crbVerificationKenya":
-                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId},function (data) {
+                            if (scope.isCrbVerificationInProgress) {
+                                return;
+                            }
+                            scope.isCrbVerificationInProgress = true;
+                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId}, function (data) {
                                  scope.crbMetropolIdentityVerification();
+                                 scope.isCrbVerificationInProgress = false;
                                  location.path('/viewloanaccount/' + accountId);
+                             }, function (error) {
+                                 scope.isCrbVerificationInProgress = false;
                              });
                             break;
                       case "verifyLoanCreditInfoEnhancedOnMetropolKenya":
@@ -616,10 +685,21 @@
             var DelChargeCtrl = function ($scope, $uibModalInstance, ids) {
                 $scope.delete = function () {
                     resourceFactory.LoanAccountResource.delete({loanId: routeParams.id, resourceType: 'charges', chargeId: ids}, {}, function (data) {
-
                         $uibModalInstance.close('delete');
                         route.reload();
                     });
+                };
+                $scope.cancel = function () {
+                    $uibModalInstance.dismiss('cancel');
+                };
+            };
+
+            // CGLT-624: selector shown when a loan has more than one waivable penalty charge.
+            var WaivePenaltyCtrl = function ($scope, $uibModalInstance, penalties, loanId) {
+                $scope.penalties = penalties;
+                $scope.select = function (charge) {
+                    $uibModalInstance.close('select');
+                    location.path('/loanaccountcharge/' + loanId + '/waivecharge/' + charge.id);
                 };
                 $scope.cancel = function () {
                     $uibModalInstance.dismiss('cancel');
@@ -649,17 +729,51 @@
                     } else {
                         scope.isPendingDisbursement = false;
                     }
+                    scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
+                    scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
+                    scope.isAwaitingPartnerDisbursementInstruction = scope.enableThirdPartyDisbursement
+                        && data.status && data.status.value === 'Approved'
+                        && !data.subStatus;
+                    scope.isReadyForStaffThirdPartyDisbursement = scope.enableThirdPartyDisbursement
+                        && data.status && data.status.value === 'Approved'
+                        && data.subStatus && data.subStatus.id === 200;
+                    scope.partnerSupplierDisbursementDetail = null;
+                    if (scope.enableThirdPartyDisbursement && data.disbursementDetails && data.disbursementDetails.length > 0) {
+                        var firstDisbursementDetail = data.disbursementDetails[0];
+                        if (firstDisbursementDetail
+                            && (firstDisbursementDetail.supplierId
+                                || firstDisbursementDetail.supplierName
+                                || firstDisbursementDetail.beneficiaryName
+                                || firstDisbursementDetail.clientPhoneNumber
+                                || firstDisbursementDetail.clientAccountNumber
+                                || firstDisbursementDetail.paymentTypeId
+                                || firstDisbursementDetail.paymentTypeName)) {
+                            scope.partnerSupplierDisbursementDetail = firstDisbursementDetail;
+                        }
+                    }
                     scope.decimals = data.currency.decimalPlaces;
+                    scope.isResidualPenaltyWaiver = function (charge) {
+                        return charge && charge.penalty && charge.waived && !charge.paid && Number(charge.amountOutstanding) > 0;
+                    };
+                    // Deliberately the complement of canWaiveLoanCharge, which returns false once a charge is paid:
+                    // the two actions are mutually exclusive by construction (CGLT-656).
+                    scope.canHistoricallyWaive = function (charge) {
+                        if (!charge || scope.loandetails.status.value != 'Active' || !charge.penalty
+                            || charge.chargeTimeType.value == 'Disbursement') {
+                            return false;
+                        }
+                        return Number(charge.amountPaid) > 0;
+                    };
+                    scope.canWaiveLoanCharge = function (charge) {
+                        if (!charge || scope.loandetails.status.value != 'Active' || charge.paid || charge.chargeTimeType.value == 'Disbursement') {
+                            return false;
+                        }
+                        return !charge.waived || scope.isResidualPenaltyWaiver(charge);
+                    };
                     if (scope.loandetails.charges) {
                         scope.charges = scope.loandetails.charges;
                         for (var i in scope.charges) {
-                            if (scope.charges[i].paid || scope.charges[i].waived || scope.charges[i].chargeTimeType.value == 'Disbursement' || scope.loandetails.status.value != 'Active') {
-                                var actionFlag = true;
-                            }
-                            else {
-                                var actionFlag = false;
-                            }
-                            scope.charges[i].actionFlag = actionFlag;
+                            scope.charges[i].actionFlag = !scope.canWaiveLoanCharge(scope.charges[i]);
                         }
 
                         scope.chargeTableShow = true;
@@ -910,7 +1024,24 @@
 
                         };
 
-                        if(!data.subStatus || (data.subStatus && data.subStatus.code !== 'loanSubStatus.loanSubStatusType.pending.disbursement' && data.subStatus.id !==300)) {
+                        if (scope.isAwaitingPartnerDisbursementInstruction) {
+                            scope.buttons.singlebuttons.push({
+                                name: "button.undoapproval",
+                                icon: "fa fa-undo",
+                                taskPermissionName: 'APPROVALUNDO_LOAN'
+                            });
+                        } else if (scope.isReadyForStaffThirdPartyDisbursement) {
+                            scope.buttons.singlebuttons.push({
+                                name: "button.approveDisbursement",
+                                icon: "fa fa-flag",
+                                taskPermissionName: 'DISBURSE_LOAN'
+                            });
+                            scope.buttons.singlebuttons.push({
+                                name: "button.undoapproval",
+                                icon: "fa fa-undo",
+                                taskPermissionName: 'APPROVALUNDO_LOAN'
+                            });
+                        } else if(!data.subStatus || (data.subStatus && data.subStatus.code !== 'loanSubStatus.loanSubStatusType.pending.disbursement' && data.subStatus.id !==300)) {
                             scope.buttons.singlebuttons.push({
                                 name: "button.disbursementRequest",
                                 icon: "fa fa-flag",
@@ -972,6 +1103,10 @@
                                     name: "button.writeoff",
                                     taskPermissionName: 'WRITEOFF_LOAN'
                                 },
+                                {
+                                    name: "button.partialwriteoff",
+                                    taskPermissionName: 'PARTIALWRITEOFF_LOAN'
+                                },
 
                                 // {
                                 //     name: "button.payoff",
@@ -1005,7 +1140,19 @@
 
                         };
 
-                        if (data.canDisburse) {
+                        // CGLT-624: expose "Waive Penalty" in the More menu only when the loan
+                        // has at least one penalty charge that can be waived (reuses canWaiveLoanCharge).
+                        var hasWaivablePenalty = (scope.charges || []).some(function (c) {
+                            return c.penalty && scope.canWaiveLoanCharge(c);
+                        });
+                        if (hasWaivablePenalty) {
+                            scope.buttons.options.unshift({
+                                name: "button.waivepenalty",
+                                taskPermissionName: 'WAIVE_LOANCHARGE'
+                            });
+                        }
+
+                        if (data.canDisburse && !scope.enableThirdPartyDisbursement) {
                             scope.buttons.singlebuttons.splice(1, 0, {
                                 name: "button.disburse",
                                 icon: "fa fa-flag",
@@ -1093,8 +1240,74 @@
                     if(data.nextLoanIcReviewDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"){
                         scope.showApprovedICAmount = true;
                     }
+
+                    if(data.isExtendLoanLifeCycleConfig){
+                        fetchLoanDecisionHistory();
+                    }
                 });
             }
+
+            scope.approvalSummary = [];
+            scope.openApprovalHistory = function () {
+                $uibModal.open({
+                    templateUrl: 'views/loans/loan_approval_history_modal.html',
+                    controller: function ($scope, $uibModalInstance, approvalSummary) {
+                        $scope.approvalSummary = approvalSummary;
+                        $scope.cancel = function () {
+                            $uibModalInstance.dismiss('cancel');
+                        };
+                    },
+                    resolve: {
+                        approvalSummary: function () {
+                            return scope.approvalSummary;
+                        }
+                    }
+                });
+            };
+
+            // Collect the approved amount at each IC review level. Prefer the dynamic decision-level
+            // rows (richer: who/when/status); fall back to the hardcoded level columns (older loans).
+            var buildIcReviewLevels = function (decision) {
+                if (decision.decisionLevels && decision.decisionLevels.length > 0) {
+                    return decision.decisionLevels.map(function (level) {
+                        return {
+                            name: level.levelName,
+                            amount: level.recommendedAmount,
+                            decisionByName: level.decisionByName,
+                            decisionOn: level.decisionOn,
+                            decision: level.decision
+                        };
+                    });
+                }
+                var hardcoded = [
+                    { name: 'IC Review Level One', amount: decision.icReviewDecisionLevelOneRecommendedAmount },
+                    { name: 'IC Review Level Two', amount: decision.icReviewDecisionLevelTwoRecommendedAmount },
+                    { name: 'IC Review Level Three', amount: decision.icReviewDecisionLevelThreeRecommendedAmount },
+                    { name: 'IC Review Level Four', amount: decision.icReviewDecisionLevelFourRecommendedAmount },
+                    { name: 'IC Review Level Five', amount: decision.icReviewDecisionLevelFiveRecommendedAmount }
+                ];
+                return hardcoded.filter(function (level) {
+                    return level.amount != null;
+                });
+            };
+
+            // Build the full approved-amount summary across every stage:
+            // Applied -> Due Diligence -> each IC review level -> final Approved.
+            var fetchLoanDecisionHistory = function () {
+                resourceFactory.loanDecisionHistoryResource.get({loanId: routeParams.id}, function (decision) {
+                    if (!decision) { return; }
+                    var rows = [];
+                    rows.push({ key: 'label.heading.appliedamount', amount: scope.loandetails.proposedPrincipal });
+                    if (decision.dueDiligenceRecommendedAmount != null) {
+                        rows.push({ key: 'label.heading.duediligence', amount: decision.dueDiligenceRecommendedAmount });
+                    }
+                    buildIcReviewLevels(decision).forEach(function (level) {
+                        rows.push(level);
+                    });
+                    rows.push({ key: 'label.heading.approvedamount', amount: scope.loandetails.approvedPrincipal });
+                    scope.approvalSummary = rows;
+                });
+            };
 
             fetchLoanAccountDetails();
 
@@ -1594,8 +1807,17 @@
                 };
             };
 
+            // New buttons for credit bureau summary and different verification types
+            scope.creditBureauButton = `<div class="pull-right btn-group">
+                <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary" ng-disabled="isCrbVerificationInProgress">{{'label.button.creditcheck' | translate}}</a>
+                <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
+                   class="btn btn-primary" has-permission='{{button.taskPermissionName}}' 
+                   ng-disabled="isCrbVerificationInProgress && (button.name === 'button.crbVerification' || button.name === 'button.crbVerificationKenya')">
+                        <i class="{{button.icon}} "></i>&nbsp;{{'label.' + button.name | translate}} 
+                        <i ng-show="isCrbVerificationInProgress && (button.name === 'button.crbVerification' || button.name === 'button.crbVerificationKenya')" class="fa fa-spinner fa-spin"></i>
+                </a>
+            </div>`;
         }
-
 
     });
     mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', 'localStorageService', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {

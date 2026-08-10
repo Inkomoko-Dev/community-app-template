@@ -32,9 +32,17 @@
                 scope.data = data ;
                 scope.createdby = data.createdUser ;
                 scope.createdDate = data.createdDate ;
+                scope.provisioningDate = data.provisioningDate || data.createdDate;
+                scope.executedAt = data.executedAt || data.createdDate;
+                scope.runScope = data.runScope;
+                scope.criteriaVersions = data.criteriaVersions || [];
                 scope.totalReservedAmount = data.reservedAmount ;
                 scope.isjournalEntriesCreated = !data.journalEntry ;
             });
+
+            scope.toggleLoans = function (entry) {
+                entry.showLoans = !entry.showLoans;
+            };
 
             scope.searchTransaction = function () {
                 scope.transactions = paginatorService.paginate(fetchFunction, 10);

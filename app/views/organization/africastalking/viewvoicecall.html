@@ -1,0 +1,58 @@
+<div ng-controller="ViewVoiceCallController" class="content-container">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/africastalking">{{'label.anchor.africastalking' | translate}}</a></li>
+        <li class="active">{{'label.heading.viewvoicecall' | translate}}</li>
+    </ul>
+    <api-validate></api-validate>
+    <div class="card" ng-if="callLog">
+        <div class="content">
+            <div class="toolbar">
+                <h3>{{'label.heading.viewvoicecall' | translate}}</h3>
+            </div>
+            <br/>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <td><strong>{{'label.heading.caller' | translate}}</strong></td>
+                    <td>{{callLog.callerNumber}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.destination' | translate}}</strong></td>
+                    <td>{{callLog.destinationNumber}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.direction' | translate}}</strong></td>
+                    <td>{{callLog.direction}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.status' | translate}}</strong></td>
+                    <td>{{callLog.status}}</td>
+                </tr>
+                <tr ng-if="callLog.durationSeconds">
+                    <td><strong>{{'label.heading.duration' | translate}}</strong></td>
+                    <td>{{callLog.durationSeconds}}</td>
+                </tr>
+                <tr ng-if="callLog.dtmfDigits">
+                    <td><strong>{{'label.heading.dtmf' | translate}}</strong></td>
+                    <td>{{callLog.dtmfDigits}}</td>
+                </tr>
+                <tr ng-if="callLog.clientId">
+                    <td><strong>{{'label.heading.clientid' | translate}}</strong></td>
+                    <td>{{callLog.clientId}}</td>
+                </tr>
+                <tr ng-if="callLog.staffId">
+                    <td><strong>{{'label.heading.staffid' | translate}}</strong></td>
+                    <td>{{callLog.staffId}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.submittedondate' | translate}}</strong></td>
+                    <td>{{callLog.createdDate}}</td>
+                </tr>
+                <tr ng-if="callLog.recordingUrl">
+                    <td><strong>{{'label.heading.recording' | translate}}</strong></td>
+                    <td><a href="{{callLog.recordingUrl}}" target="_blank">{{callLog.recordingUrl}}</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

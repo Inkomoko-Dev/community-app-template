@@ -275,9 +275,25 @@
                             method: 'POST',
                             params: { command: 'adjust' }
                         },
+                        historicalWaive: {
+                            method: 'POST',
+                            params: { command: 'historicalwaive' }
+                        },
                         get: {
                             method: 'GET'
                         }
+                    }),
+                    historicalPenaltyWaiverPreviewResource: defineResource(apiVer + "/loans/:loanId/charges/:chargeId/historicalwaiver/preview", { loanId: '@loanId', chargeId: '@chargeId' }, {
+                        get: { method: 'GET' }
+                    }),
+                    historicalPenaltyWaiverResource: defineResource(apiVer + "/loans/historicalpenaltywaivers/:waiverId", { waiverId: '@waiverId' }, {
+                        getAll: { method: 'GET', isArray: true },
+                        get: { method: 'GET' },
+                        approve: { method: 'POST', params: { command: 'approve' } },
+                        reject: { method: 'POST', params: { command: 'reject' } }
+                    }),
+                    historicalPenaltyWaiversByLoanResource: defineResource(apiVer + "/loans/historicalpenaltywaivers/loans/:loanId", { loanId: '@loanId' }, {
+                        getAll: { method: 'GET', isArray: true }
                     }),
                     loanCollateralTemplateResource: defineResource(apiVer + "/loans/:loanId/collaterals/template", { loanId: '@loanId' }, {
                         get: { method: 'GET', params: {} }
@@ -810,6 +826,9 @@
                     dueDiligenceLoanDecisionEngineResource: defineResource(apiVer + "/loans/decision/template/:loanId", { loanId: '@loanId' }, {
                         getTemplate: { method: 'GET', params: {} },
                     }),
+                    loanDecisionHistoryResource: defineResource(apiVer + "/loans/decision/details/:loanId", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {} },
+                    }),
                     addApprovalMatrixEngineResource: defineResource(apiVer + "/loans/decision/approvalMatrix/createApprovalMatrix", {}, {
                         save: { method: 'POST', params: {} },
                     }),
@@ -884,6 +903,13 @@
                         post: { method: 'POST', params: {} },
                         put: { method: 'PUT', params: {} },
                         delete: { method: 'DELETE', params: {} }
+                    }),
+                    provisioningCriteriaVersions: defineResource(apiVer + "/provisioningcriteria/:criteriaId/versions/:versionId", {
+                        criteriaId: '@criteriaId',
+                        versionId: '@versionId'
+                    }, {
+                        getAll: { method: 'GET', url: baseUrl + apiVer + '/provisioningcriteria/:criteriaId/versions', isArray: true },
+                        get: { method: 'GET', params: {} }
                     }),
                     provisioningentries: defineResource(apiVer + "/provisioningentries/:entryId", { entryId: '@entryId' }, {
                         get: { method: 'GET', params: {} },
@@ -1050,8 +1076,38 @@
                         delete: { method: 'DELETE', params: {} }
                     }),
 
+                    whatsAppCampaignTemplateResource: defineResource(apiVer + "/whatsappcampaigns/template", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+
+                    whatsAppCampaignResource: defineResource(apiVer + "/whatsappcampaigns/:campaignId/:additionalParam", { campaignId: '@campaignId', additionalParam: '@additionalParam' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
+                        save: { method: 'POST', params: {} },
+                        update: { method: 'PUT', params: {} },
+                        preview: { method: 'POST', params: {} },
+                        withCommand: { method: 'POST', params: {} },
+                        delete: { method: 'DELETE', params: {} }
+                    }),
+
                     smsResource: defineResource(apiVer + "/sms/:campaignId/messageByStatus", { campaignId: '@campaignId', additionalParam: '@additionalParam' }, {
                         getByStatus: { method: 'GET', params: {} }
+                    }),
+
+                    africasTalkingMessageResource: defineResource(apiVer + "/africastalking/messages/:messageId", { messageId: '@resourceId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
+                        save: { method: 'POST', params: {} }
+                    }),
+
+                    africasTalkingVoiceResource: defineResource(apiVer + "/africastalking/voice/calls/:callId", { callId: '@resourceId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
+                        save: { method: 'POST', params: {} }
+                    }),
+
+                    africasTalkingConnectivityResource: defineResource(apiVer + "/africastalking/connectivity", {}, {
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
 
                     entityDatatableChecksResource: defineResource(apiVer + "/entityDatatableChecks/:entityDatatableCheckId/:additionalParam", { entityDatatableCheckId: '@entityDatatableCheckId', additionalParam: '@additionalParam' }, {
@@ -1151,6 +1207,11 @@
                     banksResource: defineResource(apiVer + "/banks", {}, {
                         getAll: { method: 'GET', params: {}, isArray: true },
                         search: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    suppliersResource: defineResource(apiVer + "/suppliers/:supplierId", { supplierId: '@supplierId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: false },
+                        get: { method: 'GET', params: { supplierId: '@supplierId' } },
+                        template: { method: 'GET', params: { supplierId: 'template' } }
                     }),
                     crbPostingReportsViewResource: defineResource(
                          apiVer + "/crb/posting-logs",

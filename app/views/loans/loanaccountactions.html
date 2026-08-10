@@ -19,10 +19,18 @@
                 <span ng-repeat="table in submittedDatatables"><i class="fa fa-check"></i>Entry in ` {{table}} ` has been made successfully. If the inputs are changed, the datatable entries will be updated.<br></span>
             </div>
             <api-validate></api-validate>
+            <div class="alert alert-info" ng-show="(action === 'approve' || action === 'approveDisbursement') && enableThirdPartyDisbursement">
+                <strong>{{'label.heading.thirdPartyDisbursement' | translate}}:</strong>
+                <span ng-show="action === 'approve'">{{'label.msg.approve.disbursementDetailsFromProvider' | translate}}</span>
+                <span ng-show="action === 'approveDisbursement'">{{'label.msg.loan.readyForStaffDisbursementApproval' | translate}}</span>
+                <span ng-show="thirdPartyDisbursementProvider">
+                    ({{'label.heading.thirdPartyDisbursementProvider' | translate}}:
+                    <strong>{{thirdPartyDisbursementProvider}}</strong>)
+                </span>
+            </div>
             <table width="100%">
                 <tr>
                     <td>
-                        <!--<legend>{{ title | translate}}</legend>-->
                     </td>
                     <td ng-show="addDisburseDetails" align="right">
                         <legend>
@@ -139,6 +147,35 @@
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
                     </div>
                 </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <div class="alert alert-info" role="alert">
+                            <strong>{{'label.heading.department' | translate}}</strong>:
+                            {{kenyaCapitalDefaults.departmentName || 'Investment'}}
+                            <div>
+                                <strong>{{'label.input.investments.budget' | translate}}</strong>:
+                                {{formData.budgetLocation || kenyaCapitalDefaults.budgetLocation}}
+                            </div>
+                        </div>
+                        <div class="alert alert-warning" role="alert" ng-if="kenyaCapitalDefaults.budgetReviewRequired">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            {{'label.message.kenya.capital.budget.review.required' | translate}}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2">{{'label.heading.department' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="text" ng-model="kenyaCapitalDefaults.departmentName" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group" ng-show="isKenyaCapitalDisbursement">
+                    <label class="control-label col-sm-2" for="budgetLocation">{{'label.input.investments.budget' | translate}}</label>
+                    <div class="col-sm-3">
+                        <input id="budgetLocation" class="form-control" type="text" ng-model="formData.budgetLocation"
+                               ng-disabled="isReadOnly">
+                    </div>
+                </div>
                 <div class="form-group" ng-show="principalPortion">
                     <label class="control-label col-sm-2" for="principalPortion">{{ 'label.input.principal' |
                         translate}}</label>
@@ -182,6 +219,73 @@
                     </div>
                 </div>
 
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2">{{ 'label.input.partialwriteoff.components' | translate }}</label>
+                    <div class="col-sm-6">
+                        <div class="alert alert-info">
+                            {{ 'label.input.outstandingbalance' | translate }}: {{ outstandingBalance }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="principalPortion">{{ 'label.input.principal' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="principalPortion" type="text" name="principalPortion" ng-model="formData.principalPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="interestPortion">{{ 'label.input.interest' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="interestPortion" type="text" name="interestPortion" ng-model="formData.interestPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="feeChargesPortion">{{ 'label.input.fees' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="feeChargesPortion" type="text" name="feeChargesPortion" ng-model="formData.feeChargesPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="penaltyChargesPortion">{{ 'label.input.penalties' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="penaltyChargesPortion" type="text" name="penaltyChargesPortion" ng-model="formData.penaltyChargesPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="reason">{{ 'label.input.reason' |
+                        translate}}<span class="required">*</span></label>
+
+                    <div class="col-sm-6">
+                        <textarea id="reason" name="reason" ng-model="formData.reason"
+                                  class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff" ng-if="!formData.principalPortion && !formData.interestPortion && !formData.feeChargesPortion && !formData.penaltyChargesPortion">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <div class="alert alert-warning">
+                            {{ 'label.input.atleastonecomponentrequired' | translate }}
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group" ng-show="isLoaPayOff">
                     <label class="control-label col-sm-2" for="payOffAmount">{{ 'label.input.amount' |
                         translate}}</label>
@@ -189,6 +293,77 @@
                     <div class="col-sm-3">
                         <input id="payOffAmount" type="text" name="amount" ng-model="payOffAmount"
                                class="form-control" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="futureInterestCancelled > 0 && !isWriteOffAction">
+                    <label class="control-label col-sm-2" for="futureInterestCancelled">{{ 'label.heading.futureinterestcancelled' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="futureInterestCancelled" type="text" ng-model="futureInterestCancelled"
+                               class="form-control" number-format readonly>
+                    </div>
+                </div>
+
+                <div ng-show="isWriteOffAction">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="productBasis">{{ 'label.heading.productbasis' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="productBasis" type="text" ng-model="productBasis" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffPrincipal">{{ 'label.heading.outstandingprincipal' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffPrincipal" type="text" ng-model="writeOffPrincipal"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffRecognisedInterest">{{ 'label.heading.recognisedinterest' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffRecognisedInterest" type="text" ng-model="writeOffRecognisedInterest"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffFutureInterest">{{ 'label.heading.futureinterestcancelled' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffFutureInterest" type="text" ng-model="futureInterestCancelled"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="writeOffFees">{{ 'label.heading.outstandingfeespenalties' |
+                            translate}}</label>
+
+                        <div class="col-sm-3">
+                            <input id="writeOffFees" type="text" ng-model="writeOffFees"
+                                   class="form-control" number-format readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <div class="help-block">
+                                <div>&#10003; {{ 'label.help.writeoff.principal' | translate}}</div>
+                                <div>&#10003; {{ 'label.help.writeoff.recognisedinterest' | translate}}</div>
+                                <div>&#10003; {{ 'label.help.writeoff.futureinterest' | translate}}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -208,6 +383,15 @@
                 </div>
 
                 <div ng-show="isTransaction">
+
+                    <div class="form-group" ng-show="isMfiCodeAccepted()">
+                        <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
+                        <div class="col-sm-3">
+                            <input id="mfiCode" type="text" name="mfiCode" ng-model="formData.mfiCode"
+                                   class="form-control" ng-disabled="!isMfiCodeAccepted()">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="paymentTypeId">{{ 'label.input.paymenttype' |
                             translate}}</label>
@@ -218,6 +402,7 @@
                                     value="{{paymentType.id}}" ng-disabled="isReadOnly"></select>
                         </div>
                     </div>
+
                     <div class="form-group" ng-show="showClientOtherInfoForm">
                         <label class="control-label col-sm-2" for="paymentTo">{{ 'label.input.paymentto' |
                             translate}}</label>
@@ -288,6 +473,13 @@
                         </div>
                     </div>
                     <div uib-collapse="!showPaymentDetails">
+                        <div class="form-group" ng-show="showClientOtherInfoForm && (isClientBankDetailsMissing() || isReviewBankDetailsMissing())">
+                            <div class="col-sm-offset-2 col-sm-6">
+                                <div class="alert alert-warning" role="alert">
+                                    {{ (isReviewBankDetailsMissing() ? 'label.message.client.bank.details.not.captured' : 'label.message.client.bank.details.missing') | translate }}
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group" ng-show="!showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="accountNumber">{{ 'label.input.accnum' |
                                 translate}}</label>
@@ -342,27 +534,27 @@
                         
                             <div class="col-sm-3">
                                 <input id="clientPhoneNumber" name="clientPhoneNumber" class="form-control" type="text"
-                                       ng-model="formData.clientPhoneNumber" ng-disabled="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                                       ng-model="formData.clientPhoneNumber" ng-disabled="isReadOnly || isClientPaymentFieldLocked('clientPhoneNumber')" ng-required="isSupplierNonCashPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientAccountNumber">
                                 {{ 'label.input.clientAccountNumber' | translate}}
-                                <span class="required" ng-show="isSupplierNonCashPayment()">*</span>
+                                <span class="required" ng-show="isSupplierNonCashPayment() || isClientBankPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" ng-disabled="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                                <input id="clientAccountNumber" name="clientAccountNumber" class="form-control" type="text" ng-model="formData.clientAccountNumber" ng-disabled="isReadOnly || isClientPaymentFieldLocked('bankAccountNumber')" ng-required="isSupplierNonCashPayment() || isClientBankPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientBankName">
                                 {{ 'label.input.clientBankName' | translate}}
-                                <span class="required" ng-show="isSupplierNonCashPayment()">*</span>
+                                <span class="required" ng-show="isSupplierNonCashPayment() || isClientBankPayment()">*</span>
                             </label>
                         
                             <div class="col-sm-3">
-                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" ng-disabled="isReadOnly || isPaymentToClient()" ng-required="isSupplierNonCashPayment()">
+                                <input id="clientBankName" name="clientBankName" class="form-control" type="text" ng-model="formData.clientBankName" ng-disabled="isReadOnly || isClientPaymentFieldLocked('clientBankName')" ng-required="isSupplierNonCashPayment() || isClientBankPayment()">
                             </div>
                         </div>
                         <div class="form-group" ng-show="showClientOtherInfoForm && isPaymentToSupplier()">
@@ -379,9 +571,10 @@
                         </div>
                     </div>
                 </div>
+
             </div>
             <div ng-show="isICReview">
-                <div ng-show="icReviewPreviousRecommendedAmount" ng-repeat="previousRecommendedAmount in icReviewPreviousRecommendedAmount" class="form-group">
+                <div ng-show="icReviewPreviousRecommendedAmount && icReviewPreviousRecommendedAmount.length" ng-repeat="previousRecommendedAmount in icReviewPreviousRecommendedAmount" class="form-group">
                     <label class="control-label col-sm-2" for="{{previousRecommendedAmount.label}}">{{ 'label.input.' + previousRecommendedAmount.label | translate }}</label>
                     <div class="col-sm-3">
                         <div class="input-group">
@@ -410,8 +603,17 @@
                                 type="text"
                                 name="icReviewRecommendedAmount"
                                 ng-model="formData.icReviewRecommendedAmount"
-                                number-format />
+                                number-format
+                                ng-required="true" />
                         </div>
+                        <p class="help-block"
+                           ng-show="icreviewTemplate.maxRecommendedAmount != null">
+                            {{ 'label.hint.icReviewMaxRecommendedAmount' | translate }} {{ icreviewTemplate.maxRecommendedAmount | number }}
+                        </p>
+                        <p class="help-block"
+                           ng-show="icreviewTemplate.dueDiligenceRecommendedAmount != null">
+                            {{ 'label.hint.icReviewDueDiligenceRecommendedAmount' | translate }} {{ icreviewTemplate.dueDiligenceRecommendedAmount | number }}
+                        </p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -435,15 +637,16 @@
                             class="form-control col=sm-2" 
                             name="icReviewTermPeriodFrequencyEnum"
                             ng-options="termFrequencyType.id as termFrequencyType.value for termFrequencyType in icreviewTemplate.termFrequencyTypeOptions"
+                            ng-required="true"
                             value="{{frequency.id}}">
                                 <option value="">-- Term Period --</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-show="icreviewTemplate && icreviewTemplate.nextApproverRequired">
                     <label class="control-label col-sm-2" for="nextApproverId">
                         {{ 'label.input.nextApproverId' | translate }}
-<!--                        <span class="required">*</span>-->
+                        <span class="required">*</span>
                     </label>
                     <div class="col-sm-3">
                         <select
@@ -451,10 +654,27 @@
                                 name="nextApproverUserId"
                                 ng-model="formData.nextApproverUserId"
                                 ng-options="user.id as (user.firstname + ' ' + user.lastname + ' (' + user.username + ')') for user in icreviewTemplate.approverOptions"
+                                ng-required="icreviewTemplate.nextApproverRequired && icreviewTemplate.approverOptions.length"
                                 class="form-control">
                             <option value="">-- Select Next Stage Approver --</option>
                         </select>
+                        <p class="help-block text-warning"
+                           ng-show="icreviewTemplate.approverOptions.length === 0">
+                            {{ 'label.hint.icReviewNoApproversConfigured' | translate }}
+                        </p>
                     </div>
+                </div>
+                <div class="form-group" ng-show="icreviewTemplate && icreviewTemplate.nextApproverRequired === false">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <p class="help-block">{{ 'label.hint.icReviewProceedToPrepareAndSignContract' | translate }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" ng-show="showExpectedResidualAmount">
+                <label class="control-label col-sm-2" for="expectedResidualAmount">{{ 'label.heading.outstanding' | translate}}</label>
+                <div class="col-sm-3">
+                    <input id="expectedResidualAmount" class="form-control" type="text"
+                           ng-model="formData.expectedResidualAmount" readonly>
                 </div>
             </div>
             <div class="form-group" ng-show="showNoteField">

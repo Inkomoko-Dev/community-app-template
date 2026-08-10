@@ -1,0 +1,202 @@
+<div class="page" ng-controller="HistoricalPenaltyWaiverController">
+    <div class="page-title">
+        <span class="glyphicon glyphicon-refresh"></span>
+        <span translate="label.heading.historicalpenaltywaiver">Historical Penalty Waiver</span>
+    </div>
+
+    <div class="alert alert-info" ng-if="charge">
+        <strong>{{charge.name}}</strong>
+        &mdash; <span translate="label.input.duedate">Due Date</span>: {{charge.dueDate | dateFormat}}
+        &mdash; <span translate="label.input.amount">Amount</span>: {{charge.amount | number:2}}
+        &mdash; <span translate="label.input.amountpaid">Paid</span>: {{charge.amountPaid | number:2}}
+        &mdash; <span translate="label.input.amountwaived">Waived</span>: {{charge.amountWaived | number:2}}
+    </div>
+
+    <div class="alert alert-danger" ng-if="previewFailed">
+        <span translate="label.message.historicalpenaltywaiver.previewfailed">The preview could not be produced. This penalty may not be eligible for a historical waiver.</span>
+    </div>
+
+    <!-- Step 1: what to waive -->
+    <div ng-if="step === 'input'">
+        <form name="waiverForm" novalidate>
+            <div class="form-group">
+                <label translate="label.input.waiveramount">Amount to Waive</label>
+                <input type="number" class="form-control" ng-model="formData.waiverAmount" ng-change="loadPreview()"/>
+                <span class="help-block" translate="label.help.waiveramount">Leave at the full penalty balance to waive it entirely, or reduce it for a partial waiver.</span>
+            </div>
+
+            <div class="form-group">
+                <label translate="label.input.waivereffectivedate">Waiver Effective Date</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" uib-datepicker-popup="{{dateFormat}}"
+                           ng-model="formData.waiverEffectiveDate" is-open="datePicker.opened"
+                           datepicker-options="dateOptions" ng-click="openDatePicker()" readonly/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="openDatePicker()">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                    </span>
+                </div>
+                <span class="help-block" ng-if="preview.suggestedEffectiveDate">
+                    <span translate="label.help.suggestedeffectivedate">Suggested: the date of the earliest repayment that paid this penalty</span>
+                    &mdash; {{preview.suggestedEffectiveDate | dateFormat}}
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label translate="label.input.reason">Reason</label>
+                <textarea class="form-control" rows="3" ng-model="formData.reason" maxlength="1000" required></textarea>
+            </div>
+
+            <div class="alert alert-warning" ng-if="preview.requiresApproval">
+                <span translate="label.message.historicalpenaltywaiver.requiresapproval">This waiver crosses an approval threshold and will be held until an approver acts on it.</span>
+                <span ng-if="preview.approvalTrigger">({{preview.approvalTrigger}})</span>
+            </div>
+
+            <div class="form-group" ng-if="preview.requiresApproval">
+                <label translate="label.input.nextapprover">Send for Approval To</label>
+                <select class="form-control" ng-model="formData.nextApproverUserId"
+                        ng-options="approver.id as approver.username for approver in preview.approverOptions" required>
+                    <option value="" translate="label.input.selectapprover">-- Select an approver --</option>
+                </select>
+                <span class="help-block" ng-if="preview.approverOptions.length === 0" translate="label.help.noapprovers">
+                    No approver is mapped to this loan product. An administrator must map one before this waiver can be submitted.
+                </span>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" ng-click="review()" ng-disabled="isPreviewing || !formData.reason || !formData.waiverEffectiveDate">
+                    <span translate="label.button.review">Review</span>
+                </button>
+                <button class="btn btn-default" ng-click="cancel()" translate="label.button.cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 2: what it will do -->
+    <div ng-if="step === 'preview' && preview">
+        <div class="alert alert-danger" ng-if="!preview.correctionAllowed">
+            <span translate="label.message.historicalpenaltywaiver.periodclosed">The effective date falls in a closed accounting period and corrections there are switched off. This waiver cannot be posted.</span>
+            <span ng-if="preview.latestClosureDate"> ({{preview.latestClosureDate | dateFormat}})</span>
+        </div>
+
+        <div class="alert alert-warning" ng-if="preview.requiresApproval">
+            <span translate="label.message.historicalpenaltywaiver.willbeheld">Submitting will create an approval request. Nothing on the loan changes until it is approved.</span>
+        </div>
+
+        <h4 translate="label.heading.chargeimpact">Penalty</h4>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th translate="label.input.amountpaid">Paid</th>
+                    <th translate="label.input.amountwaived">Waived</th>
+                    <th translate="label.input.amountoutstanding">Outstanding</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><span translate="label.input.before">Before</span></td>
+                    <td>{{preview.chargeAmountPaidBefore | number:2}}</td>
+                    <td>{{preview.chargeAmountWaivedBefore | number:2}}</td>
+                    <td>{{preview.chargeAmountOutstandingBefore | number:2}}</td>
+                </tr>
+                <tr>
+                    <td><span translate="label.input.after">After</span></td>
+                    <td>0.00</td>
+                    <td>{{preview.chargeAmountWaivedAfter | number:2}}</td>
+                    <td>{{preview.chargeAmountOutstandingAfter | number:2}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 translate="label.heading.affectedtransactions">Affected Transactions</h4>
+        <p>
+            <span translate="label.input.strategy">Processing Strategy</span>: <strong>{{preview.transactionProcessingStrategyName}}</strong>
+            &mdash; <span translate="label.input.reprocessedcount">Transactions reprocessed</span>: <strong>{{preview.reprocessedTransactionCount}}</strong>
+        </p>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th translate="label.input.date">Date</th>
+                    <th translate="label.input.type">Type</th>
+                    <th translate="label.input.change">Change</th>
+                    <th translate="label.input.amount">Amount</th>
+                    <th translate="label.input.principal">Principal</th>
+                    <th translate="label.input.interest">Interest</th>
+                    <th translate="label.input.fees">Fees</th>
+                    <th translate="label.input.penalties">Penalties</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="txn in preview.transactions">
+                <tr ng-if="txn.changeType !== 'NEW'">
+                    <td rowspan="2">{{txn.transactionDate | dateFormat}}</td>
+                    <td rowspan="2">{{txn.transactionType}}</td>
+                    <td rowspan="2">
+                        <span class="label" ng-class="{'label-default': txn.changeType === 'UNCHANGED', 'label-warning': txn.changeType === 'REVERSED_AND_REPLACED'}">{{txn.changeType}}</span>
+                    </td>
+                    <td>{{txn.amountBefore | number:2}}</td>
+                    <td>{{txn.principalBefore | number:2}}</td>
+                    <td>{{txn.interestBefore | number:2}}</td>
+                    <td>{{txn.feesBefore | number:2}}</td>
+                    <td>{{txn.penaltiesBefore | number:2}}</td>
+                </tr>
+                <tr ng-if="txn.changeType !== 'NEW'">
+                    <td>{{txn.amountAfter | number:2}}</td>
+                    <td>{{txn.principalAfter | number:2}}</td>
+                    <td>{{txn.interestAfter | number:2}}</td>
+                    <td>{{txn.feesAfter | number:2}}</td>
+                    <td>{{txn.penaltiesAfter | number:2}}</td>
+                </tr>
+                <tr ng-if="txn.changeType === 'NEW'">
+                    <td>{{txn.transactionDate | dateFormat}}</td>
+                    <td>{{txn.transactionType}}</td>
+                    <td><span class="label label-success">{{txn.changeType}}</span></td>
+                    <td>{{txn.amountAfter | number:2}}</td>
+                    <td>{{txn.principalAfter | number:2}}</td>
+                    <td>{{txn.interestAfter | number:2}}</td>
+                    <td>{{txn.feesAfter | number:2}}</td>
+                    <td>{{txn.penaltiesAfter | number:2}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 translate="label.heading.loanimpact">Loan</h4>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th translate="label.input.status">Status</th>
+                    <th translate="label.input.totaloutstanding">Total Outstanding</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><span translate="label.input.before">Before</span></td>
+                    <td>{{preview.loanStatusBefore}}</td>
+                    <td>{{preview.totalOutstandingBefore | number:2}}</td>
+                </tr>
+                <tr>
+                    <td><span translate="label.input.after">After</span></td>
+                    <td>{{preview.loanStatusAfter}}</td>
+                    <td>{{preview.totalOutstandingAfter | number:2}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-default" ng-click="back()" translate="label.button.back">Back</button>
+            <button class="btn btn-warning" ng-click="submit()" ng-disabled="!canSubmit()">
+                <span ng-if="!preview.requiresApproval" translate="label.button.confirm">Confirm</span>
+                <span ng-if="preview.requiresApproval" translate="label.button.sendforapproval">Send for Approval</span>
+            </button>
+            <button class="btn btn-default" ng-click="cancel()" translate="label.button.cancel">Cancel</button>
+        </div>
+    </div>
+</div>

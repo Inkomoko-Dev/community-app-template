@@ -119,6 +119,14 @@
                 if(scope.loanaccountinfo.isLoanProductLinkedToFloatingRate) {
                     scope.formData.isFloatingInterestRate = false ;
                 }
+                scope.enableThirdPartyDisbursement = !!scope.loanaccountinfo.enableThirdPartyDisbursement;
+                scope.thirdPartyDisbursementProviderOptions = scope.loanaccountinfo.thirdPartyDisbursementProviderOptions || [];
+                if (scope.enableThirdPartyDisbursement) {
+                    scope.loanApplicationCommonData.thirdPartyDisbursementProvider =
+                        scope.loanApplicationCommonData.thirdPartyDisbursementProvider || null;
+                } else {
+                    scope.loanApplicationCommonData.thirdPartyDisbursementProvider = null;
+                }
             }
 
             scope.addCharge = function () {
@@ -221,6 +229,11 @@
             }
 
             scope.submit = function () {
+
+                if (scope.enableThirdPartyDisbursement && !scope.loanApplicationCommonData.thirdPartyDisbursementProvider) {
+                    scope.error = 'Third-party disbursement provider is required for this product.';
+                    return;
+                }
 
                 if (!_.isUndefined(scope.datatables) && scope.datatables.length > 0) {
                     angular.forEach(scope.datatables, function (datatable, index) {
@@ -337,6 +350,10 @@
 
                         loanApplication.linkAccountId=scope.formData.gsimAccountId;
                         console.log('formData.gsimAccountId : '+scope.formData.gsimAccountId);
+
+                        if (scope.enableThirdPartyDisbursement && scope.loanApplicationCommonData.thirdPartyDisbursementProvider) {
+                            loanApplication.thirdPartyDisbursementProvider = scope.loanApplicationCommonData.thirdPartyDisbursementProvider;
+                        }
 
                         if (!_.isUndefined(scope.formData.datatables) && scope.formData.datatables.length > 0) {
                             loanApplication.datatables = scope.formData.datatables;

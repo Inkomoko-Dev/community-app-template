@@ -238,6 +238,9 @@
             .when('/loan/:loanId/adjustinsurancecharge/:chargeId', {
                 templateUrl: 'views/loans/adjustloaninsurancecharge.html'
             })
+            .when('/loan/:loanId/historicalpenaltywaiver/:chargeId', {
+                templateUrl: 'views/loans/historicalpenaltywaiver.html'
+            })
             .when('/assignloanofficer/:id', {
                 templateUrl: 'views/loans/assignloanofficer.html'
             })
@@ -400,6 +403,12 @@
             })
             .when('/employees', {
                 templateUrl: 'views/organization/employees.html'
+            })
+            .when('/suppliers', {
+                templateUrl: 'views/organization/suppliers.html'
+            })
+            .when('/viewsupplier/:id', {
+                templateUrl: 'views/organization/viewsupplier.html'
             })
             .when('/viewemployee/:id', {
                 templateUrl: 'views/organization/viewemployee.html'
@@ -983,6 +992,12 @@
             .when('/viewprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/ViewProvisioningCriteria.html'
             })
+            .when('/viewprovisioningcriteria/:criteriaId/versions', {
+                templateUrl: 'views/organization/provisioning/ViewProvisioningCriteriaVersionHistory.html'
+            })
+            .when('/viewprovisioningcriteria/:criteriaId/versions/:versionId', {
+                templateUrl: 'views/organization/provisioning/ViewProvisioningCriteriaVersion.html'
+            })
             .when('/editprovisioningcriteria/:criteriaId', {
                 templateUrl: 'views/organization/provisioning/EditProvisioningCriteria.html'
             })
@@ -1069,6 +1084,33 @@
             })
             .when('/editsmscampaign/:campaignId', {
                 templateUrl: 'views/organization/smscampaigns/editsmscampaign.html'
+            })
+            .when('/whatsappcampaigns', {
+                templateUrl: 'views/organization/whatsappcampaigns/whatsappcampaigns.html'
+            })
+            .when('/createwhatsappcampaign', {
+                templateUrl: 'views/organization/whatsappcampaigns/createwhatsappcampaign.html'
+            })
+            .when('/viewwhatsappcampaign/:campaignId', {
+                templateUrl: 'views/organization/whatsappcampaigns/viewwhatsappcampaign.html'
+            })
+            .when('/editwhatsappcampaign/:campaignId', {
+                templateUrl: 'views/organization/whatsappcampaigns/editwhatsappcampaign.html'
+            })
+            .when('/africastalking', {
+                templateUrl: 'views/organization/africastalking/africastalking.html'
+            })
+            .when('/createwhatsappmessage', {
+                templateUrl: 'views/organization/africastalking/createwhatsappmessage.html'
+            })
+            .when('/createvoicecall', {
+                templateUrl: 'views/organization/africastalking/createvoicecall.html'
+            })
+            .when('/viewcommunication/:messageId', {
+                templateUrl: 'views/organization/africastalking/viewcommunication.html'
+            })
+            .when('/viewvoicecall/:callId', {
+                templateUrl: 'views/organization/africastalking/viewvoicecall.html'
             })
             .when('/entitydatatablechecks', {
                 templateUrl: 'views/organization/entitydatatablechecks/entitydatatablechecks.html'

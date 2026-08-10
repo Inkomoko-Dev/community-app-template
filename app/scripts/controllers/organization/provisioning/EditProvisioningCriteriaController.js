@@ -44,14 +44,21 @@
         });
     };
 
+    var parseOptionalInteger = function (value) {
+        if (value === null || value === undefined || value === '') {
+            return null;
+        }
+        return parseInt(value, 10);
+    };
+
     var buildDefinitionPayload = function (definitions, categories) {
         var payload = [];
         angular.forEach(definitions, function (definition) {
             applyCategoryMetadata(definition, categories);
             payload.push({
                 categoryId: definition.categoryId,
-                minAge: angular.isDefined(definition.minAge) && definition.minAge !== '' ? parseInt(definition.minAge, 10) : null,
-                maxAge: angular.isDefined(definition.maxAge) && definition.maxAge !== '' ? parseInt(definition.maxAge, 10) : null,
+                minAge: parseOptionalInteger(definition.minAge),
+                maxAge: parseOptionalInteger(definition.maxAge),
                 provisioningPercentage: definition.provisioningPercentage,
                 liabilityAccount: definition.liabilityAccount,
                 expenseAccount: definition.expenseAccount
@@ -127,7 +134,7 @@
                 var nextDefinition = {
                     categoryId: null,
                     minAge: scope.definitions.length === 0 ? 0 : null,
-                    maxAge: '',
+                    maxAge: null,
                     provisioningPercentage: null,
                     liabilityAccount: null,
                     expenseAccount: null
@@ -135,7 +142,7 @@
 
                 if (scope.definitions.length > 0) {
                     var previousDefinition = scope.definitions[scope.definitions.length - 1];
-                    if (angular.isDefined(previousDefinition.maxAge) && previousDefinition.maxAge !== '') {
+                    if (previousDefinition.maxAge !== null && previousDefinition.maxAge !== undefined && previousDefinition.maxAge !== '') {
                         nextDefinition.minAge = parseInt(previousDefinition.maxAge, 10) + 1;
                     }
                 }
@@ -177,7 +184,7 @@
             scope.doFocus = function (index) {
                 if (index > 0 && !scope.definitions[index].minAge) {
                     var previousMaxAge = scope.definitions[index - 1].maxAge;
-                    if (angular.isDefined(previousMaxAge) && previousMaxAge !== '') {
+                    if (angular.isDefined(previousMaxAge) && previousMaxAge !== null && previousMaxAge !== '') {
                         scope.definitions[index].minAge = parseInt(previousMaxAge, 10) + 1;
                     }
                 }
@@ -187,8 +194,9 @@
                 if (index >= scope.definitions.length - 1) {
                     return;
                 }
-                if (angular.isDefined(scope.definitions[index].maxAge) && scope.definitions[index].maxAge !== '') {
-                    scope.definitions[index + 1].minAge = parseInt(scope.definitions[index].maxAge, 10) + 1;
+                var maxAge = scope.definitions[index].maxAge;
+                if (maxAge !== null && maxAge !== undefined && maxAge !== '') {
+                    scope.definitions[index + 1].minAge = parseInt(maxAge, 10) + 1;
                 }
             };
 
@@ -242,8 +250,8 @@
                     return left.minAge - right.minAge;
                 }), function (definition, index) {
                     var normalized = angular.copy(definition);
-                    if (normalized.maxAge === null) {
-                        normalized.maxAge = '';
+                    if (normalized.maxAge === null || normalized.maxAge === undefined) {
+                        normalized.maxAge = null;
                     }
                     if (!angular.isDefined(normalized.minAge) || normalized.minAge === null) {
                         normalized.minAge = index === 0 ? 0 : null;

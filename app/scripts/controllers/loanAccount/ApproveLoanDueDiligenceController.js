@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        ApproveLoanDueDiligenceController: function (scope, resourceFactory, routeParams, location, dateFilter,routeParams) {
+        ApproveLoanDueDiligenceController: function (scope, resourceFactory, routeParams, location, dateFilter) {
 
             scope.loandetails = [];
             scope.formData = {};

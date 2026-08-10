@@ -148,6 +148,9 @@
                     scope.latestClosureDate = null;
                     loadRelatedReversal(data);
                 });
+                resourceFactory.loanResource.get({loanId: routeParams.accountId}, function (data) {
+                    scope.loanPrincipal = data.approvedPrincipal || data.principal;
+                });
             }
 
             scope.isRecoveryPaymentTransaction = function (transaction) {
@@ -307,6 +310,9 @@
                         },
                         insuranceCharges: function () {
                             return angular.copy(scope.getEditableInsuranceCharges(transaction));
+                        },
+                        loanPrincipal: function () {
+                            return scope.loanPrincipal;
                         },
                         dateFormat: function () {
                             return scope.df;

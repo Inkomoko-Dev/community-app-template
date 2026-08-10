@@ -1,0 +1,135 @@
+<div class="content-container" ng-controller="EditWhatsAppCampaignController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/whatsappcampaigns">{{'label.anchor.whatsappcampaigns' | translate}}</a></li>
+        <li><a href="#/viewwhatsappcampaign/{{campaignData.id}}">{{campaignData.campaignName}}</a></li>
+        <li class="active">{{'label.anchor.editcampaign' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h3>{{'label.heading.editwhatsappcampaign' | translate}}</h3>
+            </div>
+            <br>
+            <form name="editwhatsappform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                <api-validate></api-validate>
+                <fieldset>
+                    <h3>{{'label.heading.messagedetails' | translate}}</h3>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.campaignName' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" id="campaignName" name="campaignName" ng-model="campaignData.campaignName" class="form-control" ng-disabled="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.campaignType' | translate}}</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" ng-model="campaignData.campaignTypeLabel" ng-disabled="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.triggerType' | translate}}</label>
+                        <div class="col-sm-3">
+                            <select id="triggerType" name="triggerType" chosen="triggerTypeOptions" ng-model="campaignData.triggerType"
+                                    class="form-control"
+                                    ng-options="triggerTypeOption.id as triggerTypeOption.value for triggerTypeOption in triggerTypeOptions"
+                                    ng-disabled="true">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.businessRule' | translate}}</label>
+                        <div class="col-sm-3">
+                            <select id="businessRule" name="businessRule" chosen="businessRuleOptions" ng-model="campaignData.report"
+                                    class="form-control"
+                                    ng-options="businessRuleOption.reportId as businessRuleOption.reportName for businessRuleOption in businessRuleOptions"
+                                    ng-disabled="true">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="alert-block form-horizontal">
+                        <div class="form-group info" ng-repeat="reportParam in reportParams">
+                            <label class="control-label col-sm-2">{{ reportParam.label | translate}}</label>
+                            <div class="col-sm-3">
+                                <select chosen="reportParam.selectOptions" id="{{reportParam.inputName}}" ng-model="formData[reportParam.inputName]"
+                                        ng-options="selectOption.id as selectOption.name for selectOption in reportParam.selectOptions"
+                                        class="form-control input-xlarge" ng-init="getDependencies(reportParam)" disabled>
+                                    <option value="">--{{"label.menu.selectone" | translate}}--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group info" ng-repeat="reportTextParam in reportTextParams">
+                            <label class="control-label col-sm-2">{{ reportTextParam.label | translate}}</label>
+                            <div class="col-sm-3">
+                                <input id="{{reportTextParam.inputName}}" type="text" ng-model="formData[reportTextParam.inputName]" class="form-control" ng-disabled="true"/>
+                            </div>
+                        </div>
+                        <div class="form-group info" ng-repeat="reportDateParam in reportDateParams">
+                            <label class="control-label col-sm-2">{{ reportDateParam.label | translate}}</label>
+                            <div class="col-sm-3">
+                                <input id="{{reportDateParam.inputName}}" type="text" datepicker-pop="yyyy-MM-dd"
+                                       ng-model="formData[reportDateParam.inputName]" class="form-control" ng-disabled="true"/>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.atTemplateName' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" id="atTemplateName" name="atTemplateName" ng-model="campaignData.atTemplateName"
+                                   class="form-control" placeholder="{{'label.input.atTemplateName.placeholder' | translate}}" required/>
+                        </div>
+                        <div class="col-sm-3">
+                            <form-validate valattributeform="editwhatsappform" valattribute="atTemplateName"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.languageCode' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" id="languageCode" name="languageCode" ng-model="campaignData.languageCode"
+                                   class="form-control" placeholder="{{'label.input.languageCode.placeholder' | translate}}" required/>
+                        </div>
+                        <div class="col-sm-3">
+                            <form-validate valattributeform="editwhatsappform" valattribute="languageCode"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.templatemsg' | translate}}</label>
+                        <div class="col-sm-8">
+                            <textarea id="campaignMessage" name="campaignMessage" rows="5"
+                                      ng-model="campaignData.campaignMessage"
+                                      class="form-control"
+                                      placeholder="{{'label.input.whatsapptemplatemsg.placeholder' | translate}}"></textarea>
+                            <p class="help-block">{{'label.input.whatsapptemplatemsg.help' | translate}}</p>
+                        </div>
+                    </div>
+
+                    <h3>{{'label.heading.bodyVariableMapping' | translate}}</h3>
+                    <p>{{'label.heading.templateparameters' | translate}}</p>
+                    <span ng-repeat="columnHeader in reportData.columnHeaders">
+                        <strong>
+                            <a class="reportColumns" style="cursor:pointer" ng-click="addBodyVariableMapping(columnHeader.columnName)">{{columnHeader.columnName}}</a>
+                            <a class="reportColumns" ng-if="!$last">, </a>
+                        </strong>
+                    </span>
+                    <br/><br/>
+                    <ol>
+                        <li ng-repeat="mapping in campaignData.bodyVariableMapping track by $index">
+                            {{mapping}}
+                            <button type="button" class="btn btn-default btn-xs" ng-click="removeBodyVariableMapping($index)">{{'label.button.removemapping' | translate}}</button>
+                        </li>
+                    </ol>
+                    <br/>
+                    <hr>
+                    <div class="">
+                        <button id="save" type="submit" class="btn btn-primary">{{'label.button.proceed' | translate}}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

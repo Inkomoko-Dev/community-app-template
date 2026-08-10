@@ -19,6 +19,17 @@
             <form name="adjustInsuranceChargeForm" class="form-horizontal" novalidate>
                 <api-validate></api-validate>
 
+                <div class="alert alert-danger" ng-show="noAdjustmentSubmitted && isNoEffectiveAdjustment()">
+                    Change the amount, transaction date, GL account, or payment type before submitting the insurance adjustment.
+                </div>
+
+                <div class="alert alert-warning" ng-if="correctionAllowed === false">
+                    {{'error.msg.loan.transaction.closed.period.corrections.not.allowed' | translate}}
+                </div>
+                <div class="alert alert-info" ng-if="correctionAllowed !== false && latestClosureDate">
+                    {{'label.insurance.edit.closed.period.autocorrection' | translate}}
+                </div>
+
                 <div class="form-group" ng-class="{'has-error': adjustInsuranceChargeForm.amount.$invalid && adjustInsuranceChargeForm.amount.$touched}">
                     <label class="control-label col-sm-3" for="amount">
                         New Amount <span class="required">*</span>
@@ -29,8 +40,13 @@
                                name="amount"
                                class="form-control"
                                ng-model="formData.amount"
+                               ng-change="validateInsuranceAmount()"
                                required
-                               min="0"/>
+                               min="0"
+                               ng-attr-max="{{maxInsuranceAmount || undefined}}"/>
+                        <span class="help-block" ng-if="adjustInsuranceChargeForm.amount.$error.max">
+                            Insurance amount cannot be greater than principal {{maxInsuranceAmount | number}}.
+                        </span>
                     </div>
                     <div class="col-sm-2">
                         <form-validate valattributeform="adjustInsuranceChargeForm" valattribute="formData.amount"/>
@@ -67,9 +83,33 @@
                                 ng-options="gl.id as gl.nameDecorated for gl in incomeGlAccounts"
                                 class="form-control"
                                 chosen
+                                ng-disabled="incomeGlAccountsLoading || incomeGlAccounts.length === 0"
                                 data-placeholder="-- Select GL Account --">
                             <option value=""></option>
                         </select>
+                        <span class="help-block" ng-show="!incomeGlAccountsLoading && incomeGlAccounts.length === 0">
+                            No product GL mapping is configured for this charge.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="paymentTypeId">
+                        Payment Type / Account
+                    </label>
+                    <div class="col-sm-4">
+                        <select id="paymentTypeId" name="paymentTypeId"
+                                ng-model="formData.paymentTypeId"
+                                ng-options="paymentType.id as paymentType.displayName for paymentType in paymentTypes"
+                                class="form-control"
+                                chosen
+                                ng-disabled="paymentTypesLoading || paymentTypes.length === 0"
+                                data-placeholder="-- Select Payment Type --">
+                            <option value=""></option>
+                        </select>
+                        <span class="help-block" ng-show="!paymentTypesLoading && paymentTypes.length === 0">
+                            No product payment type mapping is configured for this loan product.
+                        </span>
                     </div>
                 </div>
 
@@ -83,7 +123,8 @@
                                   class="form-control"
                                   ng-model="formData.notes"
                                   rows="3"
-                                  placeholder="Reason for adjustment (optional)"></textarea>
+                                  required
+                                  placeholder="Reason for adjustment"></textarea>
                     </div>
                 </div>
 
@@ -96,7 +137,7 @@
                         <button type="submit"
                                 class="btn btn-primary"
                                 ng-click="submit()"
-                                ng-disabled="adjustInsuranceChargeForm.$invalid || isSubmitting">
+                                ng-disabled="adjustInsuranceChargeForm.$invalid || isSubmitting || correctionAllowed === false">
                             <span ng-if="!isSubmitting">{{ 'label.button.submit' | translate }}</span>
                             <span ng-if="isSubmitting">
                 <i class="fa fa-spinner fa-spin"></i> Submitting...

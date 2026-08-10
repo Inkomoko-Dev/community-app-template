@@ -55,18 +55,27 @@
                 </table>
             </div>
             <hr/>
+            <style>
+                .audit-after-changed {
+                    background-color: #fff3cd;
+                    font-weight: 600;
+                }
+            </style>
             <div>
                 <table class="table width1200px" data-ng-show="details.commandAsJson" data-anchor>
                     <thead>
                     <tr class="graybg">
                         <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ 'label.heading.command' | translate }}</th>
-                        <th></th>
+                        <th>{{ 'label.heading.before' | translate }}</th>
+                        <th>{{ 'label.heading.after' | translate }}</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr data-ng-repeat="json in jsondata">
                         <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{json.name | translate }}</strong></td>
-                        <td>{{json.property}}</td>
+                        <td data-ng-if="json.isChange">{{json.before}}</td>
+                        <td data-ng-if="json.isChange" class="audit-after-changed">{{json.after}}</td>
+                        <td data-ng-if="!json.isChange" colspan="2">{{json.property}}</td>
                     </tr>
                     </tbody>
                 </table>
