@@ -507,6 +507,9 @@
                     case "writeoff":
                         location.path('/loanaccount/' + accountId + '/writeoff');
                         break;
+                    case "partialwriteoff":
+                        location.path('/loanaccount/' + accountId + '/partialwriteoff');
+                        break;
                     case "recoverypayment":
                         location.path('/loanaccount/' + accountId + '/recoverypayment');
                         break;
@@ -1099,6 +1102,10 @@
                                 {
                                     name: "button.writeoff",
                                     taskPermissionName: 'WRITEOFF_LOAN'
+                                },
+                                {
+                                    name: "button.partialwriteoff",
+                                    taskPermissionName: 'PARTIALWRITEOFF_LOAN'
                                 },
 
                                 // {
