@@ -28,7 +28,7 @@
             scope.isCrbVerificationInProgress = false;
 
             scope.interval = interval(function () {
-                if(scope.isPendingDisbursement){
+                if(scope.isPendingDisbursement && !scope.isReadyForStaffThirdPartyDisbursement){
                     fetchLoanAccountDetails();
                 } else {
                     interval.cancel(scope.interval);
