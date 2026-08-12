@@ -2413,6 +2413,7 @@
   "label.heading.worstArrear": "Worst Arrear",
   "label.heading.TransAccountOwner": "Account Owner",
   "label.heading.performingAccounts": "Performing Accounts",
+  "label.heading.crbVerification": "CRB Verification",
 
 
   "#Anchors": "..",
