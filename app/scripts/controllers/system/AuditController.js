@@ -166,14 +166,14 @@
                     scope.row = [];
                     scope.csvData = [];
 
-                    scope.row = ['Id', 'Resource Id', 'Status', 'Office', 'Made on', 'Maker', 'Checked on', 'Checker', 'Entity', 'Action', 'Client'];
+                    scope.row = ['Id', 'Resource Id', 'Status', 'Office', 'Made on', 'Maker', 'Checked on', 'Checker', 'Entity', 'Action', 'Client', 'Notes'];
                     scope.csvData.push(scope.row);
                     for (var i in data) {
                         scope.row = [data[i].id, data[i].resourceId, data[i].processingResult, data[i].officeName,
                         dateFilter(data[i].madeOnDate, 'yyyy-MM-dd'), data[i].maker,
                         dateFilter(data[i].checkedOnDate, 'yyyy-MM-dd hh:mm:ss'),
                         data[i].checker, data[i].entityName,
-                        data[i].actionName, data[i].clientName];
+                        data[i].actionName, data[i].clientName, (data[i].notes || '').replace(/,/g, ';')];
                         scope.csvData.push(scope.row);
                     }
                     if (scope.csvData) {

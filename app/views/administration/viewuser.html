@@ -39,8 +39,20 @@
         <div class="modal-body ">
             <api-validate></api-validate>
             <br>
+                <div class="form-group">
+                    <label for="deleteNotes">{{'label.input.notes' | translate}}<span class="required">*</span></label>
+                    <textarea id="deleteNotes" ng-model="formData.notes" class="form-control" rows="3"
+                              maxlength="500" required
+                              placeholder="{{'label.placeholder.usernotes' | translate}}"></textarea>
+                    <span ng-show="!formData.notes && showNotesError">
+                        <small class="error required">
+                            {{'validation.msg.user.notes.required' | translate}}
+                        </small>
+                    </span>
+                </div>
+                <br>
             <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
-            <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+            <button class="btn btn-primary" ng-click="confirmDelete()">{{'label.button.confirm' | translate}}</button>
         </div>
     </script>
     <div class="card well">

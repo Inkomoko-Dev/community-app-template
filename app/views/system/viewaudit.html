@@ -44,6 +44,10 @@
                         <td><strong>{{ 'label.heading.office' | translate }}:</strong></td>
                         <td>{{details.officeName}}</td>
                     </tr>
+                    <tr data-ng-show="details.notes">
+                        <td><strong>{{ 'label.heading.notes' | translate }}:</strong></td>
+                        <td>{{details.notes}}</td>
+                    </tr>
                     <tr data-ng-show="details.savingsAccountNo">
                         <td><strong>{{ 'label.heading.savingsaccountno' | translate }}:</strong></td>
                         <td>{{details.savingsAccountNo}}</td>
