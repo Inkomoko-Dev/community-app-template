@@ -321,7 +321,7 @@
                         <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
                         <div class="col-sm-3">
                             <input id="mfiCode" type="text" name="mfiCode" ng-model="formData.mfiCode"
-                                   class="form-control" ng-disabled="!isMfiCodeAccepted()">
+                                   class="form-control" ng-disabled="isMfiCodeReadOnly()">
                         </div>
                     </div>
 

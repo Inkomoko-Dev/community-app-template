@@ -2158,6 +2158,11 @@
                 return !(isDisbursementApprovalAction && (scope.isCashPayment() || scope.enableThirdPartyDisbursement));
             };
 
+            scope.isMfiCodeReadOnly = function () {
+                const isApprovalOrDRStage = scope.action === "approve" || scope.action === "disbursementpreapprovalrequest";
+                return !isApprovalOrDRStage;
+            };
+
             scope.isCashPayment = function () {
                 if (!Array.isArray(scope.paymentTypes)) return false;
 
