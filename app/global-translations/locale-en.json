@@ -2303,6 +2303,7 @@
   "label.heading.program": "Program",
   "label.heading.country": "Country",
   "label.heading.crbName": "Crb Name",
+  "label.heading.crbVerification": "Crb Verification",
   "label.heading.pdfId": "Pdf Id",
   "label.heading.productDisplayName": "Product Display Name",
   "label.heading.reportDate": "Report Date",
