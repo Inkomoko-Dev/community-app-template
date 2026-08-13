@@ -35,12 +35,16 @@
             };
 
             var UserDeleteCtrl = function ($scope, $uibModalInstance) {
-                $scope.delete = function () {
-                    resourceFactory.userListResource.delete({userId: routeParams.id}, {}, function (data) {
+                $scope.formData = {};
+                $scope.showNotesError = false;
+                $scope.confirmDelete = function () {
+                    if (!$scope.formData.notes || $scope.formData.notes.trim() === '') {
+                        $scope.showNotesError = true;
+                        return;
+                    }
+                    resourceFactory.userListResource.delete({userId: routeParams.id}, {notes: $scope.formData.notes}, function (data) {
                         $uibModalInstance.close('delete');
                         location.path('/users');
-                        // added dummy request param because Content-Type header gets removed
-                        // if the request does not contain any data (a request body)
                     });
                 };
                 $scope.cancel = function () {
