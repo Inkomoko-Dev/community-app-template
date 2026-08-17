@@ -606,7 +606,6 @@
                             scope.disbursementDetails[i].principal = loanData.disbursementDetails[i].principal;
                             scope.showTrancheAmountTotal += Number(loanData.disbursementDetails[i].principal);
                         }
-                        scope.validateApprovalTranchePrincipalTotal();
                         
                         // Now fetch disbursal template to get saved vendor/FX details
                         resourceFactory.loanTemplateResource.get({
