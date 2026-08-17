@@ -27,6 +27,37 @@
             scope.crbReportMetrolpolIdentityVerification = null;
             scope.isCrbVerificationInProgress = false;
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return firstDateValue.localeCompare(secondDateValue);
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return secondDateValue.localeCompare(firstDateValue);
+                });
+                return details[0];
+            }
+
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement){
                     fetchLoanAccountDetails();
@@ -736,16 +767,16 @@
                         && data.subStatus && data.subStatus.id === 200;
                     scope.partnerSupplierDisbursementDetail = null;
                     if (scope.enableThirdPartyDisbursement && data.disbursementDetails && data.disbursementDetails.length > 0) {
-                        var firstDisbursementDetail = data.disbursementDetails[0];
-                        if (firstDisbursementDetail
-                            && (firstDisbursementDetail.supplierId
-                                || firstDisbursementDetail.supplierName
-                                || firstDisbursementDetail.beneficiaryName
-                                || firstDisbursementDetail.clientPhoneNumber
-                                || firstDisbursementDetail.clientAccountNumber
-                                || firstDisbursementDetail.paymentTypeId
-                                || firstDisbursementDetail.paymentTypeName)) {
-                            scope.partnerSupplierDisbursementDetail = firstDisbursementDetail;
+                        var applicableDetail = applicableDisbursementDetail(data);
+                        if (applicableDetail
+                            && (applicableDetail.supplierId
+                                || applicableDetail.supplierName
+                                || applicableDetail.beneficiaryName
+                                || applicableDetail.clientPhoneNumber
+                                || applicableDetail.clientAccountNumber
+                                || applicableDetail.paymentTypeId
+                                || applicableDetail.paymentTypeName)) {
+                            scope.partnerSupplierDisbursementDetail = applicableDetail;
                         }
                     }
                     scope.decimals = data.currency.decimalPlaces;

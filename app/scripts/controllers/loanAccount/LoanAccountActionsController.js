@@ -20,6 +20,37 @@
                 return String(country).replace(/\s+/g, ' ').trim().toUpperCase();
             }
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return firstDateValue.localeCompare(secondDateValue);
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return secondDateValue.localeCompare(firstDateValue);
+                });
+                return details[0];
+            }
+
             resourceFactory.LoanAccountResource.getLoanAccountDetails({
                 loanId: scope.accountId
             }, function (data) {
@@ -742,10 +773,7 @@
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
                         
-                        var savedDetail = null;
-                        if (data.disbursementDetails && data.disbursementDetails.length > 0) {
-                            savedDetail = data.disbursementDetails[0];
-                        }
+                        var savedDetail = applicableDisbursementDetail(data);
                         
                         // Now fetch the template and apply saved details on top of it
                         resourceFactory.loanTrxnsTemplateResource.get({
