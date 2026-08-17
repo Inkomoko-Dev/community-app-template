@@ -20,6 +20,31 @@
                 return String(country).replace(/\s+/g, ' ').trim().toUpperCase();
             }
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
+                    return dateComparison || ((first.id || 0) - (second.id || 0));
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                return null;
+            }
+
             resourceFactory.LoanAccountResource.getLoanAccountDetails({
                 loanId: scope.accountId
             }, function (data) {
@@ -604,7 +629,6 @@
                             scope.disbursementDetails[i].principal = loanData.disbursementDetails[i].principal;
                             scope.showTrancheAmountTotal += Number(loanData.disbursementDetails[i].principal);
                         }
-                        scope.populateFirstTrancheFromClient();
                         
                         // Now fetch disbursal template to get saved vendor/FX details
                         resourceFactory.loanTemplateResource.get({
@@ -731,8 +755,6 @@
                     // These actions should be read-only
                     scope.isReadOnly = true;
 
-                    scope.showMfiCode = true;
-
                     var command = "";
                     var rejectCommand = "";
                     
@@ -759,20 +781,10 @@
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
 
+                        var savedDetail = applicableDisbursementDetail(data);
+
                         scope.showMfiCode = !scope.enableThirdPartyDisbursement;
 
-
-                        var savedDetail = null;
-                        if (data.disbursementDetails && data.disbursementDetails.length > 0) {
-                            var undisbursedDetails = data.disbursementDetails.filter(function (detail) {
-                                return !detail.actualDisbursementDate;
-                            }).sort(function (left, right) {
-                                var dateDifference = new Date(left.expectedDisbursementDate) - new Date(right.expectedDisbursementDate);
-                                return dateDifference || ((left.id || 0) - (right.id || 0));
-                            });
-                            savedDetail = undisbursedDetails.length > 0 ? undisbursedDetails[0] : null;
-                        }
-                        
                         // Now fetch the template and apply saved details on top of it
                         resourceFactory.loanTrxnsTemplateResource.get({
                             loanId: scope.accountId,
