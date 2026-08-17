@@ -93,6 +93,37 @@
                 return details[0];
             }
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return firstDateValue.localeCompare(secondDateValue);
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return secondDateValue.localeCompare(firstDateValue);
+                });
+                return details[0];
+            }
+
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement){
                     fetchLoanAccountDetails();

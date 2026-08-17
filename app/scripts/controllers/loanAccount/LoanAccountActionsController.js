@@ -36,13 +36,19 @@
                     var secondDate = second.expectedDisbursementDate || [];
                     var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
                     var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
-                    return dateComparison || ((first.id || 0) - (second.id || 0));
+                    return firstDateValue.localeCompare(secondDateValue);
                 });
                 if (undisbursedDetails.length) {
                     return undisbursedDetails[0];
                 }
-                return null;
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return secondDateValue.localeCompare(firstDateValue);
+                });
+                return details[0];
             }
 
             resourceFactory.LoanAccountResource.getLoanAccountDetails({
@@ -757,11 +763,9 @@
                         scope.clientName = data.clientName || scope.clientName;
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
-
+                        
                         var savedDetail = applicableDisbursementDetail(data);
-
-                        scope.showMfiCode = !scope.enableThirdPartyDisbursement;
-
+                        
                         // Now fetch the template and apply saved details on top of it
                         resourceFactory.loanTrxnsTemplateResource.get({
                             loanId: scope.accountId,
