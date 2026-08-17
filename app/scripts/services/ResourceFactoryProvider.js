@@ -620,6 +620,31 @@
                         reject: { method: 'POST', params: { command: 'reject' } },
                         approve: { method: 'POST', params: { command: 'approve' } }
                     }),
+                    bulkLoanRescheduleTemplateResource: defineResource(apiVer + "/bulk-reschedule/template-data", {}, {
+                        get: { method: 'GET', params: {}}
+                    }),
+
+                    bulkLoanRescheduleResource: defineResource(apiVer + "/bulk-reschedule", {}, {
+                        getAll: { method: 'GET', params: {status: '@status', officeId: '@officeId', assignedToMe: '@assignedToMe', dateRange: '@dateRange', limit: '@limit', offset: '@offset'}},
+                        preview: { method: 'POST', params: {}}
+                    }),
+
+                    bulkLoanRescheduleExecutionResource: defineResource( apiVer + "/bulk-reschedule/:executionId", { executionId: '@executionId'}, {
+                        get: { method: 'GET', params: {}},
+                        preview: { method: 'GET', url: baseUrl + apiVer + "/bulk-reschedule/:executionId/preview", params: { executionId: '@executionId', page: '@page', size: '@size', status: '@status'}},
+                        approvers: { method: 'GET', isArray: true, url: baseUrl + apiVer + "/bulk-reschedule/:executionId/approvers", params: { executionId: '@executionId'}},
+                        audit: { method: 'GET', isArray: true, url: baseUrl + apiVer + "/bulk-reschedule/:executionId/audit", params: { executionId: '@executionId'}},
+                        cancel: { method: 'DELETE', url: baseUrl + apiVer + "/bulk-reschedule/:executionId", params: { executionId: '@executionId'}},
+                        submitForApproval: { method: 'POST', url: baseUrl + apiVer + "/bulk-reschedule/:executionId/submit-for-approval", params: { executionId: '@executionId'}}
+                    }),
+
+                    bulkLoanRescheduleCommandResource: defineResource( apiVer + "/bulk-reschedule/:executionId/:command", {executionId: '@executionId', command: '@command'}, {
+                        approve: { method: 'POST', params: { command: 'approve' }},
+                        reject: { method: 'POST', params: { command: 'reject'}},
+                        execute: { method: 'POST', params: { command: 'execute'}},
+                        recover: { method: 'POST', params: { command: 'recover'}},
+                        rollback: { method: 'POST', params: { command: 'rollback'}}
+                    }),
                     auditResource: defineResource(apiVer + "/audits/:templateResource", { templateResource: '@templateResource' }, {
                         get: { method: 'GET', params: {} },
                         search: { method: 'GET', params: {}, isArray: false },

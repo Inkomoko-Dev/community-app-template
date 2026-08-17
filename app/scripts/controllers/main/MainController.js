@@ -374,7 +374,7 @@
             // create second array with address models
             var addrmodels = ['/users/','/organization','/system','/products','/templates', '', '/accounting',
                                 '/clients', '/groups','/centers','','/offices', '/holidays','/employees','/managefunds/',
-                                '/bulkloan','/currconfig','/standinginstructions/history','/datatables','/codes','/admin/roles',
+                                '/bulkloan','/bulkreschedule','/currconfig','/standinginstructions/history','/datatables','/codes','/admin/roles',
                                 '/admin/viewmctasks','/hooks','/audit', '/reports','/jobs','/global','/accountnumberpreferences','/loanproducts',
                                 '/savingproducts','/charges','/productmix', '/fixeddepositproducts','/recurringdepositproducts','/freqposting',
                                 '/journalentry','/searchtransaction','/financialactivityaccountmappings','/accounting_coa', '/accounts_closure','/accounting_rules','/run_periodic_accrual'];

@@ -854,6 +854,15 @@
             .when('/bulkloan', {
                 templateUrl: 'views/organization/bulkloan.html'
             })
+            .when('/bulkreschedule', {
+                templateUrl: 'views/organization/bulkreschedulelist.html'
+            })
+            .when('/bulkreschedule/create', {
+                templateUrl: 'views/organization/bulkreschedulecreate.html'
+            })
+            .when('/bulkreschedule/:executionId', {
+                templateUrl: 'views/organization/bulkrescheduledetail.html'
+            })
             .when('/audit', {
                 templateUrl: 'views/system/audit.html'
             })
