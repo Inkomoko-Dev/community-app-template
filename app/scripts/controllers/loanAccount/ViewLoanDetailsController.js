@@ -27,6 +27,39 @@
             scope.crbReportMetrolpolIdentityVerification = null;
 
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
+                    return dateComparison || ((first.id || 0) - (second.id || 0));
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    var dateComparison = secondDateValue.localeCompare(firstDateValue);
+                    return dateComparison || ((second.id || 0) - (first.id || 0));
+                });
+                return details[0];
+            }
+
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement){
                     fetchLoanAccountDetails();
@@ -713,6 +746,28 @@
                         scope.isPendingDisbursement = true;
                     } else {
                         scope.isPendingDisbursement = false;
+                    }
+                    scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
+                    scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
+                    scope.isAwaitingPartnerDisbursementInstruction = scope.enableThirdPartyDisbursement
+                        && data.status && data.status.value === 'Approved'
+                        && !data.subStatus;
+                    scope.isReadyForStaffThirdPartyDisbursement = scope.enableThirdPartyDisbursement
+                        && data.status && data.status.value === 'Approved'
+                        && data.subStatus && data.subStatus.id === 200;
+                    scope.partnerSupplierDisbursementDetail = null;
+                    if (scope.enableThirdPartyDisbursement && data.disbursementDetails && data.disbursementDetails.length > 0) {
+                        var applicableDetail = applicableDisbursementDetail(data);
+                        if (applicableDetail
+                            && (applicableDetail.supplierId
+                                || applicableDetail.supplierName
+                                || applicableDetail.beneficiaryName
+                                || applicableDetail.clientPhoneNumber
+                                || applicableDetail.clientAccountNumber
+                                || applicableDetail.paymentTypeId
+                                || applicableDetail.paymentTypeName)) {
+                            scope.partnerSupplierDisbursementDetail = applicableDetail;
+                        }
                     }
                     scope.decimals = data.currency.decimalPlaces;
                     scope.isResidualPenaltyWaiver = function (charge) {

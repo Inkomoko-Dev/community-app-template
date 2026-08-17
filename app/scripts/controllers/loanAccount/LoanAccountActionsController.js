@@ -20,6 +20,31 @@
                 return String(country).replace(/\s+/g, ' ').trim().toUpperCase();
             }
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
+                    return dateComparison || ((first.id || 0) - (second.id || 0));
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                return null;
+            }
+
             resourceFactory.LoanAccountResource.getLoanAccountDetails({
                 loanId: scope.accountId
             }, function (data) {
@@ -688,8 +713,6 @@
                     // These actions should be read-only
                     scope.isReadOnly = true;
 
-                    scope.showMfiCode = true;
-
                     var command = "";
                     var rejectCommand = "";
                     
@@ -716,14 +739,10 @@
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
 
+                        var savedDetail = applicableDisbursementDetail(data);
+
                         scope.showMfiCode = !scope.enableThirdPartyDisbursement;
 
-
-                        var savedDetail = null;
-                        if (data.disbursementDetails && data.disbursementDetails.length > 0) {
-                            savedDetail = data.disbursementDetails[0];
-                        }
-                        
                         // Now fetch the template and apply saved details on top of it
                         resourceFactory.loanTrxnsTemplateResource.get({
                             loanId: scope.accountId,
