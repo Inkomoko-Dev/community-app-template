@@ -1,0 +1,112 @@
+<div class="content-container" ng-controller="BulkLoanRescheduleListController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.bulkreschedule.title' | translate}}</li>
+    </ul>
+
+    <div class="toolbar clearfix">
+        <div class="pull-left">
+            <h4 class="m-b-0">{{'label.bulkreschedule.requests' | translate}}</h4>
+            <p class="text-muted">{{'label.bulkreschedule.requests.help' | translate}}</p>
+        </div>
+        <button ng-if="canCreate" type="button" class="btn btn-primary pull-right" ng-click="createNew()">
+            <i class="fa fa-plus"></i> {{'label.bulkreschedule.create' | translate}}
+        </button>
+    </div>
+
+    <api-validate></api-validate>
+    <div class="alert alert-danger" ng-if="errorStatus">{{errorStatus}}</div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form class="row" ng-submit="loadRequests(true)">
+                <div class="col-sm-3">
+                    <label>{{'label.bulkreschedule.search' | translate}}</label>
+                    <input type="text" class="form-control" ng-model="filters.search"
+                           placeholder="{{'label.bulkreschedule.search.placeholder' | translate}}">
+                </div>
+                <div class="col-sm-2">
+                    <label>{{'label.bulkreschedule.status' | translate}}</label>
+                    <select class="form-control" ng-model="filters.status"
+                            ng-options="status as statusLabel(status) for status in statusOptions">
+                        <option value="">{{'label.bulkreschedule.all' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <label>{{'label.bulkreschedule.office' | translate}}</label>
+                    <select class="form-control" ng-model="filters.officeId"
+                            ng-options="office.id as office.displayName for office in officeOptions">
+                        <option value="">{{'label.bulkreschedule.alloffices' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <label>{{'label.bulkreschedule.daterange' | translate}}</label>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <input type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
+                                   ng-model="filters.startDate" placeholder="{{'label.bulkreschedule.from' | translate}}">
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
+                                   ng-model="filters.endDate" placeholder="{{'label.bulkreschedule.to' | translate}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-default btn-block"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+            <div class="text-right m-t-1"><a href="" ng-click="resetFilters()">{{'label.bulkreschedule.resetfilters' | translate}}</a></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="filters.assignedToMe" ng-change="loadRequests(true)"> {{'label.bulkreschedule.assignedtome' | translate}}</label></div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>{{'label.bulkreschedule.executionid' | translate}}</th>
+                    <th>{{'label.bulkreschedule.office' | translate}}</th>
+                    <th>{{'label.bulkreschedule.criteriasummary' | translate}}</th>
+                    <th class="text-right">{{'label.bulkreschedule.loansfound' | translate}}</th>
+                    <th>{{'label.bulkreschedule.status' | translate}}</th>
+                    <th>{{'label.bulkreschedule.requestedby' | translate}}</th>
+                    <th>{{'label.bulkreschedule.requestedon' | translate}}</th>
+                    <th class="text-right">{{'label.bulkreschedule.actions' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="request in requests track by request.id">
+                    <td><a href="" ng-click="openRequest(request)">{{request.id}}</a></td>
+                    <td>{{request.officeName || request.officeId || '—'}}</td>
+                    <td>{{criteriaSummary(request)}}</td>
+                    <td class="text-right">{{request.totalLoansFound}}</td>
+                    <td><span class="label" ng-class="statusClass(request.status)">{{statusLabel(request.status)}}</span></td>
+                    <td>{{request.requestedBy || '—'}}</td>
+                    <td>{{request.requestedOn | date:'dd MMM yyyy, h:mm a'}}</td>
+                    <td class="text-right">
+                        <button type="button" class="btn btn-default btn-sm" ng-click="openRequest(request)">
+                            {{'label.bulkreschedule.view' | translate}} <i class="fa fa-angle-right"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr ng-if="!state.loading && !requests.length">
+                    <td colspan="8" class="text-center text-muted">{{'label.bulkreschedule.nonefound' | translate}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel-footer clearfix">
+            <span class="text-muted">{{'label.bulkreschedule.showingrequests' | translate:{start: pageStart(), end: pageEnd(), total: total} }}</span>
+            <div class="pull-right">
+                <button class="btn btn-default btn-sm" ng-disabled="filters.offset <= 0 || state.loading" ng-click="previousPage()">
+                    <i class="fa fa-angle-left"></i> {{'label.bulkreschedule.previous' | translate}}
+                </button>
+                <button class="btn btn-default btn-sm" ng-disabled="!hasMore || state.loading" ng-click="nextPage()">
+                    {{'label.bulkreschedule.next' | translate}} <i class="fa fa-angle-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
