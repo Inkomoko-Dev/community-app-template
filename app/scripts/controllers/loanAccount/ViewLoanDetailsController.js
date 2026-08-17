@@ -43,7 +43,8 @@
                     var secondDate = second.expectedDisbursementDate || [];
                     var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
                     var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    return firstDateValue.localeCompare(secondDateValue);
+                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
+                    return dateComparison || ((first.id || 0) - (second.id || 0));
                 });
                 if (undisbursedDetails.length) {
                     return undisbursedDetails[0];
@@ -53,7 +54,8 @@
                     var secondDate = second.actualDisbursementDate || [];
                     var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
                     var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    return secondDateValue.localeCompare(firstDateValue);
+                    var dateComparison = secondDateValue.localeCompare(firstDateValue);
+                    return dateComparison || ((second.id || 0) - (first.id || 0));
                 });
                 return details[0];
             }
