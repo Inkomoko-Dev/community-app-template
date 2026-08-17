@@ -59,7 +59,7 @@
             }
 
             scope.interval = interval(function () {
-                if(scope.isPendingDisbursement){
+                if(scope.isPendingDisbursement && !scope.isReadyForStaffThirdPartyDisbursement){
                     fetchLoanAccountDetails();
                 } else {
                     interval.cancel(scope.interval);
@@ -537,6 +537,9 @@
                         break;
                     case "writeoff":
                         location.path('/loanaccount/' + accountId + '/writeoff');
+                        break;
+                    case "partialwriteoff":
+                        location.path('/loanaccount/' + accountId + '/partialwriteoff');
                         break;
                     case "recoverypayment":
                         location.path('/loanaccount/' + accountId + '/recoverypayment');
@@ -1130,6 +1133,10 @@
                                 {
                                     name: "button.writeoff",
                                     taskPermissionName: 'WRITEOFF_LOAN'
+                                },
+                                {
+                                    name: "button.partialwriteoff",
+                                    taskPermissionName: 'PARTIALWRITEOFF_LOAN'
                                 },
 
                                 // {

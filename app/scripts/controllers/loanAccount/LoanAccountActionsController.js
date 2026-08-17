@@ -68,6 +68,7 @@
             scope.error = false;
             // Transaction UI Related
             scope.isTransaction = false;
+            scope.showMfiCode = false;
             scope.showPaymentDetails = false;
             scope.paymentTypes = [];
             scope.form = {};
@@ -668,6 +669,7 @@
                                 scope.showApprovalAmount = true;
                                 scope.showAmountField = true;
                                 scope.isTransaction = !scope.enableThirdPartyDisbursement;
+                                scope.showMfiCode = scope.isTransaction;
                                 scope.formData.approvedLoanAmount = data.approvalAmount;
                                 scope.formData.transactionAmount = data.netDisbursalAmount;
                                 scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
@@ -747,6 +749,8 @@
                     // These actions should be read-only
                     scope.isReadOnly = true;
 
+                    scope.showMfiCode = true;
+
                     var command = "";
                     var rejectCommand = "";
                     
@@ -772,8 +776,10 @@
                         scope.loanCountry = extractLoanCountry(data);
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
+                        scope.showMfiCode = !scope.enableThirdPartyDisbursement;
                         
                         var savedDetail = applicableDisbursementDetail(data);
+
                         
                         // Now fetch the template and apply saved details on top of it
                         resourceFactory.loanTrxnsTemplateResource.get({
@@ -962,6 +968,22 @@
                     scope.labelName = 'label.input.writeoffondate';
                     scope.taskPermissionName = 'WRITEOFF_LOAN';
                     scope.fetchEntities('m_loan', 'WRITE_OFF');
+                    break;
+
+                case "partialwriteoff":
+                    scope.modelName = 'transactionDate';
+                    resourceFactory.loanTrxnsTemplateResource.get({
+                        loanId: scope.accountId,
+                        command: 'partialwriteoff'
+                    }, function (data) {
+                        scope.formData[scope.modelName] = new Date(data.date) || new Date();
+                        scope.outstandingBalance = data.outstandingLoanBalance || data.amount;
+                        scope.isPartialWriteOff = true;
+                    });
+                    scope.title = 'label.heading.partialwriteoffloanaccount';
+                    scope.labelName = 'label.input.partialwriteoffondate';
+                    scope.taskPermissionName = 'PARTIALWRITEOFF_LOAN';
+                    scope.showComponentFields = true;
                     break;
 
                 case "payoff":
@@ -1506,6 +1528,10 @@
                     || scope.action === "disbursementpreapprovalrequest"
                     || scope.action === "disbursementapproval";
 
+                if (!scope.isMfiCodeAccepted()) {
+                    delete submitData.mfiCode;
+                }
+
                 // Clean up FX details separately from payment recipient details.
                 if ((scope.isReviewRelatedAction() || !scope.shouldShowFxDetails() || isDisbursementReviewAction) && !(scope.isSouthSudanSspLoan() && (scope.isApprovalAction() || scope.isDisbursementReviewAction()))) {
                     delete submitData.fxRate;
@@ -1531,13 +1557,25 @@
                     scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }
-                if (scope.isSupplierNonCashPayment() && (!scope.formData.clientPhoneNumber || !scope.formData.clientAccountNumber || !scope.formData.clientBankName)) {
-                    scope.error = 'Supplier payment details (Phone, Account, Bank) are mandatory for vendor disbursement';
-                    return;
-                }
-                if (scope.isSupplierNonCashPayment() && !scope.formData.beneficiaryName) {
-                    scope.error = 'Beneficiary name is mandatory for vendor disbursement';
-                    return;
+                // Skip supplier payment validation for third-party disbursement - details come from partner instruction
+                if (scope.isSupplierNonCashPayment() && !scope.enableThirdPartyDisbursement) {
+                    // Phone number is always required for supplier payments
+                    if (!scope.formData.clientPhoneNumber) {
+                        scope.error = 'Phone number is mandatory for vendor disbursement';
+                        return;
+                    }
+                    // Bank details only required for non-mobile-money payments
+                    if (!scope.isMobileMoneyPayment()) {
+                        if (!scope.formData.clientAccountNumber || !scope.formData.clientBankName) {
+                            scope.error = 'Account number and bank name are mandatory for bank vendor disbursement';
+                            return;
+                        }
+                    }
+                    // Beneficiary name is always required
+                    if (!scope.formData.beneficiaryName) {
+                        scope.error = 'Beneficiary name is mandatory for vendor disbursement';
+                        return;
+                    }
                 }
                 // Mirror the backend rule: bank (non-cash, non-mobile-money) payments to the client
                 // require account number + bank name, otherwise approval is rejected server-side
@@ -1651,7 +1689,7 @@
                     submitData.locale = scope.optlang.code;
                     submitData.dateFormat = scope.df;
                 }
-                if (scope.action == "repayment" || scope.action == "waiveinterest" || scope.action == "payoff" || scope.action == "writeoff" || scope.action == "close-rescheduled"
+                if (scope.action == "repayment" || scope.action == "waiveinterest" || scope.action == "payoff" || scope.action == "writeoff" || scope.action == "partialwriteoff" || scope.action == "close-rescheduled"
                     || scope.action == "close" || scope.action == "modifytransaction" || scope.action == "recoverypayment" || scope.action == "prepayloan") {
                     if (scope.action == "modifytransaction") {
                         params.command = 'modify';
@@ -2167,6 +2205,18 @@
                     scope.refreshKenyaCapitalBudgetForDisbursementDate(newDate);
                 }
             });
+
+            scope.isMfiCodeAccepted = function () {
+                if (!scope.showMfiCode) return false;
+                var isDisbursementApprovalAction = scope.action === "approveDisbursement"
+                    || scope.action === "disbursementapproval";
+                return !(isDisbursementApprovalAction && (scope.isCashPayment() || scope.enableThirdPartyDisbursement));
+            };
+
+            scope.isMfiCodeReadOnly = function () {
+                const isApprovalOrDRStage = scope.action === "approve" || scope.action === "disbursementpreapprovalrequest";
+                return !isApprovalOrDRStage;
+            };
 
             scope.isCashPayment = function () {
                 if (!Array.isArray(scope.paymentTypes)) return false;

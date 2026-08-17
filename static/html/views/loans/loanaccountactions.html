@@ -219,6 +219,73 @@
                     </div>
                 </div>
 
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2">{{ 'label.input.partialwriteoff.components' | translate }}</label>
+                    <div class="col-sm-6">
+                        <div class="alert alert-info">
+                            {{ 'label.input.outstandingbalance' | translate }}: {{ outstandingBalance }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="principalPortion">{{ 'label.input.principal' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="principalPortion" type="text" name="principalPortion" ng-model="formData.principalPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="interestPortion">{{ 'label.input.interest' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="interestPortion" type="text" name="interestPortion" ng-model="formData.interestPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="feeChargesPortion">{{ 'label.input.fees' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="feeChargesPortion" type="text" name="feeChargesPortion" ng-model="formData.feeChargesPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="penaltyChargesPortion">{{ 'label.input.penalties' |
+                        translate}}</label>
+
+                    <div class="col-sm-3">
+                        <input id="penaltyChargesPortion" type="text" name="penaltyChargesPortion" ng-model="formData.penaltyChargesPortion"
+                               class="form-control" number-format>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff">
+                    <label class="control-label col-sm-2" for="reason">{{ 'label.input.reason' |
+                        translate}}<span class="required">*</span></label>
+
+                    <div class="col-sm-6">
+                        <textarea id="reason" name="reason" ng-model="formData.reason"
+                                  class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="isPartialWriteOff" ng-if="!formData.principalPortion && !formData.interestPortion && !formData.feeChargesPortion && !formData.penaltyChargesPortion">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <div class="alert alert-warning">
+                            {{ 'label.input.atleastonecomponentrequired' | translate }}
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group" ng-show="isLoaPayOff">
                     <label class="control-label col-sm-2" for="payOffAmount">{{ 'label.input.amount' |
                         translate}}</label>
@@ -246,11 +313,11 @@
 
                 <div ng-show="isTransaction">
 
-                    <div class="form-group">
+                    <div class="form-group" ng-show="isMfiCodeAccepted()">
                         <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
                         <div class="col-sm-3">
                             <input id="mfiCode" type="text" name="mfiCode" ng-model="formData.mfiCode"
-                                   class="form-control" ng-disabled="isReadOnly">
+                                   class="form-control" ng-disabled="isMfiCodeReadOnly()">
                         </div>
                     </div>
 
