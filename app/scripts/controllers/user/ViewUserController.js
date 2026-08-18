@@ -19,8 +19,14 @@
                 });
             };
             var ModalInstanceCtrl = function ($scope, $uibModalInstance) {
-                $scope.save = function (staffId) {
-                    resourceFactory.userListResource.update({'userId': routeParams.id}, this.formData, function (data) {
+                $scope.formData = {};
+                $scope.showNotesError = false;
+                $scope.save = function () {
+                    if (!$scope.formData.notes || $scope.formData.notes.trim() === '') {
+                        $scope.showNotesError = true;
+                        return;
+                    }
+                    resourceFactory.userListResource.update({'userId': routeParams.id}, $scope.formData, function (data) {
                         $uibModalInstance.close('activate');
                         if (data.resourceId == scope.currentSession.user.userId) {
                             scope.logout();
