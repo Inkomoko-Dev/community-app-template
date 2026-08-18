@@ -726,14 +726,34 @@
                         scope.loanCountry = extractLoanCountry(data);
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                         scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
-                        
-                        var savedDetail = applicableDisbursementDetail(data);
+
+                        scope.showMfiCode = !scope.enableThirdPartyDisbursement;
+
+
+                        var savedDetail = null;
+                        if (data.disbursementDetails && data.disbursementDetails.length > 0) {
+                            var undisbursedDetails = data.disbursementDetails.filter(function (detail) {
+                                return !detail.actualDisbursementDate;
+                            }).sort(function (left, right) {
+                                var dateDifference = new Date(left.expectedDisbursementDate) - new Date(right.expectedDisbursementDate);
+                                return dateDifference || ((left.id || 0) - (right.id || 0));
+                            });
+                            savedDetail = undisbursedDetails.length > 0 ? undisbursedDetails[0] : null;
+                        }
                         
                         // Now fetch the template and apply saved details on top of it
                         resourceFactory.loanTrxnsTemplateResource.get({
                             loanId: scope.accountId,
                             command: command
                         }, function (templateData) {
+                            if (templateData.disbursementDetailId && data.disbursementDetails) {
+                                savedDetail = data.disbursementDetails.find(function (detail) {
+                                    return detail.id === templateData.disbursementDetailId;
+                                }) || savedDetail;
+                            }
+                            scope.currentTrancheNumber = templateData.trancheNumber;
+                            scope.remainingUndisbursedAmount = templateData.remainingUndisbursedAmount;
+                            scope.currentTranchePrincipal = templateData.amount;
                             scope.loanCurrencyCode = templateData.currency ? templateData.currency.code : scope.loanCurrencyCode;
                             scope.paymentTypes = templateData.paymentTypeOptions;
                             if (scope.paymentTypes && scope.paymentTypes.length > 0) {
