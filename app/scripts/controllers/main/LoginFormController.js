@@ -69,6 +69,11 @@
             });*/
 
             scope.updatePassword = function (){
+                if (!scope.passwordDetails.notes || scope.passwordDetails.notes.trim() === '') {
+                    scope.showNotesError = true;
+                    return;
+                }
+                scope.showNotesError = false;
                 resourceFactory.userListResource.update({'userId': scope.loggedInUserId}, scope.passwordDetails, function (data) {
                     //clear the old authorization token
                     httpService.cancelAuthorization();
