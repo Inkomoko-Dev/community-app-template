@@ -5690,7 +5690,7 @@
   "label.input.correctionreference": "Correction Reference",
   "label.help.waiveramount": "Leave at the full penalty balance to waive it entirely, or reduce it for a partial waiver.",
   "label.help.suggestedeffectivedate": "Suggested: the date of the earliest repayment that paid this penalty",
-  "label.help.noapprovers": "No approver is mapped to this loan product. An administrator must map one before this waiver can be submitted.",
+  "label.help.noapprovers": "Nobody in this office holds the historical penalty waiver approval permission. An administrator must grant it before this waiver can be submitted.",
   "label.message.historicalpenaltywaiver.previewfailed": "The preview could not be produced. This penalty may not be eligible for a historical waiver.",
   "label.message.historicalpenaltywaiver.requiresapproval": "This waiver crosses an approval threshold and will be held until an approver acts on it.",
   "label.message.historicalpenaltywaiver.willbeheld": "Submitting will create an approval request. Nothing on the loan changes until it is approved.",
