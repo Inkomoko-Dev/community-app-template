@@ -42,7 +42,7 @@
                 <tbody>
                 <tr ng-repeat="charge in penalties">
                     <td>{{charge.name}}</td>
-                    <td>{{charge.dueDate | dateFormat}}</td>
+                    <td>{{charge.dueDate | DateFormat}}</td>
                     <td>{{charge.amountOutstanding | number}}</td>
                     <td>
                         <a class="btn btn-primary btn-sm" ng-click="select(charge)"><i class="fa fa-flag"></i>&nbsp;{{'label.button.waivecharge' | translate}}</a>

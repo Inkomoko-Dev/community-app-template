@@ -453,8 +453,7 @@
                 description: key,
                 containsAmount: true,
                 boldTitle: false,
-                amount: (scope.availableCharges[key].toFixed(3) / (1
-                    + scope.tax ? scope.tax :0)).toFixed(3)
+                amount: (scope.availableCharges[key] / (1 + (scope.tax ? scope.tax : 0))).toFixed(3)
               };
               scope.details.push(chargeDetail);
               if (scope.tax) {
