@@ -87,7 +87,7 @@
                             <td>{{'label.account.deposit.principal.amount' | translate}}</td>
                             <td>{{'label.heading.actions' | translate}}</td>
                         </tr>
-                        <tr ng-repeat="details in disbursementDetails">
+                        <tr ng-repeat-start="details in disbursementDetails">
                             <td>{{'label.heading.tranche' | translate}}{{$index + 1}}</td>
                             <td>
                                 <input id="details[{{$index}}].expectedDisbursementDate" type="text"
@@ -101,16 +101,16 @@
                                        ng-disabled="!isTrancheEditable(details)">
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link" ng-if="action === 'approve' && !enableThirdPartyDisbursement"
+                                <button type="button" class="btn btn-link" ng-if="!enableThirdPartyDisbursement"
                                         ng-click="details.editPaymentDetails = !details.editPaymentDetails">
                                     <i class="fa" ng-class="details.editPaymentDetails ? 'fa-chevron-up' : 'fa-pencil'"></i>
                                     Payment details
                                 </button>
-                                <a ng-if="multiDisburseLoan && isTrancheEditable(details)" ng-click="deleteTranches($index);addTrancheAmounts();"><i
+                                <a ng-click="deleteTranches($index);addTrancheAmounts();"><i
                                         class="fa fa-times-circle fa-2x"></i></a>
                             </td>
                         </tr>
-                        <tr ng-repeat-end ng-show="action === 'approve' && details.editPaymentDetails && !enableThirdPartyDisbursement">
+                        <tr ng-repeat-end ng-show="details.editPaymentDetails && !enableThirdPartyDisbursement">
                             <td colspan="4">
                                 <div class="row">
                                     <div class="col-sm-3">
@@ -325,7 +325,7 @@
                     </div>
                 </div>
 
-                <div ng-show="isTransaction">
+                <div ng-show="isTransaction && !(action === 'approve' && approveTranches)">
 
                     <div class="form-group" ng-show="isMfiCodeAccepted()">
                         <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
@@ -683,6 +683,38 @@
                                class="form-control"
                                number-format disabled>
                         <small class="help-block">Use Manage tranches to change a tranche amount.</small>
+                    </div>
+                </div>
+                <div ng-if="!enableThirdPartyDisbursement">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Payment type</label>
+                        <div class="col-sm-3"><select class="form-control" ng-model="formData.paymentTypeId" ng-options="paymentType.id as paymentType.name for paymentType in paymentTypes"></select></div>
+                        <label class="control-label col-sm-2">{{ 'label.input.paymentto' | translate }}</label>
+                        <div class="col-sm-3"><select class="form-control" ng-model="formData.paymentTo" ng-change="formData.disbursementType = formData.paymentTo === 2 ? 'VENDOR' : 'CLIENT'" ng-options="option.id as option.name | translate for option in paymentToOptions"></select></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Disbursement type</label>
+                        <div class="col-sm-3"><select class="form-control" ng-model="formData.disbursementType" ng-options="option.id as option.name for option in disbursementTypeOptions"></select></div>
+                        <label class="control-label col-sm-2">Beneficiary name</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.beneficiaryName"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Phone number</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.clientPhoneNumber"></div>
+                        <label class="control-label col-sm-2">Bank name</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.clientBankName"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Account number</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.clientAccountNumber"></div>
+                        <label class="control-label col-sm-2">{{ 'label.anchor.mfiCode' | translate }}</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.mfiCode"></div>
+                    </div>
+                    <div class="form-group" ng-if="isSouthSudanSspLoan() && formData.disbursementType === 'VENDOR'">
+                        <label class="control-label col-sm-2">FX Rate (SSP/USD)</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" number-format ng-model="formData.fxRate"></div>
+                        <label class="control-label col-sm-2">USD Equivalent</label>
+                        <div class="col-sm-3"><input class="form-control" type="text" disabled value="{{formData.fxRate ? (formData.updatedPrincipal / formData.fxRate | number:2) : ''}}"></div>
                     </div>
                 </div>
             </div>
