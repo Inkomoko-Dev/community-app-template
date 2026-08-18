@@ -127,5 +127,30 @@
 			</div>
 		</div>
     </div>
+    <div class="card well" has-permission='READ_AUDIT' data-ng-show="userAudits.length">
+        <h4 class="bolder">{{'label.anchor.audittrails' | translate}}</h4>
+        <div class="row">
+            <div class="col-md-10">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.action' | translate}}</th>
+                        <th>{{'label.heading.madeby' | translate}}</th>
+                        <th>{{'label.heading.madedate' | translate}}</th>
+                        <th>{{'label.heading.notes' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="audit in userAudits">
+                        <td>{{audit.actionName}}</td>
+                        <td>{{audit.maker}}</td>
+                        <td>{{audit.madeOnDate | date:'d MMM y h:mm:ss'}}</td>
+                        <td>{{audit.notes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
           
