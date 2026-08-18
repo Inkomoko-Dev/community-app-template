@@ -552,6 +552,8 @@
   "error.msg.header": "You have the following errors:",
   "label.placeholder.usernotes": "Enter ticket number or justification for this action",
   "validation.msg.user.notes.required": "Notes are required for this action. Please provide a ticket number or justification.",
+  "validation.msg.user.notes.cannot.be.blank": "Notes are required for this action. Please provide a ticket number or justification.",
+  "validation.msg.user.notes.exceeds.max.length": "Notes must not exceed 500 characters.",
   "validation.msg.validation.errors.exist": "Validation errors exist.",
   "validation.msg.client.other.info.nationality.invalid": "Please select a valid country of origin / nationality.",
   "validation.msg.productivecollectionsheet.staffId.cannot.be.blank": "Staff is mandatory.",
