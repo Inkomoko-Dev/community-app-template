@@ -3,9 +3,18 @@
         ViewUserController: function (scope, routeParams, route, location, resourceFactory, $uibModal) {
             scope.user = [];
             scope.formData = {};
+            scope.userAudits = [];
             resourceFactory.userListResource.get({userId: routeParams.id}, function (data) {
                 scope.user = data;
             });
+            if (scope.hasPermission && scope.hasPermission('READ_AUDIT')) {
+                resourceFactory.auditResource.searchAll({
+                    entityName: 'USER',
+                    resourceId: routeParams.id
+                }, function (data) {
+                    scope.userAudits = data;
+                });
+            }
             scope.open = function () {
                 $uibModal.open({
                     templateUrl: 'password.html',
