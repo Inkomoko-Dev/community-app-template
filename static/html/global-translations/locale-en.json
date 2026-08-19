@@ -1761,6 +1761,8 @@
   "label.button.createguarantor": "Create Guarantor",
   "label.button.recoverguarantee": "Recover From Guarantor",
   "label.button.disburse": "Disburse",
+  "label.button.disbursementRequest": "Disbursement Request",
+  "label.button.approveDisbursement": "Approve Disbursement",
   "label.button.disbursetosavings": "Disburse To Savings",
   "label.button.Guarantor": "Guarantor",
   "label.button.undodisbursal": "Undo Disbursal",

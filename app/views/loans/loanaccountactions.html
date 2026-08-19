@@ -15,6 +15,11 @@
             <strong>Error:</strong> {{ error }}
             </div>
         <fieldset>
+            <div class="alert alert-info" ng-show="isDisbursementReviewAction() && currentTrancheNumber">
+                <strong>Tranche {{currentTrancheNumber}}</strong>
+                <span> &mdash; Principal: {{currentTranchePrincipal | number}}</span>
+                <span> &mdash; Remaining undisbursed amount: {{remainingUndisbursedAmount | number}} {{loanCurrencyCode}}</span>
+            </div>
             <div ng-show="submittedDatatables.length > 0" uib-alert type="success">
                 <span ng-repeat="table in submittedDatatables"><i class="fa fa-check"></i>Entry in ` {{table}} ` has been made successfully. If the inputs are changed, the datatable entries will be updated.<br></span>
             </div>
@@ -161,20 +166,7 @@
                 </div>
             </div>
             <div ng-show="disbursementDetails">
-                <div class="form-group" ng-show="showApprovalAmount">
-                    <label class="control-label col-sm-2" for="approvedAmount">{{ 'label.heading.approvedamount' |
-                        translate}}<span class="required">*</span></label>
-
-                    <div class="col-sm-3">
-                        <input id="approvedAmount" type="text" name="amount" ng-model="formData.approvedLoanAmount"
-                               class="form-control"
-                               number-format required late-Validate ng-readonly="isReadOnly">
-                    </div>
-                    <div class="col-sm-3">
-                        <form-validate valattributeform="loanactionform" valattribute="amount"/>
-                    </div>
-                </div>
-            <div class="form-group" ng-show="showAmountField">
+            <div class="form-group" ng-show="showAmountField && !(action === 'approve' && approveTranches)">
                     <label class="control-label col-sm-2" for="transactionAmount">{{ 'label.input.transactionamount' |
                         translate}}<span class="required">*</span></label>
 
@@ -185,6 +177,13 @@
                     </div>
                     <div class="col-sm-3">
                         <form-validate valattributeform="loanactionform" valattribute="amount"/>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="action === 'approve' && approveTranches">
+                    <label class="control-label col-sm-2">Repayment at disbursement (Insurance)</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control"
+                               value="{{getRepaymentAtDisbursementAmount() | number}}" disabled>
                     </div>
                 </div>
                 <div class="form-group" ng-show="isKenyaCapitalDisbursement">
@@ -709,11 +708,6 @@
                         <p class="help-block">{{ 'label.hint.icReviewProceedToPrepareAndSignContract' | translate }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="alert alert-info" ng-show="isDisbursementReviewAction() && currentTrancheNumber">
-                <strong>Tranche {{currentTrancheNumber}}</strong>
-                <span> &mdash; Principal: {{currentTranchePrincipal | number}}</span>
-                <span> &mdash; Remaining undisbursed amount: {{remainingUndisbursedAmount | number}} {{loanCurrencyCode}}</span>
             </div>
             <div class="form-group" ng-show="showExpectedResidualAmount">
                 <label class="control-label col-sm-2" for="expectedResidualAmount">{{ 'label.heading.outstanding' | translate}}</label>

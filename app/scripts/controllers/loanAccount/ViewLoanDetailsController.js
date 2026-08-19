@@ -505,6 +505,13 @@
                     case "approveDisbursement":
                         location.path('/loanaccount/' + accountId + '/approveDisbursement');
                         break;
+                    case "disburse":
+                        var subStatus = scope.loandetails && scope.loandetails.subStatus;
+                        var isPendingDisbursementApproval = subStatus
+                            && (subStatus.id === 300 || subStatus.code === 'loanSubStatus.loanSubStatusType.pending.disbursement');
+                        location.path('/loanaccount/' + accountId
+                            + (isPendingDisbursementApproval ? '/approveDisbursement' : '/disbursementpreapprovalrequest'));
+                        break;
                     case "disbursetosavings":
                         location.path('/loanaccount/' + accountId + '/disbursetosavings');
                         break;
@@ -1186,10 +1193,13 @@
                         }
 
                         if (data.canDisburse && !scope.enableThirdPartyDisbursement) {
+                            var pendingDisbursementApproval = data.subStatus
+                                && (data.subStatus.id === 300
+                                    || data.subStatus.code === 'loanSubStatus.loanSubStatusType.pre.disbursement');
                             scope.buttons.singlebuttons.splice(1, 0, {
-                                name: "button.disburse",
+                                name: pendingDisbursementApproval ? "button.approveDisbursement" : "button.disbursementRequest",
                                 icon: "fa fa-flag",
-                                taskPermissionName: 'DISBURSE_LOAN'
+                                taskPermissionName: pendingDisbursementApproval ? 'DISBURSE_LOAN' : 'DISBURSEMENTPREAPPROVAL_LOAN'
                             });
                             scope.buttons.singlebuttons.splice(1, 0, {
                                 name: "button.disbursetosavings",
