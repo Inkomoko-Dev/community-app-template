@@ -343,7 +343,8 @@
                     }),
                     userListResource: defineResource(apiVer + "/users/:userId", { userId: '@userId' }, {
                         getAllUsers: { method: 'GET', params: {}, isArray: true },
-                        update: { method: 'PUT' }
+                        update: { method: 'PUT' },
+                        delete: { method: 'DELETE', hasBody: true }
                     }),
                     userTemplateResource: defineResource(apiVer + "/users/template", {}, {
                         get: { method: 'GET', params: {} }

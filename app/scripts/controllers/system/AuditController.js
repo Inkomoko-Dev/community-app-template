@@ -173,7 +173,7 @@
                         dateFilter(data[i].madeOnDate, 'yyyy-MM-dd'), data[i].maker,
                         dateFilter(data[i].checkedOnDate, 'yyyy-MM-dd hh:mm:ss'),
                         data[i].checker, data[i].entityName,
-                        data[i].actionName, data[i].clientName, (data[i].notes || '').replace(/,/g, ';')];
+                        data[i].actionName, data[i].clientName, (data[i].notes || '').replace(/[\r\n]+/g, ' ').replace(/,/g, ';')];
                         scope.csvData.push(scope.row);
                     }
                     if (scope.csvData) {
