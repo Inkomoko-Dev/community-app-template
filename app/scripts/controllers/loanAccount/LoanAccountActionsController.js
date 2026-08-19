@@ -310,6 +310,37 @@
                 return scope.action === 'disbursementpreapprovalrequest' || scope.action === 'approveDisbursement' || scope.action === 'disbursementapproval';
             };
 
+            scope.getRepaymentAtDisbursementAmount = function () {
+                var approvedAmount = Number(String(scope.formData.approvedLoanAmount || 0).replace(/,/g, ''));
+                var netDisbursalAmount = Number(String(scope.formData.transactionAmount || 0).replace(/,/g, ''));
+                return Math.max(approvedAmount - netDisbursalAmount, 0);
+            };
+
+            scope.applyKenyaCapitalDisbursementDefaults = function (templateData) {
+                scope.isKenyaCapitalDisbursement = templateData && templateData.kenyaCapitalDisbursementDefaults === true;
+                if (!scope.isKenyaCapitalDisbursement) {
+                    return;
+                }
+                scope.kenyaCapitalDefaults = {
+                    departmentName: templateData.defaultDepartmentName,
+                    budgetLocation: templateData.defaultBudgetLocation,
+                    budgetReviewRequired: templateData.budgetReviewRequired === true
+                };
+                scope.formData.budgetLocation = templateData.defaultBudgetLocation;
+            };
+
+            scope.refreshKenyaCapitalBudgetForDisbursementDate = function (disbursementDate) {
+                if (!scope.isKenyaCapitalDisbursement || !disbursementDate) {
+                    return;
+                }
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                const budgetLocation = 'Investments - ' + monthNames[disbursementDate.getMonth()] + ' ' + disbursementDate.getFullYear();
+                scope.formData.budgetLocation = budgetLocation;
+                if (scope.kenyaCapitalDefaults) {
+                    scope.kenyaCapitalDefaults.budgetLocation = budgetLocation;
+                }
+            };
+
             scope.shouldShowFxDetails = function () {
                 return scope.isSouthSudanSspLoan() && scope.isVendorDisbursement();
             };
@@ -548,6 +579,7 @@
             switch (scope.action) {
                 case "approve":
                     scope.taskPermissionName = 'APPROVE_LOAN';
+                    scope.noteFieldMandatory = true;
                     
                     // First get loan account details first to set loanCountry and loanCurrencyCode!
                     resourceFactory.LoanAccountResource.getLoanAccountDetails({
@@ -780,7 +812,10 @@
                             cachePersistedDisbursementRecipientDetails(scope.formData);
                             
                             scope.formData.transactionAmount = templateData.netDisbursalAmount || '';
-                            scope.principalPortion = templateData.principalPortion || '';
+                            // For tranche disbursement reviews the gross amount booked by Fineract is
+                            // the selected tranche principal. principalPortion may represent the full
+                            // approved loan and must not be shown as the amount of this disbursement.
+                            scope.principalPortion = scope.currentTranchePrincipal || templateData.principalPortion || '';
                             scope.interestPortion = templateData.interestPortion || '';
                             scope.feeChargesPortion = templateData.feeChargesPortion || '';
                             scope.formData[scope.modelName] = new Date();
