@@ -27,6 +27,39 @@
             scope.crbReportMetrolpolIdentityVerification = null;
             scope.isCrbVerificationInProgress = false;
 
+            function applicableDisbursementDetail(loan) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
+                if (!details.length) {
+                    return null;
+                }
+                if (!loan.multiDisburseLoan) {
+                    return details[0];
+                }
+                var undisbursedDetails = details.filter(function (detail) {
+                    return !detail.actualDisbursementDate;
+                });
+                undisbursedDetails.sort(function (first, second) {
+                    var firstDate = first.expectedDisbursementDate || [];
+                    var secondDate = second.expectedDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
+                    return dateComparison || ((first.id || 0) - (second.id || 0));
+                });
+                if (undisbursedDetails.length) {
+                    return undisbursedDetails[0];
+                }
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    var dateComparison = secondDateValue.localeCompare(firstDateValue);
+                    return dateComparison || ((second.id || 0) - (first.id || 0));
+                });
+                return details[0];
+            }
+
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement && !scope.isReadyForStaffThirdPartyDisbursement){
                     fetchLoanAccountDetails();
@@ -472,6 +505,13 @@
                     case "approveDisbursement":
                         location.path('/loanaccount/' + accountId + '/approveDisbursement');
                         break;
+                    case "disburse":
+                        var subStatus = scope.loandetails && scope.loandetails.subStatus;
+                        var isPendingDisbursementApproval = subStatus
+                            && (subStatus.id === 300 || subStatus.code === 'loanSubStatus.loanSubStatusType.pending.disbursement');
+                        location.path('/loanaccount/' + accountId
+                            + (isPendingDisbursementApproval ? '/approveDisbursement' : '/disbursementpreapprovalrequest'));
+                        break;
                     case "disbursetosavings":
                         location.path('/loanaccount/' + accountId + '/disbursetosavings');
                         break;
@@ -739,16 +779,16 @@
                         && data.subStatus && data.subStatus.id === 200;
                     scope.partnerSupplierDisbursementDetail = null;
                     if (scope.enableThirdPartyDisbursement && data.disbursementDetails && data.disbursementDetails.length > 0) {
-                        var firstDisbursementDetail = data.disbursementDetails[0];
-                        if (firstDisbursementDetail
-                            && (firstDisbursementDetail.supplierId
-                                || firstDisbursementDetail.supplierName
-                                || firstDisbursementDetail.beneficiaryName
-                                || firstDisbursementDetail.clientPhoneNumber
-                                || firstDisbursementDetail.clientAccountNumber
-                                || firstDisbursementDetail.paymentTypeId
-                                || firstDisbursementDetail.paymentTypeName)) {
-                            scope.partnerSupplierDisbursementDetail = firstDisbursementDetail;
+                        var applicableDetail = applicableDisbursementDetail(data);
+                        if (applicableDetail
+                            && (applicableDetail.supplierId
+                                || applicableDetail.supplierName
+                                || applicableDetail.beneficiaryName
+                                || applicableDetail.clientPhoneNumber
+                                || applicableDetail.clientAccountNumber
+                                || applicableDetail.paymentTypeId
+                                || applicableDetail.paymentTypeName)) {
+                            scope.partnerSupplierDisbursementDetail = applicableDetail;
                         }
                     }
                     scope.decimals = data.currency.decimalPlaces;
@@ -1153,10 +1193,13 @@
                         }
 
                         if (data.canDisburse && !scope.enableThirdPartyDisbursement) {
+                            var pendingDisbursementApproval = data.subStatus
+                                && (data.subStatus.id === 300
+                                    || data.subStatus.code === 'loanSubStatus.loanSubStatusType.pre.disbursement');
                             scope.buttons.singlebuttons.splice(1, 0, {
-                                name: "button.disburse",
+                                name: pendingDisbursementApproval ? "button.approveDisbursement" : "button.disbursementRequest",
                                 icon: "fa fa-flag",
-                                taskPermissionName: 'DISBURSE_LOAN'
+                                taskPermissionName: pendingDisbursementApproval ? 'DISBURSE_LOAN' : 'DISBURSEMENTPREAPPROVAL_LOAN'
                             });
                             scope.buttons.singlebuttons.splice(1, 0, {
                                 name: "button.disbursetosavings",
