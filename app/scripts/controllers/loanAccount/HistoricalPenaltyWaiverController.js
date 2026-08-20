@@ -34,7 +34,6 @@
             scope.isPreviewing = false;
             scope.previewFailed = false;
             scope.dateFormat = 'dd MMMM yyyy';
-            scope.datePicker = { opened: false };
             scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
             scope.charge = null;
             scope.preview = null;
@@ -52,10 +51,6 @@
                 scope.formData.waiverAmount = Number(data.amountPaid || 0) + Number(data.amountOutstanding || 0);
                 scope.loadPreview();
             });
-
-            scope.openDatePicker = function () {
-                scope.datePicker.opened = true;
-            };
 
             function previewParams() {
                 var params = { loanId: scope.loanId, chargeId: scope.chargeId, locale: 'en', dateFormat: scope.dateFormat };
