@@ -570,6 +570,8 @@
   "validation.msg.loanapproval.bank.details.required": "Bank details (Account Number, Bank Name) are required for bank disbursement.",
   "validation.msg.loanapproval.payment.details.invalid": "Please fix the payment details and try again.",
   "label.message.client.bank.details.missing": "This client has no bank details on file. Enter the Account Number and Bank Name below, or update the client's Other Info so they are fetched automatically next time.",
+  "label.message.client.bank.account.missing": "This client's Account Number is not on file. Enter it below, or update the client's Other Info so it is fetched automatically next time.",
+  "label.message.client.bank.name.missing": "This client's Bank Name is not on file. Enter it below, or update the client's Other Info so it is fetched automatically next time.",
   "label.message.client.bank.details.not.captured": "This client's bank details were not captured for this disbursement, so they can't be shown here. Update the client's Other Info so the Account Number and Bank Name are available before disbursement.",
   "validation.msg.invalid.number.format": "`{{params[0].value}}` is an invalid integer.",
   "validation.msg.invalid.integer": "`{{params[0].value}}` is an invalid integer.",
