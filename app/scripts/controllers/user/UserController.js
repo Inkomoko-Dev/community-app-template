@@ -10,7 +10,5 @@
             });
         }
     });
-    mifosX.ng.application.controller('UserController', ['$scope', 'ResourceFactory', mifosX.controllers.UserController]).run(function ($log) {
-        $log.info("UserController initialized");
-    });
+    mifosX.ng.application.controller('UserController', ['$scope', 'ResourceFactory', mifosX.controllers.UserController]);
 }(mifosX.controllers || {}));

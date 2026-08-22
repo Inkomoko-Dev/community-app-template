@@ -1,0 +1,62 @@
+<div class="content-container" ng-controller="PartnerClientAssignmentController">
+    <ul class="breadcrumb">
+        <li><a href="#/clients">{{'label.heading.clients' | translate}}</a></li>
+        <li><a href="#/viewclient/{{clientId}}">{{client.displayName}}</a></li>
+        <li class="active">{{'label.heading.partnerassignment' | translate}}</li>
+    </ul>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'label.heading.partnerassignment' | translate}}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-info" ng-if="partnerClient">
+                        <strong>Current Assignment:</strong> {{partnerClient.partnerCode}}
+                        <span ng-if="partnerClient.status"> ({{partnerClient.status}})</span>
+                        <span ng-if="partnerClient.assignmentDate"> - Assigned on {{partnerClient.assignmentDate | DateFormat}}</span>
+                    </div>
+
+                    <form name="partnerAssignmentForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3" for="partner">{{'label.input.partner' | translate}}</label>
+                            <div class="col-sm-6">
+                                <select id="partner" class="form-control" ng-model="formData.partnerCode" required>
+                                    <option value="">-- Select Partner --</option>
+                                    <option ng-repeat="partner in availablePartners" value="{{partner.code}}">
+                                        {{partner.name}} ({{partner.code}})
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3" for="reason">{{'label.input.reason' | translate}}</label>
+                            <div class="col-sm-6">
+                                <textarea id="reason" class="form-control" ng-model="formData.reason" rows="3"
+                                          placeholder="Reason for assignment (optional)"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-6">
+                                <button type="button" class="btn btn-primary" ng-click="assignPartner()"
+                                        has-permission='CREATE_PARTNERCLIENT'>
+                                    <i class="fa fa-check"></i> {{'label.button.assign' | translate}}
+                                </button>
+                                <button type="button" class="btn btn-danger" ng-click="removePartner()" ng-if="partnerClient"
+                                        has-permission='DELETE_PARTNERCLIENT'>
+                                    <i class="fa fa-trash"></i> {{'label.button.remove' | translate}}
+                                </button>
+                                <button type="button" class="btn btn-default" ng-click="cancel()">
+                                    <i class="fa fa-times"></i> {{'label.button.cancel' | translate}}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

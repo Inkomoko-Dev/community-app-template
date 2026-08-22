@@ -344,6 +344,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/smscampaigns/ViewSmsCampaignController',
             'organization/smscampaigns/EditSmsCampaignController',
             'organization/entitydatatablechecks/EntityDatatableChecksController',
+            'organization/PartnerClientAssignmentController',
+            'organization/PartnerClientHistoryController',
             'configurations/AddressFormController',
             'configurations/ViewCreditBureauSummaryController',
             'configurations/AddNewCreditBureauController',

@@ -247,6 +247,34 @@
                 scope.employmentInfo=data;
               });
 
+            // Fetch partner client information using the discovery API (working method)
+            if (scope.client.mobileNo) {
+                resourceFactory.partnerClientResource.getAll({phone: scope.client.mobileNo}, function(data) {
+                    if (data && data.pageItems && data.pageItems.length > 0) {
+                        // Find the matching client by ID
+                        var matchingClient = data.pageItems.find(function(item) {
+                            return item.id === scope.client.id;
+                        });
+                        if (matchingClient && matchingClient.partnerCode) {
+                            scope.partnerClient = {
+                                partnerCode: matchingClient.partnerCode,
+                                status: matchingClient.isActive ? 'Active' : 'Inactive',
+                                assignmentDate: matchingClient.assignedDate ? matchingClient.assignedDate.join('-') : null
+                            };
+                        } else {
+                            scope.partnerClient = null;
+                        }
+                    } else {
+                        scope.partnerClient = null;
+                    }
+                }, function(error) {
+                    console.error('Error fetching partner client information:', error);
+                    scope.partnerClient = null;
+                });
+            } else {
+                scope.partnerClient = null;
+            }
+
             scope.routeToLoan = function (id) {
                 location.path('/viewloanaccount/' + id);
             };
@@ -1462,7 +1490,5 @@
         }
     });
 
-    mifosX.ng.application.controller('ViewClientController', ['$scope', '$routeParams', '$route', '$location', 'ResourceFactory', '$http', '$uibModal', 'API_VERSION', '$timeout', '$rootScope', 'Upload', mifosX.controllers.ViewClientController]).run(function ($log) {
-        $log.info("ViewClientController initialized");
-    });
+    mifosX.ng.application.controller('ViewClientController', ['$scope', '$routeParams', '$route', '$location', 'ResourceFactory', '$http', '$uibModal', 'API_VERSION', '$timeout', '$rootScope', 'Upload', mifosX.controllers.ViewClientController]);
 }(mifosX.controllers || {}));
