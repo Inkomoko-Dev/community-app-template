@@ -319,6 +319,12 @@
 										<li data-ng-show="client.status.value=='Active' && isClientRecruitmentSurveyEnabled">
 											<a href="#/clientRecruitmentSurvey/{{client.id}}" has-permission='READ_CLIENTRECRUITMENTSURVEY'>{{'label.button.clientRecruitmentSurvey' | translate}}</a>
 										</li>
+										<li>
+											<a href="#/partnerclientassignment/{{client.id}}" has-permission='CREATE_PARTNERCLIENT'>{{'label.heading.partnerassignment' | translate}}</a>
+										</li>
+										<li>
+											<a href="#/partnerclienthistory/{{client.id}}" has-permission='READ_PARTNERCLIENT'>{{'label.heading.partnerhistory' | translate}}</a>
+										</li>
 									</ul>
 								</span>
 						</div>
@@ -929,6 +935,21 @@
 									<tr data-ng-show="client.mobileNo">
 										<th class="table-bold">{{ 'label.input.mobilenumber' | translate }}</th>
 										<td><span class="padded-td">{{client.mobileNo}}</span>
+										</td>
+									</tr>
+									<tr data-ng-show="partnerClient">
+										<th class="table-bold">{{ 'label.input.partner' | translate }}</th>
+										<td><span class="padded-td">{{partnerClient.partnerCode}}</span>
+										</td>
+									</tr>
+									<tr data-ng-show="partnerClient && partnerClient.status">
+										<th class="table-bold">{{ 'label.input.partnerStatus' | translate }}</th>
+										<td><span class="padded-td">{{partnerClient.status}}</span>
+										</td>
+									</tr>
+									<tr data-ng-show="partnerClient && partnerClient.assignmentDate">
+										<th class="table-bold">{{ 'label.input.partnerAssignmentDate' | translate }}</th>
+										<td><span class="padded-td">{{partnerClient.assignmentDate | DateFormat}}</span>
 										</td>
 									</tr>
 									<tr data-ng-show="client.gender.name">

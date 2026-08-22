@@ -1,10 +1,12 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         ViewUserController: function (scope, routeParams, route, location, resourceFactory, $uibModal) {
-            scope.user = [];
+            scope.user = {};
             scope.formData = {};
             resourceFactory.userListResource.get({userId: routeParams.id}, function (data) {
                 scope.user = data;
+            }, function(error) {
+                console.error('Error loading user data:', error);
             });
             scope.open = function () {
                 $uibModal.open({
@@ -50,7 +52,5 @@
 
         }
     });
-    mifosX.ng.application.controller('ViewUserController', ['$scope', '$routeParams', '$route', '$location', 'ResourceFactory', '$uibModal', mifosX.controllers.ViewUserController]).run(function ($log) {
-        $log.info("ViewUserController initialized");
-    });
+    mifosX.ng.application.controller('ViewUserController', ['$scope', '$routeParams', '$route', '$location', 'ResourceFactory', '$uibModal', mifosX.controllers.ViewUserController]);
 }(mifosX.controllers || {}));
