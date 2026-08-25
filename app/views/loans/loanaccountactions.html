@@ -75,7 +75,7 @@
                     <table style="width:80%" class="table table-bordered">
                         <tr>
                             <td colspan="5" align="right">
-                                <button type="button" class="btn btn-primary"
+                                <button type="button" class="btn btn-primary" ng-if="multiDisburseLoan"
                                         ng-click="addTranches()">{{ 'label.button.addTranche' | translate }}
                                 </button>
                             </td>
@@ -99,7 +99,12 @@
                                        ng-change="addTrancheAmounts()" ng-model="details.principal">
                             </td>
                             <td>
-                                <a ng-click="deleteTranches($index);addTrancheAmounts();"><i
+                                <button type="button" class="btn btn-link" ng-if="!enableThirdPartyDisbursement"
+                                        ng-click="details.editPaymentDetails = !details.editPaymentDetails">
+                                    <i class="fa" ng-class="details.editPaymentDetails ? 'fa-chevron-up' : 'fa-pencil'"></i>
+                                    Payment details
+                                </button>
+                                <a ng-if="multiDisburseLoan" ng-click="deleteTranches($index);addTrancheAmounts();"><i
                                         class="fa fa-times-circle fa-2x"></i></a>
                             </td>
                         </tr>
