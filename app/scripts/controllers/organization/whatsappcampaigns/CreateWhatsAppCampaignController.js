@@ -17,10 +17,13 @@
             scope.businessRules = [];
             scope.campaignData = {};
             scope.campaignData.bodyVariableMapping = [];
+            scope.campaignData.recipientType = 'CLIENT';
+            scope.recipientTypeOptions = [];
             scope.previewData = {};
             scope.filteredBusinessRules = [];
             var triggeredBusinessRule = [];
             var nonTriggeredBusinessRule = [];
+            var staffBusinessRule = [];
             scope.simpleDate = new Date();
             var simpleTime = new Date(scope.simpleDate.getTime());
             scope.campaignData.time = new Date(0, 0, 0, simpleTime.getHours(), simpleTime.getMinutes(), simpleTime.getSeconds());
@@ -65,20 +68,39 @@
                 });
             };
 
+            scope.isTriggeredCampaign = function () {
+                return !_.isUndefined(scope.campaignData.triggerType) && !_.isUndefined(scope.campaignData.triggerType.value)
+                    && scope.campaignData.triggerType.value === 'Triggered';
+            };
+
             scope.getBusinessRule = function () {
-                if (!_.isUndefined(scope.campaignData.triggerType.value) && scope.campaignData.triggerType.value === 'Triggered') {
+                if (scope.isTriggeredCampaign()) {
+                    // Triggered campaigns fire off client/loan/savings business events, so they are client-only.
+                    scope.campaignData.recipientType = 'CLIENT';
                     scope.filteredBusinessRules = triggeredBusinessRule;
+                } else if (scope.campaignData.recipientType === 'STAFF') {
+                    scope.filteredBusinessRules = staffBusinessRule;
                 } else {
                     scope.filteredBusinessRules = nonTriggeredBusinessRule;
                 }
+                if (scope.campaignData.report && scope.filteredBusinessRules.indexOf(scope.campaignData.report) === -1) {
+                    scope.campaignData.report = undefined;
+                }
+            };
+
+            scope.recipientTypeChanged = function () {
+                scope.getBusinessRule();
             };
 
             scope.filterBusinessRule = function () {
                 triggeredBusinessRule = [];
                 nonTriggeredBusinessRule = [];
+                staffBusinessRule = [];
                 angular.forEach(scope.businessRuleOptions, function (businessRule) {
                     if (!_.isNull(businessRule.reportSubType) && !_.isUndefined(businessRule.reportSubType) && businessRule.reportSubType === 'Triggered') {
                         triggeredBusinessRule.push(businessRule);
+                    } else if (!_.isNull(businessRule.reportSubType) && !_.isUndefined(businessRule.reportSubType) && businessRule.reportSubType === 'Staff') {
+                        staffBusinessRule.push(businessRule);
                     } else {
                         nonTriggeredBusinessRule.push(businessRule);
                     }
@@ -256,6 +278,7 @@
                 scope.businessRuleOptions = data.businessRulesOptions || [];
                 scope.frequencyTypeOptions = data.frequencyTypeOptions;
                 scope.weekDays = data.weekDays;
+                scope.recipientTypeOptions = data.recipientTypeOptions || [];
                 scope.filterBusinessRule();
                 // Re-apply filter if the user already chose a trigger before options arrived.
                 if (scope.campaignData.triggerType) {
@@ -332,6 +355,7 @@
                     interval: scope.campaignData.repeatsEvery,
                     repeatsOnDay: scope.campaignData.repeatsOnDay,
                     runReportId: scope.campaignData.report.reportId,
+                    recipientType: scope.campaignData.recipientType,
                     paramValue: scope.paramValues
                 };
 

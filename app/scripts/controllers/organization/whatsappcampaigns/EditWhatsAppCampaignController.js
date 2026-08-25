@@ -66,6 +66,7 @@
                 scope.campaignData.campaignTypeLabel = data.campaignType.value;
                 scope.campaignData.report = data.runReportId;
                 scope.campaignData.reportName = data.reportName;
+                scope.campaignData.recipientType = data.recipientType || 'CLIENT';
                 scope.reportSelected(scope.campaignData.reportName);
                 scope.paramValues = angular.fromJson(data.paramValue);
                 if (data.recurrenceStartDate) {
@@ -148,6 +149,7 @@
             resourceFactory.whatsAppCampaignTemplateResource.get(function (data) {
                 scope.triggerTypeOptions = data.triggerTypeOptions;
                 scope.businessRuleOptions = data.businessRulesOptions;
+                scope.recipientTypeOptions = data.recipientTypeOptions || [];
             });
 
             scope.submit = function () {
@@ -173,6 +175,7 @@
                     recurrenceStartDate: scheduledDateTime,
                     dateTimeFormat: scope.dft,
                     runReportId: scope.campaignData.report,
+                    recipientType: scope.campaignData.recipientType,
                     paramValue: scope.paramValues
                 };
 

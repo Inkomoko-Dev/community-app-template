@@ -43,6 +43,21 @@
                 <li ng-repeat="number in whitelistedNumbers">{{number}}</li>
             </ul>
         </div>
+
+        <div ng-if="externalServicesType === 'SMS' && whatsappWhitelistEnforced" class="alert alert-info" style="margin-top: 15px;">
+            <strong>QA WhatsApp whitelist is enforced.</strong>
+            Only the numbers below can receive WhatsApp messages. Matching is digits-only, so store numbers with the country code.
+            <ul style="margin-top: 10px; margin-bottom: 0;">
+                <li ng-repeat="number in whatsappWhitelistedNumbers">{{number}}</li>
+                <li ng-if="!whatsappWhitelistedNumbers.length"><em>No numbers configured — all WhatsApp messages will be blocked</em></li>
+            </ul>
+        </div>
+        <div ng-if="externalServicesType === 'SMS' && !whatsappWhitelistEnforced && whatsappWhitelistedNumbers.length" class="well well-sm" style="margin-top: 15px;">
+            <strong>Configured WhatsApp whitelist</strong> (not enforced — toggle <code>whatsapp_whitelist_enabled</code> in Edit to enforce):
+            <ul style="margin-top: 10px; margin-bottom: 0;">
+                <li ng-repeat="number in whatsappWhitelistedNumbers">{{number}}</li>
+            </ul>
+        </div>
     </div>
 </div>
 </div>
