@@ -43,7 +43,8 @@
                     var secondDate = second.expectedDisbursementDate || [];
                     var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
                     var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    return firstDateValue.localeCompare(secondDateValue);
+                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
+                    return dateComparison || ((first.id || 0) - (second.id || 0));
                 });
                 if (undisbursedDetails.length) {
                     return undisbursedDetails[0];
@@ -53,7 +54,8 @@
                     var secondDate = second.actualDisbursementDate || [];
                     var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
                     var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    return secondDateValue.localeCompare(firstDateValue);
+                    var dateComparison = secondDateValue.localeCompare(firstDateValue);
+                    return dateComparison || ((second.id || 0) - (first.id || 0));
                 });
                 return details[0];
             }
@@ -502,6 +504,13 @@
                         break;
                     case "approveDisbursement":
                         location.path('/loanaccount/' + accountId + '/approveDisbursement');
+                        break;
+                    case "disburse":
+                        var subStatus = scope.loandetails && scope.loandetails.subStatus;
+                        var isPendingDisbursementApproval = subStatus
+                            && (subStatus.id === 300 || subStatus.code === 'loanSubStatus.loanSubStatusType.pending.disbursement');
+                        location.path('/loanaccount/' + accountId
+                            + (isPendingDisbursementApproval ? '/approveDisbursement' : '/disbursementpreapprovalrequest'));
                         break;
                     case "disbursetosavings":
                         location.path('/loanaccount/' + accountId + '/disbursetosavings');
@@ -1184,10 +1193,13 @@
                         }
 
                         if (data.canDisburse && !scope.enableThirdPartyDisbursement) {
+                            var pendingDisbursementApproval = data.subStatus
+                                && (data.subStatus.id === 300
+                                    || data.subStatus.code === 'loanSubStatus.loanSubStatusType.pre.disbursement');
                             scope.buttons.singlebuttons.splice(1, 0, {
-                                name: "button.disburse",
+                                name: pendingDisbursementApproval ? "button.approveDisbursement" : "button.disbursementRequest",
                                 icon: "fa fa-flag",
-                                taskPermissionName: 'DISBURSE_LOAN'
+                                taskPermissionName: pendingDisbursementApproval ? 'DISBURSE_LOAN' : 'DISBURSEMENTPREAPPROVAL_LOAN'
                             });
                             scope.buttons.singlebuttons.splice(1, 0, {
                                 name: "button.disbursetosavings",

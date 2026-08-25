@@ -97,6 +97,12 @@
             .when('/viewclient/:id', {
                 templateUrl: 'views/clients/viewclient.html'
             })
+            .when('/partnerclientassignment/:id', {
+                templateUrl: 'views/organization/partnerclientassignment.html'
+            })
+            .when('/partnerclienthistory/:id', {
+                templateUrl: 'views/organization/partnerclienthistory.html'
+            })
             .when('/viewclient/:id/addcharge', {
                 templateUrl: 'views/clients/addnewclientcharge.html'
             })
@@ -399,6 +405,12 @@
                 templateUrl: 'views/administration/viewuser.html'
             })
             .when('/edituser/:id', {
+                templateUrl: 'views/administration/edituser.html'
+            })
+            .when('/users/:id/edit', {
+                templateUrl: 'views/administration/edituser.html'
+            })
+            .when('/users/:id', {
                 templateUrl: 'views/administration/edituser.html'
             })
             .when('/employees', {

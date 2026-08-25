@@ -11,7 +11,6 @@
                 ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
         <li ng-show="loandetails.group"><a ng-href="#/viewgroup/{{loandetails.group.id}}">{{loandetails.group.name}}</a></li>
         <li class="active">{{loandetails.loanProductName}}({{loandetails.accountNo}})</li>
-        <li>again</li>
     </ul>
 
     <script type="text/ng-template" id="delcharge.html">
@@ -42,7 +41,7 @@
                 <tbody>
                 <tr ng-repeat="charge in penalties">
                     <td>{{charge.name}}</td>
-                    <td>{{charge.dueDate | dateFormat}}</td>
+                    <td>{{charge.dueDate | DateFormat}}</td>
                     <td>{{charge.amountOutstanding | number}}</td>
                     <td>
                         <a class="btn btn-primary btn-sm" ng-click="select(charge)"><i class="fa fa-flag"></i>&nbsp;{{'label.button.waivecharge' | translate}}</a>

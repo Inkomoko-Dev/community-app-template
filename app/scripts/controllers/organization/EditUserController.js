@@ -9,7 +9,7 @@
             scope.selectedRoles = [] ;
             scope.availableRoles = [];
 
-            scope.user = [];
+            scope.user = {};
             scope.formData.roles = [] ;
 
             resourceFactory.userListResource.get({userId: routeParams.id, template: 'true'}, function (data) {
@@ -30,11 +30,17 @@
                 scope.offices = data.allowedOffices;
                 //scope.availableRoles = data.availableRoles.concat(data.selectedRoles);
                 scope.formData.passwordNeverExpires = data.passwordNeverExpires;
+            }, function(error) {
+                console.error('Error loading user data:', error);
             });
             scope.getOfficeStaff = function(){
-                resourceFactory.employeeResource.getAllEmployees({officeId:scope.formData.officeId},function (staffs) {
-                    scope.staffs = staffs;
-                });
+                if(scope.formData.officeId) {
+                    resourceFactory.employeeResource.getAllEmployees({officeId:scope.formData.officeId},function (staffs) {
+                        scope.staffs = staffs;
+                    }, function(error) {
+                        console.error('Error loading staff:', error);
+                    });
+                }
             };
 
             scope.addRole = function () {
@@ -92,7 +98,5 @@
             };
         }
     });
-    mifosX.ng.application.controller('EditUserController', ['$scope', '$routeParams', 'ResourceFactory', '$location', mifosX.controllers.EditUserController]).run(function ($log) {
-        $log.info("EditUserController initialized");
-    });
+    mifosX.ng.application.controller('EditUserController', ['$scope', '$routeParams', 'ResourceFactory', '$location', mifosX.controllers.EditUserController]);
 }(mifosX.controllers || {}));

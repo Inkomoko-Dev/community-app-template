@@ -1,6 +1,6 @@
 <div class="content-container" ng-controller="ViewUserController">
     <ul class="breadcrumb">
-        <li><a href="#/users">{{'label.anchor.users' | translate}}</a></li>
+        <li><a href="#/users/">{{'label.anchor.users' | translate}}</a></li>
         <li class="active">{{user.firstname}}&nbsp;{{user.lastname}}</li>
     </ul>
     <script type="text/ng-template" id="password.html">
@@ -23,6 +23,21 @@
 
                 <div class="col-sm-5">
                     <input type="password" id="repeatPassword" ng-model="formData.repeatPassword" class="form-control"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-4" for="passwordNotes">{{ 'label.input.notes' | translate }}<span
+                        class="required">*</span></label>
+
+                <div class="col-sm-5">
+                    <textarea id="passwordNotes" ng-model="formData.notes" class="form-control" rows="3"
+                              maxlength="500" required
+                              placeholder="{{'label.placeholder.usernotes' | translate}}"></textarea>
+                    <span ng-show="!formData.notes && showNotesError">
+                        <small class="error required">
+                            {{'validation.msg.user.notes.required' | translate}}
+                        </small>
+                    </span>
                 </div>
             </div>
         </div>
@@ -60,6 +75,8 @@
             <div class="form-group">
                 <a href="#/edituser/{{user.id}}" class="btn btn-primary" has-permission='UPDATE_USER'><i class="fa fa-edit "></i>
                     {{'label.button.edit' | translate}}</a>
+                <a href="#/users/{{user.id}}/edit" class="btn btn-primary" has-permission='UPDATE_USER'><i class="fa fa-edit "></i>
+                    {{'label.button.edit' | translate}} (Alt)</a>
                 <button type="button" ng-click="deleteuser()" class="btn btn-danger" has-permission='DELETE_USER'>
                     <i class="fa fa-trash-o"></i> {{'label.button.delete' | translate}}
                 </button>
@@ -111,6 +128,31 @@
 		        </table>
 			</div>
 		</div>
+    </div>
+    <div class="card well" has-permission='READ_AUDIT' data-ng-show="userAudits.length">
+        <h4 class="bolder">{{'label.anchor.audittrails' | translate}}</h4>
+        <div class="row">
+            <div class="col-md-10">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.action' | translate}}</th>
+                        <th>{{'label.heading.madeby' | translate}}</th>
+                        <th>{{'label.heading.madedate' | translate}}</th>
+                        <th>{{'label.heading.notes' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="audit in userAudits">
+                        <td>{{audit.actionName}}</td>
+                        <td>{{audit.maker}}</td>
+                        <td>{{audit.madeOnDate | date:'d MMM y h:mm:ss'}}</td>
+                        <td>{{audit.notes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
           

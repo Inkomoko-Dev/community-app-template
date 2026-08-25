@@ -357,6 +357,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/africastalking/ViewWhatsAppMessageController',
             'organization/africastalking/ViewVoiceCallController',
             'organization/entitydatatablechecks/EntityDatatableChecksController',
+            'organization/PartnerClientAssignmentController',
+            'organization/PartnerClientHistoryController',
             'configurations/AddressFormController',
             'configurations/ViewCreditBureauSummaryController',
             'configurations/AddNewCreditBureauController',
