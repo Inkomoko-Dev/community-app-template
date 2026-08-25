@@ -1687,11 +1687,9 @@
             };
 
             scope.showEdit = function(disbursementDetail){
-                if((!disbursementDetail.actualDisbursementDate || disbursementDetail.actualDisbursementDate == null)
-                    && scope.status =='Approved'){
-                    return true;
-                }
-                return false;
+                var isUndisbursed = !disbursementDetail.actualDisbursementDate;
+                var isEditableLoanStatus = scope.status === 'Approved' || scope.status === 'Active';
+                return isUndisbursed && isEditableLoanStatus;
             };
 
             scope.showApprovedAmountBasedOnStatus = function () {
