@@ -26,8 +26,14 @@
                 <label class="control-label col-sm-3" for="waiverAmount">{{'label.input.waiveramount' | translate}}<span class="required">*</span></label>
                 <div class="col-sm-5">
                     <input id="waiverAmount" name="waiverAmount" type="number" class="form-control"
-                           ng-model="formData.waiverAmount" ng-change="loadPreview()" required/>
-                    <span class="help-block" translate="label.help.waiveramount">Leave at the full penalty balance to waive it entirely, or reduce it for a partial waiver.</span>
+                           ng-model="formData.waiverAmount" ng-change="loadPreview()"
+                           ng-model-options="{ debounce: 400 }"
+                           min="0" max="{{maxWaiverAmount}}" step="any" required/>
+                    <span class="help-block" ng-if="isAmountValid()" translate="label.help.waiveramount">Leave at the full penalty balance to waive it entirely, or reduce it for a partial waiver.</span>
+                    <span class="help-block text-danger" ng-if="!isAmountValid() && maxWaiverAmount !== null">
+                        <span translate="label.validation.waiveramount.range">Enter an amount greater than zero and no more than the penalty balance</span>
+                        &mdash; {{maxWaiverAmount | number:2}}
+                    </span>
                 </div>
             </div>
 
@@ -79,7 +85,7 @@
             <div class="col-md-offset-3">
                 <button id="cancel" type="button" class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
                 <button id="review" type="button" class="btn btn-primary" ng-click="review()"
-                        ng-disabled="isPreviewing || !formData.reason || !formData.waiverEffectiveDate">
+                        ng-disabled="isPreviewing || !isAmountValid() || !formData.reason || !formData.waiverEffectiveDate">
                     {{'label.button.review' | translate}}
                 </button>
             </div>

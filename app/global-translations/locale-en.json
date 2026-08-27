@@ -5691,6 +5691,7 @@
   "label.input.penalties": "Penalties",
   "label.input.correctionreference": "Correction Reference",
   "label.help.waiveramount": "Leave at the full penalty balance to waive it entirely, or reduce it for a partial waiver.",
+  "label.validation.waiveramount.range": "Enter an amount greater than zero and no more than the penalty balance",
   "label.help.suggestedeffectivedate": "Suggested: the date of the earliest repayment that paid this penalty",
   "label.help.noapprovers": "Nobody other than you holds the historical penalty waiver approval permission in this office. A correction above the threshold needs a second pair of eyes, so an administrator must grant the permission to someone else before this waiver can be submitted.",
   "label.message.historicalpenaltywaiver.previewfailed": "The preview could not be produced. This penalty may not be eligible for a historical waiver.",

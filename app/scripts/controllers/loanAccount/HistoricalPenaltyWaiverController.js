@@ -37,6 +37,9 @@
             scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
             scope.charge = null;
             scope.preview = null;
+            scope.maxWaiverAmount = null;
+
+            var previewSequence = 0;
 
             scope.formData = {
                 waiverAmount: null,
@@ -48,9 +51,18 @@
             resourceFactory.loanChargesResource.get({ loanId: scope.loanId, chargeId: scope.chargeId }, function (data) {
                 scope.charge = data;
                 // Default to waiving the whole penalty; the reviewer can reduce it before previewing.
-                scope.formData.waiverAmount = Number(data.amountPaid || 0) + Number(data.amountOutstanding || 0);
+                scope.maxWaiverAmount = Number(data.amountPaid || 0) + Number(data.amountOutstanding || 0);
+                scope.formData.waiverAmount = scope.maxWaiverAmount;
                 scope.loadPreview();
             });
+
+            scope.isAmountValid = function () {
+                var amount = Number(scope.formData.waiverAmount);
+                if (!isFinite(amount) || amount <= 0) {
+                    return false;
+                }
+                return scope.maxWaiverAmount === null || amount <= scope.maxWaiverAmount;
+            };
 
             function previewParams() {
                 var params = { loanId: scope.loanId, chargeId: scope.chargeId, locale: 'en', dateFormat: scope.dateFormat };
@@ -65,28 +77,49 @@
             }
 
             scope.loadPreview = function () {
+                if (!scope.isAmountValid()) {
+                    return;
+                }
+                // Each preview replays the whole loan server-side, so only the newest response may win.
+                var sequence = ++previewSequence;
                 scope.isPreviewing = true;
                 scope.previewFailed = false;
                 resourceFactory.historicalPenaltyWaiverPreviewResource.get(previewParams(), function (data) {
+                    if (sequence !== previewSequence) {
+                        return;
+                    }
                     scope.preview = data;
                     scope.isPreviewing = false;
                     if (!scope.formData.waiverEffectiveDate && data.suggestedEffectiveDate) {
                         scope.formData.waiverEffectiveDate = normalizeDate(data.suggestedEffectiveDate);
                     }
                 }, function () {
+                    if (sequence !== previewSequence) {
+                        return;
+                    }
                     scope.isPreviewing = false;
                     scope.previewFailed = true;
                 });
             };
 
             scope.review = function () {
+                if (!scope.isAmountValid()) {
+                    return;
+                }
+                var sequence = ++previewSequence;
                 scope.isPreviewing = true;
                 scope.previewFailed = false;
                 resourceFactory.historicalPenaltyWaiverPreviewResource.get(previewParams(), function (data) {
+                    if (sequence !== previewSequence) {
+                        return;
+                    }
                     scope.preview = data;
                     scope.isPreviewing = false;
                     scope.step = 'preview';
                 }, function () {
+                    if (sequence !== previewSequence) {
+                        return;
+                    }
                     scope.isPreviewing = false;
                     scope.previewFailed = true;
                 });
@@ -98,6 +131,7 @@
 
             scope.canSubmit = function () {
                 return scope.preview && scope.preview.correctionAllowed && !scope.isSubmitting
+                    && scope.isAmountValid()
                     && !!scope.formData.reason
                     && (!scope.preview.requiresApproval || !!scope.formData.nextApproverUserId);
             };
