@@ -515,7 +515,7 @@
                         <div class="form-group" ng-show="showClientOtherInfoForm && (isClientBankDetailsMissing() || isReviewBankDetailsMissing())">
                             <div class="col-sm-offset-2 col-sm-6">
                                 <div class="alert alert-warning" role="alert">
-                                    {{ (isReviewBankDetailsMissing() ? 'label.message.client.bank.details.not.captured' : 'label.message.client.bank.details.missing') | translate }}
+                                    {{ clientBankDetailsMessageKey() | translate }}
                                 </div>
                             </div>
                         </div>
