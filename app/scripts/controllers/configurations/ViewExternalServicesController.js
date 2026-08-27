@@ -7,6 +7,8 @@
             $scope.Configs = [];
             $scope.whitelistedNumbers = [];
             $scope.smsWhitelistEnforced = false;
+            $scope.whatsappWhitelistedNumbers = [];
+            $scope.whatsappWhitelistEnforced = false;
             $scope.externalServicesType = $routeParams.externalServicesType;
             //$scope.name = $routeParams.name;
             resourceFactory.externalServicesResource.get({id: $scope.externalServicesType}, function (data) {
@@ -19,6 +21,15 @@
                             }
                             if (data[i].name === 'sms_whitelist') {
                                 $scope.whitelistedNumbers = (data[i].value || '')
+                                    .split(/[,;\s]+/)
+                                    .map(function (number) { return number.trim(); })
+                                    .filter(function (number) { return number.length > 0; });
+                            }
+                            if (data[i].name === 'whatsapp_whitelist_enabled') {
+                                $scope.whatsappWhitelistEnforced = data[i].value === 'true';
+                            }
+                            if (data[i].name === 'whatsapp_whitelist') {
+                                $scope.whatsappWhitelistedNumbers = (data[i].value || '')
                                     .split(/[,;\s]+/)
                                     .map(function (number) { return number.trim(); })
                                     .filter(function (number) { return number.length > 0; });

@@ -50,6 +50,10 @@
                                 <td>{{campaignData.triggerType.value}}</td>
                             </tr>
                             <tr>
+                                <td><strong>{{ 'label.input.recipientType' | translate }}</strong></td>
+                                <td>{{campaignData.recipientType === 'STAFF' ? ('label.input.employees' | translate) : ('label.input.clients' | translate)}}</td>
+                            </tr>
+                            <tr>
                                 <td><strong>{{ 'label.input.atTemplateName' | translate }}</strong></td>
                                 <td>{{campaignData.atTemplateName}}</td>
                             </tr>

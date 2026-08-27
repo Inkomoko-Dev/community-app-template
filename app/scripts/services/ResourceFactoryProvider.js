@@ -343,7 +343,8 @@
                     }),
                     userListResource: defineResource(apiVer + "/users/:userId", { userId: '@userId' }, {
                         getAllUsers: { method: 'GET', params: {}, isArray: true },
-                        update: { method: 'PUT' }
+                        update: { method: 'PUT' },
+                        delete: { method: 'DELETE', hasBody: true }
                     }),
                     userTemplateResource: defineResource(apiVer + "/users/template", {}, {
                         get: { method: 'GET', params: {} }
@@ -1217,7 +1218,20 @@
                          apiVer + "/crb/posting-logs",
                         {},
                         { query: { method: 'GET', isArray: true } }
-                    )
+                    ),
+                    partnerClientResource: defineResource(apiVer + "/partner/clients/:clientId/:resourceType", { clientId: '@clientId', resourceType: '@resourceType', partnerCode: '@partnerCode', reason: '@reason', phone: '@phone' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
+                        assign: { method: 'POST', params: { resourceType: 'assign' } },
+                        remove: { method: 'DELETE', params: {} }
+                    }),
+                    partnerClientHistoryResource: defineResource(apiVer + "/partner/clients/:clientId/history", { clientId: '@clientId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    disbursementProviderResource: defineResource(apiVer + "/disbursement-providers/:providerId", { providerId: '@providerId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} }
+                    })
                 };
             }];
         }
