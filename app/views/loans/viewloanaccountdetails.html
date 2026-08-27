@@ -1273,6 +1273,39 @@
                         </table>
                     </uib-tab>
 
+                    <!-- CGLT-656: every historical penalty waiver made on this loan, and how far each one got.
+                         The tab appears only where a correction exists, so it stays out of the way otherwise. -->
+                    <uib-tab ng-show="historicalPenaltyWaivers.length > 0"
+                             heading="{{'label.heading.historicalpenaltywaivers' | translate}}">
+                        <div class="table-responsive">
+                            <table class="table width100">
+                                <tr class="graybg">
+                                    <th>{{'label.heading.correctionreference' | translate}}</th>
+                                    <th>{{'label.heading.charge' | translate}}</th>
+                                    <th>{{'label.input.waivereffectivedate' | translate}}</th>
+                                    <th>{{'label.heading.waived' | translate}}</th>
+                                    <th>{{'label.heading.status' | translate}}</th>
+                                    <th>{{'label.input.reason' | translate}}</th>
+                                </tr>
+                                <tr ng-repeat="waiver in historicalPenaltyWaivers">
+                                    <td>{{waiver.correctionReference}}</td>
+                                    <td>{{waiver.chargeName}}</td>
+                                    <td>{{waiver.waiverEffectiveDate | DateFormat}}</td>
+                                    <td>{{waiver.waiverAmount | number:2}}</td>
+                                    <td>
+                                        <span class="label"
+                                              ng-class="{'label-success': waiver.status === 'COMPLETED',
+                                                         'label-warning': waiver.status === 'PENDING_APPROVAL' || waiver.status === 'PENDING_ODOO_SYNC',
+                                                         'label-danger': waiver.status === 'REJECTED' || waiver.status === 'FAILED_ODOO_SYNC',
+                                                         'label-default': waiver.status === 'PROCESSING'}">{{waiver.status}}</span>
+                                        <div class="help-block" ng-if="waiver.failureMessage">{{waiver.failureMessage}}</div>
+                                    </td>
+                                    <td>{{waiver.reason}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </uib-tab>
+
                     <uib-tab heading="{{'label.heading.loandocuments' | translate}}" select="getLoanDocuments()">
                         <div class="pull-right" data-ng-show="choice">
                             <a href="#/addloandocument/{{loandetails.id}}" class="btn btn-primary"><i class="fa fa-plus "></i>{{'label.button.upload'
