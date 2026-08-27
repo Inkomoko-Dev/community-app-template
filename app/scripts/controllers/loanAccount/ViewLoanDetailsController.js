@@ -810,6 +810,15 @@
                         }
                         return !charge.waived || scope.isResidualPenaltyWaiver(charge);
                     };
+                    // CGLT-656: the corrections already made on this loan, and how far each one got. A user without
+                    // READ_HISTORICALPENALTYWAIVER simply sees no tab rather than an error.
+                    scope.historicalPenaltyWaivers = [];
+                    resourceFactory.historicalPenaltyWaiversByLoanResource.getAll({ loanId: routeParams.id }, function (data) {
+                        scope.historicalPenaltyWaivers = data || [];
+                    }, function () {
+                        scope.historicalPenaltyWaivers = [];
+                    });
+
                     if (scope.loandetails.charges) {
                         scope.charges = scope.loandetails.charges;
                         for (var i in scope.charges) {
