@@ -78,6 +78,7 @@
 
                 <div class="col-sm-3">
                     <input id="approvedAmt" type="text" name="amount" ng-model="formData.approvedLoanAmount"
+                           ng-change="addTrancheAmounts()"
                            class="form-control"
                            number-format required late-Validate>
                 </div>
@@ -161,6 +162,12 @@
                             <td>{{'label.heading.total' | translate}}</td>
                             <td></td>
                             <td>{{showTrancheAmountTotal}}</td>
+                        </tr>
+                        <tr ng-show="approvalTranchePrincipalMismatch">
+                            <td colspan="4" class="text-danger">
+                                Total tranche amount ({{showTrancheAmountTotal | number}}) must equal the approved principal
+                                ({{formData.approvedLoanAmount | number}}).
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -770,14 +777,19 @@
                     <input id="{{modelName}}" type="text" sort datepicker-pop="dd MMMM yyyy" class="form-control"
                            ng-model="formData.updatedExpectedDisbursementDate" is-open="opened"/>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-class="{'has-error': loanactionform.updatedPrincipal.$error.trancheTotal}">
                     <label class="control-label col-sm-2">{{ 'label.heading.principal' |
                         translate}}<span class="required">*</span></label>
 
                     <div class="col-sm-3">
-                        <input id="principal" type="text" name="amount" ng-model="formData.updatedPrincipal"
+                        <input id="principal" type="text" name="updatedPrincipal" ng-model="formData.updatedPrincipal"
+                               ng-change="validateUpdatedTranchePrincipal()"
                                class="form-control"
                                number-format required late-Validate>
+                        <small class="error" ng-show="loanactionform.updatedPrincipal.$error.trancheTotal">
+                            Total tranche amount ({{updatedTrancheTotal | number}}) must equal the approved principal
+                            ({{formData.approvedLoanAmount | number}}).
+                        </small>
                     </div>
                 </div>
                 <div ng-if="!enableThirdPartyDisbursement">
@@ -1027,7 +1039,9 @@
                                 <button id="cancel" type="reset" class="btn btn-default" ng-click="cancel()">{{ 'label.button.cancel' |
                                     translate}}
                                 </button>
-                                <button id="save" type="submit" has-permission='{{taskPermissionName}}' wz-next class="btn btn-primary">{{
+                                <button id="save" type="submit" has-permission='{{taskPermissionName}}' wz-next class="btn btn-primary"
+                                        ng-disabled="(action === 'editdisbursedate' && loanactionform.updatedPrincipal.$invalid)
+                                            || (action === 'approve' && approvalTranchePrincipalMismatch)">{{
                                     'label.button.save' | translate}}
                                 </button>
                             </div>

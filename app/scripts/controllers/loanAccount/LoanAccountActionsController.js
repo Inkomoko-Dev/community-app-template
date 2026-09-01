@@ -640,6 +640,7 @@
                             scope.disbursementDetails[i].principal = loanData.disbursementDetails[i].principal;
                             scope.showTrancheAmountTotal += Number(loanData.disbursementDetails[i].principal);
                         }
+                        scope.validateApprovalTranchePrincipalTotal();
                         
                         // Now fetch disbursal template to get saved vendor/FX details
                         resourceFactory.loanTemplateResource.get({
@@ -1190,6 +1191,7 @@
                     }, function (data) {
                         scope.showEditDisburseDate = true;
                         scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
+                        scope.disbursementDetails = data.disbursementDetails || [];
                         scope.formData.approvedLoanAmount = data.approvedPrincipal;
                         scope.form.expectedDisbursementDate = new Date(data.timeline.expectedDisbursementDate);
                         for (var i in data.disbursementDetails) {
@@ -1211,6 +1213,7 @@
                                 scope.id = detail.id;
                             }
                         }
+                        scope.validateUpdatedTranchePrincipal();
                         resourceFactory.loanTemplateResource.get({
                             loanId: scope.accountId,
                             templateType: 'approval'
@@ -1532,11 +1535,45 @@
                 location.path('/viewloanaccount/' + routeParams.id);
             };
 
+            var parseTrancheAmount = function (amount) {
+                var parsed = Number(String(amount == null ? 0 : amount).replace(/,/g, ''));
+                return isNaN(parsed) ? 0 : parsed;
+            };
+
             scope.addTrancheAmounts = function () {
                 scope.showTrancheAmountTotal = 0;
                 for (var i in scope.disbursementDetails) {
-                    scope.showTrancheAmountTotal += Number(scope.disbursementDetails[i].principal);
+                    scope.showTrancheAmountTotal += parseTrancheAmount(scope.disbursementDetails[i].principal);
                 }
+                scope.validateApprovalTranchePrincipalTotal();
+            };
+
+            scope.validateApprovalTranchePrincipalTotal = function () {
+                var approvedPrincipal = parseTrancheAmount(scope.formData.approvedLoanAmount);
+                scope.approvalTranchePrincipalMismatch = scope.action === 'approve' && scope.approveTranches
+                    && approvedPrincipal > 0 && Math.abs(scope.showTrancheAmountTotal - approvedPrincipal) > 0.000001;
+                return !scope.approvalTranchePrincipalMismatch;
+            };
+
+            scope.validateUpdatedTranchePrincipal = function () {
+                var approvedPrincipal = parseTrancheAmount(scope.formData.approvedLoanAmount);
+                var updatedPrincipal = parseTrancheAmount(scope.formData.updatedPrincipal);
+                var totalTranchePrincipal = 0;
+
+                angular.forEach(scope.disbursementDetails || [], function (detail) {
+                    totalTranchePrincipal += String(detail.id) === String(scope.id)
+                        ? updatedPrincipal : parseTrancheAmount(detail.principal);
+                });
+
+                scope.updatedTrancheTotal = totalTranchePrincipal;
+                scope.updatedTranchePrincipalMismatch = approvedPrincipal > 0
+                    && Math.abs(totalTranchePrincipal - approvedPrincipal) > 0.000001;
+
+                if (scope.loanactionform && scope.loanactionform.updatedPrincipal) {
+                    scope.loanactionform.updatedPrincipal.$setValidity('trancheTotal',
+                        !scope.updatedTranchePrincipalMismatch);
+                }
+                return !scope.updatedTranchePrincipalMismatch;
             };
 
             scope.deleteTranches = function (index) {
@@ -1707,6 +1744,11 @@
                 
                 // Fields for approval vs disbursement review
                 if (scope.action === "approve") {
+                    scope.addTrancheAmounts();
+                    if (!scope.validateApprovalTranchePrincipalTotal()) {
+                        scope.error = 'Total tranche amount must equal the approved loan principal.';
+                        return;
+                    }
                     if (scope.enableThirdPartyDisbursement) {
                         delete submitData.paymentTypeId;
                         delete submitData.paymentTo;
@@ -1872,6 +1914,12 @@
                         location.path('/viewloanaccount/' + data.loanId);
                     });
                 } else if (scope.action === "editdisbursedate") {
+                    if (!scope.validateUpdatedTranchePrincipal()) {
+                        if (scope.loanactionform && scope.loanactionform.updatedPrincipal) {
+                            scope.loanactionform.updatedPrincipal.$setTouched();
+                        }
+                        return;
+                    }
                     submitData.expectedDisbursementDate = dateFilter(scope.formData.expectedDisbursementDate, scope.df);
                     for (var i in scope.disbursementDetails) {
                         if (scope.disbursementDetails[i].id == scope.id) {
