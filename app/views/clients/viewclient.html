@@ -932,6 +932,11 @@
                                         <td><span class="padded-td">{{client.isStaff}}</span>
                                         </td>
                                     </tr>
+									<tr data-ng-show="client.migrated">
+										<th class="table-bold">{{ 'label.input.migrated' | translate }}</th>
+										<td><span class="padded-td">{{ 'label.heading.yes' | translate }}</span>
+										</td>
+									</tr>
 									<tr data-ng-show="client.mobileNo">
 										<th class="table-bold">{{ 'label.input.mobilenumber' | translate }}</th>
 										<td><span class="padded-td">{{client.mobileNo}}</span>
