@@ -1,0 +1,424 @@
+<div class="content-container" ng-controller="BulkLoanRescheduleController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.bulkloanreschedule' | translate}}</li>
+    </ul>
+
+    <div class="toolbar">
+        <h4>{{'label.heading.bulkloanreschedule' | translate}}</h4>
+        <a ng-if="executionId" class="btn btn-default pull-right" ng-click="backToWorkflow()">
+            {{'label.button.back' | translate}}
+        </a>
+    </div>
+
+    <api-validate></api-validate>
+    <div class="alert alert-info" ng-if="state.loadingTemplate">
+        Loading template data...
+    </div>
+
+    <wizard current-step="step" class="card well">
+        <wz-step wz-title="Configure">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Filter Loans</strong></div>
+                <div class="panel-body">
+                    <form name="bulkRescheduleFiltersForm" novalidate class="form-horizontal" rc-submit="runPreview()">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.office' | translate }}<span class="required">*</span></label>
+                            <div class="col-sm-5">
+                                <select chosen="officeOptions" class="form-control"
+                                        ng-model="formData.filters.officeId"
+                                        ng-options="office.id as office.displayName for office in officeOptions"
+                                        ng-change="selectOffice((officeOptions | filter:{id:formData.filters.officeId}:true)[0])">
+                                    <option value="">{{'label.selectoffice' | translate}}</option>
+                                </select>
+                                <span class="error" ng-if="validation.officeId">Office is required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.loanstatus' | translate }}</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" ng-model="formData.filters.loanStatus"
+                                        ng-options="option.value as option.label for option in loanStatusOptions">
+                                    <option value="">{{'label.selectone' | translate}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Current interest rate</label>
+                            <div class="col-sm-5">
+                                <input type="number" step="0.01" class="form-control"
+                                       ng-model="formData.filters.currentInterestRate"
+                                       placeholder="Enter exact rate">
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="loanProductOptions.length">
+                            <label class="control-label col-sm-3">{{ 'label.input.loanproduct' | translate }}</label>
+                            <div class="col-sm-5">
+                                <select multiple class="form-control" ng-model="formData.filters.loanProductIds"
+                                        ng-options="option.value as option.label for option in loanProductOptions"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="loanOfficerOptions.length">
+                            <label class="control-label col-sm-3">{{ 'label.input.loanofficer' | translate }}</label>
+                            <div class="col-sm-5">
+                                <select multiple class="form-control" ng-model="formData.filters.loanOfficerIds"
+                                        ng-options="option.value as option.label for option in loanOfficerOptions"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Loans to exclude</label>
+                            <div class="col-sm-5">
+                                <input type="text" autocomplete="off" class="form-control"
+                                       placeholder="Search by loan ID or account number"
+                                       ng-model="loanSearch.term"
+                                       typeahead-min-length="2"
+                                       uib-typeahead="loan as (loan.id + ' ' + loan.accountNo + ' ' + loan.clientName) for loan in excludedLoanOptions($viewValue)"
+                                       typeahead-on-select="addExcludedLoan($item)">
+                                <div class="help-block">Add loan IDs/accounts to exclude from the batch.</div>
+                                <ul class="list-inline" ng-if="formData.filters.excludedLoans.length">
+                                    <li ng-repeat="loan in formData.filters.excludedLoans track by loan.id">
+                                        <span class="label label-default">
+                                            {{loan.id}} {{loan.accountNo}}
+                                            <a href="" ng-click="removeExcludedLoan($index)">&times;</a>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Reschedule Details</strong></div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.installmentstrategy' | translate }}<span class="required">*</span></label>
+                            <div class="col-sm-5">
+                                <select class="form-control" ng-model="formData.reschedulingDetails.installmentStrategy"
+                                        ng-options="option.value as option.label for option in installmentStrategyOptions"></select>
+                                <span class="error" ng-if="validation.installmentStrategy">Installment strategy is required.</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="rescheduleReasonOptions.length">
+                            <label class="control-label col-sm-3">{{ 'label.input.rescheduleReasonId' | translate }}</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" ng-model="formData.reschedulingDetails.rescheduleReasonId"
+                                        ng-options="option.value as option.label for option in rescheduleReasonOptions">
+                                    <option value="">{{'label.selectone' | translate}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.submittedOnDate' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" datepicker-pop="dd MMMM yyyy" is-open="opened"
+                                       ng-model="formData.reschedulingDetails.submittedOnDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.comments' | translate }}</label>
+                            <div class="col-sm-5">
+                                <textarea class="form-control" rows="2" ng-model="formData.reschedulingDetails.rescheduleReasonComment"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.repaidevery' | translate }}</label>
+                            <div class="col-sm-2">
+                                <input class="form-control" type="text" ng-model="formData.reschedulingDetails.repaymentEvery" number-only-format>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-control" ng-model="formData.reschedulingDetails.repaymentFrequencyType"
+                                        ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in repaymentFrequencyTypeOptions">
+                                    <option value="">{{'label.selectone' | translate}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.preserveLoanTermDuration' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.preserveLoanTermDuration">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.changeRepaymentDate' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.changeRepaymentDate">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.changeRepaymentDate">
+                            <label class="control-label col-sm-3">{{ 'label.input.installemtrescheduledto' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" datepicker-pop="dd MMMM yyyy" is-open="opened"
+                                       class="form-control" ng-model="formData.reschedulingDetails.adjustedDueDate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.introduceGracePeriods' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.introduceGracePeriods">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.introduceGracePeriods">
+                            <label class="control-label col-sm-3">{{ 'label.input.graceOnPrincipal' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" ng-model="formData.reschedulingDetails.graceOnPrincipal">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.introduceGracePeriods">
+                            <label class="control-label col-sm-3">{{ 'label.input.graceOnInterest' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" ng-model="formData.reschedulingDetails.graceOnInterest">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.extendRepaymentPeriod' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.extendRepaymentPeriod">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.extendRepaymentPeriod">
+                            <label class="control-label col-sm-3">{{ 'label.input.noofnewrepayments' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" ng-model="formData.reschedulingDetails.extraTerms" number-only-format>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.adjustinterestrates' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.adjustInterestRates">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.newinterestrate' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="number" step="0.01" class="form-control"
+                                       min="{{newInterestRateMinValue}}" max="{{newInterestRateMaxValue}}"
+                                       ng-model="formData.newInterestRate">
+                                <span class="error" ng-if="validation.newInterestRate">New interest rate is required.</span>
+                                <span class="error" ng-if="validation.newInterestRateRange">New interest rate must be within the allowed range.</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.changeEMI' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.changeEMI">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.changeEMI">
+                            <label class="control-label col-sm-3">{{ 'label.input.emi.change.upto' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" datepicker-pop="dd MMMM yyyy" is-open="opened" class="form-control"
+                                       ng-model="formData.reschedulingDetails.endDate">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.changeEMI">
+                            <label class="control-label col-sm-3">{{ 'label.input.new.emi' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" ng-model="formData.reschedulingDetails.emi">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.changePrincipalAmount' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.changeFixedPrincipal">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.changeFixedPrincipal">
+                            <label class="control-label col-sm-3">{{ 'label.input.fixedPrincipalAmount' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" ng-model="formData.reschedulingDetails.newPrincipalDueFixedAmount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.change.fixed.principal.percentage.per.installment' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="checkbox" ng-model="formData.reschedulingDetails.changeFixedPrincipalPercentagePerInstallment">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.changeFixedPrincipalPercentagePerInstallment">
+                            <label class="control-label col-sm-3">{{ 'label.input.new.fixed.principal.percentage.per.installment' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" ng-model="formData.reschedulingDetails.newFixedPrincipalPercentagePerInstallment">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">{{ 'label.input.overdueChargeHandling' | translate }}</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" ng-model="formData.reschedulingDetails.overdueChargeHandling"
+                                        ng-options="option.value as option.label for option in overdueChargeHandlingOptions">
+                                    <option value="">{{ 'label.select' | translate }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.overdueChargeHandling === 'CARRY_FORWARD'">
+                            <label class="control-label col-sm-3">{{ 'label.input.carryForwardChargeDef' | translate }}</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" ng-model="formData.reschedulingDetails.carryForwardChargeId"
+                                        ng-options="charge.value as charge.label for charge in availableCarryForwardCharges">
+                                    <option value="">{{ 'label.select' | translate }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="formData.reschedulingDetails.overdueChargeHandling === 'CARRY_FORWARD'">
+                            <label class="control-label col-sm-3">{{ 'label.input.carryForwardChargeDueDate' | translate }}</label>
+                            <div class="col-sm-5">
+                                <input type="text" datepicker-pop="dd MMMM yyyy" is-open="opened" class="form-control"
+                                       ng-model="formData.reschedulingDetails.carryForwardChargeDueDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="button" class="btn btn-primary" ng-disabled="state.loadingPreview" ng-click="runPreview()">
+                    {{'label.button.preview' | translate}}
+                </button>
+            </div>
+        </wz-step>
+
+        <wz-step wz-title="Preview">
+            <div class="panel panel-info" ng-if="executionId">
+                <div class="panel-heading">
+                    <strong>Bulk Reschedule Preview</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="well well-sm">
+                                <div class="text-muted text-uppercase">Execution ID</div>
+                                <strong>{{executionId}}</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="well well-sm">
+                                <div class="text-muted text-uppercase">Matching loans</div>
+                                <h3 class="m-t-0">{{previewData.metrics.found}}</h3>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="well well-sm">
+                                <div class="text-muted text-uppercase">Loans to process</div>
+                                <h3 class="m-t-0 text-success">{{previewData.metrics.toProcess}}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="well well-sm">
+                                <div class="text-muted text-uppercase">Excluded</div>
+                                <h4 class="m-t-0">{{previewData.metrics.excluded}}</h4>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="well well-sm">
+                                <div class="text-muted text-uppercase">Skipped</div>
+                                <h4 class="m-t-0 text-warning">{{previewData.metrics.skipped}}</h4>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="well well-sm">
+                                <div class="text-muted text-uppercase">Preview status</div>
+                                <h4 class="m-t-0">{{previewData.status || 'PREVIEW'}}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success" ng-if="previewData.message">
+                        {{previewData.message}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default" ng-if="executionId">
+                <div class="panel-heading">
+                    <strong>Proposed loan changes</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-info">
+                        This is a preview only. No loan changes have been saved. Review the proposed changes before approval/execution is introduced in the next phase.
+                    </div>
+
+                    <div class="text-center" ng-if="state.loadingPreview">
+                        <i class="fa fa-spinner fa-spin"></i> Loading preview results...
+                    </div>
+
+                    <div class="table-responsive" ng-if="!state.loadingPreview && previewPageLoans().length">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>Loan ID</th>
+                                <th>Client</th>
+                                <th>Account</th>
+                                <th>Status</th>
+                                <th>Current rate</th>
+                                <th>New rate</th>
+                                <th>Rate change</th>
+                                <th>Outstanding</th>
+                                <th>Current installment</th>
+                                <th>New installment</th>
+                                <th>Remaining</th>
+                                <th>Message</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="loan in previewPageLoans() track by (loan.id || $index)"
+                                ng-class="{'warning': loan.skipped, 'danger': loan.status && loan.status.toUpperCase() === 'FAILED'}">
+                                <td>{{loan.id}}</td>
+                                <td>{{loan.clientName}}</td>
+                                <td>{{loan.accountNo}}</td>
+                                <td>{{loan.status}}</td>
+                                <td>{{loan.currentInterestRate}}</td>
+                                <td>{{loan.newInterestRate}}</td>
+                                <td>{{loan.interestRateChange}}</td>
+                                <td>{{loan.outstanding}}</td>
+                                <td>{{loan.monthlyInstallment}}</td>
+                                <td>{{loan.newMonthlyInstallment}}</td>
+                                <td>{{loan.remaining}}</td>
+                                <td>{{loan.message}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info" ng-if="!state.loadingPreview && !previewPageLoans().length">
+                        No preview results were returned for this execution.
+                    </div>
+
+                    <div class="row m-t-2" ng-if="previewQuery.total">
+                        <div class="col-sm-6">
+                            Showing {{previewStartRow()}}–{{previewEndRow()}} of {{previewQuery.total}} loans
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <button type="button" class="btn btn-default"
+                                    ng-click="previousPreviewPage()"
+                                    ng-disabled="previewQuery.page <= 1 || state.loadingPreview">
+                                <i class="fa fa-chevron-left"></i> Previous
+                            </button>
+                            <span class="m-h-1">Page {{previewQuery.page}}</span>
+                            <button type="button" class="btn btn-default"
+                                    ng-click="nextPreviewPage()"
+                                    ng-disabled="!previewQuery.hasMore || state.loadingPreview">
+                                Next <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="button" class="btn btn-default" ng-click="backToWorkflow()">
+                    {{'label.button.back' | translate}}
+                </button>
+            </div>
+        </wz-step>
+    </wizard>
+</div>

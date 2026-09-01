@@ -42,7 +42,14 @@
                 if (undisbursedDetails.length) {
                     return undisbursedDetails[0];
                 }
-                return null;
+                details.sort(function (first, second) {
+                    var firstDate = first.actualDisbursementDate || [];
+                    var secondDate = second.actualDisbursementDate || [];
+                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
+                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
+                    return secondDateValue.localeCompare(firstDateValue);
+                });
+                return details[0];
             }
 
             resourceFactory.LoanAccountResource.getLoanAccountDetails({
