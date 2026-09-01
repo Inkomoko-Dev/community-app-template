@@ -5733,6 +5733,8 @@
   "label.input.amountpaid": "Paid",
   "label.input.amountwaived": "Waived",
   "label.input.date": "Date",
+  "label.input.residualautoclose": "Automatically close small residual balances",
+  "label.input.residualclosurethreshold": "Residual closure threshold",
   "label.bulkreschedule.title": "Bulk Reschedule",
   "label.bulkreschedule.requests": "Bulk Reschedule Requests",
   "label.bulkreschedule.requests.help": "View and manage all bulk reschedule requests.",

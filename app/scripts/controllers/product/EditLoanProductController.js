@@ -91,6 +91,8 @@
                     interestCalculationPeriodType: scope.product.interestCalculationPeriodType.id,
                     allowPartialPeriodInterestCalcualtion:scope.product.allowPartialPeriodInterestCalcualtion,
                     inArrearsTolerance: scope.product.inArrearsTolerance,
+                    residualAutoCloseEnabled: scope.product.residualAutoCloseEnabled === true,
+                    residualClosureThreshold: scope.product.residualClosureThreshold,
                     transactionProcessingStrategyId: scope.product.transactionProcessingStrategyId,
                     graceOnPrincipalPayment: scope.product.graceOnPrincipalPayment,
                     graceOnInterestPayment: scope.product.graceOnInterestPayment,
@@ -235,7 +237,6 @@
                     scope.formData.incomeFromRecoveryAccountId = scope.product.accountingMappings.incomeFromRecoveryAccount.id;
                     scope.formData.writeOffAccountId = scope.product.accountingMappings.writeOffAccount.id;
                     scope.formData.overpaymentLiabilityAccountId = scope.product.accountingMappings.overpaymentLiabilityAccount.id;
-
                     _.each(scope.product.paymentChannelToFundSourceMappings, function (fundSource) {
                         scope.configureFundOptions.push({
                             paymentTypeId: fundSource.paymentType.id,

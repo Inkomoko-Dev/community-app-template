@@ -214,6 +214,7 @@
 
                 var transactionTypeId = Number(transaction.type.id);
                 return transactionTypeId === 2 || transactionTypeId === 4 || transactionTypeId === 1 || transactionTypeId === 6 ||
+                    transactionTypeId === 32 ||
                     scope.isRecoveryPaymentTransaction(transaction) || scope.isRepaymentAtDisbursementTransaction(transaction);
             };
 
