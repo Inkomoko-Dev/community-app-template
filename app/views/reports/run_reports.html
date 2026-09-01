@@ -140,10 +140,10 @@
 
 	    <div data-ng-hide="hideTable">
 	        <div class="pull-right" ng-show="reportType == 'Table'">
-	            <button type="button" class="btn btn-primary" ng-csv="csvData"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportcsv'
+	            <button type="button" class="btn btn-primary" ng-click="exportToCsv()" ng-disabled="exporting"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportcsv'
 	                | translate }}
 	            </button>
-				<button type="button" class="btn btn-primary"  ng-click="exportToExcel()"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportexcel2'
+				<button type="button" class="btn btn-primary" ng-click="exportToExcel()" ng-disabled="exporting"><i class="fa fa-file "></i>&nbsp;&nbsp;{{'label.button.exportexcel2'
 	                | translate }}
 	            </button>
 	        </div>
