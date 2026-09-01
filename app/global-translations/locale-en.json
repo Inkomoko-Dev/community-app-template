@@ -420,6 +420,7 @@
   "label.input.businessRule": "Business Rule",
   "label.input.campaignMessage": "Campaign Message",
   "label.input.isStaff": "Is Staff?",
+  "label.input.migrated": "Migrated",
   "label.nextrepaymentdate": "Next Repayment date",
   "label.input.alias": "Alias",
   "label.input.incomefrominterest": "Income from Interest",
