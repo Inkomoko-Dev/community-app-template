@@ -247,33 +247,20 @@
                 scope.employmentInfo=data;
               });
 
-            // Fetch partner client information using the discovery API (working method)
-            if (scope.client.mobileNo) {
-                resourceFactory.partnerClientResource.getAll({phone: scope.client.mobileNo}, function(data) {
-                    if (data && data.pageItems && data.pageItems.length > 0) {
-                        // Find the matching client by ID
-                        var matchingClient = data.pageItems.find(function(item) {
-                            return item.id === scope.client.id;
-                        });
-                        if (matchingClient && matchingClient.partnerCode) {
-                            scope.partnerClient = {
-                                partnerCode: matchingClient.partnerCode,
-                                status: matchingClient.isActive ? 'Active' : 'Inactive',
-                                assignmentDate: matchingClient.assignedDate ? matchingClient.assignedDate.join('-') : null
-                            };
-                        } else {
-                            scope.partnerClient = null;
-                        }
-                    } else {
-                        scope.partnerClient = null;
-                    }
-                }, function(error) {
-                    console.error('Error fetching partner client information:', error);
+            resourceFactory.partnerClientResource.getAssignment({clientId: routeParams.id}, function(data) {
+                if (data && data.partnerCode) {
+                    scope.partnerClient = {
+                        partnerCode: data.partnerCode,
+                        status: data.isActive ? 'Active' : 'Inactive',
+                        assignmentDate: data.assignedDate
+                    };
+                } else {
                     scope.partnerClient = null;
-                });
-            } else {
+                }
+            }, function(error) {
+                console.error('Error fetching partner client information:', error);
                 scope.partnerClient = null;
-            }
+            });
 
             scope.routeToLoan = function (id) {
                 location.path('/viewloanaccount/' + id);
