@@ -1540,6 +1540,13 @@
                 return isNaN(parsed) ? 0 : parsed;
             };
 
+            var formatTrancheDate = function (date) {
+                if (angular.isArray(date) && date.length >= 3) {
+                    date = new Date(date[0], date[1] - 1, date[2]);
+                }
+                return dateFilter(date, scope.df);
+            };
+
             scope.addTrancheAmounts = function () {
                 scope.showTrancheAmountTotal = 0;
                 for (var i in scope.disbursementDetails) {
@@ -1935,7 +1942,7 @@
                         submitData.disbursementData.push({
                             id: scope.disbursementDetails[i].id,
                             principal: scope.disbursementDetails[i].principal,
-                            expectedDisbursementDate: dateFilter(scope.disbursementDetails[i].expectedDisbursementDate, scope.df),
+                            expectedDisbursementDate: formatTrancheDate(scope.disbursementDetails[i].expectedDisbursementDate),
                             loanChargeId: scope.disbursementDetails[i].loanChargeId
                         });
                     }
@@ -1951,7 +1958,7 @@
                         submitData.disbursementData.push({
                             id: scope.disbursementDetails[i].id,
                             principal: scope.disbursementDetails[i].principal,
-                            expectedDisbursementDate: dateFilter(scope.disbursementDetails[i].expectedDisbursementDate, scope.df),
+                            expectedDisbursementDate: formatTrancheDate(scope.disbursementDetails[i].expectedDisbursementDate),
                             loanChargeId: scope.disbursementDetails[i].loanChargeId
                         });
                     }
