@@ -1245,10 +1245,11 @@
                         { query: { method: 'GET', isArray: true } }
                     ),
                     partnerClientResource: defineResource(apiVer + "/partner/clients/:clientId/:resourceType", { clientId: '@clientId', resourceType: '@resourceType', partnerCode: '@partnerCode', reason: '@reason', phone: '@phone' }, {
-                        getAll: { method: 'GET', params: {}, isArray: true },
+                        getAll: { method: 'GET', params: {}, isArray: false },
                         get: { method: 'GET', params: {} },
+                        getAssignment: { method: 'GET', params: { resourceType: 'assignment' } },
                         assign: { method: 'POST', params: { resourceType: 'assign' } },
-                        remove: { method: 'DELETE', params: {} }
+                        remove: { method: 'DELETE', params: { resourceType: 'mapping' } }
                     }),
                     partnerClientHistoryResource: defineResource(apiVer + "/partner/clients/:clientId/history", { clientId: '@clientId' }, {
                         getAll: { method: 'GET', params: {}, isArray: true }
