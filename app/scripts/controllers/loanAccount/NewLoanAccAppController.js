@@ -169,6 +169,7 @@
                 scope.formData.repaymentEvery = scope.loanaccountinfo.repaymentEvery;
                 scope.formData.repaymentFrequencyType = scope.loanaccountinfo.repaymentFrequencyType.id;
                 scope.loandetails.repaymentFrequencyValue = scope.loanaccountinfo.repaymentFrequencyType.value;
+                mifosX.models.RepaymentFrequency.bindTo(scope);
                 scope.formData.interestRatePerPeriod = scope.loanaccountinfo.interestRatePerPeriod;
                 scope.formData.amortizationType = scope.loanaccountinfo.amortizationType.id;
                 scope.formData.fixedPrincipalPercentagePerInstallment = scope.loanaccountinfo.fixedPrincipalPercentagePerInstallment;
@@ -481,6 +482,9 @@
             };
 
             scope.submit = function () {
+                if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
+                    return;
+                }
                 // if (WizardHandler.wizard().getCurrentStep() != scope.noOfTabs) {
                 //     WizardHandler.wizard().next();
                 //     return;
