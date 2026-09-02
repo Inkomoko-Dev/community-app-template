@@ -2,12 +2,17 @@
     mifosX.filters = _.extend(module, {
         RepaymentFrequencyLabel: function () {
             return function (repaymentEvery, frequencyType) {
-                var typeId = frequencyType && frequencyType.id !== undefined ? frequencyType.id : frequencyType;
-                var typeValue = frequencyType && frequencyType.value ? frequencyType.value : '';
-                if (mifosX.models && mifosX.models.RepaymentFrequency) {
-                    return mifosX.models.RepaymentFrequency.label(repaymentEvery, typeId, typeValue);
+                if (!(mifosX.models && mifosX.models.RepaymentFrequency)) {
+                    return repaymentEvery;
                 }
-                return repaymentEvery && typeValue ? repaymentEvery + ' ' + typeValue : typeValue;
+                var helper = mifosX.models.RepaymentFrequency;
+                var typeValue = '';
+                if (frequencyType && typeof frequencyType === 'object') {
+                    typeValue = frequencyType.value || '';
+                } else if (typeof frequencyType === 'string' && isNaN(frequencyType)) {
+                    typeValue = frequencyType;
+                }
+                return helper.label(repaymentEvery, frequencyType, typeValue);
             };
         }
     });

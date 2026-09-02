@@ -333,6 +333,7 @@
                 <div class="col-sm-2">
                     <input type="text" placeholder="{{'label.input.default' | translate}}" id="numberOfRepayments"
                            name="numofrepayments" class="form-control" ng-model="formData.numberOfRepayments" required
+                           ng-change="onLoanTermOrFrequencyChange()"
                            late-validate number-only-format />
                 </div>
                 <div class="col-sm-2">
@@ -1992,8 +1993,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>{{'label.heading.repayevery' | translate}}:</td>
-                    <td colspan="3">{{loanproduct.repaymentEvery | RepaymentFrequencyLabel:loanproduct.repaymentFrequencyOption}}</td>
+                    <td>{{'label.heading.repaymentfrequency' | translate}}:</td>
+                    <td colspan="3">{{loanproduct.repaymentEvery | RepaymentFrequencyLabel:loanproduct.repaymentFrequencyType}}</td>
                 </tr>
                 <tr ng-show="!loanproduct.isLinkedToFloatingInterestRates">
                     <td>{{'label.heading.nominalinterestrate' | translate}}:</td>

@@ -339,6 +339,7 @@
                             </td>
                             <td class="paddedbottom20" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.numberOfRepayments == true">
                                 <input id="numberOfRepayments" class="form-control" name="numofrepayments" type="text" ng-model="formData.numberOfRepayments"
+                                    ng-change="onLoanTermOrFrequencyChange()"
                                     required late-Validate>&nbsp;
                                 <form-validate valattributeform="Terms" valattribute="numofrepayments" />
                             </td>
@@ -1128,8 +1129,8 @@
                             <td>{{loandetails.numberOfRepayments}}</td>
                         </tr>
                         <tr ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery">
-                            <td colspan="6">{{ 'label.input.repaidevery' | translate }}</td>
-                            <td>{{loandetails.repaymentEvery | RepaymentFrequencyLabel:loanaccountinfo.repaymentFrequencyType}} {{loandetails.repaymentFrequencyNthDayValue}}
+                            <td colspan="6">{{ 'label.input.repaymentfrequency' | translate }}</td>
+                            <td>{{loandetails.repaymentEvery | RepaymentFrequencyLabel:formData.repaymentFrequencyType}} {{loandetails.repaymentFrequencyNthDayValue}}
                                 {{loandetails.repaymentFrequencyDayOfWeekValue}}
                             </td>
                         </tr>

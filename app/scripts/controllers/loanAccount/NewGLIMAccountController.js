@@ -127,7 +127,8 @@
                 } else {
                     scope.loanApplicationCommonData.thirdPartyDisbursementProvider = null;
                 }
-            }
+                mifosX.models.RepaymentFrequency.bindTo(scope);
+            };
 
             scope.addCharge = function () {
                 if (scope.chargeFormData.chargeId) {
@@ -229,6 +230,10 @@
             }
 
             scope.submit = function () {
+
+                if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
+                    return;
+                }
 
                 if (scope.enableThirdPartyDisbursement && !scope.loanApplicationCommonData.thirdPartyDisbursementProvider) {
                     scope.error = 'Third-party disbursement provider is required for this product.';

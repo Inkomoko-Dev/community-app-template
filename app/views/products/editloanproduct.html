@@ -250,6 +250,7 @@
 	    <div class="col-sm-2">
 	        <input type="text" placeholder="{{'label.input.default' | translate}}" id="numberOfRepayments"
 	               name="numofrepayments" class="form-control" ng-model="formData.numberOfRepayments" required
+				   ng-change="onLoanTermOrFrequencyChange()"
 				   late-validate number-only-format/>
 	    </div>
 	    <div class="col-sm-2">

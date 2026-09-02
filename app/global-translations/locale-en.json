@@ -1969,7 +1969,7 @@
   "label.tooltip.loanproduct.useborrowerloancounter": "Check this checkbox if terms vary based on the Loan Cycle.",
   "label.tooltip.loanproduct.principal": "These fields are used to define the minimum, default, and maximum principal allowed for the loan product.",
   "label.tooltip.loanproduct.principalcyclevariations": "These fields are used to define the minimum, default, and maximum principal allowed for the loan product based on the Loan Cycle.",
-  "label.tooltip.loanproduct.numofrepayments": "These fields are used to define the minimum, default, and maximum number of repayments allowed for the loan product.",
+  "label.tooltip.loanproduct.numofrepayments": "Number of installments, not the term in months. A 12-month quarterly product has 4 installments. Semi-annual has 2.",
   "label.tooltip.loanproduct.numerofrepaymentcyclevariations": "These fields are used to define the minimum, default, and maximum number of repayments allowed for the loan product based on the Loan Cycle.",
   "label.tooltip.loanproduct.nominalinterestrate": "These fields are used to define the minimum, default, maximum, and period for the nominal interest rate allowed for the loan product. The minimum, default, and maximum nominal interest rates are expressed as percentages.",
   "label.tooltip.loanproduct.interestratecyclevariations": "These fields are used to define the minimum, default, maximum, and period for the nominal interest rate allowed for the loan product based on the Loan Cycle. The minimum, default, and maximum nominal interest rates are expressed as percentages.",
