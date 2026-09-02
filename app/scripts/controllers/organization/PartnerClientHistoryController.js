@@ -4,15 +4,19 @@
             scope.clientId = routeParams.id;
             scope.history = [];
 
-            // Fetch client details
-            resourceFactory.clientResource.get({clientId: scope.clientId}, function(data) {
+            resourceFactory.clientResource.get({clientId: scope.clientId}, function (data) {
                 scope.client = data;
             });
 
-            // Fetch partner assignment history
-            resourceFactory.partnerClientHistoryResource.getAll({clientId: scope.clientId}, function(data) {
-                scope.history = data;
-            }, function(error) {
+            resourceFactory.partnerClientHistoryResource.getAll({clientId: scope.clientId}, function (data) {
+                if (angular.isArray(data)) {
+                    scope.history = data;
+                } else if (data && angular.isArray(data.pageItems)) {
+                    scope.history = data.pageItems;
+                } else {
+                    scope.history = [];
+                }
+            }, function (error) {
                 console.error('Error fetching partner history:', error);
                 scope.history = [];
             });
@@ -22,15 +26,19 @@
             };
 
             scope.formatPartnerCode = function (partnerCode) {
-                if (!partnerCode) return '-';
+                if (!partnerCode) {
+                    return '-';
+                }
                 return partnerCode.toUpperCase();
             };
 
-            scope.formatStatus = function (status) {
-                if (!status) return '-';
-                return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+            scope.formatAction = function (actionType) {
+                if (!actionType) {
+                    return '-';
+                }
+                return actionType.replace(/_/g, ' ');
             };
         }
     });
     mifosX.ng.application.controller('PartnerClientHistoryController', ['$scope', 'ResourceFactory', '$location', '$routeParams', mifosX.controllers.PartnerClientHistoryController]);
-} (mifosX.controllers));
+}(mifosX.controllers));

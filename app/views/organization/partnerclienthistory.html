@@ -20,22 +20,20 @@
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th>{{'label.heading.client' | translate}}</th>
+                                    <th>{{'label.heading.date' | translate}}</th>
+                                    <th>{{'label.heading.action' | translate}}</th>
                                     <th>{{'label.input.partner' | translate}}</th>
-                                    <th>{{'label.input.partnerStatus' | translate}}</th>
-                                    <th>{{'label.input.partnerAssignmentDate' | translate}}</th>
-                                    <th>{{'label.input.removalDate' | translate}}</th>
                                     <th>{{'label.input.reason' | translate}}</th>
+                                    <th>{{'label.heading.user' | translate}}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="record in history">
-                                    <td>{{record.clientName || client.displayName}}</td>
-                                    <td>{{formatPartnerCode(record.partnerCode)}}</td>
-                                    <td>{{formatStatus(record.status)}}</td>
-                                    <td>{{record.assignmentDate | DateFormat}}</td>
-                                    <td>{{record.removalDate | DateFormat || '-'}}</td>
+                                    <td>{{record.changedDate | DateFormat}}</td>
+                                    <td>{{formatAction(record.actionType)}}</td>
+                                    <td>{{formatPartnerCode(record.partnerCode || record.newPartnerCode)}}</td>
                                     <td>{{record.reason || '-'}}</td>
+                                    <td>{{record.changedByName || '-'}}</td>
                                 </tr>
                             </tbody>
                         </table>
