@@ -417,6 +417,8 @@
   "label.input.campaignMessage": "Campaign Message",
   "label.input.isStaff": "Is Staff?",
   "label.input.migrated": "Migrated",
+  "label.input.migratedOnDate": "Migrated On Date",
+  "label.input.migratedFromOffice": "Migrated From Office",
   "label.nextrepaymentdate": "Next Repayment date",
   "label.input.alias": "Alias",
   "label.input.incomefrominterest": "Income from Interest",
