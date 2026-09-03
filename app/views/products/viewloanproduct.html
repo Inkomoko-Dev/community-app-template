@@ -445,6 +445,12 @@
         <td>{{'label.input.arearstolerance' | translate}}</td>
         <td colspan="3">{{arrearsTolerance}}</td>
     </tr>
+    <tr>
+        <td>{{'label.input.residualautoclose' | translate}}</td>
+        <td>{{loanproduct.residualAutoCloseEnabled ? 'Yes' : 'No'}}</td>
+        <td>{{'label.input.residualclosurethreshold' | translate}}</td>
+        <td>{{loanproduct.residualClosureThreshold | number}}</td>
+    </tr>
     <tr ng-show="allowAttributeConfiguration">
         <td>{{'label.input.repaidevery' | translate}}</td>
         <td colspan="3">{{repaymentFrequency}}</td>
