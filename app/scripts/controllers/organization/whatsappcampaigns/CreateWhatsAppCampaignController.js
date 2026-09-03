@@ -209,6 +209,8 @@
                 resourceFactory.whatsAppCampaignResource.preview({additionalParam: 'preview'}, scope.previewData, function (data) {
                     scope.previewMessageText = data.previewMessage;
                     scope.previewBodyValues = data.bodyValues;
+                    scope.previewEnqueueableCount = data.enqueueableCount;
+                    scope.previewSkippedCount = data.skippedCount;
                 });
             };
 
