@@ -4,7 +4,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'clientStatus',
             'LoggedInUser',
             'roleMap',
-            'Langs'
+            'Langs',
+            'RepaymentFrequency'
         ],
         services: [
             'ResourceFactoryProvider',
@@ -435,7 +436,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'FormatNumber',
             'TranslateDataTableColumn',
             'SearchFilter',
-            'AddUpTotalFor'
+            'AddUpTotalFor',
+            'RepaymentFrequencyLabel'
         ],
         directives: [
             'DialogDirective',

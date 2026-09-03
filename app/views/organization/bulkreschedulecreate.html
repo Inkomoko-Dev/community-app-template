@@ -137,7 +137,15 @@
                         <span class="error" ng-if="validation.newInterestRate">{{'label.bulkreschedule.newrate.required' | translate}}</span>
                     </div>
                     <div class="form-group">
-                        <label>{{'label.bulkreschedule.repaymentevery' | translate}}</label>
+                        <label>{{'label.input.repaymentfrequency' | translate}}</label>
+                        <select class="form-control"
+                                ng-model="repaymentFrequencyPreset"
+                                ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
+                                ng-change="onRepaymentFrequencyPresetChange()">
+                            <option value="">{{'label.selectone' | translate}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
                         <div class="row">
                             <div class="col-xs-5"><input type="number" class="form-control" ng-model="formData.reschedulingDetails.repaymentEvery"></div>
                             <div class="col-xs-7">
@@ -148,6 +156,7 @@
                             </div>
                         </div>
                     </div>
+                    <span class="error" ng-if="repaymentFrequencyError">{{repaymentFrequencyError}}</span>
                     <div class="checkbox"><label><input type="checkbox" ng-model="formData.reschedulingDetails.preserveLoanTermDuration"> {{'label.bulkreschedule.preserveterm' | translate}}</label></div>
                     <span class="error" ng-if="validation.repaymentFrequency">{{'label.bulkreschedule.repaymentfrequency.required' | translate}}</span>
                     <div class="form-group">

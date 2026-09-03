@@ -133,8 +133,9 @@
                                                     </td>
                                                     <td class="width36 paddedbottom10">
                                                         <input id="loanTermFrequency" class="form-control" name="loanterm" type="text"
-                                                               ng-model="formData.loanTermFrequency" required late-Validate number-only/>
+                                                               ng-model="formData.loanTermFrequency" ng-change="onLoanTermOrFrequencyChange()" required late-Validate number-only/>
                                                         <select id="loanTermFrequencyType" class="form-control" ng-model="formData.loanTermFrequencyType"
+                                                                ng-change="onLoanTermOrFrequencyChange()"
                                                                 ng-options="termFrequencyType.id as termFrequencyType.value for termFrequencyType in loanaccountinfo.termFrequencyTypeOptions"
                                                                 value="{{termFrequencyType.id}}"/>
                                                     </td>
@@ -144,14 +145,21 @@
                                                     </td>
                                                     <td class="paddedbottom10" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.numberOfRepayments == true">
                                                         <input id="numberOfRepayments" class="form-control" name="numofrepayments" type="text"
-                                                               ng-model="formData.numberOfRepayments" required late-Validate number-only/>&nbsp;
+                                                               ng-model="formData.numberOfRepayments" ng-change="onLoanTermOrFrequencyChange()" required late-Validate number-only/>&nbsp;
                                                     </td>
-                                                    <td ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true"><label>{{ 'label.input.repaidevery' | translate }}&nbsp;<span class="required">*</span></label></td>
+                                                    <td ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true"><label>{{ 'label.input.repaymentfrequency' | translate }}&nbsp;<span class="required">*</span>
+                                                        <i class="fa fa-question-circle" uib-tooltip="{{ repaymentFrequencyTooltipKey | translate }}"></i>
+                                                    </label></td>
                                                     <td class="paddedbottom10 width500px" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true">
-
+                                                        <select id="repaymentFrequencyPreset" class="form-control" ng-model="repaymentFrequencyPreset"
+                                                                ng-change="onRepaymentFrequencyPresetChange()"
+                                                                ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
+                                                                ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"></select>
                                                         <input id="repaymentEvery" class="form-control" type="text" name="repaidevery"
-                                                               ng-model="formData.repaymentEvery" ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery" required late-Validate number-only/>
+                                                               ng-model="formData.repaymentEvery" ng-if="repaymentFrequencyPreset === 'CUSTOM'"
+                                                               ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery" required late-Validate number-only/>
                                                         <select id="repaymentFrequencyType" class="form-control" ng-model="formData.repaymentFrequencyType"
+                                                                ng-if="repaymentFrequencyPreset === 'CUSTOM'"
                                                                 ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in loanaccountinfo.termFrequencyTypeOptions"
                                                                 ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"
                                                                 value="{{repaymentFrequencyType.id}}"/>&nbsp;<span ng-show="formData.repaymentFrequencyType == 2">on</span>
@@ -167,6 +175,7 @@
                                                                 value="{{repaymentFrequencyDayOfWeekType.id}}">
                                                             <option value="">{{'label.selectday' | translate}}</option>
                                                         </select>&nbsp;
+                                                        <div ng-show="repaymentFrequencyError"><span class="error">{{repaymentFrequencyError}}</span></div>
                                                     </td>
 
                                                 </tr>
