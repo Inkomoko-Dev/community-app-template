@@ -1136,6 +1136,46 @@
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
 
+                    whatsAppInteractiveTicketResource: defineResource(apiVer + "/whatsapp/interactive/tickets/:ticketId", { ticketId: '@ticketId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
+                        update: { method: 'PUT', params: {} }
+                    }),
+
+                    whatsAppInteractiveTicketMessageResource: defineResource(apiVer + "/whatsapp/interactive/tickets/:ticketId/messages", { ticketId: '@ticketId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    whatsAppInteractiveBusinessHoursResource: defineResource(apiVer + "/whatsapp/interactive/business-hours/:businessHoursId", { businessHoursId: '@businessHoursId' }, {
+                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/business-hours", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        update: { method: 'PUT', params: {} }
+                    }),
+
+                    whatsAppInteractiveDashboardResource: defineResource(apiVer + "/whatsapp/interactive/dashboard", {}, {
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    whatsAppInteractiveConversationResource: defineResource(apiVer + "/whatsapp/interactive/conversations/search", {}, {
+                        search: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    whatsAppInteractiveConfigResource: defineResource(apiVer + "/whatsapp/interactive/config/:areaCode", { areaCode: '@areaCode' }, {
+                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/config", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        update: { method: 'PUT', params: {} }
+                    }),
+
+                    whatsAppInteractiveMenuDefinitionResource: defineResource(apiVer + "/whatsapp/interactive/menus/definitions/:menuKey/:languageCode", { menuKey: '@menuKey', languageCode: '@languageCode' }, {
+                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/menus/definitions", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        update: { method: 'PUT', params: {} }
+                    }),
+
+                    whatsAppInteractiveMenuOptionResource: defineResource(apiVer + "/whatsapp/interactive/menus/options/:optionId", { optionId: '@optionId' }, {
+                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/menus/options", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        save: { method: 'POST', url: apiVer + "/whatsapp/interactive/menus/options", params: {} },
+                        update: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
+                    }),
+
                     entityDatatableChecksResource: defineResource(apiVer + "/entityDatatableChecks/:entityDatatableCheckId/:additionalParam", { entityDatatableCheckId: '@entityDatatableCheckId', additionalParam: '@additionalParam' }, {
                         getAll: { method: 'GET', params: {} },
                         get: { method: 'GET', params: {} },
