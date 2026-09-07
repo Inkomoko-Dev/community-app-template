@@ -788,6 +788,19 @@
                     <form-validate valattributeform="Settings" valattribute="inArrearsTolerance"/>
                 </div>
             </div>
+            <div class="form-group" has-permission="CONFIGURE_RESIDUAL_CLOSURE_LOANPRODUCT">
+                <label class="control-label col-sm-2">{{ 'label.input.residualautoclose' | translate }}</label>
+                <div class="col-sm-2">
+                    <label class="checkbox control-label">
+                        <input id="residualAutoCloseEnabled" type="checkbox" ng-model="formData.residualAutoCloseEnabled">
+                    </label>
+                </div>
+                <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.residualclosurethreshold' | translate }}</label>
+                <div class="col-sm-2">
+                    <input id="residualClosureThreshold" type="text" name="residualClosureThreshold" class="form-control"
+                           number-format ng-model="formData.residualClosureThreshold" ng-required="formData.residualAutoCloseEnabled">
+                </div>
+            </div>
             <div class="form-group">
                 <label class="control-label col-sm-2">{{'label.input.daysinyears' | translate }}<span
                         class="required">*</span>

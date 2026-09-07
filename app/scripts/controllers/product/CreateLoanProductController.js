@@ -2,7 +2,7 @@
     mifosX.controllers = _.extend(module, {
         CreateLoanProductController: function (scope, $rootScope, resourceFactory, location, dateFilter,WizardHandler, translate) {
             scope.restrictDate = new Date();
-            scope.formData = {};
+            scope.formData = {residualAutoCloseEnabled: false};
             scope.loanproduct = {};
             scope.charges = [];
             scope.accountingOptions = ['None','Cash','Accrual(Periodic)','Accrual(Upfront)'];

@@ -1037,6 +1037,9 @@
                                     </td>
                                     <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.type.value}}
+                                        <span class="label label-info" ng-if="transaction.type.id == 32">
+                                            {{'label.residualadjustment.automatic' | translate}}
+                                        </span>
                                         <span class="label label-warning reversed-correction-badge" ng-if="isTransactionReversed(transaction)"
                                               uib-tooltip="{{'tooltip.transaction.reversedcorrection' | translate}}" tooltip-placement="top">
                                             {{reversedBadgeLabelKey(transaction) | translate}}
