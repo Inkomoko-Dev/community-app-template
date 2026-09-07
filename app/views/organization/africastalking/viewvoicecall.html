@@ -52,6 +52,14 @@
                     <td><strong>{{'label.heading.recording' | translate}}</strong></td>
                     <td><a href="{{callLog.recordingUrl}}" target="_blank">{{callLog.recordingUrl}}</a></td>
                 </tr>
+                <tr ng-if="callLog.callPurpose">
+                    <td><strong>{{'label.heading.callpurpose' | translate}}</strong></td>
+                    <td>{{callLog.callPurpose}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.recordingconsent' | translate}}</strong></td>
+                    <td>{{callLog.recordingConsentRequired}} / {{callLog.recordingConsentGiven}}</td>
+                </tr>
             </table>
         </div>
     </div>

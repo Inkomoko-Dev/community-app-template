@@ -3,6 +3,10 @@
         AfricasTalkingCommunicationsController: function (scope, resourceFactory, location) {
             scope.messages = [];
             scope.voiceCalls = [];
+            scope.voiceDashboard = null;
+            scope.voiceCallbacks = [];
+            scope.voiceVoicemails = [];
+            scope.voiceQueue = [];
             scope.connectivityResult = null;
             scope.messagesPerPage = 15;
             scope.voiceCallsPerPage = 15;
@@ -317,6 +321,49 @@
                 });
             };
 
+            scope.loadVoiceDashboard = function (done) {
+                resourceFactory.africasTalkingVoiceDashboardResource.get(function (data) {
+                    scope.voiceDashboard = data;
+                    if (angular.isFunction(done)) {
+                        done();
+                    }
+                });
+            };
+
+            scope.loadVoiceCallbacks = function (done) {
+                resourceFactory.africasTalkingVoiceCallbackResource.getAll(function (data) {
+                    scope.voiceCallbacks = data || [];
+                    if (angular.isFunction(done)) {
+                        done();
+                    }
+                });
+            };
+
+            scope.loadVoiceVoicemails = function (done) {
+                resourceFactory.africasTalkingVoiceVoicemailResource.getAll(function (data) {
+                    scope.voiceVoicemails = data || [];
+                    if (angular.isFunction(done)) {
+                        done();
+                    }
+                });
+            };
+
+            scope.loadVoiceQueue = function (done) {
+                resourceFactory.africasTalkingVoiceQueueResource.getAll(function (data) {
+                    scope.voiceQueue = data || [];
+                    if (angular.isFunction(done)) {
+                        done();
+                    }
+                });
+            };
+
+            scope.dispatchCallback = function (callbackId) {
+                resourceFactory.africasTalkingVoiceCallbackResource.dispatch({ callbackId: callbackId }, {}, function () {
+                    scope.loadVoiceCallbacks();
+                    scope.loadVoiceCalls();
+                });
+            };
+
             scope.testConnectivity = function (channel) {
                 resourceFactory.africasTalkingConnectivityResource.get({ channel: channel || 'all' }, function (data) {
                     scope.connectivityResult = data;
@@ -336,6 +383,10 @@
                         scope.loadMenuDefinitions(function () {
                             scope.loadMenuOptions();
                         });
+                        scope.loadVoiceDashboard();
+                        scope.loadVoiceCallbacks();
+                        scope.loadVoiceVoicemails();
+                        scope.loadVoiceQueue();
                     });
                 });
             };

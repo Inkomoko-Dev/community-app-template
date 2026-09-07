@@ -364,6 +364,86 @@
                     </div>
                 </uib-tab>
 
+                <uib-tab heading="{{'label.heading.voiceoperations' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div ng-if="voiceDashboard">
+                        <table class="table table-bordered table-striped">
+                            <tr><td>{{'label.heading.activeivrsessions' | translate}}</td><td>{{voiceDashboard.activeIvrSessions}}</td></tr>
+                            <tr><td>{{'label.heading.queuedcallers' | translate}}</td><td>{{voiceDashboard.queuedCallers}}</td></tr>
+                            <tr><td>{{'label.heading.pendingcallbacks' | translate}}</td><td>{{voiceDashboard.pendingCallbacks}}</td></tr>
+                            <tr><td>{{'label.heading.voicemailstoday' | translate}}</td><td>{{voiceDashboard.voicemailsToday}}</td></tr>
+                            <tr><td>{{'label.heading.inboundcallstoday' | translate}}</td><td>{{voiceDashboard.inboundCallsToday}}</td></tr>
+                            <tr><td>{{'label.heading.outboundcallstoday' | translate}}</td><td>{{voiceDashboard.outboundCallsToday}}</td></tr>
+                            <tr><td>{{'label.heading.openvoicetickets' | translate}}</td><td>{{voiceDashboard.openVoiceTickets}}</td></tr>
+                        </table>
+                    </div>
+                    <h5>{{'label.heading.pendingcallbacks' | translate}}</h5>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.department' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.submittedondate' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="callback in voiceCallbacks">
+                            <td>{{callback.callerNumber}}</td>
+                            <td>{{callback.departmentCode}}</td>
+                            <td>{{callback.status}}</td>
+                            <td>{{callback.createdDate}}</td>
+                            <td>
+                                <button class="btn btn-default btn-sm" has-permission='CREATE_COMMUNICATION'
+                                        ng-if="callback.status === 'PENDING' || callback.status === 'SCHEDULED'"
+                                        ng-click="dispatchCallback(callback.id)">
+                                    {{'label.button.dispatchcallback' | translate}}
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.voicemails' | translate}}</h5>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.department' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.recording' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="voicemail in voiceVoicemails">
+                            <td>{{voicemail.callerNumber}}</td>
+                            <td>{{voicemail.departmentCode}}</td>
+                            <td>{{voicemail.status}}</td>
+                            <td><a ng-if="voicemail.recordingUrl" href="{{voicemail.recordingUrl}}" target="_blank">Play</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.callqueue' | translate}}</h5>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.department' | translate}}</th>
+                            <th>{{'label.heading.queueposition' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="entry in voiceQueue">
+                            <td>{{entry.callerNumber}}</td>
+                            <td>{{entry.departmentCode}}</td>
+                            <td>{{entry.queuePosition}}</td>
+                            <td>{{entry.status}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </uib-tab>
+
                 <uib-tab heading="{{'label.heading.connectivity' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
                     <br>
                     <div class="row">

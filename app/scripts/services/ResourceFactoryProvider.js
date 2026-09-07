@@ -1132,6 +1132,24 @@
                         save: { method: 'POST', params: {} }
                     }),
 
+                    africasTalkingVoiceDashboardResource: defineResource(apiVer + "/africastalking/voice/dashboard", {}, {
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    africasTalkingVoiceCallbackResource: defineResource(apiVer + "/africastalking/voice/callbacks/:callbackId", { callbackId: '@resourceId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
+                        dispatch: { method: 'POST', params: { callbackId: '@resourceId' }, url: apiVer + "/africastalking/voice/callbacks/:callbackId/dispatch" }
+                    }),
+
+                    africasTalkingVoiceVoicemailResource: defineResource(apiVer + "/africastalking/voice/voicemails", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    africasTalkingVoiceQueueResource: defineResource(apiVer + "/africastalking/voice/queue", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } }
+                    }),
+
                     africasTalkingConnectivityResource: defineResource(apiVer + "/africastalking/connectivity", {}, {
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
