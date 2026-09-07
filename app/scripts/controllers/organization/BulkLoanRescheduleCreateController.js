@@ -166,6 +166,7 @@
                 { id: 2, value: $translate.instant('label.bulkreschedule.months') },
                 { id: 3, value: $translate.instant('label.bulkreschedule.years') }
             ];
+            mifosX.models.RepaymentFrequency.bindTo(scope, scope.formData.reschedulingDetails);
             scope.loanSearch = { term: '' };
 
             var loadTemplate = function (officeId) {

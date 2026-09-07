@@ -188,6 +188,7 @@
                 if(scope.loanaccountinfo.repaymentFrequencyDayOfWeekType != null){
                     scope.formData.repaymentFrequencyDayOfWeekType = scope.loanaccountinfo.repaymentFrequencyDayOfWeekType.id
                 }
+                mifosX.models.RepaymentFrequency.bindTo(scope);
                 scope.formData.interestRatePerPeriod = scope.loanaccountinfo.interestRatePerPeriod;
                 scope.formData.interestRateFrequencyType = scope.loanaccountinfo.interestRateFrequencyType.id;
                 scope.formData.amortizationType = scope.loanaccountinfo.amortizationType.id;
@@ -467,6 +468,9 @@
                         });
 
             scope.submit = function () {
+                if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
+                    return;
+                }
                 // Make sure charges and collaterals are empty before initializing.
                 delete scope.formData.charges;
                 delete scope.formData.collateral;

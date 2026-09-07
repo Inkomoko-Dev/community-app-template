@@ -129,15 +129,28 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-sm-3">{{ 'label.input.repaidevery' | translate }}</label>
-                            <div class="col-sm-2">
+                            <label class="control-label col-sm-3">{{ 'label.input.repaymentfrequency' | translate }}</label>
+                            <div class="col-sm-3">
+                                <select id="repaymentFrequencyPreset" class="form-control"
+                                        ng-model="repaymentFrequencyPreset"
+                                        ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
+                                        ng-change="onRepaymentFrequencyPresetChange()">
+                                    <option value="">{{'label.selectone' | translate}}</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
                                 <input class="form-control" type="text" ng-model="formData.reschedulingDetails.repaymentEvery" number-only-format>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-3" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
                                 <select class="form-control" ng-model="formData.reschedulingDetails.repaymentFrequencyType"
                                         ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in repaymentFrequencyTypeOptions">
                                     <option value="">{{'label.selectone' | translate}}</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="repaymentFrequencyError">
+                            <div class="col-sm-offset-3 col-sm-8">
+                                <span class="error">{{repaymentFrequencyError}}</span>
                             </div>
                         </div>
                         <div class="form-group">

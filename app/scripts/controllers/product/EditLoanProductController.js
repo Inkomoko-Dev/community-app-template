@@ -180,6 +180,7 @@
                 else{
                     scope.allowAttributeConfiguration = false;
                 }
+                mifosX.models.RepaymentFrequency.bindTo(scope);
 
                 if (scope.product.holdGuaranteeFunds) {
                     scope.formData.mandatoryGuarantee = scope.product.productGuaranteeData.mandatoryGuarantee;
@@ -488,6 +489,9 @@
             }
 
             scope.submit = function () {
+                if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(false)) {
+                    return;
+                }
                 scope.paymentChannelToFundSourceMappings = [];
                 scope.feeToIncomeAccountMappings = [];
                 scope.penaltyToIncomeAccountMappings = [];

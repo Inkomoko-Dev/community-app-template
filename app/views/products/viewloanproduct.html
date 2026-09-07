@@ -113,8 +113,8 @@
     </td>
 </tr>
 <tr>
-    <td>{{'label.heading.repayevery' | translate}}:</td>
-    <td colspan="3">{{loanproduct.repaymentEvery}}&nbsp;&nbsp;{{loanproduct.repaymentFrequencyType.value}}</td>
+    <td>{{'label.heading.repaymentfrequency' | translate}}:</td>
+    <td colspan="3">{{loanproduct.repaymentFrequencyName || (loanproduct.repaymentEvery | RepaymentFrequencyLabel:loanproduct.repaymentFrequencyType)}}</td>
 </tr>
 <tr ng-show="!loanproduct.isLinkedToFloatingInterestRates">
     <td>{{'label.heading.nominalinterestrate' | translate}}:</td>

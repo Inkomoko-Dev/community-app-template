@@ -913,6 +913,7 @@
 
             scope.repaymentFrequencyTypeOptions =
                 fallbackRepaymentFrequencyTypeOptions.slice();
+            mifosX.models.RepaymentFrequency.bindTo(scope, scope.formData.reschedulingDetails);
 
             scope.currentInterestRateOptions = [];
             scope.loanProductOptions = [];

@@ -250,6 +250,7 @@
 	    <div class="col-sm-2">
 	        <input type="text" placeholder="{{'label.input.default' | translate}}" id="numberOfRepayments"
 	               name="numofrepayments" class="form-control" ng-model="formData.numberOfRepayments" required
+				   ng-change="onLoanTermOrFrequencyChange()"
 				   late-validate number-only-format/>
 	    </div>
 	    <div class="col-sm-2">
@@ -501,21 +502,41 @@
 	    </div>
 	</div>
 	<div class="form-group">
-	    <label class="control-label col-sm-2">{{ 'label.input.repaidevery' | translate }}</label>
+	    <label class="control-label col-sm-2">{{ 'label.input.repaymentfrequency' | translate }}
+            <span class="required">*</span>
+            <i class="fa fa-question-circle" uib-tooltip="{{ repaymentFrequencyTooltipKey | translate }}"
+               tooltip-append-to-body="true"></i>
+        </label>
 	    <div class="col-sm-2">
+            <select id="repaymentFrequencyPreset" class="form-control"
+                    ng-model="repaymentFrequencyPreset"
+                    ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
+                    ng-change="onRepaymentFrequencyPresetChange()">
+            </select>
+	    </div>
+	    <div class="col-sm-2" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
 	        <input id="repaymentEvery" name="repaymentEvery" class="form-control" type="text"
 	               ng-model="formData.repaymentEvery" required  late-validate number-only-format />
 	    </div>
-	    <div class="col-sm-2">
+	    <div class="col-sm-2" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
 	        <select id="repaymentFrequencyType" class="form-control"
 	                ng-model="formData.repaymentFrequencyType"
 	                ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in product.repaymentFrequencyTypeOptions"
 	                value="{{repaymentFrequencyType.id}}"/>
 	    </div>
+        <div class="col-sm-3" ng-show="repaymentFrequencyPreset !== 'CUSTOM' && formData.numberOfRepayments && formData.repaymentEvery">
+            <span>{{ 'label.input.repaymentfrequency.impliedterm' | translate }}:
+                {{formData.numberOfRepayments * formData.repaymentEvery}} {{ 'label.input.months' | translate }}</span>
+        </div>
 	    <div class="col-sm-2">
 	        <form-validate valattributeform="editloanproductform" valattribute="repaymentEvery"/>
 	    </div>
 	</div>
+    <div class="form-group" ng-show="repaymentFrequencyError">
+        <div class="col-sm-offset-2 col-sm-8">
+            <span class="error">{{repaymentFrequencyError}}</span>
+        </div>
+    </div>
 	<div class="form-group">
 		<label class="control-label col-sm-2">{{ 'label.input.minimum.days.between.disbursal.and.first.repayment'
 			| translate }}</label>

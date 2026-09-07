@@ -113,6 +113,10 @@
                 scope.formData.repaymentEvery = data.repaymentEvery;
                 scope.formData.repaymentFrequencyType = data.repaymentFrequencyType ? data.repaymentFrequencyType.id : null;
                 scope.formData.rescheduleFromDate = findDefaultRescheduleDate(data, scope.transactionTemplateDate);
+                scope.formData.numberOfRepayments = data.numberOfRepayments;
+                scope.formData.loanTermFrequency = data.termFrequency;
+                scope.formData.loanTermFrequencyType = data.termPeriodFrequencyType ? data.termPeriodFrequencyType.id : null;
+                mifosX.models.RepaymentFrequency.bindTo(scope);
             });
 
             scope.cancel = function () {
@@ -120,6 +124,9 @@
             };
 
             scope.submit = function () {
+                if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
+                    return;
+                }
                 var repaymentEvery = normalizeInteger(this.formData.repaymentEvery);
                 var repaymentFrequencyType = normalizeInteger(this.formData.repaymentFrequencyType);
                 var currentRepaymentEvery = normalizeInteger(scope.currentRepaymentEvery);

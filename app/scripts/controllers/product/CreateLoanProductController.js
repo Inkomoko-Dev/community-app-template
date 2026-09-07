@@ -67,6 +67,8 @@
                 scope.formData.digitsAfterDecimal = '2';
                 scope.formData.inMultiplesOf = '0';
                 scope.formData.repaymentFrequencyType = scope.product.repaymentFrequencyType.id;
+                scope.formData.repaymentEvery = 1;
+                mifosX.models.RepaymentFrequency.bindTo(scope);
                 scope.formData.interestRateFrequencyType = scope.product.interestRateFrequencyType.id;
                 scope.formData.amortizationType = scope.product.amortizationType.id;
                 scope.formData.interestType = scope.product.interestType.id;
@@ -319,6 +321,9 @@
 	    };
 
             scope.submit = function () {
+                if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(false)) {
+                    return;
+                }
                 var reqFirstDate = dateFilter(scope.date.first, scope.df);
                 var reqSecondDate = dateFilter(scope.date.second, scope.df);
                 scope.paymentChannelToFundSourceMappings = [];

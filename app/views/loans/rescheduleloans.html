@@ -46,16 +46,30 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-sm-2 width20" style="text-align: left;">{{ 'label.input.repaidevery' | translate }}</label>
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{ 'label.input.repaymentfrequency' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{ repaymentFrequencyTooltipKey | translate }}"></i>
+                </label>
                 <div class="col-sm-2 paddedbottom10 paddedtop">
+                    <select id="repaymentFrequencyPreset" class="form-control"
+                            ng-model="repaymentFrequencyPreset"
+                            ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
+                            ng-change="onRepaymentFrequencyPresetChange()">
+                    </select>
+                </div>
+                <div class="col-sm-2 paddedbottom10 paddedtop" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
                     <input id="repaymentEvery" name="repaymentEvery" class="form-control"
                            type="text" ng-model="formData.repaymentEvery" late-validate number-only-format />
                 </div>
-                <div class="col-sm-2 paddedbottom10 paddedtop">
+                <div class="col-sm-2 paddedbottom10 paddedtop" ng-if="repaymentFrequencyPreset === 'CUSTOM'">
                     <select id="repaymentFrequencyType" class="form-control"
                             ng-model="formData.repaymentFrequencyType"
                             ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in repaymentFrequencyTypeOptions">
                     </select>
+                </div>
+            </div>
+            <div class="form-group" ng-show="repaymentFrequencyError">
+                <div class="col-sm-offset-2 col-sm-8">
+                    <span class="error">{{repaymentFrequencyError}}</span>
                 </div>
             </div>
 
