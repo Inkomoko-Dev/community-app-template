@@ -937,6 +937,16 @@
 										<td><span class="padded-td">{{ 'label.heading.yes' | translate }}</span>
 										</td>
 									</tr>
+									<tr data-ng-show="client.migrated && client.migratedOnDate">
+										<th class="table-bold">{{ 'label.input.migratedOnDate' | translate }}</th>
+										<td><span class="padded-td">{{client.migratedOnDate | DateFormat}}</span>
+										</td>
+									</tr>
+									<tr data-ng-show="client.migrated && client.migratedFromOfficeName">
+										<th class="table-bold">{{ 'label.input.migratedFromOffice' | translate }}</th>
+										<td><span class="padded-td">{{client.migratedFromOfficeName}}</span>
+										</td>
+									</tr>
 									<tr data-ng-show="client.mobileNo">
 										<th class="table-bold">{{ 'label.input.mobilenumber' | translate }}</th>
 										<td><span class="padded-td">{{client.mobileNo}}</span>
