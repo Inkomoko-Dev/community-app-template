@@ -1147,7 +1147,7 @@
                     }),
 
                     whatsAppInteractiveBusinessHoursResource: defineResource(apiVer + "/whatsapp/interactive/business-hours/:businessHoursId", { businessHoursId: '@businessHoursId' }, {
-                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/business-hours", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/whatsapp/interactive/business-hours", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         update: { method: 'PUT', params: {} }
                     }),
 
@@ -1160,18 +1160,18 @@
                     }),
 
                     whatsAppInteractiveConfigResource: defineResource(apiVer + "/whatsapp/interactive/config/:areaCode", { areaCode: '@areaCode' }, {
-                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/config", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/whatsapp/interactive/config", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         update: { method: 'PUT', params: {} }
                     }),
 
                     whatsAppInteractiveMenuDefinitionResource: defineResource(apiVer + "/whatsapp/interactive/menus/definitions/:menuKey/:languageCode", { menuKey: '@menuKey', languageCode: '@languageCode' }, {
-                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/menus/definitions", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/whatsapp/interactive/menus/definitions", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         update: { method: 'PUT', params: {} }
                     }),
 
                     whatsAppInteractiveMenuOptionResource: defineResource(apiVer + "/whatsapp/interactive/menus/options/:optionId", { optionId: '@optionId' }, {
-                        getAll: { method: 'GET', url: apiVer + "/whatsapp/interactive/menus/options", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
-                        save: { method: 'POST', url: apiVer + "/whatsapp/interactive/menus/options", params: {} },
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/whatsapp/interactive/menus/options", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        save: { method: 'POST', url: baseUrl + apiVer + "/whatsapp/interactive/menus/options", params: {} },
                         update: { method: 'PUT', params: {} },
                         delete: { method: 'DELETE', params: {} }
                     }),

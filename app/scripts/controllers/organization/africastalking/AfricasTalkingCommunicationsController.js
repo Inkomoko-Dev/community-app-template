@@ -49,10 +49,10 @@
             };
             scope.menuDefinitions = [];
             scope.menuOptions = [];
-            scope.menuFilter = { menuKey: '', languageCode: 'en' };
+            scope.menuFilter = { menuKey: 'MAIN', languageCode: 'en' };
             scope.menuActionTypes = ['LOAN_SERVICE', 'CONTENT', 'ADVISOR_HANDOFF', 'LANGUAGE_SELECT', 'SUBMENU'];
             scope.newMenuOption = {
-                menuKey: '',
+                menuKey: 'MAIN',
                 languageCode: 'en',
                 optionNumber: 1,
                 optionLabel: '',
