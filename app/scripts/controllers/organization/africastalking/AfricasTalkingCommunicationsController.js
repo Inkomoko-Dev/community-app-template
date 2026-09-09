@@ -65,12 +65,33 @@
                 enabled: true
             };
 
+            scope.voiceMenuDefinitions = [];
+            scope.voiceMenuOptions = [];
+            scope.voiceMenuFilter = { menuKey: 'MAIN', languageCode: 'en' };
+            scope.voiceMenuActionTypes = [
+                'SUBMENU', 'DIAL', 'SAY', 'HANGUP', 'LANGUAGE_SELECT',
+                'LOAN_SERVICE', 'QUEUE', 'CALLBACK_REQUEST', 'RECORD_VOICEMAIL'
+            ];
+            scope.newVoiceMenuOption = {
+                menuKey: 'MAIN',
+                languageCode: 'en',
+                optionDigit: 1,
+                optionLabel: '',
+                actionType: 'SUBMENU',
+                actionTarget: '',
+                enabled: true
+            };
+
             scope.routeToMessage = function (id) {
                 location.path('/viewcommunication/' + id);
             };
 
             scope.routeToVoiceCall = function (id) {
                 location.path('/viewvoicecall/' + id);
+            };
+
+            scope.routeToVoiceCallback = function (id) {
+                location.path('/viewvoicecallback/' + id);
             };
 
             scope.routeToTicket = function (id) {
@@ -321,6 +342,77 @@
                 });
             };
 
+            scope.loadVoiceMenuDefinitions = function (done) {
+                var params = {};
+                if (scope.voiceMenuFilter.menuKey) {
+                    params.menuKey = scope.voiceMenuFilter.menuKey;
+                }
+                resourceFactory.africasTalkingVoiceIvrMenuDefinitionResource.getAll(params, function (data) {
+                    scope.voiceMenuDefinitions = data || [];
+                    if (angular.isFunction(done)) {
+                        done();
+                    }
+                });
+            };
+
+            scope.loadVoiceMenuOptions = function (done) {
+                var params = {};
+                if (scope.voiceMenuFilter.menuKey) {
+                    params.menuKey = scope.voiceMenuFilter.menuKey;
+                }
+                if (scope.voiceMenuFilter.languageCode) {
+                    params.languageCode = scope.voiceMenuFilter.languageCode;
+                }
+                resourceFactory.africasTalkingVoiceIvrMenuOptionResource.getAll(params, function (data) {
+                    scope.voiceMenuOptions = data || [];
+                    if (angular.isFunction(done)) {
+                        done();
+                    }
+                });
+            };
+
+            scope.saveVoiceMenuDefinition = function (definition) {
+                resourceFactory.africasTalkingVoiceIvrMenuDefinitionResource.update({
+                    menuKey: definition.menuKey,
+                    languageCode: definition.languageCode
+                }, {
+                    promptText: definition.promptText,
+                    parentMenuKey: definition.parentMenuKey,
+                    enabled: definition.enabled
+                });
+            };
+
+            scope.saveVoiceMenuOption = function (option) {
+                resourceFactory.africasTalkingVoiceIvrMenuOptionResource.update({ optionId: option.id }, {
+                    optionLabel: option.optionLabel,
+                    optionDigit: option.optionDigit,
+                    actionType: option.actionType,
+                    actionTarget: option.actionTarget,
+                    enabled: option.enabled
+                });
+            };
+
+            scope.deleteVoiceMenuOption = function (optionId) {
+                resourceFactory.africasTalkingVoiceIvrMenuOptionResource.delete({ optionId: optionId }, function () {
+                    scope.loadVoiceMenuOptions();
+                });
+            };
+
+            scope.createVoiceMenuOption = function () {
+                resourceFactory.africasTalkingVoiceIvrMenuOptionResource.save({}, scope.newVoiceMenuOption, function () {
+                    scope.newVoiceMenuOption = {
+                        menuKey: scope.voiceMenuFilter.menuKey || '',
+                        languageCode: scope.voiceMenuFilter.languageCode || 'en',
+                        optionDigit: 1,
+                        optionLabel: '',
+                        actionType: 'SUBMENU',
+                        actionTarget: '',
+                        enabled: true
+                    };
+                    scope.loadVoiceMenuOptions();
+                });
+            };
+
             scope.loadVoiceDashboard = function (done) {
                 resourceFactory.africasTalkingVoiceDashboardResource.get(function (data) {
                     scope.voiceDashboard = data;
@@ -382,6 +474,9 @@
                         scope.loadBusinessHours();
                         scope.loadMenuDefinitions(function () {
                             scope.loadMenuOptions();
+                        });
+                        scope.loadVoiceMenuDefinitions(function () {
+                            scope.loadVoiceMenuOptions();
                         });
                         scope.loadVoiceDashboard();
                         scope.loadVoiceCallbacks();

@@ -1133,6 +1133,9 @@
             .when('/viewvoicecall/:callId', {
                 templateUrl: 'views/organization/africastalking/viewvoicecall.html'
             })
+            .when('/viewvoicecallback/:callbackId', {
+                templateUrl: 'views/organization/africastalking/viewvoicecallback.html'
+            })
             .when('/viewwhatsappticket/:ticketId', {
                 templateUrl: 'views/organization/africastalking/viewwhatsappticket.html'
             })
