@@ -23,7 +23,7 @@
     "nvd3": "~v1.1.15-beta",
     "angularjs-file-upload": "12.0.1",
     "angular-sanitize": "1.7.9",
-    "ckeditor": "^4.14.0",
+    "ckeditor": "4.22.1",
     "ng-idle": "v0.3.5",
     "q": "1.0.1",
     "angular-dynamic-locale": "^0.1.37",
@@ -43,6 +43,7 @@
     "angular": "1.7.9",
     "d3": "3.5.12",
     "angular-translate": "^2.18.2",
-    "angular-resource": "^1.7.9"
+    "angular-resource": "^1.7.9",
+    "ckeditor": "4.22.1"
   }
 }

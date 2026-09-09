@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        EditTemplateController: function (scope, resourceFactory, location, routeParams, $rootScope) {
+        EditTemplateController: function (scope, resourceFactory, location, routeParams, $rootScope, $timeout) {
             scope.mappers = [];
             scope.formData = {};
             resourceFactory.templateResource.getTemplateDetails({templateId: routeParams.id, resourceType: 'template'}, function (data) {
@@ -49,9 +49,35 @@
                     scope.loanKeys();
                     scope.savingsAccountKeys();
                     scope.groupKeys();
-                    console.log(data.template.text);
-                CKEDITOR.instances.templateeditor.insertHtml(data.template.text);
+                    scope.setEditorText(data.template.text);
             });
+
+            scope.editorInstance = function () {
+                return (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances) ? CKEDITOR.instances.templateeditor : null;
+            };
+
+            scope.editorText = function () {
+                var editor = scope.editorInstance();
+                return editor ? editor.getData() : (scope.formData.text || '');
+            };
+
+            scope.setEditorText = function (value) {
+                var editor = scope.editorInstance();
+                if (editor) {
+                    editor.setData(value);
+                } else {
+                    scope.formData.text = value;
+                }
+            };
+
+            scope.insertEditorText = function (value) {
+                var editor = scope.editorInstance();
+                if (editor) {
+                    editor.insertText(value);
+                } else {
+                    scope.formData.text = (scope.formData.text || '') + value;
+                }
+            };
 
             scope.clientKeys = function () {
                 scope.clientTemplateKeys = ["{{client.id}}",
@@ -503,7 +529,7 @@
             }
 
             scope.templateKeySelected = function (templateKey) {
-                CKEDITOR.instances.templateeditor.insertText(templateKey);
+                scope.insertEditorText(templateKey);
             }
 
             scope.addMapperKeyValue = function () {
@@ -526,21 +552,70 @@
                 }
             }
 
+            scope.extractError = function (response) {
+                var data = response ? response.data : null;
+                if (data) {
+                    if (data.errors && data.errors.length > 0) {
+                        return data.errors[0].defaultUserMessage || data.errors[0].developerMessage;
+                    }
+                    if (data.defaultUserMessage) {
+                        return data.defaultUserMessage;
+                    }
+                    if (data.developerMessage) {
+                        return data.developerMessage;
+                    }
+                }
+                if (response && response.status) {
+                    return 'Request failed with status ' + response.status + '.';
+                }
+                return 'The template could not be saved. Please try again.';
+            };
+
+            scope.serverError = null;
+            scope.successMessage = null;
+            scope.saving = false;
+            scope.submitted = false;
+
+            scope.bodyMissing = function () {
+                var text = scope.formData.text;
+                return !text || !String(text).replace(/<[^>]*>/g, '').trim();
+            };
+
             scope.submit = function () {
+                if (scope.saving) {
+                    return;
+                }
+                scope.serverError = null;
+                scope.successMessage = null;
+                scope.submitted = true;
+                scope.formData.text = scope.editorText();
+
+                if ((scope.templateForm && scope.templateForm.$invalid) || scope.bodyMissing()) {
+                    return;
+                }
+
                 for (var i in scope.mappers) {
                     delete scope.mappers[i].defaultAddIcon;
                 }
-                this.formData.mappers = scope.mappers;
-                this.formData.text = CKEDITOR.instances.templateeditor.getData();
-                resourceFactory.templateResource.update({templateId: routeParams.id}, this.formData, function (data) {
-                    location.path('/viewtemplate/' + data.resourceId);
+                scope.formData.mappers = scope.mappers;
+                scope.saving = true;
+
+                resourceFactory.templateResource.update({templateId: routeParams.id}, scope.formData, function (data) {
+                    scope.saving = false;
+                    scope.successMessage = 'label.template.message.updated';
+                    $timeout(function () {
+                        location.path('/viewtemplate/' + data.resourceId);
+                    }, 2000);
+                }, function (response) {
+                    scope.saving = false;
+                    scope.serverError = scope.extractError(response);
                 });
             }
 
 
         }
     });
-    mifosX.ng.application.controller('EditTemplateController', ['$scope', 'ResourceFactory', '$location', '$routeParams', '$rootScope', mifosX.controllers.EditTemplateController]).run(function ($log) {
+    mifosX.ng.application.controller('EditTemplateController', ['$scope', 'ResourceFactory', '$location', '$routeParams', '$rootScope', '$timeout', mifosX.controllers.EditTemplateController]).run(function ($log) {
         $log.info("EditTemplateController initialized");
     });
 }(mifosX.controllers || {}));
