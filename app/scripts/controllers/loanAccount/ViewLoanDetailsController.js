@@ -1,6 +1,8 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $window, interval, webStorage, localStorageService) {
+            scope.bankDisbursementResult = $rootScope.bankDisbursementResult;
+            delete $rootScope.bankDisbursementResult;
             scope.loandocuments = [];
             scope.report = false;
             scope.hidePentahoReport = true;
