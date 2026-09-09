@@ -265,6 +265,14 @@
                                             <td>{{'label.heading.preview' | translate}}</td>
                                             <td>{{previewMessageText}}</td>
                                         </tr>
+                                        <tr ng-if="previewEnqueueableCount !== undefined">
+                                            <td>Enqueueable recipients</td>
+                                            <td>{{previewEnqueueableCount}}</td>
+                                        </tr>
+                                        <tr ng-if="previewSkippedCount !== undefined">
+                                            <td>Skipped recipients</td>
+                                            <td>{{previewSkippedCount}}</td>
+                                        </tr>
                                     </table>
                                 </div>
                                 <div class="form-group">
