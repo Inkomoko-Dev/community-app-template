@@ -111,6 +111,259 @@
                                              pagination-id="voicePagination"></dir-pagination-controls>
                 </uib-tab>
 
+                <uib-tab heading="{{'label.heading.advisorinbox' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <select class="form-control" ng-model="selectedTicketStatus" ng-change="loadSupportTickets()">
+                                <option value="ALL">{{'label.heading.all' | translate}}</option>
+                                <option ng-repeat="status in ticketStatuses" value="{{status}}">{{status}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.ticketnumber' | translate}}</th>
+                            <th>{{'label.heading.mobilenumber' | translate}}</th>
+                            <th>{{'label.heading.client' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.priority' | translate}}</th>
+                            <th>{{'label.heading.assignedto' | translate}}</th>
+                            <th>{{'label.heading.submittedondate' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="pointer-main" ng-repeat="ticket in supportTickets">
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.ticketNumber}}</td>
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.phoneNumber}}</td>
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.clientDisplayName}}</td>
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.status}}</td>
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.priority}}</td>
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.assignedStaffName}}</td>
+                            <td class="pointer" ng-click="routeToTicket(ticket.id)">{{ticket.createdDate}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.interactivedashboard' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div ng-if="interactiveDashboard">
+                        <table class="table table-bordered table-striped">
+                            <tr><td>{{'label.heading.activesessions' | translate}}</td><td>{{interactiveDashboard.activeSessions}}</td></tr>
+                            <tr><td>{{'label.heading.clientactivesessions' | translate}}</td><td>{{interactiveDashboard.clientActiveSessions}}</td></tr>
+                            <tr><td>{{'label.heading.staffactivesessions' | translate}}</td><td>{{interactiveDashboard.staffActiveSessions}}</td></tr>
+                            <tr><td>{{'label.heading.opentickets' | translate}}</td><td>{{interactiveDashboard.openTickets}}</td></tr>
+                            <tr><td>{{'label.heading.slabreachedtickets' | translate}}</td><td>{{interactiveDashboard.slaBreachedTickets}}</td></tr>
+                            <tr><td>{{'label.heading.inboundmessagestoday' | translate}}</td><td>{{interactiveDashboard.inboundMessagesToday}}</td></tr>
+                            <tr><td>{{'label.heading.outboundmessagestoday' | translate}}</td><td>{{interactiveDashboard.outboundMessagesToday}}</td></tr>
+                            <tr><td>{{'label.heading.optedoutclients' | translate}}</td><td>{{interactiveDashboard.optedOutClients}}</td></tr>
+                            <tr><td>{{'label.heading.ticketsresolvedtoday' | translate}}</td><td>{{interactiveDashboard.ticketsResolvedToday}}</td></tr>
+                        </table>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.conversationsearch' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3">
+                            <input class="form-control" ng-model="conversationSearch.phoneNumber" placeholder="{{'label.heading.mobilenumber' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <input class="form-control" ng-model="conversationSearch.clientId" placeholder="{{'label.heading.clientid' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-3">
+                            <input class="form-control" ng-model="conversationSearch.text" placeholder="{{'label.heading.message' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <input class="form-control" type="date" ng-model="conversationSearch.fromDate">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <input class="form-control" type="date" ng-model="conversationSearch.toDate">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3">
+                            <select class="form-control" ng-model="conversationSearch.recipientType">
+                                <option value="">{{'label.heading.all' | translate}}</option>
+                                <option value="CLIENT">CLIENT</option>
+                                <option value="STAFF">STAFF</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <button class="btn btn-primary" ng-click="searchConversations()">{{'label.button.search' | translate}}</button>
+                        </div>
+                    </div>
+                    <br>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.mobilenumber' | translate}}</th>
+                            <th>{{'label.heading.client' | translate}}</th>
+                            <th>{{'label.heading.direction' | translate}}</th>
+                            <th>{{'label.heading.recipienttype' | translate}}</th>
+                            <th>{{'label.heading.message' | translate}}</th>
+                            <th>{{'label.heading.submittedondate' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="result in conversationResults">
+                            <td>{{result.phoneNumber}}</td>
+                            <td>{{result.clientDisplayName}}</td>
+                            <td>{{result.direction}}</td>
+                            <td>{{result.recipientType}}</td>
+                            <td>{{result.messageBody}}</td>
+                            <td>{{result.createdDate}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.interactiveconfig' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
+                    <br>
+                    <div class="alert alert-success" ng-if="configSaveMessage">{{configSaveMessage}}</div>
+                    <div class="panel panel-default" ng-repeat="area in configAreas">
+                        <div class="panel-heading"><strong>{{area.label}}</strong> ({{area.area}})</div>
+                        <div class="panel-body">
+                            <p ng-if="area.managedExternally" class="text-muted">
+                                {{'label.heading.managedexternally' | translate}}: {{area.externalEndpoint}}
+                            </p>
+                            <div ng-if="!area.managedExternally">
+                                <div class="form-group" ng-repeat="(key, value) in area.settings">
+                                    <label>{{key}}</label>
+                                    <input ng-if="!isBooleanSetting(key, value)" class="form-control" ng-model="area.settings[key]">
+                                    <div ng-if="isBooleanSetting(key, value)">
+                                        <input type="checkbox"
+                                               ng-checked="asBoolean(area.settings[key])"
+                                               ng-click="setBooleanSetting(area, key, !asBoolean(area.settings[key]))">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn-sm" ng-click="saveConfigArea(area)">
+                                    {{'label.button.save' | translate}}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.businesshours' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.day' | translate}}</th>
+                            <th>{{'label.heading.opentime' | translate}}</th>
+                            <th>{{'label.heading.closetime' | translate}}</th>
+                            <th>{{'label.heading.enabled' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="hours in businessHours">
+                            <td>{{dayNames[hours.dayOfWeek]}}</td>
+                            <td><input class="form-control" ng-model="hours.openTime"></td>
+                            <td><input class="form-control" ng-model="hours.closeTime"></td>
+                            <td><input type="checkbox" ng-model="hours.enabled"></td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-click="saveBusinessHours(hours)">
+                                    {{'label.button.save' | translate}}
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.interactivemenus' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3">
+                            <input class="form-control" ng-model="menuFilter.menuKey" placeholder="{{'label.heading.menukey' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <input class="form-control" ng-model="menuFilter.languageCode" placeholder="{{'label.heading.language' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <button class="btn btn-default" ng-click="loadMenuDefinitions(); loadMenuOptions();">
+                                {{'label.button.refresh' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <h5>{{'label.heading.menudefinitions' | translate}}</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.menukey' | translate}}</th>
+                            <th>{{'label.heading.language' | translate}}</th>
+                            <th>{{'label.heading.headertext' | translate}}</th>
+                            <th>{{'label.heading.parentmenu' | translate}}</th>
+                            <th>{{'label.heading.enabled' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="definition in menuDefinitions">
+                            <td>{{definition.menuKey}}</td>
+                            <td>{{definition.languageCode}}</td>
+                            <td><input class="form-control" ng-model="definition.headerText"></td>
+                            <td><input class="form-control" ng-model="definition.parentMenuKey"></td>
+                            <td><input type="checkbox" ng-model="definition.enabled"></td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-click="saveMenuDefinition(definition)">
+                                    {{'label.button.save' | translate}}
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.menuoptions' | translate}}</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="graybg">
+                            <th>#</th>
+                            <th>{{'label.heading.label' | translate}}</th>
+                            <th>{{'label.heading.actiontype' | translate}}</th>
+                            <th>{{'label.heading.actiontarget' | translate}}</th>
+                            <th>{{'label.heading.enabled' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="option in menuOptions">
+                            <td><input class="form-control" ng-model="option.optionNumber" style="width:60px"></td>
+                            <td><input class="form-control" ng-model="option.optionLabel"></td>
+                            <td>
+                                <select class="form-control" ng-model="option.actionType" ng-options="type for type in menuActionTypes"></select>
+                            </td>
+                            <td><input class="form-control" ng-model="option.actionTarget"></td>
+                            <td><input type="checkbox" ng-model="option.enabled"></td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-click="saveMenuOption(option)">{{'label.button.save' | translate}}</button>
+                                <button class="btn btn-danger btn-sm" ng-click="deleteMenuOption(option.id)">{{'label.button.delete' | translate}}</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.addmenuoption' | translate}}</h5>
+                    <div class="row">
+                        <div class="col-sm-2"><input class="form-control" ng-model="newMenuOption.menuKey" placeholder="{{'label.heading.menukey' | translate}}"></div>
+                        <div class="col-sm-2"><input class="form-control" ng-model="newMenuOption.languageCode" placeholder="{{'label.heading.language' | translate}}"></div>
+                        <div class="col-sm-1"><input class="form-control" ng-model="newMenuOption.optionNumber" placeholder="#"></div>
+                        <div class="col-sm-2"><input class="form-control" ng-model="newMenuOption.optionLabel" placeholder="{{'label.heading.label' | translate}}"></div>
+                        <div class="col-sm-2">
+                            <select class="form-control" ng-model="newMenuOption.actionType" ng-options="type for type in menuActionTypes"></select>
+                        </div>
+                        <div class="col-sm-2"><input class="form-control" ng-model="newMenuOption.actionTarget" placeholder="{{'label.heading.actiontarget' | translate}}"></div>
+                        <div class="col-sm-1">
+                            <button class="btn btn-primary" ng-click="createMenuOption()">{{'label.button.add' | translate}}</button>
+                        </div>
+                    </div>
+                </uib-tab>
+
                 <uib-tab heading="{{'label.heading.connectivity' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
                     <br>
                     <div class="row">

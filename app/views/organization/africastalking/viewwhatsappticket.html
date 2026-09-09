@@ -1,0 +1,80 @@
+
+<div class="content-container" ng-controller="ViewWhatsAppTicketController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/africastalking">{{'label.anchor.africastalking' | translate}}</a></li>
+        <li class="active">{{'label.heading.whatsappticket' | translate}}</li>
+    </ul>
+    <div class="card" ng-if="ticket">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.heading.whatsappticket' | translate}} #{{ticket.ticketNumber}}</h4>
+            </div>
+            <br>
+            <div class="alert alert-danger" ng-if="saveError">{{saveError}}</div>
+            <div class="alert alert-success" ng-if="saveMessage">{{saveMessage}}</div>
+            <table class="table table-bordered table-striped">
+                <tr><td>{{'label.heading.mobilenumber' | translate}}</td><td>{{ticket.phoneNumber}}</td></tr>
+                <tr><td>{{'label.heading.client' | translate}}</td><td>{{ticket.clientDisplayName || ticket.clientId}}</td></tr>
+                <tr><td>{{'label.heading.category' | translate}}</td><td>{{ticket.category}}</td></tr>
+                <tr><td>{{'label.heading.priority' | translate}}</td><td>{{ticket.priority}}</td></tr>
+                <tr><td>{{'label.heading.status' | translate}}</td><td>{{ticket.status}}</td></tr>
+                <tr><td>{{'label.heading.assignedto' | translate}}</td><td>{{ticket.assignedStaffName || '-'}}</td></tr>
+                <tr><td>{{'label.heading.sladue' | translate}}</td><td>{{ticket.slaDueAt}} <span ng-if="ticket.slaBreached" class="text-danger">({{'label.heading.slabreached' | translate}})</span></td></tr>
+                <tr><td>{{'label.heading.customerrequest' | translate}}</td><td>{{ticket.customerMessage}}</td></tr>
+                <tr><td>{{'label.heading.summary' | translate}}</td><td>{{ticket.summary}}</td></tr>
+            </table>
+            <h5>{{'label.heading.updateticket' | translate}}</h5>
+            <form class="form-horizontal" ng-submit="saveTicket()">
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.heading.status' | translate}}</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" ng-model="updateForm.status" ng-options="status for status in ticketStatuses"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.heading.assignedto' | translate}}</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" ng-model="updateForm.assignedStaffId"
+                                ng-options="staff.id as staff.displayName for staff in staff">
+                            <option value="">{{'label.selectone' | translate}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.heading.summary' | translate}}</label>
+                    <div class="col-sm-6">
+                        <textarea class="form-control" rows="3" ng-model="updateForm.summary"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-6">
+                        <button type="submit" class="btn btn-primary" has-permission='CONFIGURE_AFRICASTALKING'>
+                            {{'label.button.save' | translate}}
+                        </button>
+                        <button type="button" class="btn btn-default" ng-click="backToInbox()">
+                            {{'label.button.back' | translate}}
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <h5>{{'label.heading.conversationhistory' | translate}}</h5>
+            <table class="table">
+                <thead>
+                <tr class="graybg">
+                    <th>{{'label.heading.direction' | translate}}</th>
+                    <th>{{'label.heading.message' | translate}}</th>
+                    <th>{{'label.heading.submittedondate' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="message in messages">
+                    <td>{{message.direction}}</td>
+                    <td>{{message.messageBody}}</td>
+                    <td>{{message.createdDate}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
