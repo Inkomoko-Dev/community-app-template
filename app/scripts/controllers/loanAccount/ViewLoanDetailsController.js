@@ -820,6 +820,19 @@
                         scope.historicalPenaltyWaivers = [];
                     });
 
+                    scope.loanClassification = {};
+                    scope.loanClassificationAudit = [];
+                    resourceFactory.loanClassificationResource.get({ loanId: routeParams.id }, function (data) {
+                        scope.loanClassification = data || {};
+                    }, function () {
+                        scope.loanClassification = {};
+                    });
+                    resourceFactory.loanClassificationAuditResource.getAll({ loanId: routeParams.id }, function (data) {
+                        scope.loanClassificationAudit = data || [];
+                    }, function () {
+                        scope.loanClassificationAudit = [];
+                    });
+
                     if (scope.loandetails.charges) {
                         scope.charges = scope.loandetails.charges;
                         for (var i in scope.charges) {
@@ -1856,6 +1869,38 @@
                 $scope.cancel = function () {
                     $uibModalInstance.dismiss('cancel');
                 };
+            };
+
+            scope.openOverrideClassification = function () {
+                $uibModal.open({
+                    templateUrl: 'overrideclassification.html',
+                    controller: function ($scope, $uibModalInstance) {
+                        $scope.overrideForm = {
+                            classification: scope.loanClassification.classification || 1,
+                            reason: ''
+                        };
+                        $scope.codes = [
+                            { id: 1, label: '1 — Normal/Performing' },
+                            { id: 2, label: '2 — Watch' },
+                            { id: 3, label: '3 — Substandard' },
+                            { id: 4, label: '4 — Doubtful' },
+                            { id: 5, label: '5 — Loss' },
+                            { id: 6, label: '6 — Write-off' }
+                        ];
+                        $scope.submit = function () {
+                            resourceFactory.loanClassificationResource.override({ loanId: routeParams.id }, {
+                                classification: $scope.overrideForm.classification,
+                                reason: $scope.overrideForm.reason
+                            }, function () {
+                                $uibModalInstance.close();
+                                fetchLoanAccountDetails();
+                            });
+                        };
+                        $scope.cancel = function () {
+                            $uibModalInstance.dismiss('cancel');
+                        };
+                    }
+                });
             };
 
             // New buttons for credit bureau summary and different verification types

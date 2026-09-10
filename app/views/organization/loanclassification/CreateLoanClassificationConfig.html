@@ -1,0 +1,51 @@
+<div class="content-container" ng-controller="CreateLoanClassificationConfigController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/loanclassification">{{'label.anchor.loanclassification' | translate}}</a></li>
+        <li class="active">{{'label.heading.createclassificationconfig' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <form name="createclassificationform" novalidate class="form-horizontal" rc-submit="submit()">
+                <api-validate></api-validate>
+                <fieldset>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.country' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <select id="countryId" name="countryId" ng-model="formData.countryId" class="form-control"
+                                    ng-options="country.id as country.name for country in countryOptions" required>
+                                <option value="">{{'label.selectcountry' | translate}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">{{'label.help.loanclassification.bands' | translate}}</div>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.classification' | translate}}</th>
+                            <th>{{'label.heading.minimumdaysinarrears' | translate}}</th>
+                            <th>{{'label.heading.maximumdaysinarrears' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="band in formData.thresholds">
+                            <td>
+                                <select class="form-control" ng-model="band.classification" ng-options="n as n for n in [1,2,3,4,5]"></select>
+                            </td>
+                            <td><input class="form-control" type="number" min="0" ng-model="band.minDaysInArrears" required></td>
+                            <td><input class="form-control" type="number" min="0" ng-model="band.maxDaysInArrears" placeholder="{{'label.input.openended' | translate}}"></td>
+                            <td><button type="button" class="btn btn-danger" ng-click="removeBand($index)" ng-if="formData.thresholds.length > 1"><i class="fa fa-times"></i></button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-default" ng-click="addBand()"><i class="fa fa-plus"></i> {{'label.button.addband' | translate}}</button>
+                    <div class="col-md-offset-2 paddedtop">
+                        <a href="#/loanclassification" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
+                        <button type="submit" class="btn btn-primary" has-permission='CREATE_LOANCLASSIFICATIONCONFIG'>{{'label.button.save' | translate}}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1297,6 +1297,27 @@
                     disbursementProviderResource: defineResource(apiVer + "/disbursement-providers/:providerId", { providerId: '@providerId' }, {
                         getAll: { method: 'GET', params: {}, isArray: true },
                         get: { method: 'GET', params: {} }
+                    }),
+                    loanClassificationConfigResource: defineResource(apiVer + "/loanclassification/countries/:configId", { configId: '@configId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, url: baseUrl + apiVer + '/loanclassification/countries' },
+                        get: { method: 'GET', params: {} },
+                        template: { method: 'GET', params: {}, url: baseUrl + apiVer + '/loanclassification/countries/template' },
+                        save: { method: 'POST', params: {}, url: baseUrl + apiVer + '/loanclassification/countries' },
+                        update: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
+                    }),
+                    loanClassificationCodesResource: defineResource(apiVer + "/loanclassification/codes", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    loanClassificationSummaryResource: defineResource(apiVer + "/loanclassification/summary", {}, {
+                        get: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    loanClassificationResource: defineResource(apiVer + "/loans/:loanId/classification", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {} },
+                        override: { method: 'POST', params: {}, url: baseUrl + apiVer + '/loans/:loanId/classification/override' }
+                    }),
+                    loanClassificationAuditResource: defineResource(apiVer + "/loans/:loanId/classification/audit", { loanId: '@loanId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
                     })
                 };
             }];

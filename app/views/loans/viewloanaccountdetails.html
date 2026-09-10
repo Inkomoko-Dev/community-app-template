@@ -611,6 +611,26 @@
                             <th class="table-bold-loan">{{'label.heading.disburseamount' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.principal | number}}</span></td>
                         </tr>
+                        <tr>
+                            <th class="table-bold-loan">{{'label.heading.classification' | translate}}</th>
+                            <td>
+                                <span class="padded-td" ng-if="loanClassification.classification">
+                                    {{loanClassification.classification}} — {{loanClassification.classificationLabel}}
+                                    <span ng-if="loanClassification.overrideActive" class="label label-warning">{{'label.heading.overrides' | translate}}</span>
+                                </span>
+                                <div class="text-danger" ng-if="loanClassification.excludedFromDownstream">
+                                    {{loanClassification.errorMessage || ('label.error.classificationunconfigured' | translate)}}
+                                </div>
+                                <span class="padded-td" ng-if="!loanClassification.classification && !loanClassification.excludedFromDownstream && !loanClassification.status">
+                                    {{'label.heading.notavailable' | translate}}
+                                </span>
+                                <span has-permission="OVERRIDE_LOANCLASSIFICATION">
+                                    <a href="" ng-click="openOverrideClassification()" style="margin-left:8px;">
+                                        <small>{{'label.button.overrideclassification' | translate}}</small>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
                     </table>
                     <table class="table table-striped table-bordered" ng-show="loandetails.summary">
                         <tr>
@@ -1303,6 +1323,34 @@
                                         <div class="help-block" ng-if="waiver.failureMessage">{{waiver.failureMessage}}</div>
                                     </td>
                                     <td>{{waiver.reason}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </uib-tab>
+
+                    <uib-tab heading="{{'label.heading.classificationaudit' | translate}}" ng-show="loanClassificationAudit.length > 0">
+                        <div class="table-responsive">
+                            <table class="table width100">
+                                <tr class="graybg">
+                                    <th>{{'label.heading.date' | translate}}</th>
+                                    <th>{{'label.heading.source' | translate}}</th>
+                                    <th>{{'label.heading.old' | translate}}</th>
+                                    <th>{{'label.heading.new' | translate}}</th>
+                                    <th>{{'label.heading.daysinarrears' | translate}}</th>
+                                    <th>{{'label.input.reason' | translate}}</th>
+                                    <th>{{'label.heading.status' | translate}}</th>
+                                </tr>
+                                <tr ng-repeat="entry in loanClassificationAudit">
+                                    <td>{{entry.createdOnUtc}}</td>
+                                    <td>{{entry.source}}</td>
+                                    <td>{{entry.oldClassification}}</td>
+                                    <td>{{entry.newClassification}}</td>
+                                    <td>{{entry.daysInArrears}}</td>
+                                    <td>{{entry.reason}}</td>
+                                    <td>
+                                        {{entry.newStatus}}
+                                        <div class="help-block text-danger" ng-if="entry.errorMessage">{{entry.errorMessage}}</div>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
@@ -2975,5 +3023,23 @@
         <br>
         <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
         <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+    </div>
+</script>
+<script type="text/ng-template" id="overrideclassification.html">
+    <div class="modal-header silver">
+        <h3 class="bolder">{{'label.heading.overrideclassification' | translate}}</h3>
+    </div>
+    <div class="modal-body">
+        <api-validate></api-validate>
+        <div class="form-group">
+            <label>{{'label.heading.classification' | translate}}</label>
+            <select class="form-control" ng-model="overrideForm.classification" ng-options="c.id as c.label for c in codes"></select>
+        </div>
+        <div class="form-group">
+            <label>{{'label.input.reason' | translate}}<span class="required">*</span></label>
+            <textarea class="form-control" ng-model="overrideForm.reason" rows="3" maxlength="500" required></textarea>
+        </div>
+        <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+        <button class="btn btn-primary" ng-click="submit()" ng-disabled="!overrideForm.reason">{{'label.button.save' | translate}}</button>
     </div>
 </script>
