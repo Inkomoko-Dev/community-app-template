@@ -96,4 +96,30 @@ describe("LoanAccountActionsController", function () {
         });
         expect(this.resourceFactory.loanTrxnsResource.save.mostRecentCall.args[1].transactionDate).toEqual('dd MMMM yyyy|2026|3|25');
     });
+
+    it("should display the bank disbursement outcome supplied by the backend", function () {
+        this.scope.showBankDisbursementSuccess({
+            userMessageGlobalisationCode: 'label.message.bank.disbursement.success',
+            defaultUserMessage: 'Disbursement sent to the bank successfully.',
+            transactionReference: 'BANK-TXN-123'
+        });
+
+        expect(this.rootScope.bankDisbursementResult).toEqual({
+            code: 'label.message.bank.disbursement.success',
+            message: 'Disbursement sent to the bank successfully.',
+            reference: 'BANK-TXN-123'
+        });
+    });
+
+    it("should display the bank failure message supplied by the backend", function () {
+        this.scope.showBankDisbursementFailure({
+            data: {
+                errors: [{defaultUserMessage: 'The bank rejected this disbursement. Please contact support.'}]
+            }
+        });
+
+        expect(this.scope.error).toEqual('The bank rejected this disbursement. Please contact support.');
+        expect(this.rootScope.errorStatus).toBeNull();
+        expect(this.rootScope.errorDetails).toEqual([]);
+    });
 });
