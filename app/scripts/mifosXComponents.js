@@ -13,8 +13,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'AuthenticationService',
             'SessionManager',
             'Paginator',
-            'UIConfigService',
-            'NotificationResponseHeaderProvider'
+            'UIConfigService'
         ],
 
         controllers: [
