@@ -1109,6 +1109,9 @@
             .when('/whatsappcampaigns', {
                 templateUrl: 'views/organization/whatsappcampaigns/whatsappcampaigns.html'
             })
+            .when('/novucampaigns', {
+                templateUrl: 'views/organization/novucampaigns/novucampaigns.html'
+            })
             .when('/createwhatsappcampaign', {
                 templateUrl: 'views/organization/whatsappcampaigns/createwhatsappcampaign.html'
             })

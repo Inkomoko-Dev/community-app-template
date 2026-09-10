@@ -1116,6 +1116,25 @@
                         delete: { method: 'DELETE', params: {} }
                     }),
 
+                    novuCampaignResource: defineResource(apiVer + "/novu/campaigns/:campaignId", { campaignId: '@campaignId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        save: { method: 'POST', params: {} },
+                        update: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
+                    }),
+
+                    novuEventResource: defineResource(apiVer + "/novu/events", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+
+                    novuLogResource: defineResource(apiVer + "/novu/logs", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+
+                    novuSubscriberSyncResource: defineResource(apiVer + "/novu/subscribers/sync", {}, {
+                        save: { method: 'POST', params: {} }
+                    }),
+
                     smsResource: defineResource(apiVer + "/sms/:campaignId/messageByStatus", { campaignId: '@campaignId', additionalParam: '@additionalParam' }, {
                         getByStatus: { method: 'GET', params: {} }
                     }),
