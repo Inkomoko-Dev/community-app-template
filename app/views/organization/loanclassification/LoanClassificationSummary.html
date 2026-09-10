@@ -1,0 +1,73 @@
+<div class="content-container" ng-controller="LoanClassificationSummaryController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/loanclassification">{{'label.anchor.loanclassification' | translate}}</a></li>
+        <li class="active">{{'label.heading.loanclassificationsummary' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <h4>{{'label.heading.loanclassificationsummary' | translate}}</h4>
+            <form class="form-horizontal" ng-submit="search()">
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.heading.country' | translate}}</label>
+                    <div class="col-sm-3">
+                        <select class="form-control" ng-model="formData.countryId" ng-options="c.id as c.name for c in countries">
+                            <option value="">{{'label.all' | translate}}</option>
+                        </select>
+                    </div>
+                    <label class="control-label col-sm-2">{{'label.heading.office' | translate}}</label>
+                    <div class="col-sm-3">
+                        <select class="form-control" ng-model="formData.officeId" ng-options="o.id as o.name for o in offices">
+                            <option value="">{{'label.all' | translate}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.heading.product' | translate}}</label>
+                    <div class="col-sm-3">
+                        <select class="form-control" ng-model="formData.loanProductId" ng-options="p.id as p.name for p in products">
+                            <option value="">{{'label.all' | translate}}</option>
+                        </select>
+                    </div>
+                    <label class="control-label col-sm-2">{{'label.input.daterange' | translate}}</label>
+                    <div class="col-sm-2">
+                        <input type="text" datepicker-pop="dd MMMM yyyy" ng-model="first.fromDate" class="form-control"/>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" datepicker-pop="dd MMMM yyyy" ng-model="first.toDate" class="form-control"/>
+                    </div>
+                    <div class="col-sm-1">
+                        <button type="submit" class="btn btn-primary">{{'label.button.search' | translate}}</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table">
+                <thead>
+                <tr class="graybg">
+                    <th>{{'label.heading.country' | translate}}</th>
+                    <th>{{'label.heading.office' | translate}}</th>
+                    <th>{{'label.heading.product' | translate}}</th>
+                    <th>{{'label.heading.classification' | translate}}</th>
+                    <th>{{'label.heading.label' | translate}}</th>
+                    <th>{{'label.heading.loancount' | translate}}</th>
+                    <th>{{'label.heading.excluded' | translate}}</th>
+                    <th>{{'label.heading.overrides' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in rows">
+                    <td>{{row.countryName}}</td>
+                    <td>{{row.officeName}}</td>
+                    <td>{{row.loanProductName}}</td>
+                    <td>{{row.classification}}</td>
+                    <td>{{row.classificationLabel}}</td>
+                    <td>{{row.loanCount}}</td>
+                    <td>{{row.excludedCount}}</td>
+                    <td>{{row.overrideCount}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="alert alert-info" ng-if="!rows.length">{{'label.nodata' | translate}}</div>
+        </div>
+    </div>
+</div>
