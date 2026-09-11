@@ -1,7 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        NotificationsController: function (scope, rootScope, resourceFactory, location, timeout,
-                                           notificationResponseHeaderFactory, localStorageService) {
+        NotificationsController: function (scope, resourceFactory, location, localStorageService) {
             var objTypeUrlMap = {
                 'client' : '/viewclient/',
                 'group' : '/viewgroup/',
@@ -19,7 +18,6 @@
             scope.notificationsItmesInATray = 5;
             scope.isNotificationIconRed = false;
             scope.numberOfUnreadNotifications = 0;
-            scope.counter = 0;
             scope.initNotificationTray = function() {
                 var readNotifications = localStorageService.getFromLocalStorage("notifications");
                 if (readNotifications == null) {
@@ -59,10 +57,9 @@
                     limit: scope.notificationsPerPage || 10
                 }, function(data) {
                     scope.numberOfUnreadNotifications = data.pageItems.length;
-                    scope.counter = 0;
                     var readNotifications = localStorageService.getFromLocalStorage("notifications");
                     if (readNotifications == null) {
-                        scope.initNotificationsPage();
+                        scope.notifications = data.pageItems;
                     } else {
                         for (j = 0; j < data.pageItems.length; j++) {
                             for (i = 0; i < readNotifications.length; i++) {
@@ -116,33 +113,17 @@
                 
                 location.path(objTypeUrlMap[notification.objectType] + notification.objectId);
             };
-            scope.countFromLastResponse = function() {
-                scope.counter++;
-                if (scope.counter == 60) {
-                    scope.counter = 0;
-                    scope.fetchUnreadNotifications();
-                }
-                scope.timer = timeout(scope.countFromLastResponse, 1000);
-            };
             scope.fetchItemsInNotificationTray = function() {
                   scope.initNotificationTray();
             };
-            scope.$on('eventFired', function(event, data) {
-                scope.counter = 0;
-                if (data.notificationStatus === "true") {
-                    scope.fetchUnreadNotifications();
-                }
-            });
             scope.$on("UserAuthenticationSuccessEvent", function (event, data) {
-                timeout.cancel(scope.timer);
                 localStorageService.removeFromLocalStorage("notifications"); //remove all local notifications
-                timeout(scope.countFromLastResponse(), 1000);
                 scope.fetchUnreadNotifications();
             });
         }
     });
-    mifosX.ng.application.controller('NotificationsController', ['$scope', '$rootScope', 'ResourceFactory', '$location',
-        '$timeout', 'NotificationResponseHeaderFactory' , 'localStorageService', mifosX.controllers.NotificationsController])
+    mifosX.ng.application.controller('NotificationsController', ['$scope', 'ResourceFactory', '$location',
+        'localStorageService', mifosX.controllers.NotificationsController])
         .run(function ($log) {
         $log.info("NotificationsController initialized");
     });
