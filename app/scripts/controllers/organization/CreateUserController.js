@@ -6,14 +6,26 @@
             scope.selected = [];
             scope.selectedRoles = [] ;
             scope.availableRoles = [];
+            scope.additionalOfficeOptions = [];
             scope.formData = {
                 sendPasswordToEmail: true,
-                roles: []
+                roles: [],
+                officeIds: []
             };
             resourceFactory.userTemplateResource.get(function (data) {
                 scope.offices = data.allowedOffices;
                 scope.availableRoles = data.availableRoles;
+                scope.refreshAdditionalOffices();
             });
+
+            scope.refreshAdditionalOffices = function () {
+                scope.additionalOfficeOptions = _.filter(scope.offices, function (office) {
+                    return office.id !== scope.formData.officeId;
+                });
+                scope.formData.officeIds = _.filter(scope.formData.officeIds, function (officeId) {
+                    return officeId !== scope.formData.officeId;
+                });
+            };
 
             scope.addRole = function () {
                 for (var i in this.available) {
@@ -61,6 +73,7 @@
             };
 
             scope.getOfficeStaff = function(){
+                scope.refreshAdditionalOffices();
                 resourceFactory.employeeResource.getAllEmployees({officeId:scope.formData.officeId},function (data) {
                     scope.staffs = data;
                 });
