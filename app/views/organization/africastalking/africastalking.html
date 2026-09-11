@@ -364,6 +364,180 @@
                     </div>
                 </uib-tab>
 
+                <uib-tab heading="{{'label.heading.voiceivrmenus' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3">
+                            <input class="form-control" ng-model="voiceMenuFilter.menuKey" placeholder="{{'label.heading.menukey' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <input class="form-control" ng-model="voiceMenuFilter.languageCode" placeholder="{{'label.heading.language' | translate}}">
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <button class="btn btn-default" ng-click="loadVoiceMenuDefinitions(); loadVoiceMenuOptions();">
+                                {{'label.button.refresh' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <h5>{{'label.heading.menudefinitions' | translate}}</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.menukey' | translate}}</th>
+                            <th>{{'label.heading.language' | translate}}</th>
+                            <th>{{'label.heading.prompttext' | translate}}</th>
+                            <th>{{'label.heading.parentmenu' | translate}}</th>
+                            <th>{{'label.heading.enabled' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="definition in voiceMenuDefinitions">
+                            <td>{{definition.menuKey}}</td>
+                            <td>{{definition.languageCode}}</td>
+                            <td><input class="form-control" ng-model="definition.promptText"></td>
+                            <td><input class="form-control" ng-model="definition.parentMenuKey"></td>
+                            <td><input type="checkbox" ng-model="definition.enabled"></td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-click="saveVoiceMenuDefinition(definition)">
+                                    {{'label.button.save' | translate}}
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.menuoptions' | translate}}</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="graybg">
+                            <th>#</th>
+                            <th>{{'label.heading.label' | translate}}</th>
+                            <th>{{'label.heading.actiontype' | translate}}</th>
+                            <th>{{'label.heading.actiontarget' | translate}}</th>
+                            <th>{{'label.heading.enabled' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="option in voiceMenuOptions">
+                            <td><input class="form-control" ng-model="option.optionDigit" style="width:60px"></td>
+                            <td><input class="form-control" ng-model="option.optionLabel"></td>
+                            <td>
+                                <select class="form-control" ng-model="option.actionType" ng-options="type for type in voiceMenuActionTypes"></select>
+                            </td>
+                            <td><input class="form-control" ng-model="option.actionTarget"></td>
+                            <td><input type="checkbox" ng-model="option.enabled"></td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-click="saveVoiceMenuOption(option)">{{'label.button.save' | translate}}</button>
+                                <button class="btn btn-danger btn-sm" ng-click="deleteVoiceMenuOption(option.id)">{{'label.button.delete' | translate}}</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.addmenuoption' | translate}}</h5>
+                    <div class="row">
+                        <div class="col-sm-2"><input class="form-control" ng-model="newVoiceMenuOption.menuKey" placeholder="{{'label.heading.menukey' | translate}}"></div>
+                        <div class="col-sm-2"><input class="form-control" ng-model="newVoiceMenuOption.languageCode" placeholder="{{'label.heading.language' | translate}}"></div>
+                        <div class="col-sm-1"><input class="form-control" ng-model="newVoiceMenuOption.optionDigit" placeholder="#"></div>
+                        <div class="col-sm-2"><input class="form-control" ng-model="newVoiceMenuOption.optionLabel" placeholder="{{'label.heading.label' | translate}}"></div>
+                        <div class="col-sm-2">
+                            <select class="form-control" ng-model="newVoiceMenuOption.actionType" ng-options="type for type in voiceMenuActionTypes"></select>
+                        </div>
+                        <div class="col-sm-2"><input class="form-control" ng-model="newVoiceMenuOption.actionTarget" placeholder="{{'label.heading.actiontarget' | translate}}"></div>
+                        <div class="col-sm-1">
+                            <button class="btn btn-primary" ng-click="createVoiceMenuOption()">{{'label.button.add' | translate}}</button>
+                        </div>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="{{'label.heading.voiceoperations' | translate}}" has-permission='READ_COMMUNICATION'>
+                    <br>
+                    <div ng-if="voiceDashboard">
+                        <table class="table table-bordered table-striped">
+                            <tr><td>{{'label.heading.activeivrsessions' | translate}}</td><td>{{voiceDashboard.activeIvrSessions}}</td></tr>
+                            <tr><td>{{'label.heading.queuedcallers' | translate}}</td><td>{{voiceDashboard.queuedCallers}}</td></tr>
+                            <tr><td>{{'label.heading.pendingcallbacks' | translate}}</td><td>{{voiceDashboard.pendingCallbacks}}</td></tr>
+                            <tr><td>{{'label.heading.voicemailstoday' | translate}}</td><td>{{voiceDashboard.voicemailsToday}}</td></tr>
+                            <tr><td>{{'label.heading.inboundcallstoday' | translate}}</td><td>{{voiceDashboard.inboundCallsToday}}</td></tr>
+                            <tr><td>{{'label.heading.outboundcallstoday' | translate}}</td><td>{{voiceDashboard.outboundCallsToday}}</td></tr>
+                            <tr><td>{{'label.heading.openvoicetickets' | translate}}</td><td>{{voiceDashboard.openVoiceTickets}}</td></tr>
+                        </table>
+                    </div>
+                    <h5>{{'label.heading.pendingcallbacks' | translate}}</h5>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.department' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.scheduledat' | translate}}</th>
+                            <th>{{'label.heading.supportticket' | translate}}</th>
+                            <th>{{'label.heading.submittedondate' | translate}}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="callback in voiceCallbacks">
+                            <td><a href="#/viewvoicecallback/{{callback.id}}">{{callback.callerNumber}}</a></td>
+                            <td>{{callback.departmentCode}}</td>
+                            <td>{{callback.status}}</td>
+                            <td>{{callback.scheduledAt}}</td>
+                            <td>{{callback.supportTicketId}}</td>
+                            <td>{{callback.createdDate}}</td>
+                            <td>
+                                <button class="btn btn-default btn-sm" ng-click="routeToVoiceCallback(callback.id)">
+                                    {{'label.button.view' | translate}}
+                                </button>
+                                <button class="btn btn-default btn-sm" has-permission='CREATE_COMMUNICATION'
+                                        ng-if="callback.status === 'PENDING' || callback.status === 'SCHEDULED'"
+                                        ng-click="dispatchCallback(callback.id)">
+                                    {{'label.button.dispatchcallback' | translate}}
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.voicemails' | translate}}</h5>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.department' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                            <th>{{'label.heading.recording' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="voicemail in voiceVoicemails">
+                            <td>{{voicemail.callerNumber}}</td>
+                            <td>{{voicemail.departmentCode}}</td>
+                            <td>{{voicemail.status}}</td>
+                            <td><a ng-if="voicemail.recordingUrl" href="{{voicemail.recordingUrl}}" target="_blank">Play</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h5>{{'label.heading.callqueue' | translate}}</h5>
+                    <table class="table">
+                        <thead>
+                        <tr class="graybg">
+                            <th>{{'label.heading.caller' | translate}}</th>
+                            <th>{{'label.heading.department' | translate}}</th>
+                            <th>{{'label.heading.queueposition' | translate}}</th>
+                            <th>{{'label.heading.status' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="entry in voiceQueue">
+                            <td>{{entry.callerNumber}}</td>
+                            <td>{{entry.departmentCode}}</td>
+                            <td>{{entry.queuePosition}}</td>
+                            <td>{{entry.status}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </uib-tab>
+
                 <uib-tab heading="{{'label.heading.connectivity' | translate}}" has-permission='CONFIGURE_AFRICASTALKING'>
                     <br>
                     <div class="row">

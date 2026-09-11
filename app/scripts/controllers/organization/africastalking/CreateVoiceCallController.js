@@ -1,7 +1,7 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         CreateVoiceCallController: function (scope, resourceFactory, location, $q) {
-            scope.formData = {};
+            scope.formData = { recordingConsentRequired: true, callPurpose: 'GENERAL' };
             scope.recipientType = 'phone';
             scope.isButtonDisabled = false;
 
@@ -50,6 +50,8 @@
                 } else if (scope.recipientType === 'staff' && scope.formData.staff) {
                     payload.staffId = scope.formData.staff.id;
                 }
+                payload.recordingConsentRequired = scope.formData.recordingConsentRequired !== false;
+                payload.callPurpose = scope.formData.callPurpose || 'GENERAL';
                 resourceFactory.africasTalkingVoiceResource.save(payload, function (data) {
                     var callId = data.resourceId || data.resourceIdentifier || data.id;
                     if (!callId) {

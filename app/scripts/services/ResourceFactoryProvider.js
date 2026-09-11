@@ -1127,9 +1127,39 @@
                     }),
 
                     africasTalkingVoiceResource: defineResource(apiVer + "/africastalking/voice/calls/:callId", { callId: '@resourceId' }, {
-                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/africastalking/voice/calls", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
-                        save: { method: 'POST', params: {} }
+                        save: { method: 'POST', url: baseUrl + apiVer + "/africastalking/voice/calls", params: {} }
+                    }),
+
+                    africasTalkingVoiceDashboardResource: defineResource(apiVer + "/africastalking/voice/dashboard", {}, {
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    africasTalkingVoiceCallbackResource: defineResource(apiVer + "/africastalking/voice/callbacks/:callbackId", { callbackId: '@callbackId' }, {
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/africastalking/voice/callbacks", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
+                        dispatch: { method: 'POST', params: {}, url: baseUrl + apiVer + "/africastalking/voice/callbacks/:callbackId/dispatch" }
+                    }),
+
+                    africasTalkingVoiceIvrMenuDefinitionResource: defineResource(apiVer + "/africastalking/voice/menus/definitions/:menuKey/:languageCode", { menuKey: '@menuKey', languageCode: '@languageCode' }, {
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/africastalking/voice/menus/definitions", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        update: { method: 'PUT', params: {} }
+                    }),
+
+                    africasTalkingVoiceIvrMenuOptionResource: defineResource(apiVer + "/africastalking/voice/menus/options/:optionId", { optionId: '@optionId' }, {
+                        getAll: { method: 'GET', url: baseUrl + apiVer + "/africastalking/voice/menus/options", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
+                        save: { method: 'POST', url: baseUrl + apiVer + "/africastalking/voice/menus/options", params: {} },
+                        update: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
+                    }),
+
+                    africasTalkingVoiceVoicemailResource: defineResource(apiVer + "/africastalking/voice/voicemails", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } }
+                    }),
+
+                    africasTalkingVoiceQueueResource: defineResource(apiVer + "/africastalking/voice/queue", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } }
                     }),
 
                     africasTalkingConnectivityResource: defineResource(apiVer + "/africastalking/connectivity", {}, {

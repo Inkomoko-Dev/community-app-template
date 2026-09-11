@@ -1,0 +1,63 @@
+<div ng-controller="ViewVoiceCallbackController" class="content-container">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/africastalking">{{'label.anchor.africastalking' | translate}}</a></li>
+        <li class="active">{{'label.heading.viewvoicecallback' | translate}}</li>
+    </ul>
+    <api-validate></api-validate>
+    <div class="card" ng-if="callback">
+        <div class="content">
+            <div class="toolbar">
+                <h3>{{'label.heading.viewvoicecallback' | translate}}</h3>
+                <div class="pull-right">
+                    <button class="btn btn-default" has-permission='CREATE_COMMUNICATION'
+                            ng-if="callback.status === 'PENDING' || callback.status === 'SCHEDULED'"
+                            ng-click="dispatchCallback()">
+                        {{'label.button.dispatchcallback' | translate}}
+                    </button>
+                </div>
+            </div>
+            <br/>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <td><strong>{{'label.heading.caller' | translate}}</strong></td>
+                    <td>{{callback.callerNumber}}</td>
+                </tr>
+                <tr ng-if="callback.clientId">
+                    <td><strong>{{'label.heading.clientid' | translate}}</strong></td>
+                    <td>{{callback.clientId}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.department' | translate}}</strong></td>
+                    <td>{{callback.departmentCode}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.language' | translate}}</strong></td>
+                    <td>{{callback.languageCode}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.status' | translate}}</strong></td>
+                    <td>{{callback.status}}</td>
+                </tr>
+                <tr ng-if="callback.scheduledAt">
+                    <td><strong>{{'label.heading.scheduledat' | translate}}</strong></td>
+                    <td>{{callback.scheduledAt}}</td>
+                </tr>
+                <tr ng-if="callback.supportTicketId">
+                    <td><strong>{{'label.heading.supportticket' | translate}}</strong></td>
+                    <td>{{callback.supportTicketId}}</td>
+                </tr>
+                <tr ng-if="callback.outboundCallLogId">
+                    <td><strong>{{'label.heading.outboundcall' | translate}}</strong></td>
+                    <td>
+                        <a href="" ng-click="routeToVoiceCall(callback.outboundCallLogId)">{{callback.outboundCallLogId}}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>{{'label.heading.submittedondate' | translate}}</strong></td>
+                    <td>{{callback.createdDate}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
