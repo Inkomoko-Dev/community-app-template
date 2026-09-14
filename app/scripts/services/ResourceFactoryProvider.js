@@ -1136,8 +1136,8 @@
                         search: { method: 'GET', params: {}, isArray: true }
                     }),
                     crbPostingReportsViewResource: defineResource(
-                        apiVer + "/crb/posting-logs",
-                        {},
+                        apiVer + "/crb/posting-logs/:logId",
+                        { logId: '@logId' },
                         {
                             get: {
                                 method: 'GET',
@@ -1176,6 +1176,7 @@
                                     return emptyPage;
                                 }
                             },
+                            getById: { method: 'GET', isArray: false },
                             query: { method: 'GET', isArray: true }
                         }
                     )

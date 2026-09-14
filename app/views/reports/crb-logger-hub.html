@@ -26,6 +26,10 @@
                 <strong>Success:</strong> {{ success }}
             </div>
 
+            <div ng-if="!loading && !error && totalLogs === 0" class="alert alert-info" role="alert">
+                No logs found.
+            </div>
+
             <!-- Filter and Action Buttons -->
             <div class="row" style="margin-bottom: 30px;">
                 <div class="col-md-3">
@@ -108,6 +112,8 @@
                             total-items="totalLogs"
                             current-page="currentPage"
                             pagination-id="crbLogs"
+                            class="pointer"
+                            ng-click="viewDetails(log)"
                             ng-class="{'danger': log.hasPassed === 'true', 'warning': log.hasPassed === 'false'}">
                             <td>{{ log.batchId }}</td>
                             <td>{{ log.loanAccountNumber || '-' }}</td>
@@ -124,7 +130,10 @@
                                     log.errorLogs }}</span>
                                 <span ng-if="!log.errorLogs" class="text-muted">-</span>
                             </td>
-                            <td>
+                            <td ng-click="$event.stopPropagation();">
+                                <button class="btn btn-xs btn-primary" ng-click="viewDetails(log)" title="View payload">
+                                    <i class="fa fa-eye"></i> View
+                                </button>
                                 <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)"
                                     ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
                                     <i class="fa fa-check"></i> Fixed
@@ -156,6 +165,40 @@
                 boundary-links="true"
                 on-page-change="getResultsPage(newPageNumber)"
                 template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" ng-show="showDetailsModal"
+        style="display: block; background: rgba(0,0,0,0.45);">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-label="Close" ng-click="closeDetailsModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">CRB posting log details</h4>
+                </div>
+                <div class="modal-body">
+                    <div ng-if="detailsLoading" class="text-center" style="padding: 20px 0;">
+                        <i class="fa fa-spinner fa-spin"></i> Loading payload...
+                    </div>
+                    <div ng-if="detailsError" class="alert alert-danger">{{ detailsError }}</div>
+                    <div ng-if="!detailsLoading && selectedLogDetail">
+                        <p><strong>Batch Id:</strong> {{ selectedLogDetail.batchId || selectedLog.batchId }}</p>
+                        <p><strong>Loan Account:</strong> {{ selectedLogDetail.loanAccountNumber || selectedLog.loanAccountNumber || '-' }}</p>
+                        <p><strong>Status:</strong>
+                            {{ selectedLogDetail.hasPassed === true || selectedLogDetail.hasPassed === 'true' ? 'Posted' : 'Not Posted' }}
+                        </p>
+                        <p><strong>Error message:</strong></p>
+                        <pre style="white-space: pre-wrap; max-height: 160px; overflow: auto;">{{ selectedLogDetail.errorLogs || '-' }}</pre>
+                        <p><strong>Request / response payload:</strong></p>
+                        <pre style="white-space: pre-wrap; max-height: 320px; overflow: auto;">{{ formatPayload(selectedLogDetail.payload) }}</pre>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="closeDetailsModal()">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

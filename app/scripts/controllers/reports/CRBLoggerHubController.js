@@ -31,12 +31,37 @@
                 return [year, month, day].join('-');
             }
 
-            function extractErrorMessage(response) {
-                if (!response) {
-                    return 'Unknown error';
+            function firstApiMessage(data) {
+                if (!data) {
+                    return '';
                 }
-                var data = response.data || response;
-                return data.defaultUserMessage || data.developerMessage || data.message || response.statusText || 'Unknown error';
+                if (data.errors && data.errors.length) {
+                    return data.errors[0].defaultUserMessage || data.errors[0].developerMessage || data.errors[0].userMessage || '';
+                }
+                return data.defaultUserMessage || data.developerMessage || data.userMessage || data.message || '';
+            }
+
+            function extractErrorMessage(response) {
+                var status = response && response.status;
+                if (status === 401 || status === 403) {
+                    return 'Access Denied';
+                }
+                if (!status || status === 0 || status === -1 || status === 408 || status === 503 || status === 504) {
+                    return 'Service unavailable / Database query timeout';
+                }
+
+                var data = response && (response.data || response);
+                var apiMessage = firstApiMessage(data);
+                if (apiMessage) {
+                    return apiMessage;
+                }
+                if (status === 404) {
+                    return 'CRB posting log was not found.';
+                }
+                if (status === 500) {
+                    return 'Unable to fetch CRB posting logs. Please retry or narrow the date range.';
+                }
+                return 'Unable to fetch CRB posting logs.';
             }
 
             function buildQueryParams(pageNumber) {
@@ -104,7 +129,7 @@
                     scope.postingLogs = [];
                     scope.totalLogs = 0;
                     scope.loading = false;
-                    scope.error = 'Unable to fetch CRB posting logs. Error: ' + extractErrorMessage(response);
+                    scope.error = extractErrorMessage(response);
                 });
             }
 
@@ -164,7 +189,7 @@
                     scope.success = 'Retry posting initiated successfully. Log entry has been queued for reprocessing.';
                     fetchLogs(scope.currentPage);
                 }).catch(function (error) {
-                    scope.error = 'Failed to retry posting. Error: ' + extractErrorMessage(error);
+                    scope.error = extractErrorMessage(error);
                 });
             };
 
@@ -182,7 +207,7 @@
                     scope.success = 'Loan record marked as fixed and has been rescheduled for retry.';
                     fetchLogs(scope.currentPage);
                 }).catch(function (error) {
-                    scope.error = 'Failed to mark loan as fixed. Error: ' + extractErrorMessage(error);
+                    scope.error = extractErrorMessage(error);
                 });
             };
 
@@ -232,16 +257,31 @@
                         URL.revokeObjectURL(fileURL);
                     })
                     .catch(function (error) {
-                        scope.error = 'Failed to export CRB posting logs. Error: ' + extractErrorMessage(error);
+                        scope.error = extractErrorMessage(error);
                     });
             };
 
             /**
-             * View detailed error information for a log entry
+             * View detailed payload/error information for a log entry
              */
             scope.viewDetails = function (logEntry) {
+                if (!logEntry || !logEntry.id) {
+                    scope.error = 'Unable to fetch CRB posting log details.';
+                    return;
+                }
                 scope.selectedLog = logEntry;
+                scope.selectedLogDetail = null;
+                scope.detailsLoading = true;
+                scope.detailsError = null;
                 scope.showDetailsModal = true;
+
+                resourceFactory.crbPostingReportsViewResource.getById({ logId: logEntry.id }, function (data) {
+                    scope.selectedLogDetail = data;
+                    scope.detailsLoading = false;
+                }, function (response) {
+                    scope.detailsLoading = false;
+                    scope.detailsError = extractErrorMessage(response);
+                });
             };
 
             /**
@@ -250,6 +290,19 @@
             scope.closeDetailsModal = function () {
                 scope.showDetailsModal = false;
                 scope.selectedLog = null;
+                scope.selectedLogDetail = null;
+                scope.detailsError = null;
+            };
+
+            scope.formatPayload = function (payload) {
+                if (!payload) {
+                    return '-';
+                }
+                try {
+                    return JSON.stringify(JSON.parse(payload), null, 2);
+                } catch (e) {
+                    return payload;
+                }
             };
 
             /**
