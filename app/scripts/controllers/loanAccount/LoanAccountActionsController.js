@@ -1875,6 +1875,7 @@
                         if (scope.loanactionform && scope.loanactionform.updatedPrincipal) {
                             scope.loanactionform.updatedPrincipal.$setTouched();
                         }
+                        scope.error = 'Total tranche amount must equal the approved loan principal.';
                         return;
                     }
                     submitData.expectedDisbursementDate = dateFilter(scope.formData.expectedDisbursementDate, scope.df);
@@ -1901,6 +1902,12 @@
                         disbursementId: routeParams.disbursementId
                     }, submitData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
+                    }, function (response) {
+                        var errors = response && response.data && response.data.errors;
+                        scope.error = errors && errors.length && errors[0].defaultUserMessage
+                            ? errors[0].defaultUserMessage
+                            : (response && response.data && response.data.defaultUserMessage)
+                                || 'Unable to update the tranche. Please review the tranche details and try again.';
                     });
                 } else if (scope.action === "adddisbursedetails" || scope.action === "deletedisbursedetails") {
                     submitData.disbursementData = [];
