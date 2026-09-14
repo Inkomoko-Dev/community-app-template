@@ -4,6 +4,25 @@
 
             scope.action = routeParams.action || "";
             scope.accountId = routeParams.id;
+
+            scope.showBankDisbursementSuccess = function (outcome) {
+                rootScope.bankDisbursementResult = {
+                    code: outcome.userMessageGlobalisationCode,
+                    message: outcome.defaultUserMessage,
+                    reference: outcome.transactionReference || null
+                };
+            };
+
+            scope.showBankDisbursementFailure = function (response) {
+                var errors = response && response.data && response.data.errors;
+                var backendError = errors && errors.length ? errors[0] : null;
+                rootScope.errorDetails = [];
+                rootScope.errorStatus = null;
+                scope.error = backendError && backendError.defaultUserMessage
+                    ? backendError.defaultUserMessage
+                    : 'The disbursement could not be sent to the bank. Please check your connection and try again.';
+                window.scrollTo(0, 0);
+            };
             
             // Pre-fetch loan details to get currency code for South Sudan logic
             function extractLoanCountry(data) {
@@ -2175,7 +2194,14 @@
                         }
 
                         resourceFactory.LoanAccountResource.save(params, submitData, function (data) {
+                            if (params.command === 'disbursementapproval') {
+                                scope.showBankDisbursementSuccess(data.changes || {});
+                            }
                             location.path('/viewloanaccount/' + data.loanId);
+                        }, function (response) {
+                            if (params.command === 'disbursementapproval') {
+                                scope.showBankDisbursementFailure(response);
+                            }
                         });
                     } else {
                         params.loanId = scope.accountId;

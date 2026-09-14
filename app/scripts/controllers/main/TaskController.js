@@ -531,6 +531,19 @@
             // ========================
             // 🔁 Generic Bulk Executor
             // ========================
+            function backendBankDisbursementFailureMessage(item) {
+                try {
+                    var responseBody = item && item.body ? JSON.parse(item.body) : {};
+                    var backendError = responseBody.errors && responseBody.errors.length
+                        ? responseBody.errors[0]
+                        : responseBody;
+                    return backendError.defaultUserMessage || 'The disbursement could not be sent. Please contact support.';
+                } catch (ignore) {
+                    // The raw response remains available in backend logs; it is deliberately not shown here.
+                    return 'The disbursement could not be sent. Please contact support.';
+                }
+            }
+
             scope.bulkBatchExecutor = function ({
                                                     template,
                                                     command,
@@ -538,6 +551,7 @@
                                                     extraBodyBuilder = null,
                                                     successMessage,
                                                     failureMessage,
+                                                    isBankDisbursement = false,
                                                     getUrl // optional function(loanId) => string
                                                 }) {
                 const selectedIds = Object.keys(template).filter(id => template[id]);
@@ -562,6 +576,7 @@
                     function (responses) {
                         let successful = 0;
                         const failedItems = [];
+                        var bankSuccessMessage = null;
 
                         _.each(responses, function (item) {
                             try {
@@ -570,6 +585,9 @@
                                         const body = JSON.parse(item.body);
                                         template[body.loanId || body.resourceId] = false;
                                         successful++;
+                                        if (isBankDisbursement && body.changes && body.changes.defaultUserMessage) {
+                                            bankSuccessMessage = body.changes.defaultUserMessage;
+                                        }
                                         return body.loanId || body.resourceId;
                                     } else {
                                         const matches = item.relativeUrl.match(/(\d+)/);
@@ -578,16 +596,26 @@
                                 })();
 
                                 if (item.statusCode !== 200) {
-                                    failedItems.push({ id: itemId, reason: item.body });
+                                    failedItems.push({
+                                        id: itemId,
+                                        reason: isBankDisbursement ? backendBankDisbursementFailureMessage(item) : item.body
+                                    });
                                 }
                             } catch (e) {
-                                failedItems.push({ id: "unknown", reason: item.body || e.message });
+                                failedItems.push({
+                                    id: "unknown",
+                                    reason: isBankDisbursement
+                                        ? backendBankDisbursementFailureMessage(item)
+                                        : item.body || e.message
+                                });
                             }
                         });
 
                         if (successful > 0) { scope.loanResource(); }
 
-                        let msg = `${successMessage || "Bulk operation complete."}\nSuccessful: ${successful}`;
+                        let msg = `${isBankDisbursement && bankSuccessMessage
+                            ? bankSuccessMessage
+                            : successMessage || "Bulk operation complete."}\nSuccessful: ${successful}`;
                         if (failedItems.length > 0) {
                             msg += `\nFailed: ${failedItems.length}`;
                             failedItems.forEach(f => { msg += `\n  Item ${f.id}: ${f.reason}`; });
@@ -597,7 +625,9 @@
                     },
                     function (error) {
                         console.error("Batch request failed:", error);
-                        window.alert(`${failureMessage || "Batch request failed"}: ${JSON.stringify(error)}`);
+                        if (!isBankDisbursement) {
+                            window.alert(`${failureMessage || "Batch request failed"}: ${JSON.stringify(error)}`);
+                        }
                     }
                 );
             };
@@ -625,6 +655,7 @@
                         extraBodyBuilder: config.extraBodyBuilder || null,
                         successMessage: config.successMessage,
                         failureMessage: config.failureMessage,
+                        isBankDisbursement: config.isBankDisbursement || false,
                         getUrl: config.getUrl
                     });
 
@@ -707,8 +738,7 @@
                             netDisbursalAmount: loan.expectedNetDisbursalAmount || loan.netDisbursalAmount || null
                         };
                     },
-                    successMessage: "Bulk disbursement approval completed.",
-                    failureMessage: "Bulk disbursement approval failed."
+                    isBankDisbursement: true
                 });
             };
 
