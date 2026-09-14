@@ -5,8 +5,14 @@
     </ul>
     <div class="card">
     	<div class="content">
-    	    <form class="" ng-controller="CreateTemplateController">
+    	    <form class="" name="templateForm" novalidate ng-controller="CreateTemplateController">
     		    <api-validate></api-validate>
+    		    <div class="alert alert-success" ng-show="successMessage">
+    		        <i class="fa fa-check-circle"></i>&nbsp;{{ successMessage | translate }}
+    		    </div>
+    		    <div class="alert alert-danger" ng-show="serverError && !errorDetails.length && !errorStatus">
+    		        <i class="fa fa-exclamation-circle"></i>&nbsp;{{ serverError }}
+    		    </div>
     		    <fieldset>
     		        <div class="row">
     		            <div class="col-sm-7 col-md-7">
@@ -15,17 +21,19 @@
     		                        <div class="form-group">
     		                            <label class="control-label">{{ 'label.input.entity' | translate }}&nbsp;</label>
     		
-    		                            <select id="entity" ng-model="formData.entity" class="form-control"
+    		                            <select id="entity" name="entity" ng-model="formData.entity" class="form-control" required
     		                                    ng-options="entity.id as entity.name for entity in template.entities"
     		                                    value="{{entity.id}}" ng-change="entityChange(formData.entity)"> </select>
+    		                            <span class="text-danger" ng-show="submitted && templateForm.entity.$invalid">{{ 'label.template.validation.entity.required' | translate }}</span>
     		                        </div>
     		                    </div>
     		                    <div class="col-sm-4 col-md-4">
     		                        <div class="form-group">
     		                            <label class="control-label">{{ 'label.input.type' | translate }}&nbsp;</label>
-    		                            <select id="type" ng-model="formData.type" class="form-control"
+    		                            <select id="type" name="type" ng-model="formData.type" class="form-control" required
     		                                    ng-options="type.id as type.name for type in template.types"
     		                                    value="{{type.id}}"> </select>
+    		                            <span class="text-danger" ng-show="submitted && templateForm.type.$invalid">{{ 'label.template.validation.type.required' | translate }}</span>
     		                        </div>
     		                    </div>
     			        	</div>
@@ -33,7 +41,9 @@
     		                    <div class="col-sm-4 col-md-4">
     		                        <div class="form-group">
     		                            <label class="control-label">{{ 'label.input.templatename' | translate }}&nbsp;</label>
-    		                            <input id="name" type="text" ng-model="formData.name" class="form-control">
+    		                            <input id="name" name="name" type="text" ng-model="formData.name" class="form-control" required ng-maxlength="100">
+    		                            <span class="text-danger" ng-show="submitted && templateForm.name.$error.required">{{ 'label.template.validation.name.required' | translate }}</span>
+    		                            <span class="text-danger" ng-show="templateForm.name.$error.maxlength">{{ 'label.template.validation.name.maxlength' | translate }}</span>
     		                        </div>
     		                    </div>
     		                </div>
@@ -75,10 +85,14 @@
     		                    </table>
     		                </div>
     		                <div class="form-group">
-    		                    <textarea id="templateeditor" ng-model="formData.text" ck-Editor></textarea>
+    		                    <textarea id="templateeditor" name="text" ng-model="formData.text" ck-Editor></textarea>
+    		                    <span class="text-danger" ng-show="submitted && bodyMissing()">{{ 'label.template.validation.text.required' | translate }}</span>
     		                </div>
     		                <div>
-    		                    <button id="save" ng-click="submit()" has-permission='CREATE_TEMPLATE' class="btn btn-primary">{{'label.button.save'| translate}}
+    		                    <button id="save" type="button" ng-click="submit()" ng-disabled="saving" has-permission='CREATE_TEMPLATE' class="btn btn-primary">
+    		                        <i class="fa fa-spinner fa-spin" ng-show="saving"></i>
+    		                        <span ng-hide="saving">{{'label.button.save'| translate}}</span>
+    		                        <span ng-show="saving">{{'label.template.button.saving'| translate}}</span>
     		                    </button>
     		                </div>
     		            </div>

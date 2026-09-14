@@ -6,22 +6,63 @@
                 require: 'ngModel',
                 link: function (scope, elm, attr, ngModel) {
 
-                    var ck = CKEDITOR.replace(elm[0]);
-
-                    ck.on('insertElement', function () {
-                        //$scope.$apply(function () {
-                        //    ngModel.$setViewValue(ck.getData());
-                        //});
-                        setTimeout(function () {
-                            $scope.$apply(function () {
-                                ngModel.$setViewValue(ck.getData());
+                    if (typeof CKEDITOR === 'undefined' || !CKEDITOR.replace) {
+                        ngModel.$render = function () {
+                            elm.val(ngModel.$viewValue || '');
+                        };
+                        elm.on('change blur keyup', function () {
+                            scope.$evalAsync(function () {
+                                ngModel.$setViewValue(elm.val());
                             });
-                        }, 2000);
+                        });
+                        return;
+                    }
+
+                    CKEDITOR.config.versionCheck = false;
+
+                    var ck = CKEDITOR.replace(elm[0], {versionCheck: false});
+
+                    if (!ck) {
+                        ngModel.$render = function () {
+                            elm.val(ngModel.$viewValue || '');
+                        };
+                        elm.on('change blur keyup', function () {
+                            scope.$evalAsync(function () {
+                                ngModel.$setViewValue(elm.val());
+                            });
+                        });
+                        return;
+                    }
+
+                    var sync = function () {
+                        scope.$evalAsync(function () {
+                            ngModel.$setViewValue(ck.getData());
+                        });
+                    };
+
+                    ck.on('change', sync);
+                    ck.on('blur', sync);
+                    ck.on('insertElement', function () {
+                        setTimeout(sync, 0);
+                    });
+                    ck.on('insertText', function () {
+                        setTimeout(sync, 0);
+                    });
+                    ck.on('insertHtml', function () {
+                        setTimeout(sync, 0);
                     });
 
-                    ngModel.$render = function (value) {
-                        ck.setData(ngModel.$modelValue);
+                    ngModel.$render = function () {
+                        ck.setData(ngModel.$viewValue || '');
                     };
+
+                    scope.$on('$destroy', function () {
+                        try {
+                            ck.destroy();
+                        } catch (e) {
+                            ck = null;
+                        }
+                    });
                 }
             };
         }
