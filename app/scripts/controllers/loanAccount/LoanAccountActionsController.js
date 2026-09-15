@@ -180,6 +180,9 @@
             rootScope.RequestEntities = function (entity, status, productId) {
                 resourceFactory.entityDatatableChecksResource.getAll({limit: -1}, function (response) {
                     scope.entityDatatableChecks = _.filter(response.pageItems, function (datatable) {
+                        if (!datatable || !datatable.status) {
+                            return false;
+                        }
                         var specificProduct = (datatable.entity == entity && datatable.status.value == status && datatable.productId == productId);
                         var AllProducts = (datatable.entity == entity && datatable.status.value == status);
                         return (datatable.productId ? specificProduct : AllProducts);
