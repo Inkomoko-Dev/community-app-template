@@ -691,7 +691,8 @@
                     <div class="col-sm-3">
                         <input id="principal" type="text" name="amount" ng-model="formData.updatedPrincipal"
                                class="form-control"
-                               number-format required late-Validate>
+                               number-format disabled>
+                        <small class="help-block">Use Manage tranches to change a tranche amount.</small>
                     </div>
                 </div>
                 <div ng-if="!enableThirdPartyDisbursement">
@@ -738,23 +739,39 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="disbursementDetail in disbursementDetails">
-                    <td ng-hide="disbursementDetail.id">
+                    <td>
                         <input id="disbursementDetail[{{$index}}].expectedDisbursementDate" type="text"
                                datepicker-pop="dd MMMM yyyy" class="form-control"
                                placeholder="{{'label.input.expecteddisbursementon' | translate}}"
                                ng-model="disbursementDetail.expectedDisbursementDate" is-open="'openedtranche'+$index"
-                               min="minDate" />
+                               min="minDate" ng-show="isTrancheEditable(disbursementDetail)" />
+                        <span ng-hide="isTrancheEditable(disbursementDetail)">{{disbursementDetail.expectedDisbursementDate | DateFormat}}</span>
                     </td>
-                    <td ng-hide="disbursementDetail.id">
+                    <td>
                         <input id="{{disbursementDetail[$index].principal}}" class="form-control" number-format
                                type="text"
-                               ng-model="disbursementDetail.principal"
+                               ng-model="disbursementDetail.principal" ng-change="addTrancheAmounts()"
+                               ng-show="isTrancheEditable(disbursementDetail)"
                                placeholder="{{'label.input.principal' | translate}}">
+                        <span ng-hide="isTrancheEditable(disbursementDetail)">{{disbursementDetail.principal | number}}</span>
                     </td>
-                    <td ng-hide="disbursementDetail.id"><a ng-click="deleteTranches($index)"><i
+                    <td><a ng-show="isTrancheEditable(disbursementDetail)" ng-click="deleteTranches($index); addTrancheAmounts()"><i
                             class="fa fa-times-circle fa-2x"></i></a></td>
                 </tr>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td>{{'label.heading.total' | translate}}</td>
+                    <td>{{showTrancheAmountTotal | number}}</td>
+                    <td></td>
+                </tr>
+                <tr ng-show="tranchePrincipalMismatch">
+                    <td colspan="3" class="text-danger">
+                        Total tranche amount ({{showTrancheAmountTotal | number}}) must equal the approved principal
+                        ({{formData.approvedLoanAmount | number}}).
+                    </td>
+                </tr>
+                </tfoot>
             </table>
             <table class="table width100" ng-show="deleteDisburseDetails && disbursementDetails.length > 0">
                 <thead>
