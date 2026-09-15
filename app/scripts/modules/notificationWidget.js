@@ -158,11 +158,13 @@ angular.module('notificationWidget', [])
                     }
 
                     if (!rejection.status || rejection.status === 0 || rejection.status === -1) {
-                        $rootScope.errorStatus = 'No connection. Verify application is running.';
-                    } else if (rejection.status == 401) {
-                        $rootScope.errorStatus = 'Unauthorized';
+                        $rootScope.errorStatus = 'Service unavailable / Database query timeout';
+                    } else if (rejection.status == 401 || rejection.status == 403) {
+                        $rootScope.errorStatus = 'Access Denied';
                     } else if (rejection.status == 405) {
                         $rootScope.errorStatus = 'HTTP verb not supported [405]';
+                    } else if (rejection.status == 408 || rejection.status == 503 || rejection.status == 504) {
+                        $rootScope.errorStatus = 'Service unavailable / Database query timeout';
                     } else if (rejection.status == 500) {
                         $rootScope.errorStatus = 'Internal Server Error [500].';
                     } else {

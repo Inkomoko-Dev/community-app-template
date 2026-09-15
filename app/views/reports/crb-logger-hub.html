@@ -13,22 +13,26 @@
 
             <!-- Alert Messages -->
             <div ng-if="error" class="alert alert-danger alert-dismissible fade in" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="error = null">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <strong>Error:</strong> {{ error }}
             </div>
 
             <div ng-if="success" class="alert alert-success alert-dismissible fade in" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="success = null">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <strong>Success:</strong> {{ success }}
             </div>
 
+            <div ng-if="!loading && !error && totalLogs === 0" class="alert alert-info" role="alert">
+                No logs found.
+            </div>
+
             <!-- Filter and Action Buttons -->
             <div class="row" style="margin-bottom: 30px;">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label>Filter by Status:</label>
                         <select class="form-control" ng-model="selectedStatus" ng-change="applyFilters()">
@@ -42,27 +46,26 @@
                     <div class="form-group">
                         <label>From Date:</label>
                         <input type="text" datepicker-pop="yyyy-MM-dd" class="form-control"
-                        ng-readonly="isViewMode"
-						is-open="'opened'+$index" min="minDate" ng-model="fromDate" ng-change="applyFilters()" />
+                            ng-readonly="isViewMode"
+                            is-open="'openedfromdate'" min="minDate" ng-model="fromDate" ng-change="applyFilters()" />
                     </div>
                 </div>
-
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>To Date:</label>
                         <input type="text" datepicker-pop="yyyy-MM-dd" class="form-control"
-                        ng-readonly="isViewMode"
-						is-open="'opened'+$index" min="minDate" ng-model="toDate" ng-change="applyFilters()" />
+                            ng-readonly="isViewMode"
+                            is-open="'openedtodate'" min="minDate" ng-model="toDate" ng-change="applyFilters()" />
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label>Search:</label>
                         <input type="text" class="form-control" placeholder="Search by account/error..."
-                            ng-model="searchText" ng-change="applyFilters()" />
+                            ng-model="searchText" ng-change="onSearchChange()" />
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label>&nbsp;</label>
                         <div>
@@ -70,16 +73,29 @@
                                 <i class="fa fa-refresh"></i> Clear Filters
                             </button>
                             <button class="btn btn-info" ng-click="exportToCSV()"
-                                ng-disabled="filteredLogs.length === 0">
+                                ng-disabled="loading || totalLogs === 0">
                                 <i class="fa fa-download"></i> Export CSV
                             </button>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Rows per page:</label>
+                        <select class="form-control" ng-model="pageSize" ng-change="onPageSizeChange()"
+                            ng-options="size for size in pageSizeOptions">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center" ng-show="loading" style="padding: 40px 0;">
+                <i class="fa fa-spinner fa-spin fa-2x"></i>
+                <p class="text-muted">Loading CRB posting logs...</p>
             </div>
 
             <!-- Logs Table -->
-            <div class="table-responsive">
+            <div class="table-responsive" ng-show="!loading">
                 <table class="table table-striped table-hover table-bordered">
                     <thead>
                         <tr class="graybg">
@@ -92,14 +108,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr dir-paginate="log in filteredLogs | itemsPerPage:pageSize"
+                        <tr dir-paginate="log in postingLogs | itemsPerPage: pageSize"
+                            total-items="totalLogs"
+                            current-page="currentPage"
+                            pagination-id="crbLogs"
+                            class="pointer"
+                            ng-click="viewDetails(log)"
                             ng-class="{'danger': log.hasPassed === 'true', 'warning': log.hasPassed === 'false'}">
                             <td>{{ log.batchId }}</td>
                             <td>{{ log.loanAccountNumber || '-' }}</td>
                             <td>
                                 <span class="label" ng-class="getStatusClass(log.hasPassed)">
-                                    <i ng-class="getStatusIcon(log.hasPassed)"></i> {{ log.hasPassed ? 'Posted' : 'Not
-                                    Posted' }}
+                                    <i ng-class="getStatusIcon(log.hasPassed)"></i>
+                                    {{ log.hasPassed === true || log.hasPassed === 'true' ? 'Posted' : 'Not Posted' }}
                                 </span>
                             </td>
                             <td>{{ arrayToDate(log.date) | date:'yyyy-MM-dd HH:mm' }}</td>
@@ -109,32 +130,75 @@
                                     log.errorLogs }}</span>
                                 <span ng-if="!log.errorLogs" class="text-muted">-</span>
                             </td>
-                            <td>
+                            <td ng-click="$event.stopPropagation();">
+                                <button class="btn btn-xs btn-primary" ng-click="viewDetails(log)" title="View payload">
+                                    <i class="fa fa-eye"></i> View
+                                </button>
                                 <button class="btn btn-xs btn-success" ng-click="markAsFixed(log)"
                                     ng-if="log.hasPassed === false || log.hasPassed === 'false'" title="Mark as Fixed">
                                     <i class="fa fa-check"></i> Fixed
                                 </button>
                             </td>
                         </tr>
-                        <tr ng-if="filteredLogs.length === 0">
-                            <td colspan="7" class="text-center text-muted">No logs found.</td>
+                        <tr ng-if="postingLogs.length === 0">
+                            <td colspan="6" class="text-center text-muted">No logs found.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <table class="table">
-                <tr>
-                    <td colspan="5">
-                    </td>
-                    <td class="pull-right">
-                        <a ng-click="scrollto('viewlptop')"><i class="fa fa-upload"></i> Top</a>
-                    </td>
-                </tr>
-            </table>
-            <dir-pagination-controls boundary-links="true"
+            <div class="row" ng-show="!loading">
+                <div class="col-md-6">
+                    <p class="text-muted" ng-if="totalLogs > 0">
+                        Showing {{ ((currentPage - 1) * pageSize) + 1 }}
+                        - {{ currentPage * pageSize > totalLogs ? totalLogs : currentPage * pageSize }}
+                        of {{ totalLogs }} logs
+                    </p>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a ng-click="scrollto('viewlptop')"><i class="fa fa-upload"></i> Top</a>
+                </div>
+            </div>
+
+            <dir-pagination-controls ng-show="!loading && totalLogs > pageSize"
+                pagination-id="crbLogs"
+                boundary-links="true"
+                on-page-change="getResultsPage(newPageNumber)"
                 template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" ng-show="showDetailsModal"
+        style="display: block; background: rgba(0,0,0,0.45);">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-label="Close" ng-click="closeDetailsModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">CRB posting log details</h4>
+                </div>
+                <div class="modal-body">
+                    <div ng-if="detailsLoading" class="text-center" style="padding: 20px 0;">
+                        <i class="fa fa-spinner fa-spin"></i> Loading payload...
+                    </div>
+                    <div ng-if="detailsError" class="alert alert-danger">{{ detailsError }}</div>
+                    <div ng-if="!detailsLoading && selectedLogDetail">
+                        <p><strong>Batch Id:</strong> {{ selectedLogDetail.batchId || selectedLog.batchId }}</p>
+                        <p><strong>Loan Account:</strong> {{ selectedLogDetail.loanAccountNumber || selectedLog.loanAccountNumber || '-' }}</p>
+                        <p><strong>Status:</strong>
+                            {{ selectedLogDetail.hasPassed === true || selectedLogDetail.hasPassed === 'true' ? 'Posted' : 'Not Posted' }}
+                        </p>
+                        <p><strong>Error message:</strong></p>
+                        <pre style="white-space: pre-wrap; max-height: 160px; overflow: auto;">{{ selectedLogDetail.errorLogs || '-' }}</pre>
+                        <p><strong>Request / response payload:</strong></p>
+                        <pre style="white-space: pre-wrap; max-height: 320px; overflow: auto;">{{ formatPayload(selectedLogDetail.payload) }}</pre>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="closeDetailsModal()">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

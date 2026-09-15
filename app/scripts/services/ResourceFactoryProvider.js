@@ -1136,9 +1136,49 @@
                         search: { method: 'GET', params: {}, isArray: true }
                     }),
                     crbPostingReportsViewResource: defineResource(
-                         apiVer + "/crb/posting-logs",
-                        {},
-                        { query: { method: 'GET', isArray: true } }
+                        apiVer + "/crb/posting-logs/:logId",
+                        { logId: '@logId' },
+                        {
+                            get: {
+                                method: 'GET',
+                                isArray: false,
+                                transformResponse: function (data) {
+                                    var emptyPage = { pageItems: [], totalFilteredRecords: 0 };
+                                    if (data == null || data === '') {
+                                        return emptyPage;
+                                    }
+                                    var parsed = data;
+                                    if (typeof data === 'string') {
+                                        try {
+                                            parsed = JSON.parse(data);
+                                        } catch (e) {
+                                            return emptyPage;
+                                        }
+                                    }
+                                    if (Object.prototype.toString.call(parsed) === '[object Array]') {
+                                        return {
+                                            pageItems: parsed,
+                                            totalFilteredRecords: parsed.length
+                                        };
+                                    }
+                                    if (parsed.pageItems) {
+                                        if (typeof parsed.totalFilteredRecords === 'undefined') {
+                                            parsed.totalFilteredRecords = parsed.pageItems.length;
+                                        }
+                                        return parsed;
+                                    }
+                                    if (parsed.content) {
+                                        return {
+                                            pageItems: parsed.content,
+                                            totalFilteredRecords: parsed.totalElements || parsed.content.length
+                                        };
+                                    }
+                                    return emptyPage;
+                                }
+                            },
+                            getById: { method: 'GET', isArray: false },
+                            query: { method: 'GET', isArray: true }
+                        }
                     )
                 };
             }];
