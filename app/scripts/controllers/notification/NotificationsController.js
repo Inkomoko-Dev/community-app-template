@@ -11,7 +11,8 @@
                 'shareProduct': '/viewshareproduct/',
                 'savingsAccount' : '/viewsavingaccount/',
                 'center' : '/viewcenter/',
-                'loanProduct' : '/viewloanproduct/'
+                'loanProduct' : '/viewloanproduct/',
+                'BULK_RESCHEDULE': '/bulkreschedule/'
             };
             scope.notifications = [];
             scope.notificationsPerPage = 15;

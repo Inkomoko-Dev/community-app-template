@@ -4422,6 +4422,7 @@
 	"label.bulkreschedule.error.reason": "Saisissez le motif de ce rééchelonnement groupé.",
 	"label.bulkreschedule.error.approvalreason": "Un motif d’approbation est obligatoire.",
 	"label.bulkreschedule.error.rejectionreason": "Un motif de rejet est obligatoire.",
+	"label.bulkreschedule.error.requiredfields": "Renseignez les champs obligatoires marqués d’un * avant de générer l’aperçu.",
 	"label.bulkreschedule.confirm.approve": "Approuver et exécuter cette demande de rééchelonnement groupé ?",
 	"label.bulkreschedule.confirm.cancel": "Annuler et supprimer définitivement cet aperçu de rééchelonnement groupé ?",
 	"label.bulkreschedule.example15": "p. ex. 15",

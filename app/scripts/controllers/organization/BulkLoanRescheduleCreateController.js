@@ -295,7 +295,11 @@
                             !scope.formData.reschedulingDetails.carryForwardChargeDueDate)) {
                     scope.validation.carryForwardCharge = true;
                 }
-                return _.isEmpty(scope.validation);
+                if (!_.isEmpty(scope.validation)) {
+                    setApiError({ data: { defaultUserMessage: $translate.instant('label.bulkreschedule.error.requiredfields') } });
+                    return false;
+                }
+                return true;
             };
             var loadPreview = function (resetPage) {
                 if (!scope.executionId) { return; }
