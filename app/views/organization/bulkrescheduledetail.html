@@ -41,6 +41,14 @@
             {{'label.bulkreschedule.recover.availableat' | translate:{date: (request.recoveryAvailableAt | date:'dd MMM yyyy, h:mm a')} }}
         </small>
     </div>
+    <div class="alert alert-warning" ng-if="request && canOfferRecovery() && !isExecutionActive()">
+        {{'label.bulkreschedule.recover.help' | translate}}
+        <button class="btn btn-warning btn-sm" ng-click="recoverExecution()"
+                ng-disabled="state.recovering || !canRecoverExecution()">
+            <i class="fa" ng-class="state.recovering ? 'fa-spinner fa-spin' : 'fa-repeat'"></i>
+            {{(state.recovering ? 'label.bulkreschedule.recovering' : 'label.bulkreschedule.recover') | translate}}
+        </button>
+    </div>
 
     <div class="panel panel-default" ng-if="request">
         <div class="panel-heading"><strong>{{'label.bulkreschedule.approvalstatus' | translate}}</strong></div>
