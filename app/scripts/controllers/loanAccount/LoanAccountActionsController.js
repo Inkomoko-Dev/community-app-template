@@ -1290,6 +1290,7 @@
                         associations: 'multiDisburseDetails'
                     }, function (data) {
                         scope.addDisburseDetails = true;
+                        scope.multiDisburseLoan = true;
                         scope.formData.approvedLoanAmount = data.approvedPrincipal;
                         scope.form.expectedDisbursementDate = normalizeDate(data.timeline.expectedDisbursementDate);
 
@@ -1301,7 +1302,7 @@
                                 scope.disbursementDetails[i].expectedDisbursementDate = normalizeDate(scope.disbursementDetails[i].expectedDisbursementDate);
                             }
                         }
-                        scope.disbursementDetails.push({});
+                        scope.addTrancheAmounts();
                     });
 
                     scope.title = 'label.heading.adddisbursedetails';
@@ -1578,15 +1579,19 @@
                 for (var i in scope.disbursementDetails) {
                     scope.showTrancheAmountTotal += parseTrancheAmount(scope.disbursementDetails[i].principal);
                 }
-                scope.validateApprovalTranchePrincipalTotal();
+                scope.validateTranchePrincipalTotal();
             };
 
-            scope.validateApprovalTranchePrincipalTotal = function () {
+            scope.validateTranchePrincipalTotal = function () {
                 var approvedPrincipal = parseTrancheAmount(scope.formData.approvedLoanAmount);
-                scope.approvalTranchePrincipalMismatch = scope.action === 'approve' && scope.approveTranches
+                scope.tranchePrincipalMismatch = (scope.action === 'approve' && scope.approveTranches
+                    || scope.action === 'adddisbursedetails' && scope.addDisburseDetails)
                     && approvedPrincipal > 0 && Math.abs(scope.showTrancheAmountTotal - approvedPrincipal) > 0.000001;
-                return !scope.approvalTranchePrincipalMismatch;
+                scope.approvalTranchePrincipalMismatch = scope.action === 'approve' && scope.tranchePrincipalMismatch;
+                return !scope.tranchePrincipalMismatch;
             };
+
+            scope.validateApprovalTranchePrincipalTotal = scope.validateTranchePrincipalTotal;
 
             scope.validateUpdatedTranchePrincipal = function () {
                 var approvedPrincipal = parseTrancheAmount(scope.formData.approvedLoanAmount);
@@ -1610,7 +1615,18 @@
             };
 
             scope.deleteTranches = function (index) {
+                if (scope.disbursementDetails[index] && scope.disbursementDetails[index].actualDisbursementDate) {
+                    return;
+                }
                 scope.disbursementDetails.splice(index, 1);
+            };
+
+            scope.isActiveTrancheManagement = function () {
+                return scope.action === 'adddisbursedetails' && scope.addDisburseDetails;
+            };
+
+            scope.isTrancheEditable = function (details) {
+                return !scope.isActiveTrancheManagement() || !details.actualDisbursementDate;
             };
 
             var tranchePaymentDetailFields = [
@@ -1674,6 +1690,7 @@
                     });
                 }
                 scope.disbursementDetails.push(tranche);
+                scope.addTrancheAmounts();
             };
 
             scope.submit = function () {
@@ -1963,6 +1980,7 @@
                         if (scope.loanactionform && scope.loanactionform.updatedPrincipal) {
                             scope.loanactionform.updatedPrincipal.$setTouched();
                         }
+                        scope.error = 'Total tranche amount must equal the approved loan principal.';
                         return;
                     }
                     submitData.expectedDisbursementDate = dateFilter(scope.formData.expectedDisbursementDate, scope.df);
@@ -1989,8 +2007,18 @@
                         disbursementId: routeParams.disbursementId
                     }, submitData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
+                    }, function (response) {
+                        var errors = response && response.data && response.data.errors;
+                        scope.error = errors && errors.length && errors[0].defaultUserMessage
+                            ? errors[0].defaultUserMessage
+                            : (response && response.data && response.data.defaultUserMessage)
+                                || 'Unable to update the tranche. Please review the tranche details and try again.';
                     });
                 } else if (scope.action === "adddisbursedetails" || scope.action === "deletedisbursedetails") {
+                    if (scope.action === "adddisbursedetails" && !scope.validateTranchePrincipalTotal()) {
+                        scope.error = 'Total tranche amount must equal the approved loan principal.';
+                        return;
+                    }
                     submitData.disbursementData = [];
                     for (var i in scope.disbursementDetails) {
                         submitData.disbursementData.push({
@@ -2004,6 +2032,12 @@
                     submitData.expectedDisbursementDate = dateFilter(scope.form.expectedDisbursementDate, scope.df);
                     resourceFactory.LoanAddTranchesResource.update({loanId: routeParams.id}, submitData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
+                    }, function (response) {
+                        var errors = response && response.data && response.data.errors;
+                        scope.error = errors && errors.length && errors[0].defaultUserMessage
+                            ? errors[0].defaultUserMessage
+                            : (response && response.data && response.data.defaultUserMessage)
+                                || 'Unable to update the tranche details. Please review the tranches and try again.';
                     });
                 } else if (scope.action == "deleteloancharge") {
                     resourceFactory.LoanAccountResource.delete({

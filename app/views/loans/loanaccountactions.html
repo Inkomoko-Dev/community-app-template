@@ -37,7 +37,7 @@
                 <tr>
                     <td>
                     </td>
-                    <td ng-show="addDisburseDetails" align="right">
+                    <td ng-show="addDisburseDetails && !isActiveTrancheManagement()" align="right">
                         <legend>
                             <button type="button" class="btn btn-primary" align="right"
                                     ng-click="addTranches()">{{ 'label.button.add' | translate }}
@@ -83,7 +83,7 @@
                            number-format required late-Validate>
                 </div>
             </div>
-            <div class="form-group col-sm-3" ng-show="approveTranches" style="width: 100%;padding-left: 26px">
+            <div class="form-group col-sm-3" ng-show="approveTranches || addDisburseDetails" style="width: 100%;padding-left: 26px">
                 <label class="control-label col-sm-2">{{ 'label.heading.tranchedetails' | translate }}</label>
 
                 <div>
@@ -107,23 +107,24 @@
                                 <input id="details[{{$index}}].expectedDisbursementDate" type="text"
                                        datepicker-pop="dd MMMM yyyy" class="form-control"
                                        ng-model="details.expectedDisbursementDate" is-open="'openedtranche'+$index"
-                                       min="minDate" />
+                                       min="minDate" ng-disabled="!isTrancheEditable(details)" />
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="details[{{$index}}].principal"
-                                       ng-change="addTrancheAmounts()" ng-model="details.principal">
+                                       ng-change="addTrancheAmounts()" ng-model="details.principal"
+                                       ng-disabled="!isTrancheEditable(details)">
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link" ng-if="!enableThirdPartyDisbursement"
+                                <button type="button" class="btn btn-link" ng-if="action === 'approve' && !enableThirdPartyDisbursement"
                                         ng-click="details.editPaymentDetails = !details.editPaymentDetails">
                                     <i class="fa" ng-class="details.editPaymentDetails ? 'fa-chevron-up' : 'fa-pencil'"></i>
                                     Payment details
                                 </button>
-                                <a ng-if="multiDisburseLoan" ng-click="deleteTranches($index);addTrancheAmounts();"><i
+                                <a ng-if="multiDisburseLoan && isTrancheEditable(details)" ng-click="deleteTranches($index);addTrancheAmounts();"><i
                                         class="fa fa-times-circle fa-2x"></i></a>
                             </td>
                         </tr>
-                        <tr ng-repeat-end ng-show="details.editPaymentDetails && !enableThirdPartyDisbursement">
+                        <tr ng-repeat-end ng-show="action === 'approve' && details.editPaymentDetails && !enableThirdPartyDisbursement">
                             <td colspan="4">
                                 <div class="row">
                                     <div class="col-sm-3">
@@ -163,7 +164,7 @@
                             <td></td>
                             <td>{{showTrancheAmountTotal}}</td>
                         </tr>
-                        <tr ng-show="approvalTranchePrincipalMismatch">
+                        <tr ng-show="tranchePrincipalMismatch">
                             <td colspan="4" class="text-danger">
                                 Total tranche amount ({{showTrancheAmountTotal | number}}) must equal the approved principal
                                 ({{formData.approvedLoanAmount | number}}).
@@ -779,17 +780,13 @@
                 </div>
                 <div class="form-group" ng-class="{'has-error': loanactionform.updatedPrincipal.$error.trancheTotal}">
                     <label class="control-label col-sm-2">{{ 'label.heading.principal' |
-                        translate}}<span class="required">*</span></label>
+                        translate}}</label>
 
                     <div class="col-sm-3">
                         <input id="principal" type="text" name="updatedPrincipal" ng-model="formData.updatedPrincipal"
-                               ng-change="validateUpdatedTranchePrincipal()"
                                class="form-control"
-                               number-format required late-Validate>
-                        <small class="error" ng-show="loanactionform.updatedPrincipal.$error.trancheTotal">
-                            Total tranche amount ({{updatedTrancheTotal | number}}) must equal the approved principal
-                            ({{formData.approvedLoanAmount | number}}).
-                        </small>
+                               number-format disabled>
+                        <small class="help-block">Use Manage tranches to change a tranche amount.</small>
                     </div>
                 </div>
                 <div ng-if="!enableThirdPartyDisbursement">
@@ -1041,7 +1038,7 @@
                                 </button>
                                 <button id="save" type="submit" has-permission='{{taskPermissionName}}' wz-next class="btn btn-primary"
                                         ng-disabled="(action === 'editdisbursedate' && loanactionform.updatedPrincipal.$invalid)
-                                            || (action === 'approve' && approvalTranchePrincipalMismatch)">{{
+                                            || ((action === 'approve' || action === 'adddisbursedetails') && tranchePrincipalMismatch)">{{
                                     'label.button.save' | translate}}
                                 </button>
                             </div>
