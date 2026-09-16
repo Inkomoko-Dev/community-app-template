@@ -134,9 +134,11 @@
             };
             scope.canOfferRecovery = function () {
                 var currentUserId = scope.currentSession && scope.currentSession.user && scope.currentSession.user.userId;
-                return scope.canApprove && scope.request && currentUserId &&
-                    String(scope.request.status || '').toUpperCase() === 'EXECUTING' &&
-                    Number(scope.request.approverId) === Number(currentUserId);
+                var status = String(scope.request && scope.request.status || '').toUpperCase();
+                var isCreator = currentUserId && Number(scope.request.createdById) === Number(currentUserId);
+                return scope.request &&
+                    (scope.canApprove || scope.canCreate || isCreator) &&
+                    (status === 'EXECUTING' || status === 'FAILED' || status === 'PARTIAL_SUCCESS');
             };
             scope.executionProgress = function () {
                 var total = scope.request ? scope.request.totalProcessed + scope.request.totalRemaining : 0;
@@ -305,6 +307,7 @@
                     { executionId: scope.executionId }, {},
                     function () {
                         scope.state.recovering = false;
+                        if (scope.request) { scope.request.status = 'EXECUTING'; }
                         loadPreview(true);
                     },
                     function (response) {
