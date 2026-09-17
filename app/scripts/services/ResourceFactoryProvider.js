@@ -1123,6 +1123,14 @@
                         delete: { method: 'DELETE', params: {} }
                     }),
 
+                    novuCampaignTemplateResource: defineResource(apiVer + "/novu/campaigns/template", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+
+                    novuCampaignTriggerResource: defineResource(apiVer + "/novu/campaigns/:campaignId/trigger", { campaignId: '@campaignId' }, {
+                        save: { method: 'POST', params: {} }
+                    }),
+
                     novuEventResource: defineResource(apiVer + "/novu/events", {}, {
                         get: { method: 'GET', params: {} }
                     }),
@@ -1132,6 +1140,10 @@
                     }),
 
                     novuSubscriberSyncResource: defineResource(apiVer + "/novu/subscribers/sync", {}, {
+                        save: { method: 'POST', params: {} }
+                    }),
+
+                    novuSubscriberCredentialsResource: defineResource(apiVer + "/novu/subscribers/:subscriberId/credentials", { subscriberId: '@subscriberId' }, {
                         save: { method: 'POST', params: {} }
                     }),
 
