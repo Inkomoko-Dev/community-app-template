@@ -632,7 +632,7 @@
 
                     bulkLoanRescheduleExecutionResource: defineResource( apiVer + "/bulk-reschedule/:executionId", { executionId: '@executionId'}, {
                         get: { method: 'GET', params: {}},
-                        preview: { method: 'GET', url: baseUrl + apiVer + "/bulk-reschedule/:executionId/preview", params: { executionId: '@executionId', page: '@page', size: '@size', status: '@status'}},
+                        preview: { method: 'GET', url: baseUrl + apiVer + "/bulk-reschedule/:executionId/preview", params: { executionId: '@executionId', page: '@page', size: '@size', status: '@status', sortBy: '@sortBy', sortOrder: '@sortOrder'}},
                         approvers: { method: 'GET', isArray: true, url: baseUrl + apiVer + "/bulk-reschedule/:executionId/approvers", params: { executionId: '@executionId'}},
                         audit: { method: 'GET', isArray: true, url: baseUrl + apiVer + "/bulk-reschedule/:executionId/audit", params: { executionId: '@executionId'}},
                         cancel: { method: 'DELETE', url: baseUrl + apiVer + "/bulk-reschedule/:executionId", params: { executionId: '@executionId'}},

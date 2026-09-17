@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        BulkLoanRescheduleDetailController: function (scope, resourceFactory, routeParams, location, http, API_VERSION, $rootScope, timeout, $translate) {
+        BulkLoanRescheduleDetailController: function (scope, resourceFactory, routeParams, location, http, API_VERSION, $rootScope, timeout, $translate, previewHelper) {
             var defaultLimit = 15;
             var pollPromise = null;
             scope.executionId = routeParams.executionId;
@@ -15,7 +15,8 @@
             scope.approvalRequest = { approverId: null, submissionNote: '' };
             scope.auditHistory = [];
             scope.canViewAudit = false;
-            scope.previewQuery = { page: 1, pageSize: defaultLimit, total: 0, hasMore: false, status: '' };
+            scope.previewQuery = previewHelper.newQuery(defaultLimit, { status: '' });
+            scope.previewColumns = previewHelper.columns;
             scope.statusLabel = function (status) {
                 return $translate.instant('label.bulkreschedule.status.' + String(status || '').toLowerCase());
             };
@@ -196,7 +197,9 @@
                     executionId: scope.executionId,
                     page: scope.previewQuery.page - 1,
                     size: scope.previewQuery.pageSize,
-                    status: scope.previewQuery.status || undefined
+                    status: scope.previewQuery.status || undefined,
+                    sortBy: scope.previewQuery.sortBy,
+                    sortOrder: scope.previewQuery.sortOrder
                 }, function (data) {
                     var rows = data.pageItems || [];
                     scope.request.loanResults = rows.map(normalizeLoan);
@@ -224,6 +227,13 @@
                 if (scope.previewQuery.page <= 1 || scope.state.loading) { return; }
                 scope.previewQuery.page -= 1;
                 loadPreview(false);
+            };
+            scope.sortPreview = function (column) {
+                previewHelper.toggleSort(scope.previewQuery, column);
+                loadPreview(true);
+            };
+            scope.sortIcon = function (column) {
+                return previewHelper.sortIcon(scope.previewQuery, column);
             };
             scope.pageStart = function () {
                 return scope.previewQuery.total ? ((scope.previewQuery.page - 1) * scope.previewQuery.pageSize) + 1 : 0;
@@ -343,7 +353,7 @@
         }
     });
     mifosX.ng.application.controller('BulkLoanRescheduleDetailController', [
-        '$scope', 'ResourceFactory', '$routeParams', '$location', '$http', 'API_VERSION', '$rootScope', '$timeout', '$translate',
+        '$scope', 'ResourceFactory', '$routeParams', '$location', '$http', 'API_VERSION', '$rootScope', '$timeout', '$translate', 'BulkReschedulePreviewHelper',
         mifosX.controllers.BulkLoanRescheduleDetailController
     ]).run(function ($log) {
         $log.info('BulkLoanRescheduleDetailController initialized');
