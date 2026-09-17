@@ -41,6 +41,14 @@
             {{'label.bulkreschedule.recover.availableat' | translate:{date: (request.recoveryAvailableAt | date:'dd MMM yyyy, h:mm a')} }}
         </small>
     </div>
+    <div class="alert alert-warning" ng-if="request && canRecoverExecution() && !isExecutionActive()">
+        {{'label.bulkreschedule.recover.help' | translate}}
+        <button class="btn btn-warning btn-sm" ng-click="recoverExecution()"
+                ng-disabled="state.recovering || !canRecoverExecution()">
+            <i class="fa" ng-class="state.recovering ? 'fa-spinner fa-spin' : 'fa-repeat'"></i>
+            {{(state.recovering ? 'label.bulkreschedule.recovering' : 'label.bulkreschedule.recover') | translate}}
+        </button>
+    </div>
 
     <div class="panel panel-default" ng-if="request">
         <div class="panel-heading"><strong>{{'label.bulkreschedule.approvalstatus' | translate}}</strong></div>
@@ -89,9 +97,9 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-condensed">
                 <thead><tr>
-                    <th>{{'label.bulkreschedule.loanaccount' | translate}}</th><th>{{'label.bulkreschedule.client' | translate}}</th><th>{{'label.bulkreschedule.office' | translate}}</th><th>{{'label.bulkreschedule.loanproduct' | translate}}</th><th>{{'label.bulkreschedule.loanofficer' | translate}}</th><th>{{'label.bulkreschedule.loanstatus' | translate}}</th><th>{{'label.bulkreschedule.result' | translate}}</th>
-                    <th>{{'label.bulkreschedule.currentrate' | translate}}</th><th>{{'label.bulkreschedule.newrate' | translate}}</th><th>{{'label.bulkreschedule.ratemethod' | translate}}</th><th>{{'label.bulkreschedule.outstanding' | translate}}</th><th>{{'label.bulkreschedule.newoutstanding' | translate}}</th>
-                    <th>{{'label.bulkreschedule.currentterm' | translate}}</th><th>{{'label.bulkreschedule.newterm' | translate}}</th><th>{{'label.bulkreschedule.nextinstallment' | translate}}</th><th>{{'label.bulkreschedule.reason.short' | translate}}</th><th>{{'label.bulkreschedule.excludereason' | translate}}</th>
+                    <th class="pointer" ng-repeat="column in previewColumns" ng-click="sortPreview(column.key)">
+                        {{column.label | translate}} <i class="fa" ng-class="sortIcon(column.key)"></i>
+                    </th>
                 </tr></thead>
                 <tbody>
                 <tr ng-repeat="loan in request.loanResults track by $index">
