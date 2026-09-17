@@ -13,7 +13,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'SessionManager',
             'Paginator',
             'UIConfigService',
-            'NotificationResponseHeaderProvider'
+            'NotificationResponseHeaderProvider',
+            'BulkReschedulePreviewHelper'
         ],
 
         controllers: [
