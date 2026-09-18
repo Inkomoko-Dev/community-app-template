@@ -1,0 +1,49 @@
+<div class="content-container" ng-controller="ViewLoanClassificationConfigsController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.loanclassification' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>{{'label.heading.loanclassification' | translate}}</h4>
+                        <p>{{'label.view.loanclassification' | translate}}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="pull-right">
+                            <a href="#/loanclassificationsummary" class="btn btn-default" has-permission='READ_LOANCLASSIFICATIONCONFIG'>
+                                {{'label.button.classificationSummary' | translate}}
+                            </a>
+                            <a href="#/createloanclassification" class="btn btn-primary" has-permission='CREATE_LOANCLASSIFICATIONCONFIG'>
+                                <i class="fa fa-plus"></i>&nbsp;&nbsp;{{'label.button.createclassificationconfig' | translate}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                <tr class="graybg">
+                    <th>{{'label.heading.country' | translate}}</th>
+                    <th>{{'label.heading.thresholds' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="pointer-main" ng-repeat="config in configs">
+                    <td class="pointer" data-ng-click="routeTo(config.id)">{{config.countryName}}</td>
+                    <td class="pointer" data-ng-click="routeTo(config.id)">
+                        <span ng-repeat="band in config.thresholds">
+                            {{band.classification}} ({{band.minDaysInArrears}}–{{band.maxDaysInArrears == null ? '∞' : band.maxDaysInArrears}}){{$last ? '' : ', '}}
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="alert alert-info" ng-if="!configs.length">
+                {{'label.message.noloanclassificationconfigs' | translate}}
+            </div>
+        </div>
+    </div>
+</div>

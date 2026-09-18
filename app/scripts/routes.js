@@ -1025,6 +1025,21 @@
             .when('/editprovisioningcategory/:categoryId', {
                 templateUrl: 'views/organization/provisioning/EditProvisioningCategory.html'
             })
+            .when('/loanclassification', {
+                templateUrl: 'views/organization/loanclassification/ViewLoanClassificationConfigs.html'
+            })
+            .when('/createloanclassification', {
+                templateUrl: 'views/organization/loanclassification/CreateLoanClassificationConfig.html'
+            })
+            .when('/viewloanclassification/:configId', {
+                templateUrl: 'views/organization/loanclassification/ViewLoanClassificationConfig.html'
+            })
+            .when('/editloanclassification/:configId', {
+                templateUrl: 'views/organization/loanclassification/EditLoanClassificationConfig.html'
+            })
+            .when('/loanclassificationsummary', {
+                templateUrl: 'views/organization/loanclassification/LoanClassificationSummary.html'
+            })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'
             })
