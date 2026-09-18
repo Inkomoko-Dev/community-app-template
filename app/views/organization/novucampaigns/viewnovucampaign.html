@@ -1,0 +1,123 @@
+<div ng-controller="ViewNovuCampaignController" class="content-container">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/novucampaigns">Novu campaigns</a></li>
+        <li class="active">{{campaignData.campaignName}}</li>
+    </ul>
+    <api-validate></api-validate>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h3>View Novu campaign</h3>
+            </div>
+            <br/>
+            <uib-tabset>
+                <uib-tab heading="{{'label.heading.campaign' | translate}}">
+                    <div class="container">
+                        <div class="row col-md-12">
+                            <h3 class="bolder col-md-12">{{campaignData.campaignName}}
+                                <div class="pull-right">
+                                    <div class="btn-group">
+                                        <a href="#/editnovucampaign/{{campaignData.id}}" class="btn btn-primary" has-permission="UPDATE_NOVUCAMPAIGN">
+                                            <i class="fa fa-edit"></i> {{'label.button.edit' | translate}}
+                                        </a>
+                                        <a data-ng-click="toggleActive()" class="btn btn-primary" has-permission="UPDATE_NOVUCAMPAIGN">
+                                            {{campaignData.active ? 'Deactivate' : 'Activate'}}
+                                        </a>
+                                        <a data-ng-click="sendNow()" class="btn btn-success"
+                                           ng-if="campaignData.triggerType === 'DIRECT' || campaignData.triggerType === 'SCHEDULED'"
+                                           ng-disabled="sending" has-permission="CREATE_NOVUCAMPAIGN">
+                                            {{sending ? 'Sending…' : 'Send now'}}
+                                        </a>
+                                        <a data-ng-click="deleteCampaign()" class="btn btn-danger" has-permission="DELETE_NOVUCAMPAIGN">
+                                            <i class="fa fa-trash"></i> {{'label.button.delete' | translate}}
+                                        </a>
+                                    </div>
+                                </div>
+                                <hr>
+                            </h3>
+                            <p ng-if="sendResult" class="text-success">Triggered {{sendResult.triggered}} (skipped {{sendResult.skipped}}).</p>
+                            <div class="col-md-12">
+                                <table class="table table-bordered table-striped">
+                                    <tr>
+                                        <td><strong>{{'label.heading.campaignname' | translate}}</strong></td>
+                                        <td>{{campaignData.campaignName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.status' | translate}}</strong></td>
+                                        <td>
+                                            <span class="label" ng-class="campaignData.active ? 'label-success' : 'label-default'">
+                                                {{campaignData.active ? 'Active' : 'Inactive'}}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Channels</strong></td>
+                                        <td>{{campaignData.channels}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.triggertype' | translate}}</strong></td>
+                                        <td>{{campaignData.triggerType}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Event</strong></td>
+                                        <td>{{campaignData.eventType}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Novu workflow ID</strong></td>
+                                        <td>{{campaignData.workflowId}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.reportname' | translate}}</strong></td>
+                                        <td>{{campaignData.reportName}}</td>
+                                    </tr>
+                                    <tr ng-if="campaignData.recurrenceStartDate">
+                                        <td><strong>Schedule start</strong></td>
+                                        <td>{{displayDate(campaignData.recurrenceStartDate)}}</td>
+                                    </tr>
+                                    <tr ng-if="campaignData.recurrence">
+                                        <td><strong>{{'label.heading.recurrence' | translate}}</strong></td>
+                                        <td>{{campaignData.recurrence}}</td>
+                                    </tr>
+                                    <tr ng-if="campaignData.nextTriggerDate">
+                                        <td><strong>Next trigger</strong></td>
+                                        <td>{{displayDate(campaignData.nextTriggerDate)}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{'label.heading.templatemsg' | translate}}</strong></td>
+                                        <td>{{campaignMessage()}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </uib-tab>
+                <uib-tab heading="Delivery logs" has-permission="READ_NOVUNOTIFICATIONLOG">
+                    <div class="container">
+                        <p class="text-muted">These rows record Novu trigger acceptance or failure, not final provider delivery status.</p>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Event</th>
+                                <th>Subscriber</th>
+                                <th>Channel</th>
+                                <th>{{'label.heading.status' | translate}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="log in logs">
+                                <td>{{log.createdOn | DateFormat}}</td>
+                                <td>{{log.eventType}}</td>
+                                <td>{{log.subscriberId}}</td>
+                                <td>{{log.channel}}</td>
+                                <td>{{log.status}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+</div>

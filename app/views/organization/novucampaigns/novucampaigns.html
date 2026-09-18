@@ -1,317 +1,57 @@
 <div class="content-container" ng-controller="NovuCampaignsController">
     <ul class="breadcrumb">
-        <li><a href="#/organization">Organization</a></li>
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
         <li class="active">Novu campaigns</li>
     </ul>
-    <div class="card"><div class="content">
-        <h3>Novu notification campaigns</h3>
-        <p class="text-muted">
-            Direct and scheduled campaigns use a stretchy-report audience, the same way SMS campaigns do.
-            Triggered campaigns fire on loan events. CBS renders <code>${variableName}</code> before calling Novu.
-        </p>
-        <div class="well well-sm" has-permission="CREATE_NOVUCAMPAIGN">
-            <button class="btn btn-default" ng-click="syncSubscribers()" ng-disabled="syncing"><i class="fa fa-users"></i> {{syncing ? 'Syncing…' : 'Sync clients and users'}}</button>
-            <span ng-if="syncResult" class="text-success"> Synced {{syncResult.synced}} of {{syncResult.total}}; {{syncResult.failed}} failed.</span>
-            <span ng-if="sendResult" class="text-success"> Last send triggered {{sendResult.triggered}} (skipped {{sendResult.skipped}}).</span>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>Novu campaigns</h4>
+            </div>
+            <p class="text-muted">
+                Send SMS, WhatsApp, email, or in-app messages to clients and staff when a loan event happens,
+                on a schedule, or immediately.
+            </p>
+            <br>
+            <div class="row">
+                <div class="col-sm-12 col-md-6">
+                    <input ng-model="filterText" type="text" class="form-control" placeholder="{{'label.input.filterbyname' | translate}}">
+                </div>
+                <div class="col-sm-12 col-md-6">
+                    <a href="#/createnovucampaign" class="btn btn-primary pull-right" has-permission="CREATE_NOVUCAMPAIGN">
+                        <i class="fa fa-plus fa fa-large"></i>&nbsp;&nbsp;{{'label.button.createcampaign' | translate}}
+                    </a>
+                    <button class="btn btn-default pull-right" style="margin-right: 8px;" ng-click="syncSubscribers()" ng-disabled="syncing" has-permission="CREATE_NOVUCAMPAIGN">
+                        <i class="fa fa-users"></i> {{syncing ? 'Syncing…' : 'Sync contacts'}}
+                    </button>
+                </div>
+            </div>
+            <p ng-if="syncResult" class="text-success">
+                Synced {{syncResult.synced}} of {{syncResult.total}}; {{syncResult.failed}} failed.
+            </p>
+            <br>
+            <table class="table">
+                <thead>
+                <tr class="graybg">
+                    <th>{{'label.heading.campaignname' | translate}}</th>
+                    <th>Channels</th>
+                    <th>{{'label.heading.triggertype' | translate}}</th>
+                    <th>{{'label.heading.status' | translate}}</th>
+                    <th>Workflow</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="pointer-main" ng-repeat="campaign in campaigns | filter:{campaignName:filterText}">
+                    <td class="pointer" data-ng-click="routeTo(campaign.id)">{{campaign.campaignName}}</td>
+                    <td class="pointer" data-ng-click="routeTo(campaign.id)">{{campaign.channels}}</td>
+                    <td class="pointer" data-ng-click="routeTo(campaign.id)">{{campaign.triggerType}}</td>
+                    <td class="pointer" data-ng-click="routeTo(campaign.id)">
+                        <span class="label" ng-class="campaign.active ? 'label-success' : 'label-default'">{{statusLabel(campaign)}}</span>
+                    </td>
+                    <td class="pointer" data-ng-click="routeTo(campaign.id)"><code>{{campaign.workflowId}}</code></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-        <uib-tabset>
-            <uib-tab heading="Campaigns" has-permission="READ_NOVUCAMPAIGN">
-                <br>
-                <form name="novuCampaignForm" class="form-horizontal well" ng-submit="submit()" novalidate>
-                    <api-validate></api-validate>
-                    <fieldset>
-                        <legend>{{editing ? 'Edit campaign' : 'Create campaign'}}</legend>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Name</label>
-                            <div class="col-sm-5"><input class="form-control" ng-model="formData.campaignName" required></div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Novu workflow ID</label>
-                            <div class="col-sm-5"><input class="form-control" ng-model="formData.workflowId" placeholder="loan-approved" required></div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Delivery mode</label>
-                            <div class="col-sm-5">
-                                <select class="form-control" ng-model="formData.triggerType" ng-options="type for type in triggerTypes" ng-change="onTriggerTypeChange()" required></select>
-                                <span class="help-block">Direct sends on demand. Scheduled runs from a start time. Triggered follows loan events.</span>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-if="formData.triggerType === 'TRIGGERED'">
-                            <label class="control-label col-sm-2">Event</label>
-                            <div class="col-sm-5">
-                                <select ng-if="!customEvent" class="form-control" ng-model="formData.eventType" ng-options="event for event in events" ng-required="!customEvent">
-                                    <option value="">Select loan event</option>
-                                </select>
-                                <input ng-if="customEvent" class="form-control" ng-model="formData.eventType" placeholder="MY_NEW_EVENT" ng-required="customEvent">
-                                <label class="checkbox"><input type="checkbox" ng-model="customEvent" ng-change="formData.eventType = ''"> Custom event</label>
-                                <span class="help-block" ng-if="customEvent">Trigger with POST /novu/events/{{formData.eventType || '{eventType}'}}/trigger.</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Subscribers</label>
-                            <div class="col-sm-5">
-                                <select class="form-control" ng-model="formData.recipientType" ng-options="type for type in recipientTypes" required></select>
-                                <span class="help-block">Client means the borrower; staff means the assigned loan officer.</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Channels</label>
-                            <div class="col-sm-8">
-                                <label class="checkbox-inline" ng-repeat="channel in channelOptions">
-                                    <input type="checkbox" ng-model="selectedChannels[channel]"> {{channel}}
-                                </label>
-                            </div>
-                        </div>
-
-                        <div ng-if="usesReportAudience()">
-                            <div class="form-group">
-                                <label class="control-label col-sm-2">Business rule</label>
-                                <div class="col-sm-5">
-                                    <select class="form-control" ng-model="selectedReport"
-                                            ng-options="rule as rule.reportName for rule in filteredBusinessRules"
-                                            ng-change="reportSelected(selectedReport.reportName)" required>
-                                        <option value="">Select stretchy report</option>
-                                    </select>
-                                    <span class="help-block">
-                                        The report must return <code>id</code> or <code>subscriberId</code>, plus phone/email and template fields such as <code>dueDate</code>, <code>amountDue</code>, and <code>daysUntilDue</code>.
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-repeat="reportParam in reportParams">
-                                <label class="control-label col-sm-2">{{reportParam.label}}</label>
-                                <div class="col-sm-5">
-                                    <select class="form-control" ng-model="formData[reportParam.inputName]"
-                                            ng-options="option.id as option.name for option in reportParam.selectOptions"
-                                            ng-change="getDependencies(reportParam)">
-                                        <option value="">Select one</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-repeat="reportTextParam in reportTextParams">
-                                <label class="control-label col-sm-2">{{reportTextParam.label}}</label>
-                                <div class="col-sm-5">
-                                    <input class="form-control" ng-model="formData[reportTextParam.inputName]">
-                                </div>
-                            </div>
-                            <div class="form-group" ng-repeat="reportDateParam in reportDateParams">
-                                <label class="control-label col-sm-2">{{reportDateParam.label}}</label>
-                                <div class="col-sm-5">
-                                    <input type="text" class="form-control" datepicker-pop="yyyy-MM-dd"
-                                           ng-model="formData[reportDateParam.inputName]" is-open="'opened'+$index">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-sm-offset-2 col-sm-5">
-                                    <button type="button" class="btn btn-default" ng-click="loadReportColumns()">Load report columns</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div ng-if="formData.triggerType === 'SCHEDULED'">
-                            <div class="form-group">
-                                <label class="control-label col-sm-2">Schedule start</label>
-                                <div class="col-sm-3">
-                                    <input type="text" class="form-control" datepicker-pop="dd MMMM yyyy"
-                                           ng-model="formData.recurrenceStartDate" is-open="openedStart" ng-required="formData.triggerType === 'SCHEDULED'">
-                                </div>
-                                <div class="col-sm-5">
-                                    <timepicker ng-model="campaignDataTime"></timepicker>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-2">Repeats</label>
-                                <div class="col-sm-3">
-                                    <select class="form-control" ng-model="formData.frequency"
-                                            ng-options="option.id as option.value for option in frequencyTypeOptions"
-                                            ng-change="selectedPeriod(formData.frequency)">
-                                        <option value="">Once unless recurrence is set</option>
-                                    </select>
-                                </div>
-                                <label class="control-label col-sm-2">Every</label>
-                                <div class="col-sm-2">
-                                    <select class="form-control" ng-model="formData.repeatsEvery" ng-options="option for option in repeatsEveryOptions"></select>
-                                </div>
-                                <label class="control-label">{{periodValue}}</label>
-                            </div>
-                            <div class="form-group" ng-if="formData.frequency == 2">
-                                <label class="control-label col-sm-2">On day</label>
-                                <div class="col-sm-8">
-                                    <label class="radio-inline" ng-repeat="day in weekDays">
-                                        <input type="radio" ng-model="formData.repeatsOnDay" ng-value="day.id"> {{day.value}}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Template variables</label>
-                            <div class="col-sm-8">
-                                <p>
-                                    Click a variable to insert <code>${variableName}</code> into the last focused message field
-                                    ({{activeTemplateField}}).
-                                </p>
-                                <a href="" class="label label-info" style="margin: 2px; display: inline-block;"
-                                   ng-repeat="variable in variableList" ng-click="insertVariable(variable)">{{variable}}</a>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-if="selectedChannels.EMAIL">
-                            <label class="control-label col-sm-2">Email subject</label>
-                            <div class="col-sm-7">
-                                <input class="form-control" ng-model="formData.emailSubject" ng-focus="focusTemplateField('emailSubject')" placeholder="Loan status update">
-                            </div>
-                        </div>
-                        <div class="form-group" ng-if="selectedChannels.EMAIL">
-                            <label class="control-label col-sm-2">Email body</label>
-                            <div class="col-sm-7">
-                                <textarea rows="4" class="form-control" ng-model="formData.emailBody" ng-focus="focusTemplateField('emailBody')" placeholder="Hello ${clientName}, your loan ${loanAccountNumber} has changed."></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-if="selectedChannels.SMS">
-                            <label class="control-label col-sm-2">SMS body</label>
-                            <div class="col-sm-7">
-                                <textarea rows="2" class="form-control" ng-model="formData.smsBody" ng-focus="focusTemplateField('smsBody')"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-if="selectedChannels.IN_APP">
-                            <label class="control-label col-sm-2">In-app body</label>
-                            <div class="col-sm-7">
-                                <textarea rows="2" class="form-control" ng-model="formData.inAppBody" ng-focus="focusTemplateField('inAppBody')"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-if="hasChatChannel()">
-                            <label class="control-label col-sm-2">Chat body</label>
-                            <div class="col-sm-7">
-                                <textarea rows="3" class="form-control" ng-model="formData.chatBody" ng-focus="focusTemplateField('chatBody')"
-                                          placeholder="Used for WhatsApp, Telegram, and Slack"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Novu workflow bindings</label>
-                            <div class="col-sm-7">
-                                <div class="well well-sm">
-                                    <div ng-repeat="(field, binding) in novuWorkflowBindings"><code>{{binding}}</code> ← {{field}}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-5">
-                                <label class="checkbox"><input type="checkbox" ng-model="formData.active"> Active</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-offset-2">
-                            <button type="button" class="btn btn-default" ng-if="editing" ng-click="cancel()">Cancel</button>
-                            <button ng-if="!editing" type="submit" class="btn btn-primary" ng-disabled="novuCampaignForm.$invalid" has-permission="CREATE_NOVUCAMPAIGN">Save</button>
-                            <button ng-if="editing" type="submit" class="btn btn-primary" ng-disabled="novuCampaignForm.$invalid" has-permission="UPDATE_NOVUCAMPAIGN">Save</button>
-                        </div>
-                    </fieldset>
-                </form>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Workflow</th>
-                        <th>Trigger</th>
-                        <th>Event</th>
-                        <th>Schedule</th>
-                        <th>Next trigger</th>
-                        <th>Channels</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="campaign in campaigns">
-                        <td>{{campaign.campaignName}}</td>
-                        <td><code>{{campaign.workflowId}}</code></td>
-                        <td>{{campaign.triggerType}}</td>
-                        <td>{{campaign.eventType}}</td>
-                        <td>
-                            <span ng-if="campaign.triggerType === 'SCHEDULED'">
-                                {{displayDate(campaign.recurrenceStartDate)}}
-                                <div ng-if="campaign.recurrence"><small>{{campaign.recurrence}}</small></div>
-                            </span>
-                            <span ng-if="campaign.triggerType !== 'SCHEDULED'">—</span>
-                        </td>
-                        <td>{{displayDate(campaign.nextTriggerDate) || '—'}}</td>
-                        <td>{{campaign.channels}}</td>
-                        <td><span class="label" ng-class="campaign.active ? 'label-success' : 'label-default'">{{campaign.active ? 'Active' : 'Inactive'}}</span></td>
-                        <td class="text-right">
-                            <button class="btn btn-xs btn-success" ng-if="campaign.triggerType === 'DIRECT' || campaign.triggerType === 'SCHEDULED'"
-                                    ng-click="sendNow(campaign)" ng-disabled="sendingId === campaign.id" has-permission="CREATE_NOVUCAMPAIGN">
-                                {{sendingId === campaign.id ? 'Sending…' : 'Send now'}}
-                            </button>
-                            <button class="btn btn-xs btn-primary" ng-click="edit(campaign)" has-permission="UPDATE_NOVUCAMPAIGN"><i class="fa fa-edit"></i></button>
-                            <button class="btn btn-xs btn-danger" ng-click="remove(campaign)" has-permission="DELETE_NOVUCAMPAIGN"><i class="fa fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </uib-tab>
-            <uib-tab heading="Chat credentials" has-permission="UPDATE_NOVUCAMPAIGN">
-                <br>
-                <p class="text-muted">
-                    CBS can store phone and email on Novu subscribers. Telegram chat IDs and Slack webhooks cannot be inferred
-                    from those fields, so they must be saved here (or with
-                    <code>POST /api/v1/novu/subscribers/{subscriberId}/credentials</code>).
-                </p>
-                <form class="form-horizontal well" ng-submit="saveCredentials()">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2">Subscriber ID</label>
-                        <div class="col-sm-5">
-                            <input class="form-control" ng-model="credentialForm.subscriberId" placeholder="client-123" required>
-                            <span class="help-block">Clients use <code>client-{id}</code>. Staff use <code>staff-{id}</code>. Users use <code>user-{id}</code>.</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2">Provider</label>
-                        <div class="col-sm-5">
-                            <select class="form-control" ng-model="credentialForm.providerId"
-                                    ng-options="id as channel + ' (' + id + ')' for (channel, id) in chatProviders"
-                                    ng-change="onProviderChange()"></select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2">Credentials JSON</label>
-                        <div class="col-sm-7">
-                            <textarea rows="5" class="form-control" ng-model="credentialForm.credentialsJson"></textarea>
-                            <span class="help-block">Follow Novu's provider-credentials body. Examples: WhatsApp phone number, Telegram chat ID, Slack webhook URL.</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-offset-2">
-                        <p class="text-danger" ng-if="credentialError">{{credentialError}}</p>
-                        <p class="text-success" ng-if="credentialResult">Saved: {{credentialResult.message || credentialResult.transactionId}}</p>
-                        <button type="submit" class="btn btn-primary">Save credentials</button>
-                    </div>
-                </form>
-            </uib-tab>
-            <uib-tab heading="Delivery logs" has-permission="READ_NOVUNOTIFICATIONLOG">
-                <br><button class="btn btn-default pull-right" ng-click="load()"><i class="fa fa-refresh"></i> Refresh</button>
-                <p class="text-muted">These rows record Novu trigger acceptance or failure, not final provider delivery or read status.</p>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Created</th>
-                        <th>Campaign</th>
-                        <th>Event</th>
-                        <th>Subscriber</th>
-                        <th>Channel</th>
-                        <th>Status</th>
-                        <th>Transaction</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="log in logs">
-                        <td>{{log.createdOn | DateFormat}}</td>
-                        <td>{{log.campaignName}}</td>
-                        <td>{{log.eventType}}</td>
-                        <td>{{log.subscriberId}}</td>
-                        <td>{{log.channel}}</td>
-                        <td><span class="label" ng-class="log.status === 'ACCEPTED' ? 'label-success' : 'label-danger'">{{log.status}}</span></td>
-                        <td><small>{{log.transactionId}}</small></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </uib-tab>
-        </uib-tabset>
-    </div></div>
+    </div>
 </div>

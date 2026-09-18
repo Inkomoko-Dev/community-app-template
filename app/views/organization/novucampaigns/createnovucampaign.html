@@ -1,0 +1,254 @@
+<div class="content-container" ng-controller="CreateNovuCampaignController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/novucampaigns">Novu campaigns</a></li>
+        <li class="active">{{editing ? 'Edit campaign' : 'Create campaign'}}</li>
+    </ul>
+    <br>
+    <div class="card">
+        <div class="content">
+            <hr>
+            <wizard current-step="step">
+                <wz-step icon="fa fa-circle-o" wz-title="Who and how">
+                    <div class="card-content">
+                        <form name="createnovuform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                            <api-validate></api-validate>
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">{{'label.input.campaignName' | translate}}<span class="required">*</span></label>
+                                    <div class="col-sm-5">
+                                        <input type="text" id="campaignName" name="campaignName" ng-model="campaignData.campaignName"
+                                               ng-change="syncWorkflowId()" class="form-control" required/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Who should receive it<span class="required">*</span></label>
+                                    <div class="col-sm-5">
+                                        <select class="form-control" ng-model="campaignData.recipientType"
+                                                ng-options="option.id as option.value for option in recipientTypeOptions" required></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">How they receive it<span class="required">*</span></label>
+                                    <div class="col-sm-8">
+                                        <label class="checkbox-inline" ng-repeat="channel in channelOptions">
+                                            <input type="checkbox" ng-model="selectedChannels[channel.id]"> {{channel.label}}
+                                        </label>
+                                        <span class="help-block">Choose every channel this campaign should use. SMS, WhatsApp, email, and in-app can be combined.</span>
+                                        <p class="text-danger" ng-if="!selectedChannelList().length">Select at least one channel.</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">When to send<span class="required">*</span></label>
+                                    <div class="col-sm-5">
+                                        <select id="triggerType" name="triggerType" class="form-control" ng-model="campaignData.triggerType"
+                                                ng-options="option.id as option.value for option in triggerTypeOptions" ng-change="getBusinessRule()" required>
+                                            <option value="">Select when to send</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="campaignData.triggerType === 'TRIGGERED'">
+                                    <label class="control-label col-sm-2">Loan event<span class="required">*</span></label>
+                                    <div class="col-sm-5">
+                                        <select class="form-control" ng-model="campaignData.eventType"
+                                                ng-options="event.id as event.label for event in loanEventOptions"
+                                                ng-change="onEventChange()" ng-required="campaignData.triggerType === 'TRIGGERED'">
+                                            <option value="">Select loan event</option>
+                                        </select>
+                                        <span class="help-block">For due-date or overdue reminders, choose “On a schedule” and a report instead.</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="campaignData.triggerType === 'SCHEDULED'">
+                                    <label class="control-label col-sm-2">{{'label.input.scheduledate' | translate}}<span class="required">*</span></label>
+                                    <div class="col-sm-3">
+                                        <input id="scheduleDate" name="scheduleDate" type="text" datepicker-pop="dd MMMM yyyy"
+                                               ng-model="campaignData.recurrenceStartDate" is-open="opened" min="minDate" class="form-control"
+                                               ng-required="campaignData.triggerType === 'SCHEDULED'" readonly/>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="campaignData.triggerType === 'SCHEDULED'">
+                                    <label class="control-label col-sm-2">{{'label.input.scheduletime' | translate}}<span class="required">*</span></label>
+                                    <div class="col-sm-3">
+                                        <timepicker id="scheduleTime" name="scheduleTime" ng-model="campaignData.time"></timepicker>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="campaignData.triggerType === 'SCHEDULED'">
+                                    <label class="control-label col-sm-2">{{'label.input.repeats' | translate}}</label>
+                                    <div class="col-sm-3">
+                                        <select id="repeats" name="repeats" class="form-control" ng-model="campaignData.frequency"
+                                                ng-options="option.id as option.value for option in frequencyTypeOptions"
+                                                ng-change="selectedPeriod(campaignData.frequency)">
+                                            <option value="">Once</option>
+                                        </select>
+                                    </div>
+                                    <label class="control-label col-sm-2">{{'label.input.repeatsevery' | translate}}</label>
+                                    <div class="col-sm-2">
+                                        <select class="form-control" ng-model="campaignData.repeatsEvery" ng-options="option for option in repeatsEveryOptions"></select>
+                                    </div>
+                                    <label class="control-label">{{periodValue}}</label>
+                                </div>
+                                <div class="form-group" ng-if="campaignData.triggerType === 'SCHEDULED' && campaignData.frequency == 2">
+                                    <label class="control-label col-sm-2"></label>
+                                    <div class="col-sm-1" ng-repeat="day in weekDays">
+                                        <input type="radio" ng-model="campaignData.repeatsOnDay" ng-value="day.id"> {{day.value}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="usesReportAudience()">
+                                    <label class="control-label col-sm-2">Who to include (report)<span class="required">*</span></label>
+                                    <div class="col-sm-5">
+                                        <select id="businessRule" name="businessRule" class="form-control"
+                                                ng-model="campaignData.reportName"
+                                                ng-options="rule.reportName as rule.reportName for rule in filteredBusinessRules"
+                                                ng-change="onReportChange()"
+                                                ng-required="usesReportAudience()">
+                                            <option value="">Select a report</option>
+                                        </select>
+                                        <span class="help-block">SMS campaign reports. Use them for SMS, WhatsApp, email, or in-app.</span>
+                                    </div>
+                                </div>
+                                <div ng-if="usesReportAudience()">
+                                    <div class="form-group" ng-repeat="reportParam in reportParams">
+                                        <label class="control-label col-sm-2">{{reportParam.label | translate}}<span class="required">*</span></label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" ng-model="formData[reportParam.inputName]"
+                                                    ng-options="option.id as option.name for option in reportParam.selectOptions"
+                                                    ng-change="getDependencies(reportParam)">
+                                                <option value="">{{'label.menu.selectone' | translate}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-repeat="reportTextParam in reportTextParams">
+                                        <label class="control-label col-sm-2">{{reportTextParam.label | translate}}</label>
+                                        <div class="col-sm-3">
+                                            <input class="form-control" ng-model="formData[reportTextParam.inputName]">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-repeat="reportDateParam in reportDateParams">
+                                        <label class="control-label col-sm-2">{{reportDateParam.label | translate}}</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" datepicker-pop="yyyy-MM-dd"
+                                                   ng-model="formData[reportDateParam.inputName]" is-open="'opened'+$index">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Novu workflow</label>
+                                    <div class="col-sm-5">
+                                        <input type="text" id="workflowId" name="workflowId" ng-model="campaignData.workflowId"
+                                               class="form-control" ng-change="autoWorkflow = false" required/>
+                                        <span class="help-block">Created in Novu automatically if it does not already exist. Must stay unique.</span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="pull-right">
+                                    <button id="save1" type="submit" class="btn btn-primary" ng-disabled="!selectedChannelList().length">{{'label.button.proceed' | translate}}</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </wz-step>
+                <wz-step icon="fa fa-circle-o" wz-title="Message">
+                    <div class="card-content">
+                        <form name="documentdetailsform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                            <api-validate></api-validate>
+                            <fieldset>
+                                <p class="help-block">
+                                    Write one message. It is sent on every channel you selected.
+                                    Click a variable to insert it, or use a suggested message for loan events.
+                                </p>
+                                <div class="form-group" ng-if="campaignData.triggerType === 'TRIGGERED'">
+                                    <div class="col-sm-offset-2 col-sm-8">
+                                        <button type="button" class="btn btn-default" ng-click="useSuggestedMessage()">Use suggested message</button>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="hasEmailChannel()">
+                                    <label class="control-label col-sm-2">Email subject</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" ng-model="campaignData.emailSubject">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Message<span class="required">*</span></label>
+                                    <div class="col-sm-8">
+                                        <textarea rows="5" name="campaignMessage" id="campaignMessage"
+                                                  ng-model="campaignData.campaignMessage" ng-change="autoMessage = false" class="form-control" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Insert a field</label>
+                                    <div class="col-sm-8">
+                                        <a href="" class="label label-info" style="margin: 2px; display: inline-block;"
+                                           ng-repeat="variable in variableList" ng-click="buildMessageTemplate(variable)">{{variable}}</a>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="pull-right">
+                                    <button id="save2" type="submit" class="btn btn-primary">{{'label.button.proceed' | translate}}</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </wz-step>
+                <wz-step icon="fa fa-circle-o" wz-title="{{'label.heading.preview' | translate}}">
+                    <div class="card-content">
+                        <form name="confirmationform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                            <api-validate></api-validate>
+                            <fieldset>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered card-table">
+                                        <tr>
+                                            <td>Name</td>
+                                            <td>{{campaignData.campaignName}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Who</td>
+                                            <td>{{campaignData.recipientType}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>How</td>
+                                            <td>{{selectedChannelList().join(', ')}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>When</td>
+                                            <td>{{campaignData.triggerType}}</td>
+                                        </tr>
+                                        <tr ng-if="campaignData.triggerType === 'TRIGGERED'">
+                                            <td>Loan event</td>
+                                            <td>{{campaignData.eventType}}</td>
+                                        </tr>
+                                        <tr ng-if="usesReportAudience()">
+                                            <td>Report</td>
+                                            <td>{{campaignData.report.reportName}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Novu workflow</td>
+                                            <td>{{campaignData.workflowId}}</td>
+                                        </tr>
+                                        <tr ng-if="hasEmailChannel()">
+                                            <td>Email subject</td>
+                                            <td>{{campaignData.emailSubject}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Message</td>
+                                            <td>{{campaignData.campaignMessage}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-5">
+                                        <label class="checkbox"><input type="checkbox" ng-model="campaignData.active"> Active</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="pull-right">
+                                        <button id="save3" type="submit" class="btn btn-primary">Save campaign</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </wz-step>
+            </wizard>
+        </div>
+    </div>
+</div>

@@ -1118,6 +1118,7 @@
 
                     novuCampaignResource: defineResource(apiVer + "/novu/campaigns/:campaignId", { campaignId: '@campaignId' }, {
                         getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
                         save: { method: 'POST', params: {} },
                         update: { method: 'PUT', params: {} },
                         delete: { method: 'DELETE', params: {} }
@@ -1125,6 +1126,10 @@
 
                     novuCampaignTemplateResource: defineResource(apiVer + "/novu/campaigns/template", {}, {
                         get: { method: 'GET', params: {} }
+                    }),
+
+                    novuAudienceReportResource: defineResource(apiVer + "/novu/campaigns/reports", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
                     }),
 
                     novuCampaignTriggerResource: defineResource(apiVer + "/novu/campaigns/:campaignId/trigger", { campaignId: '@campaignId' }, {

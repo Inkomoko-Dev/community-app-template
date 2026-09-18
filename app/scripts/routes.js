@@ -1112,6 +1112,15 @@
             .when('/novucampaigns', {
                 templateUrl: 'views/organization/novucampaigns/novucampaigns.html'
             })
+            .when('/createnovucampaign', {
+                templateUrl: 'views/organization/novucampaigns/createnovucampaign.html'
+            })
+            .when('/viewnovucampaign/:campaignId', {
+                templateUrl: 'views/organization/novucampaigns/viewnovucampaign.html'
+            })
+            .when('/editnovucampaign/:campaignId', {
+                templateUrl: 'views/organization/novucampaigns/createnovucampaign.html'
+            })
             .when('/createwhatsappcampaign', {
                 templateUrl: 'views/organization/whatsappcampaigns/createwhatsappcampaign.html'
             })
