@@ -1,6 +1,8 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $window, interval, webStorage, localStorageService) {
+            scope.bankDisbursementResult = $rootScope.bankDisbursementResult;
+            delete $rootScope.bankDisbursementResult;
             scope.loandocuments = [];
             scope.report = false;
             scope.hidePentahoReport = true;
@@ -25,40 +27,7 @@
             scope.cblpstatuses = null;
             scope.crbReportTransUnion = null;
             scope.crbReportMetrolpolIdentityVerification = null;
-
-
-            function applicableDisbursementDetail(loan) {
-                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
-                if (!details.length) {
-                    return null;
-                }
-                if (!loan.multiDisburseLoan) {
-                    return details[0];
-                }
-                var undisbursedDetails = details.filter(function (detail) {
-                    return !detail.actualDisbursementDate;
-                });
-                undisbursedDetails.sort(function (first, second) {
-                    var firstDate = first.expectedDisbursementDate || [];
-                    var secondDate = second.expectedDisbursementDate || [];
-                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
-                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    var dateComparison = firstDateValue.localeCompare(secondDateValue);
-                    return dateComparison || ((first.id || 0) - (second.id || 0));
-                });
-                if (undisbursedDetails.length) {
-                    return undisbursedDetails[0];
-                }
-                details.sort(function (first, second) {
-                    var firstDate = first.actualDisbursementDate || [];
-                    var secondDate = second.actualDisbursementDate || [];
-                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
-                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    var dateComparison = secondDateValue.localeCompare(firstDateValue);
-                    return dateComparison || ((second.id || 0) - (first.id || 0));
-                });
-                return details[0];
-            }
+            scope.isCrbVerificationInProgress = false;
 
             function applicableDisbursementDetail(loan) {
                 var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
@@ -89,37 +58,6 @@
                     var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
                     var dateComparison = secondDateValue.localeCompare(firstDateValue);
                     return dateComparison || ((second.id || 0) - (first.id || 0));
-                });
-                return details[0];
-            }
-
-            function applicableDisbursementDetail(loan) {
-                var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
-                if (!details.length) {
-                    return null;
-                }
-                if (!loan.multiDisburseLoan) {
-                    return details[0];
-                }
-                var undisbursedDetails = details.filter(function (detail) {
-                    return !detail.actualDisbursementDate;
-                });
-                undisbursedDetails.sort(function (first, second) {
-                    var firstDate = first.expectedDisbursementDate || [];
-                    var secondDate = second.expectedDisbursementDate || [];
-                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
-                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    return firstDateValue.localeCompare(secondDateValue);
-                });
-                if (undisbursedDetails.length) {
-                    return undisbursedDetails[0];
-                }
-                details.sort(function (first, second) {
-                    var firstDate = first.actualDisbursementDate || [];
-                    var secondDate = second.actualDisbursementDate || [];
-                    var firstDateValue = Array.isArray(firstDate) ? firstDate.join('-') : String(firstDate);
-                    var secondDateValue = Array.isArray(secondDate) ? secondDate.join('-') : String(secondDate);
-                    return secondDateValue.localeCompare(firstDateValue);
                 });
                 return details[0];
             }
@@ -169,7 +107,7 @@
                     return null;
                 }
 
-                if (angular.isObject(transactionRef)) {
+                if (angular.isObject(transactionRef) && (transactionRef.id || transactionRef.transactionId || transactionRef.resourceId)) {
                     return transactionRef.id || transactionRef.transactionId || transactionRef.resourceId || null;
                 }
 
@@ -278,6 +216,7 @@
 
                 var transactionTypeId = Number(transaction.type.id);
                 return transactionTypeId === 2 || transactionTypeId === 4 || transactionTypeId === 1 || transactionTypeId === 6 ||
+                    transactionTypeId === 32 ||
                     scope.isRecoveryPaymentTransaction(transaction) || scope.isRepaymentAtDisbursementTransaction(transaction);
             };
 
@@ -611,6 +550,9 @@
                     case "writeoff":
                         location.path('/loanaccount/' + accountId + '/writeoff');
                         break;
+                    case "partialwriteoff":
+                        location.path('/loanaccount/' + accountId + '/partialwriteoff');
+                        break;
                     case "recoverypayment":
                         location.path('/loanaccount/' + accountId + '/recoverypayment');
                         break;
@@ -711,16 +653,29 @@
                         location.path('/loanaccount/' + accountId + '/rejectprepareandsigncontract');
                         break;
                     case "crbVerification":
+                        if (scope.isCrbVerificationInProgress) {
+                            return;
+                        }
+                        scope.isCrbVerificationInProgress = true;
                         resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId}, function (data) {
                             scope.getCrbReport();
+                            scope.isCrbVerificationInProgress = false;
                             location.path('/viewloanaccount/' + accountId);
+                        }, function (error) {
+                            scope.isCrbVerificationInProgress = false;
                         });
-
-                            break;
+                        break;
                       case "crbVerificationKenya":
-                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId},function (data) {
+                            if (scope.isCrbVerificationInProgress) {
+                                return;
+                            }
+                            scope.isCrbVerificationInProgress = true;
+                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId}, function (data) {
                                  scope.crbMetropolIdentityVerification();
+                                 scope.isCrbVerificationInProgress = false;
                                  location.path('/viewloanaccount/' + accountId);
+                             }, function (error) {
+                                 scope.isCrbVerificationInProgress = false;
                              });
                             break;
                       case "verifyLoanCreditInfoEnhancedOnMetropolKenya":
@@ -773,7 +728,6 @@
             var DelChargeCtrl = function ($scope, $uibModalInstance, ids) {
                 $scope.delete = function () {
                     resourceFactory.LoanAccountResource.delete({loanId: routeParams.id, resourceType: 'charges', chargeId: ids}, {}, function (data) {
-
                         $uibModalInstance.close('delete');
                         route.reload();
                     });
@@ -828,21 +782,30 @@
                         && data.subStatus && data.subStatus.id === 200;
                     scope.partnerSupplierDisbursementDetail = null;
                     if (scope.enableThirdPartyDisbursement && data.disbursementDetails && data.disbursementDetails.length > 0) {
-                        var firstDisbursementDetail = data.disbursementDetails[0];
-                        if (firstDisbursementDetail
-                            && (firstDisbursementDetail.supplierId
-                                || firstDisbursementDetail.supplierName
-                                || firstDisbursementDetail.beneficiaryName
-                                || firstDisbursementDetail.clientPhoneNumber
-                                || firstDisbursementDetail.clientAccountNumber
-                                || firstDisbursementDetail.paymentTypeId
-                                || firstDisbursementDetail.paymentTypeName)) {
-                            scope.partnerSupplierDisbursementDetail = firstDisbursementDetail;
+                        var applicableDetail = applicableDisbursementDetail(data);
+                        if (applicableDetail
+                            && (applicableDetail.supplierId
+                                || applicableDetail.supplierName
+                                || applicableDetail.beneficiaryName
+                                || applicableDetail.clientPhoneNumber
+                                || applicableDetail.clientAccountNumber
+                                || applicableDetail.paymentTypeId
+                                || applicableDetail.paymentTypeName)) {
+                            scope.partnerSupplierDisbursementDetail = applicableDetail;
                         }
                     }
                     scope.decimals = data.currency.decimalPlaces;
                     scope.isResidualPenaltyWaiver = function (charge) {
                         return charge && charge.penalty && charge.waived && !charge.paid && Number(charge.amountOutstanding) > 0;
+                    };
+                    // Deliberately the complement of canWaiveLoanCharge, which returns false once a charge is paid:
+                    // the two actions are mutually exclusive by construction (CGLT-656).
+                    scope.canHistoricallyWaive = function (charge) {
+                        if (!charge || scope.loandetails.status.value != 'Active' || !charge.penalty
+                            || charge.chargeTimeType.value == 'Disbursement') {
+                            return false;
+                        }
+                        return Number(charge.amountPaid) > 0;
                     };
                     scope.canWaiveLoanCharge = function (charge) {
                         if (!charge || scope.loandetails.status.value != 'Active' || charge.paid || charge.chargeTimeType.value == 'Disbursement') {
@@ -850,6 +813,15 @@
                         }
                         return !charge.waived || scope.isResidualPenaltyWaiver(charge);
                     };
+                    // CGLT-656: the corrections already made on this loan, and how far each one got. A user without
+                    // READ_HISTORICALPENALTYWAIVER simply sees no tab rather than an error.
+                    scope.historicalPenaltyWaivers = [];
+                    resourceFactory.historicalPenaltyWaiversByLoanResource.getAll({ loanId: routeParams.id }, function (data) {
+                        scope.historicalPenaltyWaivers = data || [];
+                    }, function () {
+                        scope.historicalPenaltyWaivers = [];
+                    });
+
                     if (scope.loandetails.charges) {
                         scope.charges = scope.loandetails.charges;
                         for (var i in scope.charges) {
@@ -1183,6 +1155,10 @@
                                     name: "button.writeoff",
                                     taskPermissionName: 'WRITEOFF_LOAN'
                                 },
+                                {
+                                    name: "button.partialwriteoff",
+                                    taskPermissionName: 'PARTIALWRITEOFF_LOAN'
+                                },
 
                                 // {
                                 //     name: "button.payoff",
@@ -1229,6 +1205,9 @@
                         }
 
                         if (data.canDisburse && !scope.enableThirdPartyDisbursement) {
+                            var pendingDisbursementApproval = data.subStatus
+                                && (data.subStatus.id === 300
+                                    || data.subStatus.code === 'loanSubStatus.loanSubStatusType.pre.disbursement');
                             scope.buttons.singlebuttons.splice(1, 0, {
                                 name: pendingDisbursementApproval ? "button.approveDisbursement" : "button.disbursementRequest",
                                 icon: "fa fa-flag",
@@ -1881,8 +1860,17 @@
                 };
             };
 
+            // New buttons for credit bureau summary and different verification types
+            scope.creditBureauButton = `<div class="pull-right btn-group">
+                <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary" ng-disabled="isCrbVerificationInProgress">{{'label.button.creditcheck' | translate}}</a>
+                <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
+                   class="btn btn-primary" has-permission='{{button.taskPermissionName}}' 
+                   ng-disabled="isCrbVerificationInProgress && (button.name === 'button.crbVerification' || button.name === 'button.crbVerificationKenya')">
+                        <i class="{{button.icon}} "></i>&nbsp;{{'label.' + button.name | translate}} 
+                        <i ng-show="isCrbVerificationInProgress && (button.name === 'button.crbVerification' || button.name === 'button.crbVerificationKenya')" class="fa fa-spinner fa-spin"></i>
+                </a>
+            </div>`;
         }
-
 
     });
     mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', 'localStorageService', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
