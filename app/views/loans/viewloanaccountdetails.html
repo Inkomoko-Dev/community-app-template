@@ -1,4 +1,21 @@
 <div class="content-container loan-account-wide" ng-controller="ViewLoanDetailsController">
+    <div class="alert alert-success alert-dismissible fade in" ng-if="bankDisbursementResult" role="alert">
+        <button type="button" class="close" ng-click="bankDisbursementResult = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <i class="fa fa-check-circle"></i>
+        {{bankDisbursementResult.message}}
+        <span ng-if="bankDisbursementResult.reference">
+            {{'label.bank.disbursement.reference' | translate}}: {{bankDisbursementResult.reference}}
+        </span>
+    </div>
+    <div ng-show="isCrbVerificationInProgress"
+         style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: wait;">
+        <div style="background: #fff; padding: 24px 32px; border-radius: 4px; text-align: center;">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+            <div style="margin-top: 12px;">{{ 'label.heading.crbVerification' | translate}}...</div>
+        </div>
+    </div>
     <ul class="breadcrumb">
         <li ng-show="loandetails.clientName"><a
                 ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
@@ -34,7 +51,7 @@
                 <tbody>
                 <tr ng-repeat="charge in penalties">
                     <td>{{charge.name}}</td>
-                    <td>{{charge.dueDate | dateFormat}}</td>
+                    <td>{{charge.dueDate | DateFormat}}</td>
                     <td>{{charge.amountOutstanding | number}}</td>
                     <td>
                         <a class="btn btn-primary btn-sm" ng-click="select(charge)"><i class="fa fa-flag"></i>&nbsp;{{'label.button.waivecharge' | translate}}</a>
@@ -641,7 +658,7 @@
                             </tr>
                             <tr>
                                 <td>{{'label.heading.repayments' | translate}}</td>
-                                <td><span class="padded-td">{{loandetails.numberOfRepayments}} every {{loandetails.repaymentEvery}}&nbsp;{{loandetails.repaymentFrequencyType.value}}</span><span ng-show="loandetails.repaymentFrequencyType.id == 2 && loandetails.repaymentFrequencyNthDayType.id != 0 && loandetails.repaymentFrequencyDayOfWeekType.id != 0">&nbsp;on&nbsp;{{loandetails.repaymentFrequencyNthDayType.value}}&nbsp;{{loandetails.repaymentFrequencyDayOfWeekType.value}}</span>
+                                <td><span class="padded-td">{{loandetails.numberOfRepayments}} {{loandetails.repaymentEvery | RepaymentFrequencyLabel:loandetails.repaymentFrequencyType}}</span><span ng-show="loandetails.repaymentFrequencyType.id == 2 && loandetails.repaymentFrequencyNthDayType.id != 0 && loandetails.repaymentFrequencyDayOfWeekType.id != 0">&nbsp;on&nbsp;{{loandetails.repaymentFrequencyNthDayType.value}}&nbsp;{{loandetails.repaymentFrequencyDayOfWeekType.value}}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -1030,6 +1047,9 @@
                                     </td>
                                     <td class="pointer" data-ng-click="routeTo(loandetails.id,transaction)">
                                         {{transaction.type.value}}
+                                        <span class="label label-info" ng-if="transaction.type.id == 32">
+                                            {{'label.residualadjustment.automatic' | translate}}
+                                        </span>
                                         <span class="label label-warning reversed-correction-badge" ng-if="isTransactionReversed(transaction)"
                                               uib-tooltip="{{'tooltip.transaction.reversedcorrection' | translate}}" tooltip-placement="top">
                                             {{reversedBadgeLabelKey(transaction) | translate}}
@@ -1249,10 +1269,53 @@
                                        title="Adjust Insurance Charge">
                                         <i class="fa fa-pencil"></i> {{'label.button.adjust' | translate}}
                                     </a>
+                                    <!-- has-permission uses raw jQuery show/hide, so it must sit on a wrapper and
+                                         never on the same element as ng-show. -->
+                                    <span has-permission="HISTORICALWAIVE_LOANCHARGE">
+                                        <a class="btn-warning btn-sm"
+                                           data-ng-show="canHistoricallyWaive(charge)"
+                                           href="#/loan/{{loandetails.id}}/historicalpenaltywaiver/{{charge.id}}"
+                                           title="{{'label.heading.historicalpenaltywaiver' | translate}}">
+                                            <i class="fa fa-history"></i> {{'label.button.historicalwaive' | translate}}
+                                        </a>
+                                    </span>
                                 </td>
                                 </td>
                             </tr>
                         </table>
+                    </uib-tab>
+
+                    <!-- CGLT-656: every historical penalty waiver made on this loan, and how far each one got.
+                         The tab appears only where a correction exists, so it stays out of the way otherwise. -->
+                    <uib-tab ng-show="historicalPenaltyWaivers.length > 0"
+                             heading="{{'label.heading.historicalpenaltywaivers' | translate}}">
+                        <div class="table-responsive">
+                            <table class="table width100">
+                                <tr class="graybg">
+                                    <th>{{'label.heading.correctionreference' | translate}}</th>
+                                    <th>{{'label.heading.charge' | translate}}</th>
+                                    <th>{{'label.input.waivereffectivedate' | translate}}</th>
+                                    <th>{{'label.heading.waived' | translate}}</th>
+                                    <th>{{'label.heading.status' | translate}}</th>
+                                    <th>{{'label.input.reason' | translate}}</th>
+                                </tr>
+                                <tr ng-repeat="waiver in historicalPenaltyWaivers">
+                                    <td>{{waiver.correctionReference}}</td>
+                                    <td>{{waiver.chargeName}}</td>
+                                    <td>{{waiver.waiverEffectiveDate | DateFormat}}</td>
+                                    <td>{{waiver.waiverAmount | number:2}}</td>
+                                    <td>
+                                        <span class="label"
+                                              ng-class="{'label-success': waiver.status === 'COMPLETED',
+                                                         'label-warning': waiver.status === 'PENDING_APPROVAL' || waiver.status === 'PENDING_ODOO_SYNC',
+                                                         'label-danger': waiver.status === 'REJECTED' || waiver.status === 'FAILED_ODOO_SYNC',
+                                                         'label-default': waiver.status === 'PROCESSING'}">{{waiver.status}}</span>
+                                        <div class="help-block" ng-if="waiver.failureMessage">{{waiver.failureMessage}}</div>
+                                    </td>
+                                    <td>{{waiver.reason}}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </uib-tab>
 
                     <uib-tab heading="{{'label.heading.loandocuments' | translate}}" select="getLoanDocuments()">
