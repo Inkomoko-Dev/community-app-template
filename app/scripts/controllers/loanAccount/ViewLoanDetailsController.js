@@ -216,7 +216,7 @@
 
                 var transactionTypeId = Number(transaction.type.id);
                 return transactionTypeId === 2 || transactionTypeId === 4 || transactionTypeId === 1 || transactionTypeId === 6 ||
-                    transactionTypeId === 32 ||
+                    transactionTypeId === 32 || transactionTypeId === 33 ||
                     scope.isRecoveryPaymentTransaction(transaction) || scope.isRepaymentAtDisbursementTransaction(transaction);
             };
 
@@ -250,7 +250,8 @@
 
             scope.getReversalTransaction = function (transaction) {
                 var transactionId = extractTransactionId(transaction && transaction.id);
-                if (!transactionId || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
+                if (!transactionId || transaction.reversalTransaction === true
+                    || (transaction.manuallyReversed !== true && transaction.reversed !== true)) {
                     return null;
                 }
 

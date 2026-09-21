@@ -118,7 +118,8 @@
             function loadRelatedReversal(transaction) {
                 scope.relatedReversal = null;
 
-                if (!transaction || transaction.reversalTransaction === true || transaction.manuallyReversed !== true) {
+                if (!transaction || transaction.reversalTransaction === true
+                    || (transaction.manuallyReversed !== true && transaction.reversed !== true)) {
                     return;
                 }
 
@@ -158,6 +159,17 @@
                 return !!(transaction && (transaction.isRecoveryPayment === true
                     || (transaction.type && transaction.type.recoveryRepayment === true)
                     || transactionTypeValue.indexOf('recovery') !== -1));
+            };
+
+            scope.canUndoTransaction = function (transaction) {
+                return !!(transaction && transaction.type)
+                    && !scope.isRecoveryPaymentTransaction(transaction)
+                    && !scope.isRepaymentAtDisbursementTransaction(transaction)
+                    && transaction.reversalTransaction !== true
+                    && transaction.reversed !== true
+                    && transaction.manuallyReversed !== true
+                    && transaction.type.writeOffReversal !== true
+                    && Number(transaction.type.id) !== 33;
             };
 
             scope.canReverseRecoveryPayment = function (transaction) {
@@ -350,7 +362,8 @@
                 $scope.undoTransaction = function () {
                     if (Number(scope.transaction.type.id) === 6) {
                         var params = { loanId: accountId, command: 'undowriteoff' };
-                        resourceFactory.loanTrxnsResource.save(params, this.formData, function(data) {
+                        var undoWriteOffData = { note: $scope.note, notes: $scope.note };
+                        resourceFactory.loanTrxnsResource.save(params, undoWriteOffData, function(data) {
                             $uibModalInstance.close('delete');
                             location.path('/viewloanaccount/' + data.loanId);
                         });
