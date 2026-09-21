@@ -5,6 +5,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'LoggedInUser',
             'roleMap',
             'Langs',
+            'CountryCallingCodes',
             'RepaymentFrequency'
         ],
         services: [
@@ -13,7 +14,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'AuthenticationService',
             'SessionManager',
             'Paginator',
-            'UIConfigService'
+            'UIConfigService',
+            'NovuCampaignHelper'
         ],
 
         controllers: [

@@ -11,6 +11,7 @@
             scope.showNonPersonOptions = false;
             scope.clientPersonId = 1;
             scope.businessRegisteredOptions = [{id: true, name: 'Yes'}, {id: false, name: 'No'}];
+            scope.mobileCountryCodeOptions = mifosX.models.CountryCallingCodes.all;
 
             resourceFactory.validationLimitTemplateResource.get(function (data) {
                             scope.template = data;
@@ -27,6 +28,7 @@
                 scope.clientLegalFormOptions = data.clientLegalFormOptions;
                 scope.maritalStatusIdOptions=data.familyMemberOptions.maritalStatusIdOptions;
                 scope.titleOptions = data.titleOptions;
+                scope.mobileCountryCodeOptions = mifosX.models.CountryCallingCodes.all;
                 scope.officeId = data.officeId;
                 scope.formData = {
                     firstname: data.firstname,
@@ -39,6 +41,10 @@
                     kivaId: data.kivaId,
                     isStaff:data.isStaff,
                     mobileNo: data.mobileNo,
+                    mobileCountryCode: (function () {
+                        var match = mifosX.models.CountryCallingCodes.find(data.mobileCountryCode);
+                        return match ? match.iso : data.mobileCountryCode;
+                    })(),
                     savingsProductId: data.savingsProductId,
                     genderId: data.gender.id,
                     fullname: data.fullname,

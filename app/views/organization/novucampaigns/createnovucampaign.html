@@ -98,7 +98,7 @@
                                     <div class="col-sm-5">
                                         <select id="businessRule" name="businessRule" class="form-control"
                                                 ng-model="campaignData.reportName"
-                                                ng-options="rule.reportName as rule.reportName for rule in filteredBusinessRules"
+                                                ng-options="rule.reportName as rule.reportName for rule in businessRuleOptions"
                                                 ng-change="onReportChange()"
                                                 ng-required="usesReportAudience()">
                                             <option value="">Select a report</option>

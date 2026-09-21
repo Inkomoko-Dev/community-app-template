@@ -905,6 +905,7 @@
   "label.input.documenttype": "Document Type",
   "label.input.uniqueidentification": "Unique ID Number",
   "label.input.mobilenumber": "Mobile number",
+  "label.input.countrycode": "Country code",
   "label.input.partner": "Partner",
   "label.input.partnerStatus": "Partner Status",
   "label.input.partnerAssignmentDate": "Partner Assignment Date",

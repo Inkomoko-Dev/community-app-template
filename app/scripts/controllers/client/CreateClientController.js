@@ -19,6 +19,7 @@
             scope.showNonPersonOptions = false;
             scope.clientPersonId = 1;
             scope.titleOptions = [];
+            scope.mobileCountryCodeOptions = mifosX.models.CountryCallingCodes.all;
             //address
             scope.addressTypes=[];
             scope.countryOptions=[];
@@ -67,6 +68,7 @@
                 scope.clientLegalFormOptions = data.clientLegalFormOptions;
                 scope.clientLevelOptions = data.clientLevelOptions;
                 scope.titleOptions = data.titleOptions;
+                scope.mobileCountryCodeOptions = mifosX.models.CountryCallingCodes.all;
                 scope.datatables = data.datatables;
                 if (!_.isUndefined(scope.datatables) && scope.datatables.length > 0) {
                     scope.noOfTabs = scope.datatables.length + 1;

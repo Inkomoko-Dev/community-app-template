@@ -21,6 +21,9 @@
             scope.collaterals = [];
             scope.businessDetails = [];
             scope.isClientBusinessDetailEnabled = false;
+            scope.mobileNumberDisplay = function () {
+                return mifosX.models.CountryCallingCodes.displayNumber(scope.client.mobileCountryCode, scope.client.mobileNo);
+            };
 
 
             // address

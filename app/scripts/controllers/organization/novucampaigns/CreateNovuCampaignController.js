@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        CreateNovuCampaignController: function (scope, WizardHandler, resourceFactory, location, dateFilter, routeParams) {
+        CreateNovuCampaignController: function (scope, WizardHandler, resourceFactory, location, dateFilter, routeParams, novuCampaignHelper) {
             scope.reportParams = [];
             scope.reportDateParams = [];
             scope.reportTextParams = [];
@@ -49,7 +49,6 @@
             scope.autoWorkflow = true;
             scope.autoMessage = true;
             scope.businessRuleOptions = [];
-            scope.filteredBusinessRules = [];
             scope.frequencyTypeOptions = [];
             scope.weekDays = [];
             scope.repeatsEveryOptions = ['1', '2', '3'];
@@ -73,39 +72,6 @@
             scope.selectedChannels = { SMS: true };
             scope.simpleDate = new Date();
             scope.campaignData.time = new Date(0, 0, 0, scope.simpleDate.getHours(), scope.simpleDate.getMinutes(), scope.simpleDate.getSeconds());
-
-            function pad(value) {
-                return value < 10 ? '0' + value : '' + value;
-            }
-
-            function toIsoLocalDateTime(value) {
-                if (!value) {
-                    return null;
-                }
-                var date = value instanceof Date ? value : parseApiDate(value);
-                if (!date) {
-                    return null;
-                }
-                return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' +
-                    pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
-            }
-
-            function parseApiDate(value) {
-                if (!value) {
-                    return null;
-                }
-                if (value instanceof Date) {
-                    return value;
-                }
-                if (typeof value === 'string') {
-                    var parsed = new Date(value);
-                    return isNaN(parsed.getTime()) ? null : parsed;
-                }
-                if (angular.isArray(value) && value.length >= 3) {
-                    return new Date(value[0], value[1] - 1, value[2], value[3] || 0, value[4] || 0, value[5] || 0);
-                }
-                return null;
-            }
 
             scope.usesReportAudience = function () {
                 return scope.campaignData.triggerType === 'DIRECT' || scope.campaignData.triggerType === 'SCHEDULED';
@@ -145,27 +111,11 @@
             };
 
             function toArray(value) {
-                if (!value) {
-                    return [];
-                }
-                if (angular.isArray(value)) {
-                    return value;
-                }
-                var items = [];
-                angular.forEach(value, function (item, key) {
-                    if (key !== '$promise' && key !== '$resolved' && key !== '$cancelRequest') {
-                        items.push(item);
-                    }
-                });
-                return items;
+                return novuCampaignHelper.toArray(value);
             }
 
-            scope.filterBusinessRules = function () {
-                scope.filteredBusinessRules = scope.businessRuleOptions;
-            };
-
             scope.onReportChange = function () {
-                scope.campaignData.report = _.find(scope.filteredBusinessRules, function (rule) {
+                scope.campaignData.report = _.find(scope.businessRuleOptions, function (rule) {
                     return rule.reportName === scope.campaignData.reportName;
                 });
                 if (scope.campaignData.report) {
@@ -189,7 +139,6 @@
             };
 
             scope.getBusinessRule = function () {
-                scope.filterBusinessRules();
                 scope.refreshVariableList();
                 scope.syncWorkflowId();
                 if (scope.campaignData.triggerType === 'DIRECT') {
@@ -437,7 +386,7 @@
                         startDate.setMinutes(scope.campaignData.time.getMinutes());
                         startDate.setSeconds(scope.campaignData.time.getSeconds());
                     }
-                    payload.recurrenceStartDate = toIsoLocalDateTime(startDate);
+                    payload.recurrenceStartDate = novuCampaignHelper.toIsoLocalDateTime(startDate);
                     payload.recurrence = constructRecurrence();
                 }
                 return payload;
@@ -459,7 +408,6 @@
                         scope.selectedChannels[channel.trim()] = true;
                     }
                 });
-                scope.filterBusinessRules();
                 if (campaign.reportName) {
                     scope.campaignData.reportName = campaign.reportName;
                     scope.campaignData.report = _.find(scope.businessRuleOptions, function (rule) {
@@ -469,7 +417,7 @@
                     applyParamValue(campaign.paramValue);
                 }
                 parseRecurrence(campaign.recurrence);
-                var start = parseApiDate(campaign.recurrenceStartDate);
+                var start = novuCampaignHelper.parseDate(campaign.recurrenceStartDate);
                 if (start) {
                     scope.campaignData.recurrenceStartDate = start;
                     scope.campaignData.time = start;
@@ -509,7 +457,6 @@
                 } else if (!hasSmsReports() && !scope.businessRuleOptions.length) {
                     scope.businessRuleOptions = reports;
                 }
-                scope.filterBusinessRules();
             }
 
             function applyTemplateData(data) {
@@ -534,37 +481,23 @@
                 if (weekDays.length) {
                     scope.weekDays = weekDays;
                 }
-                scope.filterBusinessRules();
                 scope.refreshVariableList();
+            }
+
+            function loadCampaignIfEditing() {
+                if (scope.editing) {
+                    resourceFactory.novuCampaignResource.get({ campaignId: routeParams.campaignId }, populateCampaign);
+                }
             }
 
             resourceFactory.novuAudienceReportResource.getAll(function (data) {
                 setReports(data);
             });
 
-            resourceFactory.smsCampaignTemplateResource.get(function (smsTemplate) {
-                setReports(smsTemplate.businessRulesOptions);
-                scope.frequencyTypeOptions = toArray(smsTemplate.frequencyTypeOptions).length ? toArray(smsTemplate.frequencyTypeOptions) : scope.frequencyTypeOptions;
-                scope.weekDays = toArray(smsTemplate.weekDays).length ? toArray(smsTemplate.weekDays) : scope.weekDays;
-                scope.filterBusinessRules();
-            });
-
-            resourceFactory.reportsResource.getReport({}, function (data) {
-                if (!scope.businessRuleOptions.length) {
-                    setReports(data);
-                }
-            });
-
             resourceFactory.novuCampaignTemplateResource.get({}, function (data) {
                 applyTemplateData(data);
-                if (scope.editing) {
-                    resourceFactory.novuCampaignResource.get({ campaignId: routeParams.campaignId }, populateCampaign);
-                }
-            }, function () {
-                if (scope.editing) {
-                    resourceFactory.novuCampaignResource.get({ campaignId: routeParams.campaignId }, populateCampaign);
-                }
-            });
+                loadCampaignIfEditing();
+            }, loadCampaignIfEditing);
 
             scope.refreshVariableList();
 
@@ -592,7 +525,7 @@
             };
         }
     });
-    mifosX.ng.application.controller('CreateNovuCampaignController', ['$scope', 'WizardHandler', 'ResourceFactory', '$location', 'dateFilter', '$routeParams',
+    mifosX.ng.application.controller('CreateNovuCampaignController', ['$scope', 'WizardHandler', 'ResourceFactory', '$location', 'dateFilter', '$routeParams', 'NovuCampaignHelper',
         mifosX.controllers.CreateNovuCampaignController]).run(function ($log) {
         $log.info('CreateNovuCampaignController initialized');
     });
