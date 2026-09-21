@@ -8,6 +8,7 @@
         <div class="content">
             <form name="approveloanrescheduleform" novalidate="" class="form-horizontal" rc-submit="submit()">
                 <api-validate></api-validate>
+                <div class="alert alert-danger" ng-if="error">{{error}}</div>
                 <fieldset>
                     <legend>{{'label.heading.approveloanreschedule' | translate}}</legend>
 

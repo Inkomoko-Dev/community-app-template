@@ -15,6 +15,14 @@
 
                 resourceFactory.loanRescheduleResource.approve({scheduleId:scope.requestId},this.formData,function (data) {
                     location.path('/viewloanaccount/' + scope.loanId);
+                }, function (response) {
+                    var errors = response && response.data && response.data.errors;
+                    var backendError = response && response.data;
+                    scope.error = errors && errors.length && errors[0].defaultUserMessage
+                        ? errors[0].defaultUserMessage
+                        : (backendError && backendError.defaultUserMessage)
+                            ? backendError.defaultUserMessage
+                            : 'Loan reschedule approval failed. Please contact support.';
                 });
             };
         }
