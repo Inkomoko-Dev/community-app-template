@@ -247,20 +247,24 @@
                 scope.employmentInfo=data;
               });
 
-            resourceFactory.partnerClientResource.getAssignment({clientId: routeParams.id}, function(data) {
-                if (data && data.partnerCode) {
-                    scope.partnerClient = {
-                        partnerCode: data.partnerCode,
-                        status: data.isActive ? 'Active' : 'Inactive',
-                        assignmentDate: data.assignedDate
-                    };
-                } else {
+            if (resourceFactory.partnerClientResource && resourceFactory.partnerClientResource.getAssignment) {
+                resourceFactory.partnerClientResource.getAssignment({clientId: routeParams.id}, function(data) {
+                    if (data && data.partnerCode) {
+                        scope.partnerClient = {
+                            partnerCode: data.partnerCode,
+                            status: data.isActive ? 'Active' : 'Inactive',
+                            assignmentDate: data.assignedDate
+                        };
+                    } else {
+                        scope.partnerClient = null;
+                    }
+                }, function(error) {
+                    console.error('Error fetching partner client information:', error);
                     scope.partnerClient = null;
-                }
-            }, function(error) {
-                console.error('Error fetching partner client information:', error);
+                });
+            } else {
                 scope.partnerClient = null;
-            });
+            }
 
             scope.routeToLoan = function (id) {
                 location.path('/viewloanaccount/' + id);
