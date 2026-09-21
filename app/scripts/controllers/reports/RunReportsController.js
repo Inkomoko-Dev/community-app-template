@@ -23,6 +23,8 @@
             scope.pentahoReportParameters = [];
             scope.type = "pie";
             scope.recordsPerPage = 15;
+            scope.knownTotalRecords = null;
+            scope.countInFlight = false;
             scope.exporting = false;
 
             scope.highlight = function (id) {
@@ -159,10 +161,42 @@
                 downloadReport({exportCSV: true}, scope.reportName + '.csv');
             };
 
+            function estimateTotalRecords(data, pageNumber) {
+                if (scope.knownTotalRecords || scope.knownTotalRecords === 0) {
+                    return scope.knownTotalRecords;
+                }
+                var rows = (data && data.data) ? data.data.length : 0;
+                var seen = ((pageNumber - 1) * scope.recordsPerPage) + rows;
+                return rows < scope.recordsPerPage ? seen : seen + 1;
+            }
+
+            function fetchTotalRecords() {
+                if (scope.countInFlight) {
+                    return;
+                }
+                scope.knownTotalRecords = null;
+                scope.countInFlight = true;
+                resourceFactory.runReportsResource.getReport(
+                    buildReportPayload({limit: 1, offset: 0}),
+                    function (data) {
+                        scope.countInFlight = false;
+                        if (data && data.count !== undefined && data.count !== null) {
+                            scope.knownTotalRecords = data.count;
+                            scope.totalRecords = data.count;
+                        }
+                    },
+                    function () {
+                        scope.countInFlight = false;
+                        scope.knownTotalRecords = null;
+                    }
+                );
+            }
+
             function buildReportPayload(overrides) {
                 var payload = angular.copy(scope.formData);
                 delete payload.limit;
                 delete payload.offset;
+                delete payload.includeCount;
                 delete payload.exportCSV;
                 delete payload.exportXLSX;
                 payload.reportSource = scope.reportName;
@@ -401,11 +435,12 @@
                     scope.hideChart = true;
                     var pagePayload = buildReportPayload({
                         limit: scope.recordsPerPage,
-                        offset: ((pageNumber - 1) * scope.recordsPerPage)
+                        offset: ((pageNumber - 1) * scope.recordsPerPage),
+                        includeCount: false
                     });
                     resourceFactory.runReportsResource.getReport(pagePayload, function (data) {
                         scope.reportData.data = data.data;
-                        scope.totalRecords = data.count;
+                        scope.totalRecords = estimateTotalRecords(data, pageNumber);
                     });
                 }
             }
@@ -428,12 +463,13 @@
                             scope.hideTable = false;
                             scope.hidePentahoReport = true;
                             scope.hideChart = true;
-                            var tablePayload = buildReportPayload({limit: scope.recordsPerPage, offset: 0});
+                            var tablePayload = buildReportPayload({limit: scope.recordsPerPage, offset: 0, includeCount: false});
                             resourceFactory.runReportsResource.getReport(tablePayload, function (data) {
                                 scope.reportData.columnHeaders = data.columnHeaders;
                                 scope.reportData.data = data.data;
-                                scope.totalRecords = data.count;
+                                scope.totalRecords = estimateTotalRecords(data, 1);
                             });
+                            fetchTotalRecords();
                             break;
 
                         case "Pentaho":
