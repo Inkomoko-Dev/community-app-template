@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        BulkLoanRescheduleCreateController: function (scope, resourceFactory, location, dateFilter, $q, $translate) {
+        BulkLoanRescheduleCreateController: function (scope, resourceFactory, location, dateFilter, $q, $translate, previewHelper) {
             var defaultLimit = 15;
             var normalizeNumber = function (value) {
                 if (value === undefined || value === null || value === '') { return value; }
@@ -125,7 +125,7 @@
             };
             var clearApiError = function () { scope.errorStatus = ''; scope.errorDetails = []; };
 
-            scope.state = { loadingTemplate: false, loadingPreview: false };
+            scope.state = { loadingTemplate: false, loadingPreview: false, resolvingExclusions: false };
             scope.step = 1;
             scope.executionId = null;
             scope.previewData = null;
@@ -133,7 +133,8 @@
             scope.validationRules = {};
             scope.errorStatus = '';
             scope.errorDetails = [];
-            scope.previewQuery = { page: 1, pageSize: defaultLimit, total: 0, hasMore: false };
+            scope.previewQuery = previewHelper.newQuery(defaultLimit);
+            scope.previewColumns = previewHelper.columns;
             scope.approverOptions = [];
             scope.approvalRequest = { approverId: null, submissionNote: '' };
             scope.formData = {
@@ -168,6 +169,47 @@
             ];
             mifosX.models.RepaymentFrequency.bindTo(scope, scope.formData.reschedulingDetails);
             scope.loanSearch = { term: '' };
+            scope.availableLoanProducts = [];
+            scope.selectedLoanProducts = [];
+            scope.availableLoanOfficers = [];
+            scope.selectedLoanOfficers = [];
+            scope.availableProducts = [];
+            scope.selectedProducts = [];
+            scope.availableOfficers = [];
+            scope.selectedOfficers = [];
+            scope.excludeLookupError = '';
+
+            var idsMatch = function (left, right) {
+                return String(left) === String(right) || Number(left) === Number(right);
+            };
+            var moveSelectedOptions = function (fromList, toList, selectedIds) {
+                angular.forEach(selectedIds || [], function (id) {
+                    for (var i = 0; i < fromList.length; i++) {
+                        if (idsMatch(fromList[i].value, id)) {
+                            toList.push(fromList[i]);
+                            fromList.splice(i, 1);
+                            break;
+                        }
+                    }
+                });
+            };
+            var optionValues = function (options) {
+                return (options || []).map(function (option) { return option.value; });
+            };
+            var allowedOfficeIds = function () {
+                var officeIds = [Number(scope.formData.filters.officeId)];
+                var addChildren = function (parentId) {
+                    angular.forEach(scope.officeOptions, function (office) {
+                        var officeParentId = office.parentOfficeId !== undefined ? office.parentOfficeId : office.parentId;
+                        if (Number(officeParentId) === Number(parentId) && officeIds.indexOf(Number(office.id)) === -1) {
+                            officeIds.push(Number(office.id));
+                            addChildren(office.id);
+                        }
+                    });
+                };
+                addChildren(scope.formData.filters.officeId);
+                return officeIds;
+            };
 
             var loadTemplate = function (officeId) {
                 scope.state.loadingTemplate = true;
@@ -180,6 +222,14 @@
                     scope.loanStatusOptions = normalizeOptionList(filterOptions.loanStatuses || data.loanStatuses || []);
                     scope.loanProductOptions = normalizeOptionList(filterOptions.loanProducts || data.loanProducts || []);
                     scope.loanOfficerOptions = normalizeOptionList(filterOptions.loanOfficers || data.loanOfficers || []);
+                    scope.availableLoanProducts = angular.copy(scope.loanProductOptions);
+                    scope.selectedLoanProducts = [];
+                    scope.availableLoanOfficers = angular.copy(scope.loanOfficerOptions);
+                    scope.selectedLoanOfficers = [];
+                    scope.availableProducts = [];
+                    scope.selectedProducts = [];
+                    scope.availableOfficers = [];
+                    scope.selectedOfficers = [];
                     scope.rescheduleReasonOptions = normalizeOptionList(details.rescheduleReasons || data.rescheduleReasons || []);
                     scope.overdueChargeHandlingOptions = details.overdueChargeHandlingOptions || [];
                     scope.availableCarryForwardCharges = details.availableCarryForwardCharges || [];
@@ -197,41 +247,94 @@
                 scope.formData.filters.loanProductIds = [];
                 scope.formData.filters.loanOfficerIds = [];
                 scope.formData.filters.excludedLoans = [];
+                scope.loanSearch.term = '';
+                scope.excludeLookupError = '';
                 loadTemplate(scope.formData.filters.officeId);
             };
-            scope.excludedLoanOptions = function (value) {
+            scope.addLoanProducts = function () {
+                moveSelectedOptions(scope.availableLoanProducts, scope.selectedLoanProducts, scope.availableProducts);
+                scope.availableProducts = [];
+                scope.formData.filters.loanProductIds = optionValues(scope.selectedLoanProducts);
+            };
+            scope.removeLoanProducts = function () {
+                moveSelectedOptions(scope.selectedLoanProducts, scope.availableLoanProducts, scope.selectedProducts);
+                scope.selectedProducts = [];
+                scope.formData.filters.loanProductIds = optionValues(scope.selectedLoanProducts);
+            };
+            scope.addLoanOfficers = function () {
+                moveSelectedOptions(scope.availableLoanOfficers, scope.selectedLoanOfficers, scope.availableOfficers);
+                scope.availableOfficers = [];
+                scope.formData.filters.loanOfficerIds = optionValues(scope.selectedLoanOfficers);
+            };
+            scope.removeLoanOfficers = function () {
+                moveSelectedOptions(scope.selectedLoanOfficers, scope.availableLoanOfficers, scope.selectedOfficers);
+                scope.selectedOfficers = [];
+                scope.formData.filters.loanOfficerIds = optionValues(scope.selectedLoanOfficers);
+            };
+            var loanMatchesToken = function (loan, token) {
+                var normalized = String(token).toLowerCase();
+                return idsMatch(loan.id, token) || idsMatch(loan.loanId, token) ||
+                    String(loan.accountNo || loan.accountNumber || '').toLowerCase() === normalized;
+            };
+            var searchLoanToken = function (token) {
                 var deferred = $q.defer();
-                if (!value || value.length < 2) { deferred.resolve([]); return deferred.promise; }
-                var allowedOfficeIds = [Number(scope.formData.filters.officeId)];
-                var addChildren = function (parentId) {
-                    angular.forEach(scope.officeOptions, function (office) {
-                        var officeParentId = office.parentOfficeId !== undefined ? office.parentOfficeId : office.parentId;
-                        if (Number(officeParentId) === Number(parentId) && allowedOfficeIds.indexOf(Number(office.id)) === -1) {
-                            allowedOfficeIds.push(Number(office.id));
-                            addChildren(office.id);
-                        }
-                    });
-                };
-                addChildren(scope.formData.filters.officeId);
+                var officeIds = allowedOfficeIds();
                 resourceFactory.loanResource.getAllLoans({
                     limit: 10,
-                    sqlSearch: value,
+                    sqlSearch: token,
                     officeId: scope.formData.filters.officeId
                 }, function (data) {
-                    var rows = data && data.pageItems ? data.pageItems : [];
-                    deferred.resolve(rows.filter(function (loan) {
-                        return loan.officeId && allowedOfficeIds.indexOf(Number(loan.officeId)) !== -1;
-                    }));
+                    var rows = (data && data.pageItems ? data.pageItems : []).filter(function (loan) {
+                        return loan.officeId && officeIds.indexOf(Number(loan.officeId)) !== -1;
+                    });
+                    var exact = rows.filter(function (loan) { return loanMatchesToken(loan, token); });
+                    deferred.resolve(exact[0] || rows[0] || null);
+                }, function () {
+                    deferred.resolve(null);
                 });
                 return deferred.promise;
             };
             scope.addExcludedLoan = function (loan) {
                 if (!loan) { return; }
                 var id = loan.id || loan.loanId;
-                if (!_.some(scope.formData.filters.excludedLoans, function (item) { return (item.id || item.loanId) === id; })) {
+                if (!_.some(scope.formData.filters.excludedLoans, function (item) { return idsMatch(item.id || item.loanId, id); })) {
                     scope.formData.filters.excludedLoans.push(loan);
                 }
-                scope.loanSearch.term = '';
+            };
+            scope.addExcludedLoansFromText = function () {
+                var tokens = String(scope.loanSearch.term || '').split(',').map(function (token) {
+                    return token.trim();
+                }).filter(Boolean);
+                if (!tokens.length) { return; }
+                scope.state.resolvingExclusions = true;
+                scope.excludeLookupError = '';
+                var missing = [];
+                var remaining = tokens.length;
+                angular.forEach(tokens, function (token) {
+                    searchLoanToken(token).then(function (loan) {
+                        if (loan) {
+                            scope.addExcludedLoan(loan);
+                        } else {
+                            missing.push(token);
+                        }
+                        remaining -= 1;
+                        if (remaining === 0) {
+                            scope.state.resolvingExclusions = false;
+                            scope.loanSearch.term = missing.join(', ');
+                            if (missing.length) {
+                                scope.excludeLookupError = $translate.instant('label.bulkreschedule.loanstoexclude.notfound', {
+                                    loans: missing.join(', ')
+                                });
+                            }
+                        }
+                    });
+                });
+            };
+            scope.onExcludeKeydown = function (event) {
+                if (event && event.keyCode === 13) {
+                    event.preventDefault();
+                    scope.addExcludedLoansFromText();
+                }
             };
             scope.removeExcludedLoan = function (index) { scope.formData.filters.excludedLoans.splice(index, 1); };
 
@@ -243,8 +346,8 @@
                 if (scope.formData.filters.currentInterestRate !== null && scope.formData.filters.currentInterestRate !== undefined && scope.formData.filters.currentInterestRate !== '') {
                     filters.currentInterestRate = normalizeNumber(scope.formData.filters.currentInterestRate);
                 }
-                if (scope.formData.filters.loanProductIds.length) { filters.loanProductIds = scope.formData.filters.loanProductIds.map(normalizeNumber); }
-                if (scope.formData.filters.loanOfficerIds.length) { filters.loanOfficerIds = scope.formData.filters.loanOfficerIds.map(normalizeNumber); }
+                if (scope.selectedLoanProducts.length) { filters.loanProductIds = optionValues(scope.selectedLoanProducts).map(normalizeNumber); }
+                if (scope.selectedLoanOfficers.length) { filters.loanOfficerIds = optionValues(scope.selectedLoanOfficers).map(normalizeNumber); }
                 if (scope.formData.filters.excludedLoans.length) {
                     filters.excludedLoanIds = scope.formData.filters.excludedLoans.map(function (loan) { return normalizeNumber(loan.id || loan.loanId); });
                 }
@@ -275,9 +378,6 @@
                 if (!scope.formData.filters.rescheduleFromDateStrategy) { scope.validation.rescheduleFromDateStrategy = true; }
                 if (!scope.formData.reschedulingDetails.rescheduleReasonId) { scope.validation.rescheduleReasonId = true; }
                 if (!scope.formData.reschedulingDetails.submittedOnDate) { scope.validation.submittedOnDate = true; }
-                if (scope.formData.newInterestRate === null || scope.formData.newInterestRate === undefined || scope.formData.newInterestRate === '') {
-                    scope.validation.newInterestRate = true;
-                }
                 if (!scope.formData.reschedulingDetails.overdueChargeHandling) {
                     scope.validation.overdueChargeHandling = true;
                 }
@@ -295,7 +395,11 @@
                             !scope.formData.reschedulingDetails.carryForwardChargeDueDate)) {
                     scope.validation.carryForwardCharge = true;
                 }
-                return _.isEmpty(scope.validation);
+                if (!_.isEmpty(scope.validation)) {
+                    setApiError({ data: { defaultUserMessage: $translate.instant('label.bulkreschedule.error.requiredfields') } });
+                    return false;
+                }
+                return true;
             };
             var loadPreview = function (resetPage) {
                 if (!scope.executionId) { return; }
@@ -305,7 +409,9 @@
                 resourceFactory.bulkLoanRescheduleExecutionResource.preview({
                     executionId: scope.executionId,
                     page: scope.previewQuery.page - 1,
-                    size: scope.previewQuery.pageSize
+                    size: scope.previewQuery.pageSize,
+                    sortBy: scope.previewQuery.sortBy,
+                    sortOrder: scope.previewQuery.sortOrder
                 }, function (data) {
                     scope.previewData = normalizePreview(data);
                     scope.executionId = scope.previewData.id || scope.executionId;
@@ -357,6 +463,13 @@
                 scope.previewQuery.page += 1;
                 loadPreview(false);
             };
+            scope.sortPreview = function (column) {
+                previewHelper.toggleSort(scope.previewQuery, column);
+                loadPreview(true);
+            };
+            scope.sortIcon = function (column) {
+                return previewHelper.sortIcon(scope.previewQuery, column);
+            };
             scope.pageStart = function () {
                 return scope.previewQuery.total ? ((scope.previewQuery.page - 1) * scope.previewQuery.pageSize) + 1 : 0;
             };
@@ -395,7 +508,7 @@
         }
     });
     mifosX.ng.application.controller('BulkLoanRescheduleCreateController', [
-        '$scope', 'ResourceFactory', '$location', 'dateFilter', '$q', '$translate',
+        '$scope', 'ResourceFactory', '$location', 'dateFilter', '$q', '$translate', 'BulkReschedulePreviewHelper',
         mifosX.controllers.BulkLoanRescheduleCreateController
     ]).run(function ($log) {
         $log.info('BulkLoanRescheduleCreateController initialized');

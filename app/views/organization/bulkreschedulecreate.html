@@ -56,32 +56,72 @@
                         <input type="number" step="0.01" class="form-control" ng-model="formData.filters.currentInterestRate" placeholder="{{'label.bulkreschedule.example15' | translate}}">
                     </div>
                 </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label>{{'label.bulkreschedule.loanproduct' | translate}}</label>
-                        <select multiple class="form-control" ng-model="formData.filters.loanProductIds"
-                                ng-options="option.value as option.label for option in loanProductOptions"></select>
-                        <p class="help-block">{{'label.bulkreschedule.allproducts.help' | translate}}</p>
+            </div>
+
+            <div class="form-group">
+                <label>{{'label.bulkreschedule.loanproduct' | translate}}</label>
+                <p class="help-block">{{'label.bulkreschedule.allproducts.help' | translate}}</p>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <label class="control-label">{{'label.input.allproducts' | translate}}</label>
+                        <select id="availableProducts" ng-model="availableProducts" class="form-control multiselectmin" multiple>
+                            <option ng-repeat="option in availableLoanProducts track by option.value" value="{{option.value}}">{{option.label}}</option>
+                        </select>
                     </div>
-                    <div class="form-group">
-                        <label>{{'label.bulkreschedule.loanofficer' | translate}}</label>
-                        <select multiple class="form-control" ng-model="formData.filters.loanOfficerIds"
-                                ng-options="option.value as option.label for option in loanOfficerOptions"></select>
-                        <p class="help-block">{{'label.bulkreschedule.allofficers.help' | translate}}</p>
+                    <div class="col-sm-2 text-center paddedtop25px">
+                        <button type="button" class="btn btn-primary" ng-click="addLoanProducts()"><i class="fa fa-angle-double-right"></i></button>
+                        <br/>
+                        <button type="button" class="btn btn-primary" ng-click="removeLoanProducts()"><i class="fa fa-angle-double-left"></i></button>
                     </div>
-                    <div class="form-group">
-                        <label>{{'label.bulkreschedule.loanstoexclude' | translate}}</label>
-                        <input type="text" class="form-control" autocomplete="off" ng-model="loanSearch.term"
-                               placeholder="{{'label.bulkreschedule.loansearch.placeholder' | translate}}" typeahead-min-length="2"
-                               uib-typeahead="loan as (loan.id + ' ' + loan.accountNo + ' ' + loan.clientName) for loan in excludedLoanOptions($viewValue)"
-                               typeahead-on-select="addExcludedLoan($item)">
-                        <ul class="list-inline m-t-1">
-                            <li ng-repeat="loan in formData.filters.excludedLoans track by (loan.id || loan.loanId)">
-                                <span class="label label-default">{{loan.accountNo || loan.id}} <a href="" ng-click="removeExcludedLoan($index)">&times;</a></span>
-                            </li>
-                        </ul>
+                    <div class="col-sm-5">
+                        <label class="control-label">{{'label.input.selectedproducts' | translate}}</label>
+                        <select id="selectedProducts" ng-model="selectedProducts" class="form-control multiselectmin" multiple>
+                            <option ng-repeat="option in selectedLoanProducts track by option.value" value="{{option.value}}">{{option.label}}</option>
+                        </select>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>{{'label.bulkreschedule.loanofficer' | translate}}</label>
+                <p class="help-block">{{'label.bulkreschedule.allofficers.help' | translate}}</p>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <label class="control-label">{{'label.bulkreschedule.availableofficers' | translate}}</label>
+                        <select id="availableOfficers" ng-model="availableOfficers" class="form-control multiselectmin" multiple>
+                            <option ng-repeat="option in availableLoanOfficers track by option.value" value="{{option.value}}">{{option.label}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 text-center paddedtop25px">
+                        <button type="button" class="btn btn-primary" ng-click="addLoanOfficers()"><i class="fa fa-angle-double-right"></i></button>
+                        <br/>
+                        <button type="button" class="btn btn-primary" ng-click="removeLoanOfficers()"><i class="fa fa-angle-double-left"></i></button>
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label">{{'label.bulkreschedule.selectedofficers' | translate}}</label>
+                        <select id="selectedOfficers" ng-model="selectedOfficers" class="form-control multiselectmin" multiple>
+                            <option ng-repeat="option in selectedLoanOfficers track by option.value" value="{{option.value}}">{{option.label}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>{{'label.bulkreschedule.loanstoexclude' | translate}}</label>
+                <textarea class="form-control" rows="2" ng-model="loanSearch.term"
+                          placeholder="{{'label.bulkreschedule.loansearch.placeholder' | translate}}"
+                          ng-keydown="onExcludeKeydown($event)"></textarea>
+                <p class="help-block">{{'label.bulkreschedule.loanstoexclude.help' | translate}}</p>
+                <button type="button" class="btn btn-default" ng-click="addExcludedLoansFromText()" ng-disabled="state.resolvingExclusions">
+                    <i class="fa" ng-class="state.resolvingExclusions ? 'fa-spinner fa-spin' : 'fa-plus'"></i>
+                    {{'label.bulkreschedule.loanstoexclude.add' | translate}}
+                </button>
+                <p class="error" ng-if="excludeLookupError">{{excludeLookupError}}</p>
+                <ul class="list-inline m-t-1">
+                    <li ng-repeat="loan in formData.filters.excludedLoans track by (loan.id || loan.loanId)">
+                        <span class="label label-default">{{loan.accountNo || loan.id}} <a href="" ng-click="removeExcludedLoan($index)">&times;</a></span>
+                    </li>
+                </ul>
             </div>
 
             <h5 class="text-muted m-t-2">{{'label.bulkreschedule.rescheduledetails' | translate}}</h5><hr>
@@ -93,16 +133,16 @@
                                 ng-options="option.value as option.label for option in installmentStrategyOptions"></select>
                         <span class="error" ng-if="validation.rescheduleFromDateStrategy">{{'label.bulkreschedule.installmentstrategy.required' | translate}}</span>
                     </div>
-                    <div class="form-group">
-                        <label>{{'label.bulkreschedule.reschedulereason' | translate}}</label>
+                    <div class="form-group" ng-class="{'has-error': validation.rescheduleReasonId}">
+                        <label>{{'label.bulkreschedule.reschedulereason' | translate}} <span class="required">*</span></label>
                         <select class="form-control" ng-model="formData.reschedulingDetails.rescheduleReasonId"
-                                ng-options="option.value as option.label for option in rescheduleReasonOptions">
+                                ng-options="option.value as option.label for option in rescheduleReasonOptions" required>
                             <option value="">{{'label.bulkreschedule.selectreason' | translate}}</option>
                         </select>
                         <span class="error" ng-if="validation.rescheduleReasonId">{{'label.bulkreschedule.reschedulereason.required' | translate}}</span>
                     </div>
                     <div class="form-group">
-                        <label>{{'label.bulkreschedule.submittedon' | translate}}</label>
+                        <label>{{'label.bulkreschedule.submittedon' | translate}} <span class="required">*</span></label>
                         <input type="text" class="form-control" datepicker-pop="dd MMMM yyyy" ng-model="formData.reschedulingDetails.submittedOnDate">
                         <span class="error" ng-if="validation.submittedOnDate">{{'label.bulkreschedule.submittedon.required' | translate}}</span>
                     </div>
@@ -129,7 +169,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <label>{{'label.bulkreschedule.newrate' | translate}} <span class="required">*</span></label>
+                        <label>{{'label.bulkreschedule.newrate' | translate}}</label>
                         <div class="input-group">
                             <input type="number" step="0.01" class="form-control" ng-model="formData.newInterestRate" placeholder="{{'label.bulkreschedule.example10' | translate}}">
                             <span class="input-group-addon">%</span>
@@ -238,9 +278,9 @@
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-condensed">
                     <thead><tr>
-                        <th>{{'label.bulkreschedule.loanaccount' | translate}}</th><th>{{'label.bulkreschedule.client' | translate}}</th><th>{{'label.bulkreschedule.office' | translate}}</th><th>{{'label.bulkreschedule.loanproduct' | translate}}</th><th>{{'label.bulkreschedule.loanofficer' | translate}}</th><th>{{'label.bulkreschedule.loanstatus' | translate}}</th><th>{{'label.bulkreschedule.result' | translate}}</th>
-                        <th>{{'label.bulkreschedule.currentrate' | translate}}</th><th>{{'label.bulkreschedule.newrate' | translate}}</th><th>{{'label.bulkreschedule.ratemethod' | translate}}</th><th>{{'label.bulkreschedule.outstanding' | translate}}</th><th>{{'label.bulkreschedule.newoutstanding' | translate}}</th>
-                        <th>{{'label.bulkreschedule.currentterm' | translate}}</th><th>{{'label.bulkreschedule.newterm' | translate}}</th><th>{{'label.bulkreschedule.nextinstallment' | translate}}</th><th>{{'label.bulkreschedule.reason.short' | translate}}</th><th>{{'label.bulkreschedule.excludereason' | translate}}</th>
+                        <th class="pointer" ng-repeat="column in previewColumns" ng-click="sortPreview(column.key)">
+                            {{column.label | translate}} <i class="fa" ng-class="sortIcon(column.key)"></i>
+                        </th>
                     </tr></thead>
                     <tbody>
                     <tr ng-repeat="loan in previewData.loanResults track by $index">
