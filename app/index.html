@@ -62,9 +62,18 @@
                                    class="input-sm form-control"
                                    required id="repeatPassword">
                         </div>
+                        <div class="form-group">
+                            <input type="text" data-ng-model="passwordDetails.notes"
+                                   placeholder="{{ 'label.placeholder.usernotes' | translate }}"
+                                   class="input-sm form-control"
+                                   maxlength="500" required id="passwordNotes">
+                        </div>
                         <button class="btn btn-success" type="submit" data-ng-click="updatePassword()"
                                 id="updatepassword-button">{{ 'label.button.resetPassword' | translate }}
                         </button>
+                        <div data-ng-show="showNotesError">
+                            <small class="error required">{{'validation.msg.user.notes.required' | translate}}</small>
+                        </div>
                     </form>
                 </div>
 

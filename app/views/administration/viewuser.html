@@ -25,6 +25,21 @@
                     <input type="password" id="repeatPassword" ng-model="formData.repeatPassword" class="form-control"/>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="control-label col-sm-4" for="passwordNotes">{{ 'label.input.notes' | translate }}<span
+                        class="required">*</span></label>
+
+                <div class="col-sm-5">
+                    <textarea id="passwordNotes" ng-model="formData.notes" class="form-control" rows="3"
+                              maxlength="500" required
+                              placeholder="{{'label.placeholder.usernotes' | translate}}"></textarea>
+                    <span ng-show="!formData.notes && showNotesError">
+                        <small class="error required">
+                            {{'validation.msg.user.notes.required' | translate}}
+                        </small>
+                    </span>
+                </div>
+            </div>
         </div>
 
         <div class="modal-footer silver">
@@ -39,8 +54,20 @@
         <div class="modal-body ">
             <api-validate></api-validate>
             <br>
+                <div class="form-group">
+                    <label for="deleteNotes">{{'label.input.notes' | translate}}<span class="required">*</span></label>
+                    <textarea id="deleteNotes" ng-model="formData.notes" class="form-control" rows="3"
+                              maxlength="500" required
+                              placeholder="{{'label.placeholder.usernotes' | translate}}"></textarea>
+                    <span ng-show="!formData.notes && showNotesError">
+                        <small class="error required">
+                            {{'validation.msg.user.notes.required' | translate}}
+                        </small>
+                    </span>
+                </div>
+                <br>
             <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
-            <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+            <button class="btn btn-primary" ng-click="confirmDelete()">{{'label.button.confirm' | translate}}</button>
         </div>
     </script>
     <div class="card well">
@@ -101,6 +128,31 @@
 		        </table>
 			</div>
 		</div>
+    </div>
+    <div class="card well" has-permission='READ_AUDIT' data-ng-show="userAudits.length">
+        <h4 class="bolder">{{'label.anchor.audittrails' | translate}}</h4>
+        <div class="row">
+            <div class="col-md-10">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.action' | translate}}</th>
+                        <th>{{'label.heading.madeby' | translate}}</th>
+                        <th>{{'label.heading.madedate' | translate}}</th>
+                        <th>{{'label.heading.notes' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="audit in userAudits">
+                        <td>{{audit.actionName}}</td>
+                        <td>{{audit.maker}}</td>
+                        <td>{{audit.madeOnDate | date:'d MMM y h:mm:ss'}}</td>
+                        <td>{{audit.notes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
           

@@ -112,6 +112,24 @@
                         </div>
                 </div>
                 <div class="form-group">
+                    <label class="control-label col-sm-2" for="notes">{{'label.input.notes' | translate}}<span
+                            class="required">*</span></label>
+
+                    <div class="col-sm-5">
+                        <textarea id="notes" name="notes" ng-model="formData.notes" class="form-control" rows="3"
+                                  maxlength="500" required late-Validate
+                                  placeholder="{{'label.placeholder.usernotes' | translate}}"></textarea>
+                    </div>
+                    <div class="col-sm-3">
+                        <span ng-show="createselfserviceuserform.notes.$error.required && createselfserviceuserform.$submitted">
+                            <small class="error required">
+                                {{'validation.msg.user.notes.required' | translate}}
+                            </small>
+                        </span>
+                        <form-validate valattributeform="createselfserviceuserform" valattribute="notes"/>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="control-label col-sm-2">{{'label.input.status' | translate}}</label>
                     <div class="col-sm-3">
                         {{ (accountActive ? 'label.tooltip.loanProduct.active' : 'label.tooltip.loanProduct.inActive') | translate }}
