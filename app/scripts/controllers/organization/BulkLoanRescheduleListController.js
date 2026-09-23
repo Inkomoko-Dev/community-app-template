@@ -13,7 +13,7 @@
             scope.total = 0;
             scope.hasMore = false;
             scope.officeOptions = [];
-            scope.statusOptions = ['PREVIEW', 'PENDING_APPROVAL', 'APPROVED', 'EXECUTING', 'COMPLETED', 'PARTIAL_SUCCESS', 'REJECTED', 'ROLLING_BACK', 'ROLLED_BACK', 'FAILED'];
+            scope.statusOptions = ['PREVIEWING', 'PREVIEW', 'PENDING_APPROVAL', 'APPROVED', 'EXECUTING', 'COMPLETED', 'PARTIAL_SUCCESS', 'REJECTED', 'ROLLING_BACK', 'ROLLED_BACK', 'FAILED'];
             scope.statusLabel = function (status) {
                 return $translate.instant('label.bulkreschedule.status.' + String(status || '').toLowerCase());
             };
