@@ -313,6 +313,13 @@
                             <th class="table-bold-loan">{{'label.heading.kivaUUId' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.kivaUUId}}</span><span ng-hide="loandetails.kivaUUId">{{'label.heading.notprovided' | translate}}</span></td>
                         </tr>
+                        <tr ng-show="enableThirdPartyDisbursement">
+                            <th class="table-bold-loan">{{'label.heading.thirdPartyDisbursementProvider' | translate}}</th>
+                            <td>
+                                <span class="padded-td">{{thirdPartyDisbursementProvider}}</span>
+                                <span ng-hide="thirdPartyDisbursementProvider">{{'label.heading.notprovided' | translate}}</span>
+                            </td>
+                        </tr>
                         <tr ng-show="isPendingDisbursement">
                             <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
