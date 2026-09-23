@@ -16,13 +16,20 @@
             scope.toVendorAccounts = [];
             scope.vendorSavingsAccountOptions = [];
 
-            resourceFactory.loanResource.get({loanId: routeParams.id, template: true, associations: 'charges,collateral,meeting,multiDisburseDetails',staffInSelectedOfficeOnly:true}, function (data) {
+            resourceFactory.loanResource.get({loanId: routeParams.id, template: true, associations: 'charges,collateral,meeting,multiDisburseDetails'}, function (data) {
                 scope.loanaccountinfo = data;
+
+                // Get full loan details to retrieve thirdPartyDisbursementProvider value
+                resourceFactory.loanResource.get({loanId: routeParams.id, associations: 'charges,collateral,meeting,multiDisburseDetails',staffInSelectedOfficeOnly:true}, function (fullData) {
+                    if (fullData.thirdPartyDisbursementProvider) {
+                        scope.loanaccountinfo.thirdPartyDisbursementProvider = fullData.thirdPartyDisbursementProvider;
+                    }
+                });
+
                 if (scope.loanaccountinfo.collateral) {
                     for (var i in scope.loanaccountinfo.collateral) {
                         scope.collaterals.push({collateralId: scope.loanaccountinfo.collateral[i].clientCollateralId, id: scope.loanaccountinfo.collateral[i].id, quantity: scope.loanaccountinfo.collateral[i].quantity,
                             total: scope.loanaccountinfo.collateral[i].total, totalCollateral: scope.loanaccountinfo.collateral[i].totalCollateral});
-
                     }
                 }
 
@@ -59,6 +66,12 @@
                 scope.formData.description = data.description
                 scope.formData.kivaId = data.kivaId
 
+                // Set third-party disbursement provider flags and value
+                scope.enableThirdPartyDisbursement = !!scope.loanaccountinfo.enableThirdPartyDisbursement;
+                scope.thirdPartyDisbursementProviderOptions = scope.loanaccountinfo.thirdPartyDisbursementProviderOptions || [];
+                if (scope.loanaccountinfo.thirdPartyDisbursementProvider) {
+                    scope.formData.thirdPartyDisbursementProvider = scope.loanaccountinfo.thirdPartyDisbursementProvider;
+                }
 
                 //update collaterals
                 resourceFactory.clientcollateralTemplateResource.getAllCollaterals({clientId: scope.clientId}, function(data) {
@@ -87,10 +100,16 @@
                     inparams.groupId = scope.groupId;
                 }
 
-                inparams.staffInSelectedOfficeOnly = true;
-
                 resourceFactory.loanResource.get(inparams, function (data) {
                     scope.loanaccountinfo = data;
+
+                    // Update third-party disbursement related values when product changes
+                    scope.enableThirdPartyDisbursement = !!scope.loanaccountinfo.enableThirdPartyDisbursement;
+                    scope.thirdPartyDisbursementProviderOptions = scope.loanaccountinfo.thirdPartyDisbursementProviderOptions || [];
+                    if (!scope.enableThirdPartyDisbursement) {
+                        scope.formData.thirdPartyDisbursementProvider = null;
+                    }
+
                     scope.previewClientLoanAccInfo();
                 });
 
@@ -213,13 +232,6 @@
                 scope.formData.isBnplLoan = scope.loanaccountinfo.isBnplLoan;
                 scope.formData.equityContributionLoanPercentage = scope.loanaccountinfo.equityContributionLoanPercentage;
                 scope.formData.requiresEquityContribution = scope.loanaccountinfo.requiresEquityContribution;
-                scope.enableThirdPartyDisbursement = !!scope.loanaccountinfo.enableThirdPartyDisbursement;
-                scope.thirdPartyDisbursementProviderOptions = scope.loanaccountinfo.thirdPartyDisbursementProviderOptions || [];
-                if (scope.enableThirdPartyDisbursement) {
-                    scope.formData.thirdPartyDisbursementProvider = scope.loanaccountinfo.thirdPartyDisbursementProvider || null;
-                } else {
-                    scope.formData.thirdPartyDisbursementProvider = null;
-                }
                 scope.toVendorClients = scope.loanaccountinfo.vendorClientOptions;
                 scope.vendorSavingsAccountOptions = scope.loanaccountinfo.vendorSavingsAccountOptions;
                 if(scope.loanaccountinfo.vendorClientOptions != null && scope.loanaccountinfo.linkedVendorAccount != null){
@@ -449,7 +461,9 @@
                     delete this.formData.interestRateDifferential ;
                     delete this.formData.isFloatingInterestRate ;
                 }
-                resourceFactory.loanResource.save({command: 'calculateLoanSchedule'}, this.formData, function (data) {
+                var schedulePreviewData = angular.copy(this.formData);
+                delete schedulePreviewData.thirdPartyDisbursementProvider;
+                resourceFactory.loanResource.save({command: 'calculateLoanSchedule'}, schedulePreviewData, function (data) {
                     scope.repaymentscheduleinfo = data;
                     scope.previewRepayment = true;
                     scope.formData.syncRepaymentsWithMeeting = scope.syncRepaymentsWithMeeting;
@@ -468,6 +482,22 @@
                         });
 
             scope.submit = function () {
+                // Disallow modification at disbursement approval stage or when disbursement is approved
+                var isDisbursementApprovalStage = scope.loanaccountinfo.status.value === "Approved" &&
+                    scope.loanaccountinfo.subStatus && scope.loanaccountinfo.subStatus.value === "PENDING_DISBURSEMENT";
+                var isDisbursementApproved = scope.loanaccountinfo.status.value === "Approved" &&
+                    !scope.loanaccountinfo.subStatus;
+
+                if (isDisbursementApprovalStage || isDisbursementApproved) {
+                    alert("Loan modification is not allowed when loan is in disbursement approval stage or when disbursement is approved.");
+                    return;
+                }
+
+                // Delete thirdPartyDisbursementProvider if product doesn't support it or if value is null
+                if (!scope.enableThirdPartyDisbursement || !scope.formData.thirdPartyDisbursementProvider) {
+                    delete scope.formData.thirdPartyDisbursementProvider;
+                }
+
                 if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
                     return;
                 }
@@ -504,9 +534,6 @@
                 delete this.formData.syncRepaymentsWithMeeting;
                 delete this.formData.interestRateFrequencyType;
                 delete this.formData.applicationDate;
-                if (!scope.enableThirdPartyDisbursement) {
-                    delete this.formData.thirdPartyDisbursementProvider;
-                }
                 if(!scope.loanaccountinfo.isLoanProductLinkedToFloatingRate) {
                     delete this.formData.interestRateDifferential ;
                     delete this.formData.isFloatingInterestRate ;
