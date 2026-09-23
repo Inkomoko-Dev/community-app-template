@@ -11,6 +11,8 @@
 
             scope.user = {};
             scope.formData.roles = [] ;
+            scope.formData.officeIds = [] ;
+            scope.additionalOfficeOptions = [];
 
             resourceFactory.userListResource.get({userId: routeParams.id, template: 'true'}, function (data) {
                 scope.formData.username = data.username;
@@ -28,12 +30,24 @@
 
                 scope.userId = data.id;
                 scope.offices = data.allowedOffices;
+                scope.formData.officeIds = _.pluck(data.assignedOffices || [], 'id');
+                scope.refreshAdditionalOffices();
                 //scope.availableRoles = data.availableRoles.concat(data.selectedRoles);
                 scope.formData.passwordNeverExpires = data.passwordNeverExpires;
             }, function(error) {
                 console.error('Error loading user data:', error);
             });
+            scope.refreshAdditionalOffices = function () {
+                scope.additionalOfficeOptions = _.filter(scope.offices, function (office) {
+                    return office.id !== scope.formData.officeId;
+                });
+                scope.formData.officeIds = _.filter(scope.formData.officeIds, function (officeId) {
+                    return officeId !== scope.formData.officeId;
+                });
+            };
+
             scope.getOfficeStaff = function(){
+                scope.refreshAdditionalOffices();
                 if(scope.formData.officeId) {
                     resourceFactory.employeeResource.getAllEmployees({officeId:scope.formData.officeId},function (staffs) {
                         scope.staffs = staffs;
