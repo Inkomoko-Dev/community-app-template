@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        BulkLoanRescheduleCreateController: function (scope, resourceFactory, location, dateFilter, $q, $translate, previewHelper) {
+        BulkLoanRescheduleCreateController: function (scope, resourceFactory, location, dateFilter, $q, $translate, previewHelper, timeout) {
             var defaultLimit = 15;
             var normalizeNumber = function (value) {
                 if (value === undefined || value === null || value === '') { return value; }
@@ -66,17 +66,25 @@
                 var count = function () {
                     for (var i = 0; i < arguments.length; i += 1) {
                         if (angular.isArray(arguments[i])) { return arguments[i].length; }
-                        if (arguments[i] !== undefined && arguments[i] !== null && Number(arguments[i])) {
-                            return Number(arguments[i]);
+                        if (arguments[i] !== undefined && arguments[i] !== null && arguments[i] !== '') {
+                            var parsed = Number(arguments[i]);
+                            if (!isNaN(parsed)) { return parsed; }
                         }
                     }
                     return 0;
                 };
+                var found = count(s.found, s.foundCount, s.totalFound, s.totalLoansFound);
+                var excluded = count(s.excluded, s.excludedCount, s.totalExcluded);
+                var failed = count(s.failed, s.failedCount, s.failureCount, s.totalFailed);
+                var affected = count(s.toProcess, s.toProcessCount, s.processed, s.totalToProcess, s.totalSucceeded);
+                if (!affected) {
+                    affected = Math.max(0, found - excluded - failed);
+                }
                 return {
-                    found: count(s.found, s.foundCount, s.totalFound, s.totalLoansFound),
-                    affected: count(s.toProcess, s.toProcessCount, s.processed, s.totalToProcess, s.totalSucceeded),
-                    excluded: count(s.excluded, s.excludedCount, s.totalExcluded),
-                    failed: count(s.failed, s.failedCount, s.failureCount, s.totalFailed)
+                    found: found,
+                    affected: affected,
+                    excluded: excluded,
+                    failed: failed
                 };
             };
             var normalizeLoanRow = function (row) {
@@ -90,9 +98,10 @@
                     loanProductName: row.loanProductName || row.loanProduct || row.productName,
                     loanOfficerId: row.loanOfficerId,
                     loanOfficerName: row.loanOfficerName || row.loanOfficer,
-                    loanStatus: row.loanStatus || row.status,
+                    loanStatus: row.loanStatus,
                     resultStatus: row.status,
-                    currentInterestRate: row.currentInterestRate || row.oldInterestRate || row.currentRate,
+                    resultStatus: row.status,
+                    currentInterestRate: row.currentInterestRate || row.originalInterestRate || row.oldInterestRate || row.currentRate,
                     newInterestRate: row.newInterestRate || row.updatedInterestRate || row.targetRate,
                     interestRateMethod: row.interestRateMethod || row.interestRateType,
                     totalOutstanding: row.totalOutstanding || row.outstanding || row.outstandingBalance,
@@ -138,7 +147,7 @@
             scope.approverOptions = [];
             scope.approvalRequest = { approverId: null, submissionNote: '' };
             scope.formData = {
-                filters: { officeId: null, loanStatus: null, currentInterestRate: null, loanProductIds: [], loanOfficerIds: [],
+                filters: { officeId: null, loanStatus: '300', currentInterestRate: null, interestMethod: null, loanProductIds: [], loanOfficerIds: [],
                     excludedLoans: [], rescheduleFromDateStrategy: 'NEXT_UNPAID' },
                 reschedulingDetails: {
                     rescheduleReasonId: null, submittedOnDate: new Date(),
@@ -152,6 +161,7 @@
             };
             scope.officeOptions = [];
             scope.loanStatusOptions = [];
+            scope.interestMethodOptions = [];
             scope.loanProductOptions = [];
             scope.loanOfficerOptions = [];
             scope.rescheduleReasonOptions = [];
@@ -220,6 +230,15 @@
                     scope.validationRules = data.validationRules || {};
                     scope.officeOptions = flattenOffices(filterOptions.offices || []);
                     scope.loanStatusOptions = normalizeOptionList(filterOptions.loanStatuses || data.loanStatuses || []);
+                    scope.interestMethodOptions = (filterOptions.interestMethods || []).map(function (option) {
+                        return {
+                            value: option.code || option.value,
+                            label: option.value || option.name || option.label || option.code
+                        };
+                    });
+                    if (!scope.formData.filters.loanStatus && scope.loanStatusOptions.length) {
+                        scope.formData.filters.loanStatus = '300';
+                    }
                     scope.loanProductOptions = normalizeOptionList(filterOptions.loanProducts || data.loanProducts || []);
                     scope.loanOfficerOptions = normalizeOptionList(filterOptions.loanOfficers || data.loanOfficers || []);
                     scope.availableLoanProducts = angular.copy(scope.loanProductOptions);
@@ -341,7 +360,8 @@
             var buildPayload = function () {
                 var filters = {}, details = angular.copy(scope.formData.reschedulingDetails);
                 if (scope.formData.filters.officeId) { filters.officeId = normalizeNumber(scope.formData.filters.officeId); }
-                if (scope.formData.filters.loanStatus) { filters.loanStatus = scope.formData.filters.loanStatus; }
+                filters.loanStatus = scope.formData.filters.loanStatus;
+                filters.interestMethod = scope.formData.filters.interestMethod;
                 filters.rescheduleFromDateStrategy = scope.formData.filters.rescheduleFromDateStrategy;
                 if (scope.formData.filters.currentInterestRate !== null && scope.formData.filters.currentInterestRate !== undefined && scope.formData.filters.currentInterestRate !== '') {
                     filters.currentInterestRate = normalizeNumber(scope.formData.filters.currentInterestRate);
@@ -375,6 +395,11 @@
             scope.validateConfiguration = function () {
                 scope.validation = {};
                 if (!scope.formData.filters.officeId) { scope.validation.officeId = true; }
+                if (!scope.formData.filters.loanStatus) { scope.validation.loanStatus = true; }
+                if (scope.formData.filters.currentInterestRate === null || scope.formData.filters.currentInterestRate === undefined || scope.formData.filters.currentInterestRate === '') {
+                    scope.validation.currentInterestRate = true;
+                }
+                if (!scope.formData.filters.interestMethod) { scope.validation.interestMethod = true; }
                 if (!scope.formData.filters.rescheduleFromDateStrategy) { scope.validation.rescheduleFromDateStrategy = true; }
                 if (!scope.formData.reschedulingDetails.rescheduleReasonId) { scope.validation.rescheduleReasonId = true; }
                 if (!scope.formData.reschedulingDetails.submittedOnDate) { scope.validation.submittedOnDate = true; }
@@ -401,11 +426,22 @@
                 }
                 return true;
             };
-            var loadPreview = function (resetPage) {
+            var pollPromise = null;
+            scope.isPreviewBuilding = function () {
+                return String(scope.previewData && scope.previewData.status || '').toUpperCase() === 'PREVIEWING';
+            };
+            var schedulePoll = function () {
+                if (pollPromise || !scope.isPreviewBuilding()) { return; }
+                pollPromise = timeout(function () {
+                    pollPromise = null;
+                    loadPreview(false, true);
+                }, 3000);
+            };
+            var loadPreview = function (resetPage, silent) {
                 if (!scope.executionId) { return; }
                 if (resetPage) { scope.previewQuery.page = 1; }
                 clearApiError();
-                scope.state.loadingPreview = true;
+                if (!silent) { scope.state.loadingPreview = true; }
                 resourceFactory.bulkLoanRescheduleExecutionResource.preview({
                     executionId: scope.executionId,
                     page: scope.previewQuery.page - 1,
@@ -426,6 +462,7 @@
                         });
                         scope.state.loadingPreview = false;
                         scope.step = 2;
+                        schedulePoll();
                     }, function (response) {
                         scope.state.loadingPreview = false;
                         setApiError(response);
@@ -478,7 +515,7 @@
             };
             scope.backToConfigure = function () { scope.step = 1; };
             scope.submitForApproval = function () {
-                if (!scope.executionId || scope.state.submitting) { return; }
+                if (!scope.executionId || scope.state.submitting || scope.isPreviewBuilding()) { return; }
                 if (!scope.approvalRequest.approverId) {
                     setApiError({ data: { defaultUserMessage: $translate.instant('label.bulkreschedule.error.selectapprover') } });
                     return;
@@ -504,11 +541,14 @@
                 );
             };
             scope.cancel = function () { location.path('/bulkreschedule'); };
+            scope.$on('$destroy', function () {
+                if (pollPromise) { timeout.cancel(pollPromise); }
+            });
             loadTemplate();
         }
     });
     mifosX.ng.application.controller('BulkLoanRescheduleCreateController', [
-        '$scope', 'ResourceFactory', '$location', 'dateFilter', '$q', '$translate', 'BulkReschedulePreviewHelper',
+        '$scope', 'ResourceFactory', '$location', 'dateFilter', '$q', '$translate', 'BulkReschedulePreviewHelper', '$timeout',
         mifosX.controllers.BulkLoanRescheduleCreateController
     ]).run(function ($log) {
         $log.info('BulkLoanRescheduleCreateController initialized');

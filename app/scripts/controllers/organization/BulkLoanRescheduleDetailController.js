@@ -49,11 +49,11 @@
                 var found = count(s.found, s.totalFound, s.totalLoansFound);
                 var excluded = count(s.excluded, s.totalExcluded);
                 var failed = count(s.failed, s.totalFailed);
+                var succeeded = count(s.totalSucceeded);
                 return {
                     found: found,
-                    affected: count(s.toProcess, s.totalToProcess, s.totalToBeProcessed,
-                        Math.max(0, found - excluded - failed)),
-                    succeeded: count(s.totalSucceeded),
+                    affected: succeeded || Math.max(0, found - excluded - failed),
+                    succeeded: succeeded,
                     excluded: excluded,
                     failed: failed
                 };
@@ -67,9 +67,9 @@
                     officeName: row.officeName || row.branchName,
                     loanProductName: row.loanProductName || row.loanProduct,
                     loanOfficerName: row.loanOfficerName || row.loanOfficer,
-                    loanStatus: row.loanStatus || row.status,
+                    loanStatus: row.loanStatus,
                     resultStatus: row.status,
-                    currentInterestRate: row.currentInterestRate || row.currentRate,
+                    currentInterestRate: row.currentInterestRate || row.originalInterestRate || row.currentRate,
                     newInterestRate: row.newInterestRate || row.targetRate,
                     interestRateMethod: row.interestRateMethod || row.interestRateType,
                     totalOutstanding: row.totalOutstanding || row.outstanding,
@@ -106,6 +106,7 @@
                     executionCompletedAt: normalizeDateTime(data.executionCompletedAt),
                     recoveryAvailableAt: normalizeDateTime(data.recoveryAvailableAt),
                     recoveryAvailable: data.recoveryAvailable === true,
+                    rollbackAvailable: data.rollbackAvailable === true,
                     rejectionReason: data.rejectReason || data.rejectionReason || (rejected ? data.approvalNote : null),
                     metrics: normalizeMetrics(data),
                     raw: data
@@ -116,6 +117,7 @@
                     case 'APPROVED':
                     case 'EXECUTED':
                     case 'COMPLETED': return 'label-success';
+                    case 'ROLLED_BACK': return 'label-default';
                     case 'PENDING_APPROVAL': return 'label-warning';
                     case 'REJECTED':
                     case 'FAILED': return 'label-danger';
@@ -128,7 +130,11 @@
             };
             scope.isExecutionActive = function () {
                 var status = String(scope.request && scope.request.status || '').toUpperCase();
-                return status === 'APPROVED' || status === 'EXECUTING';
+                return status === 'APPROVED' || status === 'EXECUTING' || status === 'ROLLING_BACK' || status === 'PREVIEWING';
+            };
+            scope.canRollbackExecution = function () {
+                return scope.canApprove && scope.request && scope.request.rollbackAvailable === true
+                    && Number(scope.request.metrics.succeeded) > 0;
             };
             scope.canRecoverExecution = function () {
                 return scope.canOfferRecovery() && scope.request.recoveryAvailable;
@@ -139,7 +145,7 @@
                 var isCreator = currentUserId && Number(scope.request.createdById) === Number(currentUserId);
                 return scope.request &&
                     (scope.canApprove || scope.canCreate || isCreator) &&
-                    (status === 'EXECUTING' || status === 'FAILED' || status === 'PARTIAL_SUCCESS');
+                    (status === 'EXECUTING' || status === 'ROLLING_BACK' || status === 'PREVIEWING' || status === 'FAILED' || status === 'PARTIAL_SUCCESS');
             };
             scope.executionProgress = function () {
                 var total = scope.request ? scope.request.totalProcessed + scope.request.totalRemaining : 0;
@@ -317,11 +323,40 @@
                     { executionId: scope.executionId }, {},
                     function () {
                         scope.state.recovering = false;
-                        if (scope.request) { scope.request.status = 'EXECUTING'; }
+                        if (scope.request) {
+                            var status = String(scope.request.status || '').toUpperCase();
+                            if (status === 'ROLLING_BACK' || status === 'PREVIEWING') {
+                                scope.request.status = status;
+                            } else {
+                                scope.request.status = 'EXECUTING';
+                            }
+                        }
                         loadPreview(true);
                     },
                     function (response) {
                         scope.state.recovering = false;
+                        setApiError(response);
+                    }
+                );
+            };
+            scope.rollbackExecution = function () {
+                if (!scope.canRollbackExecution() || scope.state.rollingBack) { return; }
+                if (!scope.decision.reason || !scope.decision.reason.trim()) {
+                    scope.errorStatus = $translate.instant('label.bulkreschedule.error.rollbackreason');
+                    return;
+                }
+                if (!window.confirm($translate.instant('label.bulkreschedule.confirm.rollback'))) { return; }
+                scope.state.rollingBack = true;
+                resourceFactory.bulkLoanRescheduleCommandResource.rollback(
+                    { executionId: scope.executionId },
+                    { rollbackReason: scope.decision.reason.trim() },
+                    function () {
+                        scope.state.rollingBack = false;
+                        if (scope.request) { scope.request.status = 'ROLLING_BACK'; }
+                        loadPreview(true);
+                    },
+                    function (response) {
+                        scope.state.rollingBack = false;
                         setApiError(response);
                     }
                 );

@@ -89,6 +89,7 @@
                     <option value="">{{'label.bulkreschedule.allresults' | translate}}</option><option value="PREVIEW_MATCHED">{{'label.bulkreschedule.available' | translate}}</option>
                     <option value="EXCLUDED">{{'label.bulkreschedule.excluded' | translate}}</option><option value="FAILED">{{'label.bulkreschedule.failed' | translate}}</option>
                     <option value="SUCCEEDED">{{'label.bulkreschedule.succeeded' | translate}}</option>
+                    <option value="ROLLED_BACK">{{'label.bulkreschedule.status.rolled_back' | translate}}</option>
                 </select>
                 <span class="text-muted"> {{'label.bulkreschedule.showingloans' | translate:{start: pageStart(), end: pageEnd(), total: previewQuery.total} }}</span>
             </div>
@@ -150,6 +151,24 @@
                 <button class="btn btn-primary" ng-click="submitForApproval()" ng-disabled="state.submitting || !approverOptions.length">
                     <i class="fa" ng-class="state.submitting ? 'fa-spinner fa-spin' : 'fa-send'"></i>
                     {{(state.submitting ? 'label.bulkreschedule.submitting' : 'label.bulkreschedule.submitapproval') | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-danger" ng-if="canRollbackExecution()">
+        <div class="panel-heading"><strong>{{'label.bulkreschedule.rollback' | translate}}</strong></div>
+        <div class="panel-body">
+            <p>{{'label.bulkreschedule.rollback.help' | translate}}</p>
+            <div class="form-group">
+                <label>{{'label.bulkreschedule.rollbackreason' | translate}} <span class="required">*</span></label>
+                <textarea class="form-control" rows="3" ng-model="decision.reason"
+                          placeholder="{{'label.bulkreschedule.rollbackreason.placeholder' | translate}}"></textarea>
+            </div>
+            <div class="text-right">
+                <button class="btn btn-danger" ng-click="rollbackExecution()" ng-disabled="state.rollingBack">
+                    <i class="fa" ng-class="state.rollingBack ? 'fa-spinner fa-spin' : 'fa-undo'"></i>
+                    {{(state.rollingBack ? 'label.bulkreschedule.rollingback' : 'label.bulkreschedule.rollback') | translate}}
                 </button>
             </div>
         </div>
