@@ -65,11 +65,17 @@
                     } else if (temp.displayType === 'date') {
                         if (temp.variable === 'asAtDate') {
                             scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
+                        } else if (temp.defaultVal === 'today') {
+                            scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
+                        } else if (/^\d{4}-\d{2}-\d{2}$/.test(temp.defaultVal || '')) {
+                            scope.formData[temp.inputName] = temp.defaultVal;
                         }
                         scope.reportDateParams.push(temp);
                     } else if (temp.displayType === 'text') {
                         if (temp.variable === 'gracePeriod') {
                             scope.formData[temp.inputName] = '0';
+                        } else if (hasUsableDefault(temp)) {
+                            scope.formData[temp.inputName] = temp.defaultVal;
                         }
                         scope.reportTextParams.push(temp);
                     }
@@ -115,8 +121,27 @@
                         paramData.selectOptions = selectData;
                         scope.reportParams.push(paramData);
                     }
+                    applySelectDefault(paramData, selectData);
                 };
                 return successFunction;
+            }
+
+            function hasUsableDefault(paramData) {
+                var value = paramData.defaultVal;
+                return value !== undefined && value !== null && value !== '' && value !== 'n/a';
+            }
+
+            function applySelectDefault(paramData, selectData) {
+                var current = scope.formData[paramData.inputName];
+                if ((current !== undefined && current !== null && current !== '') || !hasUsableDefault(paramData)) {
+                    return;
+                }
+                for (var i in selectData) {
+                    if (String(selectData[i].id) === String(paramData.defaultVal)) {
+                        scope.formData[paramData.inputName] = selectData[i].id;
+                        return;
+                    }
+                }
             }
 
             function intializeParams(paramData, params) {
@@ -330,7 +355,7 @@
                                 errorObj.args = {params: []};
                                 errorObj.args.params.push({value: paramDetails.label});
                                 scope.errorDetails.push(errorObj);
-                            } else if (paramDetails.variable === 'gracePeriod' && !/^\d+$/.test(selectedVal)) {
+                            } else if ((paramDetails.variable === 'gracePeriod' || paramDetails.formatType === 'number') && !/^\d+$/.test(selectedVal)) {
                                 var fieldId = '#' + paramDetails.inputName;
                                 $(fieldId).addClass("validationerror");
                                 var errorObj = new Object();
