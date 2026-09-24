@@ -412,73 +412,96 @@
                     return office;
                 });
 
-                scope.loanResource = function () {
-                    resourceFactory.loanResource.getAllLoans(
-                        {
-                            limit: '2000',
-                            sqlSearch: 'l.loan_status_id in (100,200) OR l.loan_sub_status_id = 300'
-                        },
-                        function (loanData) {
-                            const loans = loanData.pageItems;
+                function placeLoansOnTabs(loans) {
+                    scope.offices.forEach(office => {
+                        office.loans.length = 0;
+                        office.awaitingDisbursalLoans.length = 0;
+                        office.disbursementLoans.length = 0;
+                    });
 
-                            // Reset office loan arrays
-                            scope.offices.forEach(office => {
-                                office.loans.length = 0;
-                                office.awaitingDisbursalLoans.length = 0;
-                                office.disbursementLoans.length = 0;
-                            });
+                    loans.forEach(loan => {
+                        let office = null;
 
-                            loans.forEach(loan => {
-                                let office = null;
-
-                                // Determine office from client or group
-                                if (loan.clientOfficeId) {
-                                    office = idToNodeMap[loan.clientOfficeId];
-                                } else if (loan.group && loan.group.officeId) {
-                                    office = idToNodeMap[loan.group.officeId];
-                                }
-
-                                if (!office) {return};
-
-                                // Awaiting Disbursal: status 200, no substatus
-                                if (loan.status.id === 200 && (!loan.subStatus || !loan.subStatus.id)) {
-                                    office.awaitingDisbursalLoans.push(loan);
-                                }
-
-                                // Disbursement Approval: status 200, substatus 300
-                                else if (loan.status.id === 200 && loan.subStatus && loan.subStatus.id === 300) {
-                                    office.disbursementLoans.push(loan);
-                                    scope.disbursementApprovalTemplate[loan.id] = loan;
-                                }
-
-                                // Pending Approval: status 100, optional
-                                else if (loan.status.id === 100 && loan.loanDecisionState && loan.loanDecisionState.id === 1900) {
-                                    office.loans.push(loan);
-                                }
-                            });
-
-                            // Compute totals
-                            scope.offices.forEach(office => {
-                                office.totalLoanAmount = office.loans.reduce((sum, l) => sum + (l.principal || 0), 0);
-                                office.totalAwaitingDisbursal = office.awaitingDisbursalLoans.reduce((sum, l) => sum + (l.principal || 0), 0);
-                                office.totalDisbursementNet = office.disbursementLoans.reduce(
-                                    (sum, l) => sum + (l.expectedNetDisbursalAmount || l.principal || 0), 0
-                                );
-                            });
-
-                            // Compute grand total
-                            scope.grandTotalDisbursementNet = scope.offices.reduce(
-                                (sum, o) => sum + (o.totalDisbursementNet || 0), 0
-                            );
-
-                            // Keep only offices that have at least one loan
-                            scope.offices = scope.offices.filter(o =>
-                                (o.loans && o.loans.length) ||
-                                (o.awaitingDisbursalLoans && o.awaitingDisbursalLoans.length) ||
-                                (o.disbursementLoans && o.disbursementLoans.length)
-                            );
+                        if (loan.clientOfficeId) {
+                            office = idToNodeMap[loan.clientOfficeId];
+                        } else if (loan.group && loan.group.officeId) {
+                            office = idToNodeMap[loan.group.officeId];
                         }
+
+                        if (!office) {return;}
+
+                        // Awaiting Disbursal: status 200, no substatus
+                        if (loan.status.id === 200 && (!loan.subStatus || !loan.subStatus.id)) {
+                            office.awaitingDisbursalLoans.push(loan);
+                        }
+
+                        // Disbursement Approval: status 200, substatus 300
+                        else if (loan.status.id === 200 && loan.subStatus && loan.subStatus.id === 300) {
+                            office.disbursementLoans.push(loan);
+                            scope.disbursementApprovalTemplate[loan.id] = loan;
+                        }
+
+                        // Pending Approval: the status 100 query is already limited to decision state 1900.
+                        else if (loan.status.id === 100) {
+                            office.loans.push(loan);
+                        }
+                    });
+
+                    scope.offices.forEach(office => {
+                        office.totalLoanAmount = office.loans.reduce((sum, l) => sum + (l.principal || 0), 0);
+                        office.totalAwaitingDisbursal = office.awaitingDisbursalLoans.reduce((sum, l) => sum + (l.principal || 0), 0);
+                        office.totalDisbursementNet = office.disbursementLoans.reduce(
+                            (sum, l) => sum + (l.expectedNetDisbursalAmount || l.principal || 0), 0
+                        );
+                    });
+
+                    scope.grandTotalDisbursementNet = scope.offices.reduce(
+                        (sum, o) => sum + (o.totalDisbursementNet || 0), 0
                     );
+
+                    scope.offices = scope.offices.filter(o =>
+                        (o.loans && o.loans.length) ||
+                        (o.awaitingDisbursalLoans && o.awaitingDisbursalLoans.length) ||
+                        (o.disbursementLoans && o.disbursementLoans.length)
+                    );
+                }
+
+                scope.loanResource = function () {
+                    var searches = [
+                        'l.loan_status_id = 200 AND l.loan_sub_status_id IS NULL',
+                        'l.loan_status_id = 200 AND l.loan_sub_status_id = 300',
+                        'l.loan_status_id = 100 AND l.loan_decision_state = 1900'
+                    ];
+                    var pageSize = 200;
+                    var loans = [];
+                    var pending = searches.length;
+
+                    function finishSearch() {
+                        pending--;
+                        if (pending === 0) {
+                            placeLoansOnTabs(loans);
+                        }
+                    }
+
+                    function fetchPage(sqlSearch, offset) {
+                        resourceFactory.loanResource.getAllLoans({
+                            limit: pageSize,
+                            offset: offset,
+                            sqlSearch: sqlSearch
+                        }, function (loanData) {
+                            var pageItems = loanData.pageItems || [];
+                            loans = loans.concat(pageItems);
+                            if (pageItems.length === pageSize) {
+                                fetchPage(sqlSearch, offset + pageSize);
+                                return;
+                            }
+                            finishSearch();
+                        }, finishSearch);
+                    }
+
+                    searches.forEach(function (sqlSearch) {
+                        fetchPage(sqlSearch, 0);
+                    });
                 };
 
                 scope.loanResource();
