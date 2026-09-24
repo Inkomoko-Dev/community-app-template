@@ -16,14 +16,30 @@
             };
             scope.getLoanTemplate = function (templateId) {
                 scope.selectedTemplate = templateId;
+                scope.template = null;
+                scope.templateError = null;
                 http({
                     method: 'POST',
                     url: $rootScope.hostUrl + API_VERSION + '/templates/' + templateId + '?loanId=' + routeParams.loanId,
                     data: {}
                 }).then(function (data) {
                         scope.template =  $sce.trustAsHtml(data.data);
+                    }, function (response) {
+                        scope.templateError = templateErrorFrom(response);
                     });
             };
+
+            function templateErrorFrom(response) {
+                var body = response && response.data;
+                var error = body && body.errors && body.errors.length ? body.errors[0] : body;
+                if (!error || !error.userMessageGlobalisationCode) {
+                    return {code: 'error.msg.template.generation.failed', args: {params: []}};
+                }
+                return {
+                    code: error.userMessageGlobalisationCode,
+                    args: {params: _.map(error.args || [], function (arg) { return {value: arg.value}; })}
+                };
+            }
         }
     });
     mifosX.ng.application.controller('LoanScreenReportController', ['$scope', 'ResourceFactory', '$location', '$http', 'API_VERSION', '$routeParams', '$rootScope', '$sce', mifosX.controllers.LoanScreenReportController]).run(function ($log) {
