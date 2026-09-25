@@ -7,6 +7,7 @@
     </div>
     <form name="createloanrescheduleform" novalidate="" class="form-horizontal well" rc-submit="submit()">
         <api-validate></api-validate>
+        <div class="alert alert-danger" ng-if="error">{{error}}</div>
         <fieldset>
             <legend>{{'label.heading.rescheduleloan' | translate}}</legend>
             <div class="form-group">
