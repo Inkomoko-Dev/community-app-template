@@ -3,6 +3,7 @@
         CreateEmployeeController: function (scope, resourceFactory, location, dateFilter) {
             scope.offices = [];
             scope.restrictDate = new Date();
+            scope.mobileCountryCodeOptions = mifosX.models.CountryCallingCodes.all;
             resourceFactory.officeResource.getAllOfficesInAlphabeticalOrder(function (data) {
                 scope.offices = data;
                 scope.formData = {

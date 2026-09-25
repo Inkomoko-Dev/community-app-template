@@ -2,6 +2,9 @@
     mifosX.controllers = _.extend(module, {
         ViewEmployeeController: function (scope, routeParams, resourceFactory) {
             scope.employee = [];
+            scope.mobileNumberDisplay = function () {
+                return mifosX.models.CountryCallingCodes.displayNumber(scope.employee.mobileCountryCode, scope.employee.mobileNo);
+            };
             resourceFactory.employeeResource.get({staffId: routeParams.id}, function (data) {
                 scope.employee = data;
             });

@@ -3,6 +3,7 @@
         EditEmployeeController: function (scope, routeParams, resourceFactory, location, dateFilter) {
             scope.offices = [];
             scope.restrictDate = new Date();
+            scope.mobileCountryCodeOptions = mifosX.models.CountryCallingCodes.all;
 
             resourceFactory.employeeResource.get({staffId: routeParams.id, template: 'true'}, function (data) {
                 scope.offices = data.allowedOffices;
@@ -17,6 +18,10 @@
                     isLoanOfficer: data.isLoanOfficer,
                     officeId: data.officeId,
                     mobileNo: data.mobileNo,
+                    mobileCountryCode: (function () {
+                        var match = mifosX.models.CountryCallingCodes.find(data.mobileCountryCode);
+                        return match ? match.iso : data.mobileCountryCode;
+                    })(),
                     isActive: data.isActive,
                     joiningDate: data.joiningDate
                 };
