@@ -2263,6 +2263,7 @@
   "error.msg.loan.product.does.not.support.multiple.disbursals": "This loan product does not support multiple disbursals",
   "error.msg.cannot.modify.tranches.if.loan.is.pendingapproval.closed.overpaid.writtenoff": "Disbursement details cannot be modified if the loan account is Pending approval/Closed/Overpaid/WrittenOff",
   "validation.msg.rescheduleloan.graceOnPrincipal.cannot.be.blank": "Select any one of the below options before submitting: \"Change Repayment Date\", \"Introduce Mid-term Grace Period\", \"Extend Repayment Period\", \"Adjust Interest rate for the remainder of loan\"",
+  "validation.msg.rescheduleloan.preserveLoanTermDuration.requiresFrequencyChange": "Preserve Loan Term Duration can only be used when changing the repayment frequency",
   "validation.msg.rescheduleloan.rescheduleFromDate.cannot.be.blank": "Reschedule From Date cannot be empty",
   "validation.msg.rescheduleloan.rescheduleReasonId.cannot.be.blank": "Reason for Rescheduling cannot be empty",
   "validation.msg.rescheduleloan.loan.reschedule.interestrecalculation.error.code": "Error in Recalculation of Interest",
