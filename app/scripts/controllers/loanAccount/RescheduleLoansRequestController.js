@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        RescheduleLoansRequestController: function (scope, resourceFactory, routeParams, location, dateFilter) {
+        RescheduleLoansRequestController: function (scope, resourceFactory, routeParams, location, dateFilter, $translate) {
             var fallbackRepaymentFrequencyTypeOptions = [
                 { id: 0, value: 'Days' },
                 { id: 1, value: 'Weeks' },
@@ -127,6 +127,7 @@
                 if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
                     return;
                 }
+
                 var repaymentEvery = normalizeInteger(this.formData.repaymentEvery);
                 var repaymentFrequencyType = normalizeInteger(this.formData.repaymentFrequencyType);
                 var currentRepaymentEvery = normalizeInteger(scope.currentRepaymentEvery);
@@ -134,6 +135,29 @@
                     normalizeInteger(scope.currentRepaymentFrequencyType.id) : scope.currentRepaymentFrequencyType;
                 var repaymentFrequencyChanged = repaymentEvery !== currentRepaymentEvery ||
                     repaymentFrequencyType !== currentRepaymentFrequencyType;
+
+                // preserveLoanTermDuration is a modifier and only valid when repayment frequency changes.
+                var preserveTerm = this.formData.preserveLoanTermDuration;
+                if (preserveTerm && !repaymentFrequencyChanged) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.preserveLoanTermDuration.requiresFrequencyChange');
+                    return;
+                }
+
+                // A repayment-frequency change is a valid reschedule action by itself.
+                var hasOption = scope.changeRepaymentDate
+                    || scope.introduceGracePeriods
+                    || scope.extendRepaymentPeriod
+                    || scope.adjustinterestrates
+                    || scope.changeEMI
+                    || scope.changeFixedPrincipal
+                    || scope.changeFixedPrincipalPercentagePerInstallment
+                    || repaymentFrequencyChanged;
+                if (!hasOption) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.graceOnPrincipal.cannot.be.blank');
+                    return;
+                }
+
+                scope.error = '';
 
                 this.formData.loanId = scope.loanId;
                 this.formData.dateFormat = scope.df;
@@ -170,15 +194,28 @@
                     // Do not send preserveLoanTermDuration for non-frequency reschedule types
                     delete this.formData.preserveLoanTermDuration;
                 }
+
+                // These fields are only for display/template - not supported by the reschedule create API.
+                delete this.formData.numberOfRepayments;
+                delete this.formData.loanTermFrequency;
+                delete this.formData.loanTermFrequencyType;
                 resourceFactory.loanRescheduleResource.put(this.formData, function (data) {
                     scope.requestId = data.resourceId;
                     location.path('/loans/' + scope.loanId + '/viewreschedulerequest/'+ data.resourceId);
+                }, function (response) {
+                    var errors = response && response.data && response.data.errors;
+                    var backendError = response && response.data;
+                    scope.error = errors && errors.length && errors[0].defaultUserMessage
+                        ? errors[0].defaultUserMessage
+                        : (backendError && backendError.defaultUserMessage)
+                            ? backendError.defaultUserMessage
+                            : 'Loan reschedule request failed. Please contact support.';
                 });
             };
 
         }
     });
-    mifosX.ng.application.controller('RescheduleLoansRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', mifosX.controllers.RescheduleLoansRequestController]).run(function ($log) {
+    mifosX.ng.application.controller('RescheduleLoansRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', '$translate', mifosX.controllers.RescheduleLoansRequestController]).run(function ($log) {
         $log.info("RescheduleLoansRequestController initialized");
     });
 }(mifosX.controllers || {}));
