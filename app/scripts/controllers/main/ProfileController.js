@@ -22,12 +22,7 @@
             };
             var UpdatePasswordCtrl = function ($scope, $uibModalInstance, userId) {
                 $scope.formData = {};
-                $scope.showNotesError = false;
                 $scope.save = function () {
-                    if (!$scope.formData.notes || $scope.formData.notes.trim() === '') {
-                        $scope.showNotesError = true;
-                        return;
-                    }
                     resourceFactory.userListResource.update({'userId': userId}, $scope.formData, function (data) {
                         $uibModalInstance.close('modal');
                         if (data.resourceId == userId) {
