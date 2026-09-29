@@ -136,8 +136,15 @@
                 if (!data) {
                     return;
                 }
-                if (data.dueDiligenceRecommendedAmount != null && scope.formData.icReviewRecommendedAmount == null) {
-                    scope.formData.icReviewRecommendedAmount = data.dueDiligenceRecommendedAmount;
+                // CGLT-772: default the recommended amount from the latest completed IC review
+                // level (previousIcReviewRecommendedAmount, resolved by the backend); only when
+                // no prior completed level exists fall back to the Due Diligence recommendation.
+                if (scope.formData.icReviewRecommendedAmount == null) {
+                    if (data.previousIcReviewRecommendedAmount != null) {
+                        scope.formData.icReviewRecommendedAmount = data.previousIcReviewRecommendedAmount;
+                    } else if (data.dueDiligenceRecommendedAmount != null) {
+                        scope.formData.icReviewRecommendedAmount = data.dueDiligenceRecommendedAmount;
+                    }
                 }
                 if (data.dueDiligenceTermFrequency != null && scope.formData.icReviewTermFrequency == null) {
                     scope.formData.icReviewTermFrequency = data.dueDiligenceTermFrequency;

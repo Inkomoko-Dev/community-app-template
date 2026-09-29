@@ -658,6 +658,10 @@
                             {{ 'label.hint.icReviewMaxRecommendedAmount' | translate }} {{ icreviewTemplate.maxRecommendedAmount | number }}
                         </p>
                         <p class="help-block"
+                           ng-show="icreviewTemplate.previousIcReviewRecommendedAmount != null">
+                            {{ 'label.hint.icReviewPreviousLevelRecommendedAmount' | translate }} {{ icreviewTemplate.previousIcReviewLevelNumber }}: {{ icreviewTemplate.previousIcReviewRecommendedAmount | number }}
+                        </p>
+                        <p class="help-block"
                            ng-show="icreviewTemplate.dueDiligenceRecommendedAmount != null">
                             {{ 'label.hint.icReviewDueDiligenceRecommendedAmount' | translate }} {{ icreviewTemplate.dueDiligenceRecommendedAmount | number }}
                         </p>

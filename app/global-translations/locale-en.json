@@ -158,6 +158,7 @@
   "label.hint.icReviewProceedToPrepareAndSignContract": "This loan will proceed to Prepare and Sign Contract after approval.",
   "label.hint.icReviewNoApproversConfigured": "No users are configured as the next-stage approver for this office. Ask an administrator to assign the required IC review permission to the appropriate role.",
   "label.hint.icReviewMaxRecommendedAmount": "Maximum recommended amount (from cash flow):",
+  "label.hint.icReviewPreviousLevelRecommendedAmount": "Recommended by IC review level",
   "label.hint.icReviewDueDiligenceRecommendedAmount": "Due diligence recommended amount:",
   "label.heading.loanPrepareAndSignContract": "Loan Prepare And Sign Contract",
   "label.total.netdisbursement": "Total Net Disbursement",
