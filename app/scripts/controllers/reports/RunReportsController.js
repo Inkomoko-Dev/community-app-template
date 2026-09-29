@@ -17,14 +17,15 @@
             scope.reportData.columnHeaders = [];
             scope.reportData.data = [];
             scope.baseURL = "";
-            scope.csvData = [];
-            scope.row = [];
             scope.reportName = routeParams.name;
             scope.reportType = routeParams.type;
             scope.reportId = routeParams.reportId;
             scope.pentahoReportParameters = [];
             scope.type = "pie";
             scope.recordsPerPage = 15;
+            scope.knownTotalRecords = null;
+            scope.countInFlight = false;
+            scope.exporting = false;
 
             scope.highlight = function (id) {
                 var i = document.getElementById(id);
@@ -153,26 +154,98 @@
             };
 
             scope.exportToExcel = function () {
-                // Send a request to the server to generate the Excel file
-                scope.formData.reportSource = scope.reportName;
-                scope.formData.exportXLSX = true;
-                var reportURL = $rootScope.hostUrl + API_VERSION + "/runreports/" + encodeURIComponent(scope.formData.reportSource);
-
-                http.get(reportURL, {responseType: 'arraybuffer', params: scope.formData})
-                .then(function (response) {
-                    var contentType = response.headers('Content-Type');
-                    var blob = new Blob([response.data], { type: contentType });
-                    var link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = scope.reportName + '.xlsx';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }).catch(function (error) {
-                    console.error('Error downloading the Excel file:', error);
-                });
+                downloadReport({exportXLSX: true}, scope.reportName + '.xlsx');
             };
 
+            scope.exportToCsv = function () {
+                downloadReport({exportCSV: true}, scope.reportName + '.csv');
+            };
+
+            function estimateTotalRecords(data, pageNumber) {
+                if (scope.knownTotalRecords || scope.knownTotalRecords === 0) {
+                    return scope.knownTotalRecords;
+                }
+                var rows = (data && data.data) ? data.data.length : 0;
+                var seen = ((pageNumber - 1) * scope.recordsPerPage) + rows;
+                return rows < scope.recordsPerPage ? seen : seen + 1;
+            }
+
+            function fetchTotalRecords() {
+                if (scope.countInFlight) {
+                    return;
+                }
+                scope.knownTotalRecords = null;
+                scope.countInFlight = true;
+                resourceFactory.runReportsResource.getReport(
+                    buildReportPayload({limit: 1, offset: 0}),
+                    function (data) {
+                        scope.countInFlight = false;
+                        if (data && data.count !== undefined && data.count !== null) {
+                            scope.knownTotalRecords = data.count;
+                            scope.totalRecords = data.count;
+                        }
+                    },
+                    function () {
+                        scope.countInFlight = false;
+                        scope.knownTotalRecords = null;
+                    }
+                );
+            }
+
+            function buildReportPayload(overrides) {
+                var payload = angular.copy(scope.formData);
+                delete payload.limit;
+                delete payload.offset;
+                delete payload.includeCount;
+                delete payload.exportCSV;
+                delete payload.exportXLSX;
+                payload.reportSource = scope.reportName;
+                return angular.extend(payload, overrides || {});
+            }
+
+            function normalizeDateParams() {
+                for (var i in scope.reportDateParams) {
+                    if (scope.formData[scope.reportDateParams[i].inputName]) {
+                        scope.formData[scope.reportDateParams[i].inputName] = dateFilter(scope.formData[scope.reportDateParams[i].inputName], 'yyyy-MM-dd');
+                    }
+                }
+            }
+
+            function downloadReport(exportFlag, filename) {
+                scope.errorDetails = [];
+                removeErrors();
+                normalizeDateParams();
+                parameterValidationErrors();
+
+                if (scope.errorDetails.length > 0) {
+                    return;
+                }
+
+                var reportURL = $rootScope.hostUrl + API_VERSION + "/runreports/" + encodeURIComponent(scope.reportName);
+                scope.exporting = true;
+
+                http.get(reportURL, {responseType: 'blob', params: buildReportPayload(exportFlag)})
+                    .then(function (response) {
+                        var blob = new Blob([response.data], {type: response.headers('Content-Type')});
+                        var objectUrl = window.URL.createObjectURL(blob);
+                        var link = document.createElement('a');
+                        link.href = objectUrl;
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.setTimeout(function () {
+                            window.URL.revokeObjectURL(objectUrl);
+                        }, 0);
+                    })
+                    .catch(function (error) {
+                        $log.error('Error downloading ' + filename);
+                        $log.error(error);
+                    })
+                    .finally(function () {
+                        scope.exporting = false;
+                    });
+            }
 
             function invalidDate(checkDate) {
                 // validates for yyyy-mm-dd returns true if invalid, false is valid
@@ -345,33 +418,31 @@
                 return false;
             };
             scope.getResultsPage = function (pageNumber) {
-                
+
                 scope.errorDetails = [];
                 removeErrors();
 
                 //update date fields with proper dateformat
-                for (var i in scope.reportDateParams) {
-                    if (scope.formData[scope.reportDateParams[i].inputName]) {
-                        scope.formData[scope.reportDateParams[i].inputName] = dateFilter(scope.formData[scope.reportDateParams[i].inputName], 'yyyy-MM-dd');
-                    }
-                }
+                normalizeDateParams();
 
                 //Custom validation for report parameters
                 parameterValidationErrors();
 
                 if (scope.errorDetails.length == 0) {
                     scope.isCollapsed = true;
-                        scope.hideTable = false;
-                        scope.hidePentahoReport = true;
-                        scope.hideChart = true;
-                         scope.formData.reportSource = scope.reportName;
-                        scope.formData.limit = scope.recordsPerPage;
-                         scope.formData.offset = ((pageNumber - 1) * scope.recordsPerPage);
-                         resourceFactory.runReportsResource.getReport(scope.formData, function (data) {
-                            scope.reportData.data = data.data;
-                            scope.totalRecords = data.count;
-                            });
-                        }
+                    scope.hideTable = false;
+                    scope.hidePentahoReport = true;
+                    scope.hideChart = true;
+                    var pagePayload = buildReportPayload({
+                        limit: scope.recordsPerPage,
+                        offset: ((pageNumber - 1) * scope.recordsPerPage),
+                        includeCount: false
+                    });
+                    resourceFactory.runReportsResource.getReport(pagePayload, function (data) {
+                        scope.reportData.data = data.data;
+                        scope.totalRecords = estimateTotalRecords(data, pageNumber);
+                    });
+                }
             }
             scope.runReport = function () {
                 //clear the previous errors
@@ -379,11 +450,7 @@
                 removeErrors();
 
                 //update date fields with proper dateformat
-                for (var i in scope.reportDateParams) {
-                    if (scope.formData[scope.reportDateParams[i].inputName]) {
-                        scope.formData[scope.reportDateParams[i].inputName] = dateFilter(scope.formData[scope.reportDateParams[i].inputName], 'yyyy-MM-dd');
-                    }
-                }
+                normalizeDateParams();
 
                 //Custom validation for report parameters
                 parameterValidationErrors();
@@ -396,15 +463,13 @@
                             scope.hideTable = false;
                             scope.hidePentahoReport = true;
                             scope.hideChart = true;
-                            scope.formData.reportSource = scope.reportName;
-                            scope.formData.limit = scope.recordsPerPage;
-                            scope.formData.offset = 0;
-                            resourceFactory.runReportsResource.getReport(scope.formData, function (data) {
+                            var tablePayload = buildReportPayload({limit: scope.recordsPerPage, offset: 0, includeCount: false});
+                            resourceFactory.runReportsResource.getReport(tablePayload, function (data) {
                                 scope.reportData.columnHeaders = data.columnHeaders;
                                 scope.reportData.data = data.data;
-                                scope.totalRecords = data.count;
+                                scope.totalRecords = estimateTotalRecords(data, 1);
                             });
-                            scope.getCsvData();
+                            fetchTotalRecords();
                             break;
 
                         case "Pentaho":
@@ -444,18 +509,17 @@
                             scope.hideTable = true;
                             scope.hidePentahoReport = true;
                             scope.hideChart = false;
-                            scope.formData.reportSource = scope.reportName;
-                            resourceFactory.runReportsResource.getReport(scope.formData, function (data) {
+                            resourceFactory.runReportsResource.getReport(buildReportPayload(), function (data) {
                                 scope.reportData.columnHeaders = data.columnHeaders;
                                 scope.reportData.data = data.data;
                                 scope.chartData = [];
                                 scope.barData = [];
                                 var l = data.data.length;
                                 for (var i = 0; i < l; i++) {
-                                    scope.row = {};
-                                    scope.row.key = data.data[i].row[0];
-                                    scope.row.values = data.data[i].row[1];
-                                    scope.chartData.push(scope.row);
+                                    scope.chartData.push({
+                                        key: data.data[i].row[0],
+                                        values: data.data[i].row[1]
+                                    });
                                 }
                                 var x = {};
                                 x.key = "summary";
@@ -478,38 +542,6 @@
                     }
                 }
             };
-
-            scope.getCsvData = function () {
-                scope.errorDetails = [];
-                removeErrors();
-
-                //update date fields with proper dateformat
-                for (var i in scope.reportDateParams) {
-                    if (scope.formData[scope.reportDateParams[i].inputName]) {
-                        scope.formData[scope.reportDateParams[i].inputName] = dateFilter(scope.formData[scope.reportDateParams[i].inputName], 'yyyy-MM-dd');
-                    }
-                }
-
-                //Custom validation for report parameters
-                parameterValidationErrors();
-
-                if (scope.errorDetails.length == 0) {
-                    scope.isCollapsed = true;
-                            delete scope.formData.limit;
-                            delete scope.formData.offset;
-                            resourceFactory.runReportsResource.getReport(scope.formData, function (data) {
-                                //clear the csvData array for each request
-                                scope.csvData = [];
-                                for (var i in data.columnHeaders) {
-                                    scope.row.push(data.columnHeaders[i].columnName);
-                                }
-                                scope.csvData.push(scope.row);
-                                for (var k in data.data) {
-                                    scope.csvData.push(data.data[k].row);
-                                }
-                            });
-                        }
-            }
         }
     });
     mifosX.ng.application.controller('RunReportsController', ['$scope', '$routeParams', 'ResourceFactory', '$location', 'dateFilter', '$http', 'API_VERSION', '$rootScope', '$sce', '$log', mifosX.controllers.RunReportsController]).run(function ($log) {
