@@ -13,7 +13,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'SessionManager',
             'Paginator',
             'UIConfigService',
-            'NotificationResponseHeaderProvider'
+            'NotificationResponseHeaderProvider',
+            'BulkReschedulePreviewHelper'
         ],
 
         controllers: [
@@ -288,6 +289,9 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'product/productmix/ViewProductMixController',
             'product/productmix/AddProductMixController',
             'organization/BulkLoanReassignmentController',
+            'organization/BulkLoanRescheduleListController',
+            'organization/BulkLoanRescheduleCreateController',
+            'organization/BulkLoanRescheduleDetailController',
             'system/AuditController',
             'system/ViewAuditController',
             'template/TemplateController',
