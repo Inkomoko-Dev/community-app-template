@@ -18,6 +18,7 @@
                     beneficiaryName: ''
                 }
             };
+            scope.batchResult = null;
 
             scope.addItem = function () {
                 scope.formData.items.push(angular.copy(scope.newItem));
@@ -25,7 +26,10 @@
 
             scope.submit = function () {
                 resourceFactory.excessRefundBatchResource.save(scope.formData, function (data) {
-                    location.path('/excessrefunds');
+                    scope.batchResult = data;
+                    if (!data.lineErrors || data.lineErrors.length === 0) {
+                        location.path('/excessrefunds');
+                    }
                 });
             };
         }

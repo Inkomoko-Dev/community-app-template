@@ -29,6 +29,14 @@
                 </tbody>
             </table>
 
+            <div class="alert alert-warning m-t-20" ng-if="batchResult && batchResult.failedCount > 0">
+                <p>Batch {{batchResult.resourceId}}: {{batchResult.successCount}} succeeded, {{batchResult.failedCount}} failed.</p>
+                <ul>
+                    <li ng-repeat="err in batchResult.lineErrors">{{err}}</li>
+                </ul>
+                <a href="#/excessrefunds" class="btn btn-default">Back to list</a>
+            </div>
+
             <button class="btn btn-primary" ng-click="submit()" has-permission="CREATE_EXCESS_REFUND_BATCH">Submit batch</button>
         </div>
     </div>
