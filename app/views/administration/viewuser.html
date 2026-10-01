@@ -109,6 +109,12 @@
 		                <td>{{'label.heading.office' | translate}}:</td>
 		                <td>{{user.officeName}}</td>
 		            </tr>
+		            <tr data-ng-show="user.assignedOffices.length">
+		                <td valign="top">{{'label.heading.additionaloffices' | translate}}:</td>
+		                <td>
+		                    <div data-ng-repeat="office in user.assignedOffices">{{office.name}}</div>
+		                </td>
+		            </tr>
 		            <tr data-ng-show="user.staff">
 		                <td>{{'label.heading.staff' | translate}}:</td>
 		                <td>{{user.staff.displayName}}</td>

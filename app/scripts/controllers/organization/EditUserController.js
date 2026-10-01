@@ -11,6 +11,13 @@
 
             scope.user = {};
             scope.formData.roles = [] ;
+            scope.formData.officeIds = [];
+            scope.isNotHomeOffice = function (office) {
+                return office.id !== scope.formData.officeId;
+            };
+            scope.$watch('formData.officeId', function (homeOfficeId) {
+                scope.formData.officeIds = _.without(scope.formData.officeIds || [], homeOfficeId);
+            });
 
             resourceFactory.userListResource.get({userId: routeParams.id, template: 'true'}, function (data) {
                 scope.formData.username = data.username;
@@ -18,6 +25,7 @@
                 scope.formData.lastname = data.lastname;
                 scope.formData.email = data.email;
                 scope.formData.officeId = data.officeId;
+                scope.formData.officeIds = data.officeIds || [];
                 scope.getOfficeStaff();
                 if(data.staff){
                     scope.formData.staffId = data.staff.id;

@@ -8,8 +8,15 @@
             scope.availableRoles = [];
             scope.formData = {
                 sendPasswordToEmail: true,
-                roles: []
+                roles: [],
+                officeIds: []
             };
+            scope.isNotHomeOffice = function (office) {
+                return office.id !== scope.formData.officeId;
+            };
+            scope.$watch('formData.officeId', function (homeOfficeId) {
+                scope.formData.officeIds = _.without(scope.formData.officeIds || [], homeOfficeId);
+            });
             resourceFactory.userTemplateResource.get(function (data) {
                 scope.offices = data.allowedOffices;
                 scope.availableRoles = data.availableRoles;
