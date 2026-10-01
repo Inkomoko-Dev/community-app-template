@@ -5272,6 +5272,7 @@
   "label.input.icReviewDecisionLevelFiveRecommendedAmount" : "IC review level 5 recommended amount",
   "label.input.icReviewRecommendedAmount": "Recommended Amount",
   "label.input.icReviewTermFrequency": "Loan Term",
+  "label.hint.icReviewPreviousLevelRecommendedAmount": "Recommended by IC review level",
   "error.msg.required.crb.verification": "CRB Verification required",
   "label.input.isCrbVerificationRequired": "CRB Verification required?",
   "label.input.isIdeaClient": "Is Idea Client?",
