@@ -320,6 +320,8 @@
   "label.input.staff": "Staff",
   "label.input.representative": "Representative",
   "label.input.office": "Office",
+  "label.input.additionaloffices": "Additional offices",
+  "label.heading.additionaloffices": "Additional offices",
   "label.input.client": "Client",
   "label.input.clients": "Clients",
   "label.input.enternote": "Enter note:",
