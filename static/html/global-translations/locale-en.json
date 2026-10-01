@@ -5397,5 +5397,14 @@
   "label.input.allsyncstatuses": "All sync statuses",
   "label.heading.enableThirdPartyDisbursement": "Enable Third-Party Disbursement",
   "label.heading.thirdPartyDisbursementProvider": "Third-Party Disbursement Provider",
-  "----End---": "--End of file--- "
+  "----End---": "--End of file--- ",
+  "label.anchor.excessrefunds": "Refund Management",
+  "label.description.excessrefunds": "Manage excess loan payment refunds",
+  "label.heading.excessrefunds": "Excess Loan Refunds",
+  "label.button.createexcessrefund": "New Refund",
+  "label.button.bulkexcessrefund": "Bulk Refunds",
+  "label.heading.excessrefundwizard": "Create Excess Refund",
+  "label.heading.excessrefunddetail": "Excess Refund Detail",
+  "label.heading.excessrefundbulk": "Bulk Excess Refunds"
+
 }

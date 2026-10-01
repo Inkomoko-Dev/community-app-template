@@ -1,0 +1,31 @@
+<div class="content-container" ng-controller="ExcessRefundDetailController">
+    <ul class="breadcrumb">
+        <li><a href="#/excessrefunds">{{'label.heading.excessrefunds' | translate}}</a></li>
+        <li class="active">{{'label.heading.excessrefunddetail' | translate}} #{{refundId}}</li>
+    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p><strong>Status:</strong> {{refund.statusLabel}}</p>
+            <p><strong>Loan:</strong> {{refund.loanAccountNo}}</p>
+            <p><strong>Amount:</strong> {{refund.amount}} {{refund.currencyCode}}</p>
+            <p><strong>Mode:</strong> {{refund.paymentModeLabel}}</p>
+            <p ng-if="refund.failureReason"><strong>Failure:</strong> {{refund.failureReason}}</p>
+
+            <div class="btn-group">
+                <button class="btn btn-success" ng-if="refund.status === 100" ng-click="approve()" has-permission="APPROVE_EXCESS_REFUND">Approve</button>
+                <button class="btn btn-warning" ng-if="refund.status === 100" ng-click="reject()" has-permission="REJECT_EXCESS_REFUND">Reject</button>
+                <button class="btn btn-default" ng-if="refund.status === 100 || refund.status === 200 || refund.status === 450" ng-click="cancel()" has-permission="CANCEL_EXCESS_REFUND">Cancel</button>
+                <button class="btn btn-info" ng-if="refund.status === 200 || refund.status === 450" ng-click="sendToHub()" has-permission="SEND_TO_PAYMENTHUB_EXCESS_REFUND">Send to Hub</button>
+                <button class="btn btn-primary" ng-if="refund.status === 400" ng-click="post()" has-permission="POST_EXCESS_REFUND">Post to CBS</button>
+            </div>
+
+            <div class="m-t-20" ng-if="refund.status === 200 || refund.status === 450">
+                <h5>Record manual payment</h5>
+                <input class="form-control" placeholder="Payment reference" ng-model="paymentForm.paymentReference"/>
+                <input class="form-control m-t-5" placeholder="Paid on" ng-model="paymentForm.paidOn"/>
+                <button class="btn btn-primary m-t-10" ng-click="recordPayment()" has-permission="RECORD_PAYMENT_EXCESS_REFUND">Record payment</button>
+            </div>
+        </div>
+    </div>
+</div>
