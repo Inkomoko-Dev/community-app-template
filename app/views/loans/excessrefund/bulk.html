@@ -1,0 +1,43 @@
+<div class="content-container" ng-controller="ExcessRefundBulkController">
+    <ul class="breadcrumb">
+        <li><a href="#/excessrefunds">{{'label.heading.excessrefunds' | translate}}</a></li>
+        <li class="active">{{'label.heading.excessrefundbulk' | translate}}</li>
+    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <label>Office ID</label>
+            <input type="number" class="form-control" ng-model="formData.officeId"/>
+            <label>Note</label>
+            <textarea class="form-control" ng-model="formData.note"></textarea>
+
+            <h5 class="m-t-20">Add line</h5>
+            <input type="number" class="form-control" placeholder="Loan ID" ng-model="newItem.loanId"/>
+            <input type="number" class="form-control m-t-5" placeholder="Amount" ng-model="newItem.amount"/>
+            <input class="form-control m-t-5" placeholder="Beneficiary name" ng-model="newItem.beneficiary.beneficiaryName"/>
+            <input class="form-control m-t-5" placeholder="MSISDN" ng-model="newItem.beneficiary.msisdn"/>
+            <button class="btn btn-default m-t-10" ng-click="addItem()">Add item</button>
+
+            <table class="table m-t-20" ng-if="formData.items.length">
+                <thead><tr><th>Loan</th><th>Amount</th><th>Beneficiary</th></tr></thead>
+                <tbody>
+                <tr ng-repeat="item in formData.items">
+                    <td>{{item.loanId}}</td>
+                    <td>{{item.amount}}</td>
+                    <td>{{item.beneficiary.beneficiaryName}} / {{item.beneficiary.msisdn}}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-warning m-t-20" ng-if="batchResult && batchResult.failedCount > 0">
+                <p>Batch {{batchResult.resourceId}}: {{batchResult.successCount}} succeeded, {{batchResult.failedCount}} failed.</p>
+                <ul>
+                    <li ng-repeat="err in batchResult.lineErrors">{{err}}</li>
+                </ul>
+                <a href="#/excessrefunds" class="btn btn-default">Back to list</a>
+            </div>
+
+            <button class="btn btn-primary" ng-click="submit()" has-permission="CREATE_EXCESS_REFUND_BATCH">Submit batch</button>
+        </div>
+    </div>
+</div>
