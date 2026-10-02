@@ -22451,3 +22451,55 @@ Interactive Layer
     transform: rotate(360deg);
   }
 }
+
+/* CGLT-656 historical penalty waiver */
+.hpw .hpw-header h3 { margin: 0 0 4px; font-size: 24px; font-weight: 500; color: #082331; }
+.hpw .hpw-header p { margin: 0 0 16px; }
+.hpw .hpw-muted { color: #666; }
+.hpw .hpw-label { display: block; font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+.hpw .hpw-num { font-variant-numeric: tabular-nums; }
+.hpw .hpw-strong { font-weight: 700; }
+.hpw .hpw-ok { color: #2f6b2f; }
+.hpw .hpw-card { background: #fff; border: 1px solid #dde3e7; border-radius: 4px; padding: 20px; margin-bottom: 16px; }
+.hpw .hpw-card h4 { margin: 0 0 16px; font-size: 16px; font-weight: 700; }
+.hpw .hpw-penalty { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 40px; padding: 16px 20px; border-top: 3px solid #5dc5e9; }
+.hpw .hpw-penalty-name { display: flex; flex-direction: column; flex-grow: 1; }
+.hpw .hpw-penalty-name strong { font-size: 16px; }
+.hpw .hpw-figure { display: flex; flex-direction: column; }
+.hpw .hpw-figure-value { font-size: 18px; font-variant-numeric: tabular-nums; }
+.hpw .hpw-form .form-group { margin-bottom: 18px; }
+.hpw .hpw-form label.hpw-label { margin-bottom: 6px; }
+.hpw .hpw-help { margin-top: 6px; font-size: 13px; color: #666; }
+.hpw .hpw-help.hpw-ok { color: #2f6b2f; }
+.hpw .hpw-approval { padding: 14px 16px; margin-bottom: 18px; background: #fcf8e3; border: 1px solid #faebcc; border-radius: 4px; color: #6d5326; }
+.hpw .hpw-approval .form-group { margin: 12px 0 0; }
+.hpw .hpw-approval .hpw-label, .hpw .hpw-approval .hpw-help { color: #6d5326; }
+.hpw .hpw-approval-reason, .hpw .hpw-direct, .hpw .hpw-blocked, .hpw .hpw-held { display: flex; gap: 10px; }
+.hpw .hpw-approval-reason .fa, .hpw .hpw-direct .fa, .hpw .hpw-blocked .fa, .hpw .hpw-held .fa { margin-top: 2px; }
+.hpw .hpw-direct { padding: 12px 16px; margin-bottom: 18px; background: #dff0d8; border: 1px solid #d0e9c6; border-radius: 4px; color: #2b542c; }
+.hpw .hpw-blocked { padding: 14px 18px; margin-bottom: 16px; background: #f2dede; border: 1px solid #ebccd1; border-radius: 4px; color: #843534; }
+.hpw .hpw-blocked .fa { font-size: 18px; }
+.hpw .hpw-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.hpw .btn-primary.hpw-submit { background-color: #d4432c; border-color: #d4432c; font-weight: 700; }
+.hpw .btn-primary.hpw-submit[disabled] { background-color: #e4e7e9; border-color: #d4d8db; color: #666; opacity: 1; }
+.hpw .hpw-stale { opacity: .55; }
+.hpw .hpw-headline { padding-bottom: 16px; margin-bottom: 12px; border-bottom: 1px solid #eee; }
+.hpw .hpw-balance { font-size: 22px; margin: 2px 0; }
+.hpw .hpw-table { width: 100%; margin-bottom: 12px; font-size: 13px; }
+.hpw .hpw-table th { padding: 4px 0; color: #555; text-align: right; }
+.hpw .hpw-table td { padding: 6px 0; border-top: 1px solid #eee; text-align: right; }
+.hpw .hpw-table th:first-child, .hpw .hpw-table td:first-child { text-align: left; }
+.hpw .hpw-table td.hpw-changed { background: #e8f4fb; font-weight: 700; }
+.hpw .hpw-txn-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.hpw .hpw-txn { padding: 12px; margin-bottom: 8px; background: #f9fafb; border: 1px solid #eee; border-radius: 4px; }
+.hpw .hpw-txn .hpw-table { margin-bottom: 0; }
+.hpw .hpw-txn .hpw-table td { padding: 3px 0; border-top: 0; }
+.hpw .hpw-txn-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.hpw .hpw-pill { padding: 2px 8px; font-size: 11px; font-weight: 700; border-radius: 10px; border: 1px solid; }
+.hpw .hpw-pill-reallocated { color: #6d5326; background: #fcf8e3; border-color: #faebcc; }
+.hpw .hpw-pill-new { color: #2b542c; background: #dff0d8; border-color: #d0e9c6; }
+.hpw .hpw-pill-unchanged { color: #555; background: #f5f5f5; border-color: #e5e5e5; }
+.hpw .hpw-toggle { display: flex; gap: 6px; align-items: center; font-weight: 400; }
+.hpw .hpw-toggle input { margin: 0; }
+.hpw .hpw-held { padding: 10px 12px; margin-top: 12px; background: #f5f7f8; border-radius: 4px; color: #555; font-size: 13px; }
+.hpw .hpw-sync { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; margin-top: 4px; border-top: 1px solid #eee; font-size: 13px; }
