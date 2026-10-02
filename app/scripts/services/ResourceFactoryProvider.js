@@ -265,6 +265,7 @@
                     loanResource: defineResource(apiVer + "/loans/:loanId/:resourceType/:resourceId", { resourceType: '@resourceType', loanId: '@loanId', resourceId: '@resourceId', limit: '@limit', sqlSearch: '@sqlSearch' }, {
                         getAllLoans: { method: 'GET', params: { limit: '@limit', offset: '@offset', sqlSearch: '@sqlSearch' } },
                         getAllNotes: { method: 'GET', params: {}, isArray: true },
+                        getAllCollaterals: { method: 'GET', params: {}, isArray: true },
                         put: { method: 'PUT', params: {} }
                     }),
                     loanChargeTemplateResource: defineResource(apiVer + "/loans/:loanId/charges/template", { loanId: '@loanId' }, {

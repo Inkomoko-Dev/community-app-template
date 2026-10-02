@@ -822,6 +822,12 @@
                     }, function () {
                         scope.historicalPenaltyWaivers = [];
                     });
+                    scope.loanCollaterals = [];
+                    resourceFactory.loanResource.getAllCollaterals({ loanId: routeParams.id, resourceType: 'collaterals' }, function (data) {
+                        scope.loanCollaterals = data || [];
+                    }, function () {
+                        scope.loanCollaterals = [];
+                    });
 
                     scope.loanClassification = {};
                     scope.loanClassificationAudit = [];

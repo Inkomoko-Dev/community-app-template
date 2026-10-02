@@ -233,7 +233,7 @@
                 templateUrl: 'views/loans/editloancollateral.html'
             })
             .when('/loan/:id/viewcollateral/:collateralId', {
-                templateUrl: 'views/loans/viewloancollateraldata.html'
+                templateUrl: 'views/loans/viewloancollateral.html'
             })
             .when('/loan/:loanId/viewcharge/:id', {
                 templateUrl: 'views/loans/viewloancharge.html'

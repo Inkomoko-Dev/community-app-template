@@ -1312,6 +1312,23 @@
                         </table>
                     </uib-tab>
 
+                    <uib-tab ng-show="loanCollaterals.length > 0" heading="{{'label.heading.collaterals' | translate}}">
+                        <table class="table width100">
+                            <tr class="graybg">
+                                <th>{{'label.heading.id' | translate}}</th>
+                                <th>{{'label.heading.name' | translate}}</th>
+                                <th>{{'label.heading.value' | translate}}</th>
+                                <th>{{'label.heading.description' | translate}}</th>
+                            </tr>
+                            <tr ng-repeat="collateral in loanCollaterals" class="pointer-main">
+                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.id}}</td>
+                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.type.name}}</td>
+                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.currency.displaySymbol}}{{collateral.value | number}}</td>
+                                <td class="pointer" data-ng-click="viewLoanCollateral(collateral.id)">{{collateral.description}}</td>
+                            </tr>
+                        </table>
+                    </uib-tab>
+
                     <!-- CGLT-656: every historical penalty waiver made on this loan, and how far each one got.
                          The tab appears only where a correction exists, so it stays out of the way otherwise. -->
                     <uib-tab ng-show="historicalPenaltyWaivers.length > 0"
