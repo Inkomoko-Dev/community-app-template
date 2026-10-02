@@ -118,6 +118,26 @@
                  })[retAttr];
             };
 
+            scope.residualAutoCloseToggled = function () {
+                if (scope.formData.residualAutoCloseEnabled === true) {
+                    return;
+                }
+                scope.formData.residualAutoCloseEnabled = false;
+                scope.formData.residualClosureThreshold = null;
+                var field = scope.Settings && scope.Settings.residualClosureThreshold;
+                if (!field) {
+                    return;
+                }
+                field.$setViewValue('');
+                field.$setPristine();
+                field.$setUntouched();
+                scope.$evalAsync(function () {
+                    field.$setValidity('required', true);
+                    field.$setValidity('parse', true);
+                    field.$validate();
+                });
+            };
+
             scope.goNext = function(form){
                 WizardHandler.wizard().checkValid(form);
                 scope.isClicked = true;
@@ -464,6 +484,11 @@
                     delete this.formData.recalculationRestFrequencyOnDayType;
                     delete this.formData.recalculationRestFrequencyNthDayType;
                 }
+                if (this.formData.residualAutoCloseEnabled !== true) {
+                    this.formData.residualAutoCloseEnabled = false;
+                    this.formData.residualClosureThreshold = null;
+                }
+
                 if(scope.chart.chartSlabs.length > 0){
                       var newChart = copyChartData(scope.chart);
                       if(newChart.chartSlabs.length > 0){
