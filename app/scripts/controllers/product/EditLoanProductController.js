@@ -488,6 +488,26 @@
                 }
             }
 
+            scope.residualAutoCloseToggled = function () {
+                if (scope.formData.residualAutoCloseEnabled === true) {
+                    return;
+                }
+                scope.formData.residualAutoCloseEnabled = false;
+                scope.formData.residualClosureThreshold = null;
+                var field = scope.editloanproductform && scope.editloanproductform.residualClosureThreshold;
+                if (!field) {
+                    return;
+                }
+                field.$setViewValue('');
+                field.$setPristine();
+                field.$setUntouched();
+                scope.$evalAsync(function () {
+                    field.$setValidity('required', true);
+                    field.$setValidity('parse', true);
+                    field.$validate();
+                });
+            };
+
             scope.submit = function () {
                 if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(false)) {
                     return;
@@ -629,6 +649,11 @@
                 } else if (this.formData.recalculationRestFrequencyType == 3){
                     delete this.formData.recalculationRestFrequencyOnDayType;
                     delete this.formData.recalculationRestFrequencyNthDayType;
+                }
+
+                if (this.formData.residualAutoCloseEnabled !== true) {
+                    this.formData.residualAutoCloseEnabled = false;
+                    this.formData.residualClosureThreshold = null;
                 }
 
                 if(scope.chart){

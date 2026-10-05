@@ -68,6 +68,7 @@
                             }
                             return result;
                         }
+                        return null;
                     });
 
                     scope.$on('$localeChangeSuccess', function (event, localeId) {
