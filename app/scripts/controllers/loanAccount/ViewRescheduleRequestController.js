@@ -4,6 +4,10 @@
             scope.requestId = routeParams.requestId;
             scope.loanId = routeParams.loanId;
 
+            function toTime(date) {
+                return angular.isArray(date) ? new Date(date[0], date[1] - 1, date[2]).getTime() : new Date(date).getTime();
+            }
+
             resourceFactory.loanRescheduleResource.get({scheduleId:scope.requestId}, function (data) {
                 scope.loanRescheduleDetails = data;
                 scope.loanTermVariationsData = data.loanTermVariationsData;
@@ -16,6 +20,7 @@
                         scope.loanRescheduleDetails.repaymentFrequencyType.name ||
                         scope.loanRescheduleDetails.repaymentFrequencyType) : '';
                 scope.loanRescheduleDetails.emichange = [];
+                scope.loanRescheduleDetails.principalAmountChange = [];
                 for(var i in scope.loanTermVariationsData) {
 
                     if(scope.loanTermVariationsData[i].termType.value == "dueDate") {
@@ -39,8 +44,12 @@
                         scope.extendRepaymentPeriod = true;
                     }
 
-                    if(scope.loanTermVariationsData[i].termType.value == "principalAmount") {
-                        scope.loanRescheduleDetails.extraTerms = scope.loanTermVariationsData[i].decimalValue;
+                    var termTypeValue = scope.loanTermVariationsData[i].termType.value;
+                    if (termTypeValue === 'principalAmount' || termTypeValue === 'fixedPrincipalPerInstallmentAmount') {
+                        scope.loanRescheduleDetails.principalAmountChange.push({
+                            amount: scope.loanTermVariationsData[i].decimalValue,
+                            date: scope.loanTermVariationsData[i].termVariationApplicableFrom
+                        });
                         scope.principalAmountChange = true;
                      }
 
@@ -62,6 +71,9 @@
                         scope.changeEMI = true;
                     }
                 }
+                scope.loanRescheduleDetails.principalAmountChange.sort(function (a, b) {
+                    return toTime(a.date) - toTime(b.date);
+                });
             });
 
             scope.reject = function(){
