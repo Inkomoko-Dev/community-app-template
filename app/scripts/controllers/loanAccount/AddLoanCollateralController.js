@@ -17,7 +17,8 @@
             scope.submit = function () {
                 this.formData.locale = scope.optlang.code;
                 resourceFactory.loanResource.save({resourceType: 'collaterals', loanId: scope.loanId}, this.formData, function (data) {
-                    location.path('/loan/' + data.loanId + '/viewcollateral/' + data.resourceId);
+                    location.path('/loan/' + data.loanId + '/viewcollateral/' + data.resourceId)
+                        .search({status: 'Submitted and pending approval'});
                 });
             };
 
