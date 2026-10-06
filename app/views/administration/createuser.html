@@ -148,6 +148,17 @@
 	            </div>
                 <form-validate valattributeform="createuserform" valattribute="officeId"/>
 	        </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="officeIds">{{'label.input.additionaloffices' | translate}}</label>
+
+                <div class="col-sm-3">
+                    <select chosen="offices" id="officeIds" name="officeIds" ng-model="formData.officeIds" class="form-control" multiple
+                            data-placeholder="{{'label.menu.selectoffice' | translate}}"
+                            ng-options="office.id as office.name for office in offices | filter:isNotHomeOffice">
+                    </select>
+                </div>
+            </div>
 	        <div class="form-group">
 	            <label class="control-label col-sm-2">{{'label.input.staff' | translate}}</label>
 
