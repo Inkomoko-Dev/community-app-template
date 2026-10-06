@@ -10,11 +10,12 @@
                 <div class="btn-group pull-right">
                     <button type="button" ng-click="reject()" class="btn btn-md btn-warning" has-permission="REJECTRESCHEDULE_LOAN"><i class="fa fa-times"></i>
                         {{'label.button.reject' | translate}}</button>
-                    <button type="button" ng-click="approve()" class="btn btn-md btn-success" has-permission="APPROVERESCHEDULE_LOAN"><i class="fa fa-ok"></i>
+                    <button type="button" ng-click="approve()" ng-disabled="!previewLoaded" class="btn btn-md btn-success" has-permission="APPROVERESCHEDULE_LOAN"><i class="fa fa-ok"></i>
                         {{ 'label.button.approve' | translate }}</button>
                 </div>
             </div>
             <br/>
+            <div class="alert alert-danger" ng-if="previewError">{{previewError}}</div>
             <form name="previewloanrescheduleform" novalidate="" class="form-horizontal" rc-submit="submit()">
                 <api-validate></api-validate>
                 <fieldset>

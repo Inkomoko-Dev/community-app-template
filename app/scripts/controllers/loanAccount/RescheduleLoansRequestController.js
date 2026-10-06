@@ -66,11 +66,11 @@
                 }
 
                 for (i = 0; i < schedulePeriods.length; i++) {
-                    if (!schedulePeriods[i] || !schedulePeriods[i].dueDate) {
+                    if (!schedulePeriods[i] || !schedulePeriods[i].period || !schedulePeriods[i].dueDate) {
                         continue;
                     }
 
-                    if (schedulePeriods[i].obligationsMetOnDate) {
+                    if (schedulePeriods[i].complete || schedulePeriods[i].obligationsMetOnDate) {
                         continue;
                     }
 
@@ -96,7 +96,7 @@
             scope.formData.preserveLoanTermDuration = false;
 
             resourceFactory.loanRescheduleResource.template({scheduleId:'template', loanId:scope.loanId},function(data){
-                if (data.length > 0) {
+                if (data.rescheduleReasons && data.rescheduleReasons.length > 0) {
                     scope.formData.rescheduleReasonId = data.rescheduleReasons[0].id;
                 }
                 scope.codes = data.rescheduleReasons;
@@ -106,7 +106,7 @@
                 scope.transactionTemplateDate = normalizeDate(data.loanTransactionData.date);
             });
 
-            resourceFactory.loanResource.get({loanId: scope.loanId, template: true}, function (data) {
+            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, associations: 'repaymentSchedule'}, function (data) {
                 scope.currentRepaymentEvery = data.repaymentEvery;
                 scope.currentRepaymentFrequencyType = data.repaymentFrequencyType;
                 scope.repaymentFrequencyTypeOptions = normalizeRepaymentFrequencyOptions(data);
@@ -122,6 +122,10 @@
             scope.cancel = function () {
                 location.path('/viewloanaccount/' + scope.loanId);
             };
+
+            function isBlank(value) {
+                return value === undefined || value === null || String(value).trim() === '';
+            }
 
             scope.submit = function () {
                 if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
@@ -157,6 +161,18 @@
                     return;
                 }
 
+                if (scope.changeFixedPrincipal && scope.changeFixedPrincipalPercentagePerInstallment) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.fixedPrincipal.amountAndPercentage');
+                    return;
+                }
+                var missingFixedAmount = scope.changeFixedPrincipal && isBlank(this.formData.newPrincipalDueFixedAmount);
+                var missingFixedPercentage = scope.changeFixedPrincipalPercentagePerInstallment &&
+                    isBlank(this.formData.newFixedPrincipalPercentagePerInstallment);
+                if (missingFixedAmount || missingFixedPercentage) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.fixedPrincipal.required');
+                    return;
+                }
+
                 scope.error = '';
 
                 this.formData.loanId = scope.loanId;
@@ -174,6 +190,23 @@
                     this.formData.adjustedDueDate = dateFilter(this.formData.adjustedDueDate, scope.df);
                 } else {
                     delete this.formData.adjustedDueDate;
+                }
+
+                if (!scope.introduceGracePeriods) {
+                    delete this.formData.graceOnPrincipal;
+                    delete this.formData.graceOnInterest;
+                }
+                if (!scope.extendRepaymentPeriod) {
+                    delete this.formData.extraTerms;
+                }
+                if (!scope.adjustinterestrates) {
+                    delete this.formData.newInterestRate;
+                }
+                if (!scope.changeFixedPrincipal) {
+                    delete this.formData.newPrincipalDueFixedAmount;
+                }
+                if (!scope.changeFixedPrincipalPercentagePerInstallment) {
+                    delete this.formData.newFixedPrincipalPercentagePerInstallment;
                 }
 
                 if (scope.changeEMI) {
