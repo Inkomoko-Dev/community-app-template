@@ -1,223 +1,258 @@
-<div class="col-md-12" ng-controller="HistoricalPenaltyWaiverController">
+<div class="col-md-12 hpw" ng-controller="HistoricalPenaltyWaiverController">
     <ul class="breadcrumb">
         <li><a href="#/viewloanaccount/{{loanId}}">{{'label.anchor.viewloanaccount' | translate}}</a></li>
         <li class="active">{{'label.heading.historicalpenaltywaiver' | translate}}</li>
     </ul>
 
-    <div class="alert alert-info" ng-if="charge">
-        <strong>{{charge.name}}</strong>
-        &mdash; <span translate="label.input.duedate">Due Date</span>: {{charge.dueDate | DateFormat}}
-        &mdash; <span translate="label.input.amount">Amount</span>: {{charge.amount | number:2}}
-        &mdash; <span translate="label.input.amountpaid">Paid</span>: {{charge.amountPaid | number:2}}
-        &mdash; <span translate="label.input.amountwaived">Waived</span>: {{charge.amountWaived | number:2}}
+    <div class="hpw-header">
+        <h3>{{'label.heading.historicalpenaltywaiver' | translate}}</h3>
+        <p class="hpw-muted" ng-if="loan">
+            <a href="#/viewloanaccount/{{loanId}}">{{loan.accountNo}}</a>
+            &middot; {{loan.clientName}}
+            &middot; {{loan.loanProductName}}
+            <span ng-if="officeName">&middot; {{officeName}}</span>
+            &middot; {{currencyCode}}
+        </p>
     </div>
 
-    <div class="alert alert-danger" ng-if="previewFailed">
-        <span translate="label.message.historicalpenaltywaiver.previewfailed">The preview could not be produced. This penalty may not be eligible for a historical waiver.</span>
+    <div class="hpw-blocked" ng-if="isBlocked()">
+        <i class="fa fa-lock"></i>
+        <div>
+            <strong>{{'label.hpw.blocked.title' | translate}}</strong>
+            <div>{{'label.help.noapprovers' | translate}}</div>
+        </div>
     </div>
 
-    <!-- Step 1: what to waive -->
-    <form class="form-horizontal well" name="waiverForm" novalidate ng-if="step === 'input'">
-        <api-validate></api-validate>
-        <fieldset>
-            <legend><i class="fa fa-history"></i>&nbsp;{{'label.heading.historicalpenaltywaiver' | translate}}</legend>
+    <div class="hpw-card hpw-penalty" ng-if="charge">
+        <div class="hpw-penalty-name">
+            <strong>{{charge.name}}</strong>
+            <span class="hpw-muted">
+                {{'label.hpw.due' | translate}} {{charge.dueDate | DateFormat}}<span ng-if="hasAge()"> &middot; {{preview.chargeAgeInDays}} {{'label.hpw.daysago' | translate}}</span>
+            </span>
+        </div>
+        <div class="hpw-figure">
+            <span class="hpw-label">{{'label.hpw.charged' | translate}}</span>
+            <span class="hpw-figure-value">{{charge.amount | number:2}}</span>
+        </div>
+        <div class="hpw-figure">
+            <span class="hpw-label">{{'label.input.amountpaid' | translate}}</span>
+            <span class="hpw-figure-value">{{charge.amountPaid | number:2}}</span>
+        </div>
+        <div class="hpw-figure">
+            <span class="hpw-label">{{'label.input.amountwaived' | translate}}</span>
+            <span class="hpw-figure-value">{{charge.amountWaived | number:2}}</span>
+        </div>
+        <div class="hpw-figure">
+            <span class="hpw-label">{{'label.input.amountoutstanding' | translate}}</span>
+            <span class="hpw-figure-value">{{charge.amountOutstanding | number:2}}</span>
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label class="control-label col-sm-3" for="waiverAmount">{{'label.input.waiveramount' | translate}}<span class="required">*</span></label>
-                <div class="col-sm-5">
-                    <input id="waiverAmount" name="waiverAmount" type="number" class="form-control"
-                           ng-model="formData.waiverAmount" ng-change="loadPreview()"
-                           ng-model-options="{ debounce: 400 }"
-                           min="0" max="{{maxWaiverAmount}}" step="any" required/>
-                    <span class="help-block" ng-if="isAmountValid()" translate="label.help.waiveramount">Leave at the full penalty balance to waive it entirely, or reduce it for a partial waiver.</span>
-                    <span class="help-block text-danger" ng-if="!isAmountValid() && maxWaiverAmount !== null">
-                        <span translate="label.validation.waiveramount.range">Enter an amount greater than zero and no more than the penalty balance</span>
-                        &mdash; {{maxWaiverAmount | number:2}}
-                    </span>
+    <div class="row">
+        <div class="col-md-7">
+            <form class="hpw-card hpw-form" name="waiverForm" novalidate>
+                <api-validate></api-validate>
+                <h4>{{'label.hpw.waiver' | translate}}</h4>
+
+                <div class="form-group">
+                    <label class="hpw-label" for="waiverAmount">{{'label.input.waiveramount' | translate}} *</label>
+                    <div class="input-group">
+                        <input id="waiverAmount" name="waiverAmount" type="number" class="form-control hpw-num"
+                               ng-model="formData.waiverAmount" ng-change="loadPreview()"
+                               ng-model-options="{ debounce: 400 }"
+                               min="0" max="{{maxWaiverAmount}}" step="any" required/>
+                        <span class="input-group-addon">{{currencyCode}}</span>
+                    </div>
+                    <div class="hpw-help" ng-if="isAmountValid() && !isPartial()">{{'label.hpw.fullwaiver' | translate}}</div>
+                    <div class="hpw-help" ng-if="isAmountValid() && isPartial()">
+                        {{'label.hpw.partialwaiver' | translate}} {{remainingPaid() | number:2}} {{'label.hpw.stayspaid' | translate}}
+                        <a href="" ng-click="useFullAmount()">{{'label.hpw.usefullamount' | translate}} ({{maxWaiverAmount | number:2}})</a>
+                    </div>
+                    <div class="hpw-help text-danger" ng-if="!isAmountValid() && maxWaiverAmount !== null">
+                        {{'label.validation.waiveramount.range' | translate}} &mdash; {{maxWaiverAmount | number:2}}
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="control-label col-sm-3" for="waiverEffectiveDate">{{'label.input.waivereffectivedate' | translate}}<span class="required">*</span></label>
-                <div class="col-sm-5">
+                <div class="form-group">
+                    <label class="hpw-label" for="waiverEffectiveDate">{{'label.input.waivereffectivedate' | translate}} *</label>
                     <input id="waiverEffectiveDate" name="waiverEffectiveDate" type="text" class="form-control"
                            datepicker-pop="{{dateFormat}}" ng-model="formData.waiverEffectiveDate"
                            datepicker-options="dateOptions" required>
-                    <span class="help-block" ng-if="preview.suggestedEffectiveDate">
-                        <span translate="label.help.suggestedeffectivedate">Suggested: the date of the earliest repayment that paid this penalty</span>
-                        &mdash; {{preview.suggestedEffectiveDate | DateFormat}}
-                    </span>
+                    <div ng-if="preview.suggestedEffectiveDate">
+                        <div class="hpw-help hpw-ok" ng-if="isSuggestedDate()">
+                            <i class="fa fa-check"></i> {{'label.hpw.suggesteddateinuse' | translate}}
+                        </div>
+                        <div class="hpw-help" ng-if="!isSuggestedDate()">
+                            {{'label.hpw.suggested' | translate}}
+                            <a href="" ng-click="useSuggestedDate()">{{preview.suggestedEffectiveDate | DateFormat}}</a>{{'label.hpw.suggestedsuffix' | translate}}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="control-label col-sm-3" for="reason">{{'label.input.reason' | translate}}<span class="required">*</span></label>
-                <div class="col-sm-5">
+                <div class="form-group">
+                    <label class="hpw-label" for="reason">{{'label.input.reason' | translate}} *</label>
                     <textarea id="reason" name="reason" class="form-control" rows="3"
                               ng-model="formData.reason" maxlength="1000" required></textarea>
                 </div>
-            </div>
 
-            <div class="form-group" ng-if="preview.requiresApproval">
-                <div class="col-sm-offset-3 col-sm-7">
-                    <div class="alert alert-warning">
-                        <span translate="label.message.historicalpenaltywaiver.requiresapproval">This waiver crosses an approval threshold and will be held until an approver acts on it.</span>
-                        <span ng-if="preview.approvalTrigger">({{preview.approvalTrigger}})</span>
+                <div class="alert alert-danger" ng-if="preview && !preview.correctionAllowed">
+                    <i class="fa fa-lock"></i>
+                    {{'label.message.historicalpenaltywaiver.periodclosed' | translate}}
+                    <span ng-if="preview.latestClosureDate"> ({{preview.latestClosureDate | DateFormat}})</span>
+                </div>
+
+                <div class="hpw-approval" ng-if="preview.requiresApproval">
+                    <div class="hpw-approval-reason">
+                        <i class="fa fa-shield"></i>
+                        <div>
+                            <strong>{{'label.hpw.needsapproval' | translate}}</strong>
+                            <div ng-repeat="line in approvalReasons()">{{line}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="preview.approverOptions.length > 0">
+                        <label class="hpw-label" for="nextApproverUserId">{{'label.input.nextapprover' | translate}} *</label>
+                        <select id="nextApproverUserId" name="nextApproverUserId" class="form-control" ng-model="formData.nextApproverUserId"
+                                ng-options="approver.id as approverLabel(approver) for approver in preview.approverOptions" required>
+                            <option value="">{{'label.input.selectapprover' | translate}}</option>
+                        </select>
+                        <div class="hpw-help">
+                            <span ng-if="selectedApprover()">{{approverDetail(selectedApprover())}} &middot; </span>{{preview.approverOptions.length}} {{'label.hpw.cancapprove' | translate}}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group" ng-if="preview.requiresApproval">
-                <label class="control-label col-sm-3" for="nextApproverUserId">{{'label.input.nextapprover' | translate}}<span class="required">*</span></label>
-                <div class="col-sm-5">
-                    <select id="nextApproverUserId" name="nextApproverUserId" class="form-control" ng-model="formData.nextApproverUserId"
-                            ng-options="approver.id as approver.username for approver in preview.approverOptions" required>
-                        <option value="" translate="label.input.selectapprover">-- Select an approver --</option>
-                    </select>
-                    <span class="help-block" ng-if="preview.approverOptions.length === 0" translate="label.help.noapprovers">
-                        Nobody other than you holds the historical penalty waiver approval permission in this office. An administrator
-                        must grant it to someone else before this waiver can be submitted.
-                    </span>
+                <div class="hpw-direct" ng-if="preview && !preview.requiresApproval && preview.correctionAllowed">
+                    <i class="fa fa-check-circle"></i>
+                    <div>{{'label.hpw.direct' | translate}}</div>
+                </div>
+
+                <div class="hpw-actions">
+                    <button id="cancel" type="button" class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+                    <button id="submit" type="button" class="btn btn-primary hpw-submit" ng-click="submit()" ng-disabled="!canSubmit()">
+                        <i class="fa fa-spinner fa-spin" ng-if="isSubmitting"></i>
+                        <span ng-if="!preview.requiresApproval">{{'label.hpw.confirm' | translate}}</span>
+                        <span ng-if="preview.requiresApproval">{{'label.button.sendforapproval' | translate}}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-5">
+            <div class="hpw-card hpw-impact">
+                <h4>
+                    {{'label.hpw.whatthisdoes' | translate}}
+                    <i class="fa fa-spinner fa-spin pull-right hpw-muted" ng-if="isPreviewing"></i>
+                </h4>
+
+                <div class="alert alert-danger" ng-if="previewFailed">
+                    {{'label.message.historicalpenaltywaiver.previewfailed' | translate}}
+                </div>
+
+                <div ng-if="preview && !previewFailed" ng-class="{'hpw-stale': isPreviewing}">
+                    <div class="hpw-headline">
+                        <span class="hpw-label">{{'label.hpw.clientbalance' | translate}}</span>
+                        <div class="hpw-balance hpw-num">
+                            <span class="hpw-muted">{{preview.totalOutstandingBefore | number:2}}</span>
+                            &rarr; <strong>{{preview.totalOutstandingAfter | number:2}}</strong>
+                        </div>
+                        <div class="hpw-ok hpw-strong" ng-if="balanceReduction() > 0">
+                            &darr; {{balanceReduction() | number:2}} {{currencyCode}} {{'label.hpw.returnedtoclient' | translate}}
+                        </div>
+                        <div class="hpw-muted" ng-if="balanceReduction() <= 0">{{'label.hpw.nobalancechange' | translate}}</div>
+                    </div>
+
+                    <div ng-if="!isBlocked()">
+                        <table class="hpw-table hpw-num">
+                            <thead>
+                            <tr><th></th><th>{{'label.input.before' | translate}}</th><th>{{'label.input.after' | translate}}</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{'label.hpw.penaltypaid' | translate}}</td>
+                                <td>{{preview.chargeAmountPaidBefore | number:2}}</td>
+                                <td class="hpw-strong">{{paidAfter() | number:2}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.hpw.penaltywaived' | translate}}</td>
+                                <td>{{preview.chargeAmountWaivedBefore | number:2}}</td>
+                                <td class="hpw-strong">{{preview.chargeAmountWaivedAfter | number:2}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.hpw.loanstatus' | translate}}</td>
+                                <td>{{preview.loanStatusBefore.value}}</td>
+                                <td ng-class="{'hpw-strong': preview.loanStatusAfter.value !== preview.loanStatusBefore.value}">{{preview.loanStatusAfter.value}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="hpw-txn-summary">
+                            <span ng-if="changedTransactions().length > 0">
+                                <strong>{{changedTransactions().length}}</strong> {{(changedTransactions().length === 1 ? 'label.hpw.repaymentreallocated' : 'label.hpw.repaymentsreallocated') | translate}}
+                            </span>
+                            <span class="hpw-muted" ng-if="changedTransactions().length === 0">{{'label.hpw.notransactionschange' | translate}}</span>
+                            <a href="" ng-if="preview.transactions.length > 0" ng-click="toggleTransactions()">
+                                <i class="fa" ng-class="showTransactions ? 'fa-caret-down' : 'fa-caret-right'"></i>
+                                {{(showTransactions ? 'label.hpw.hidetransactions' : 'label.hpw.showtransactions') | translate}}
+                            </a>
+                        </div>
+
+                        <div ng-if="showTransactions">
+                            <div class="hpw-txn" ng-repeat="txn in visibleTransactions()">
+                                <div class="hpw-txn-head">
+                                    <strong>{{txn.transactionDate | DateFormat}} &middot; {{txn.transactionType}}</strong>
+                                    <span class="hpw-pill" ng-class="'hpw-pill-' + changeTypeKey(txn)">{{('label.hpw.change.' + changeTypeKey(txn)) | translate}}</span>
+                                </div>
+                                <table class="hpw-table hpw-num">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>{{'label.input.principal' | translate}}</th>
+                                        <th>{{'label.hpw.interest' | translate}}</th>
+                                        <th>{{'label.input.fees' | translate}}</th>
+                                        <th>{{'label.hpw.penalty' | translate}}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-if="txn.changeType !== 'NEW'">
+                                        <td class="hpw-muted">{{'label.input.before' | translate}}</td>
+                                        <td>{{txn.principalBefore | number:2}}</td>
+                                        <td>{{txn.interestBefore | number:2}}</td>
+                                        <td>{{txn.feesBefore | number:2}}</td>
+                                        <td>{{txn.penaltiesBefore | number:2}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="hpw-muted">{{'label.input.after' | translate}}</td>
+                                        <td ng-class="{'hpw-changed': differs(txn, 'principal')}">{{txn.principalAfter | number:2}}</td>
+                                        <td ng-class="{'hpw-changed': differs(txn, 'interest')}">{{txn.interestAfter | number:2}}</td>
+                                        <td ng-class="{'hpw-changed': differs(txn, 'fees')}">{{txn.feesAfter | number:2}}</td>
+                                        <td ng-class="{'hpw-changed': differs(txn, 'penalties')}">{{txn.penaltiesAfter | number:2}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="hpw-help" ng-if="preview.transactionProcessingStrategyName">
+                                {{'label.input.strategy' | translate}}: {{preview.transactionProcessingStrategyName}}
+                            </div>
+                            <label class="hpw-help hpw-toggle" ng-if="unchangedCount() > 0">
+                                <input type="checkbox" ng-model="txnFilter.showUnchanged">
+                                {{'label.hpw.show' | translate}} {{unchangedCount()}} {{'label.hpw.unchangedtransactions' | translate}}
+                            </label>
+                        </div>
+
+                        <div class="hpw-sync">
+                            <span>{{'label.hpw.odoosync' | translate}}</span>
+                            <strong>{{'label.hpw.odoosync.yes' | translate}}</strong>
+                        </div>
+
+                        <div class="hpw-held" ng-if="preview.requiresApproval">
+                            <i class="fa fa-pause-circle"></i>
+                            <span>{{'label.hpw.heldprefix' | translate}} {{heldUntilName()}} {{'label.hpw.heldsuffix' | translate}}</span>
+                        </div>
+                    </div>
+
+                    <div class="hpw-help" ng-if="isBlocked()">{{'label.hpw.blocked.preview' | translate}}</div>
                 </div>
             </div>
-
-            <br/>
-            <div class="col-md-offset-3">
-                <button id="cancel" type="button" class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
-                <button id="review" type="button" class="btn btn-primary" ng-click="review()"
-                        ng-disabled="isPreviewing || !isAmountValid() || !formData.reason || !formData.waiverEffectiveDate">
-                    {{'label.button.review' | translate}}
-                </button>
-            </div>
-        </fieldset>
-    </form>
-
-    <!-- Step 2: what it will do -->
-    <div class="well" ng-if="step === 'preview' && preview">
-        <api-validate></api-validate>
-
-        <div class="alert alert-danger" ng-if="!preview.correctionAllowed">
-            <span translate="label.message.historicalpenaltywaiver.periodclosed">The effective date falls in a closed accounting period and corrections there are switched off. This waiver cannot be posted.</span>
-            <span ng-if="preview.latestClosureDate"> ({{preview.latestClosureDate | DateFormat}})</span>
-        </div>
-
-        <div class="alert alert-warning" ng-if="preview.requiresApproval">
-            <span translate="label.message.historicalpenaltywaiver.willbeheld">Submitting will create an approval request. Nothing on the loan changes until it is approved.</span>
-        </div>
-
-        <h4 translate="label.heading.chargeimpact">Penalty</h4>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th></th>
-                    <th translate="label.input.amountpaid">Paid</th>
-                    <th translate="label.input.amountwaived">Waived</th>
-                    <th translate="label.input.amountoutstanding">Outstanding</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><span translate="label.input.before">Before</span></td>
-                    <td>{{preview.chargeAmountPaidBefore | number:2}}</td>
-                    <td>{{preview.chargeAmountWaivedBefore | number:2}}</td>
-                    <td>{{preview.chargeAmountOutstandingBefore | number:2}}</td>
-                </tr>
-                <tr>
-                    <td><span translate="label.input.after">After</span></td>
-                    <td>0.00</td>
-                    <td>{{preview.chargeAmountWaivedAfter | number:2}}</td>
-                    <td>{{preview.chargeAmountOutstandingAfter | number:2}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h4 translate="label.heading.affectedtransactions">Affected Transactions</h4>
-        <p>
-            <span translate="label.input.strategy">Processing Strategy</span>: <strong>{{preview.transactionProcessingStrategyName}}</strong>
-            &mdash; <span translate="label.input.reprocessedcount">Transactions reprocessed</span>: <strong>{{preview.reprocessedTransactionCount}}</strong>
-        </p>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th translate="label.input.date">Date</th>
-                    <th translate="label.input.type">Type</th>
-                    <th translate="label.input.change">Change</th>
-                    <th translate="label.input.amount">Amount</th>
-                    <th translate="label.input.principal">Principal</th>
-                    <th translate="label.input.interest">Interest</th>
-                    <th translate="label.input.fees">Fees</th>
-                    <th translate="label.input.penalties">Penalties</th>
-                </tr>
-                </thead>
-                <tbody ng-repeat="txn in preview.transactions">
-                <tr ng-if="txn.changeType !== 'NEW'">
-                    <td rowspan="2">{{txn.transactionDate | DateFormat}}</td>
-                    <td rowspan="2">{{txn.transactionType}}</td>
-                    <td rowspan="2">
-                        <span class="label" ng-class="{'label-default': txn.changeType === 'UNCHANGED', 'label-warning': txn.changeType === 'REVERSED_AND_REPLACED'}">{{txn.changeType}}</span>
-                    </td>
-                    <td>{{txn.amountBefore | number:2}}</td>
-                    <td>{{txn.principalBefore | number:2}}</td>
-                    <td>{{txn.interestBefore | number:2}}</td>
-                    <td>{{txn.feesBefore | number:2}}</td>
-                    <td>{{txn.penaltiesBefore | number:2}}</td>
-                </tr>
-                <tr ng-if="txn.changeType !== 'NEW'">
-                    <td>{{txn.amountAfter | number:2}}</td>
-                    <td>{{txn.principalAfter | number:2}}</td>
-                    <td>{{txn.interestAfter | number:2}}</td>
-                    <td>{{txn.feesAfter | number:2}}</td>
-                    <td>{{txn.penaltiesAfter | number:2}}</td>
-                </tr>
-                <tr ng-if="txn.changeType === 'NEW'">
-                    <td>{{txn.transactionDate | DateFormat}}</td>
-                    <td>{{txn.transactionType}}</td>
-                    <td><span class="label label-success">{{txn.changeType}}</span></td>
-                    <td>{{txn.amountAfter | number:2}}</td>
-                    <td>{{txn.principalAfter | number:2}}</td>
-                    <td>{{txn.interestAfter | number:2}}</td>
-                    <td>{{txn.feesAfter | number:2}}</td>
-                    <td>{{txn.penaltiesAfter | number:2}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h4 translate="label.heading.loanimpact">Loan</h4>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th></th>
-                    <th translate="label.input.status">Status</th>
-                    <th translate="label.input.totaloutstanding">Total Outstanding</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><span translate="label.input.before">Before</span></td>
-                    <td>{{preview.loanStatusBefore.value}}</td>
-                    <td>{{preview.totalOutstandingBefore | number:2}}</td>
-                </tr>
-                <tr>
-                    <td><span translate="label.input.after">After</span></td>
-                    <td>{{preview.loanStatusAfter.value}}</td>
-                    <td>{{preview.totalOutstandingAfter | number:2}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="form-group">
-            <button id="back" type="button" class="btn btn-default" ng-click="back()">{{'label.button.back' | translate}}</button>
-            <button id="confirm" type="button" class="btn btn-warning" ng-click="submit()" ng-disabled="!canSubmit()">
-                <span ng-if="!preview.requiresApproval" translate="label.button.confirm">Confirm</span>
-                <span ng-if="preview.requiresApproval" translate="label.button.sendforapproval">Send for Approval</span>
-            </button>
-            <button id="cancelPreview" type="button" class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
         </div>
     </div>
 </div>
