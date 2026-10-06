@@ -14,6 +14,7 @@
             </button>
             <strong>Error:</strong> {{ error }}
             </div>
+        <div class="alert alert-info" ng-show="isFormLoading()">{{ 'label.message.loan.action.form.loading' | translate }}</div>
         <fieldset>
             <div class="alert alert-info" ng-show="isDisbursementReviewAction() && currentTrancheNumber">
                 <strong>Tranche {{currentTrancheNumber}}</strong>
@@ -44,7 +45,8 @@
 
                 <div class="col-sm-3">
                     <input id="{{modelName}}" sort type="text" datepicker-pop="dd MMMM yyyy" class="form-control"
-                           ng-model="formData[modelName]" min="transactionDateMinDate" max="restrictDate"/>
+                           ng-model="formData[modelName]" min="transactionDateMinDate" max="restrictDate"
+                           ng-disabled="isFormLoading()"/>
                     <div class="help-block text-warning" ng-show="isRecoveryPaymentAction && recoveryPaymentWriteOffOnDate">
                         <i class="fa fa-exclamation-triangle"></i>
                         {{ 'label.warning.recoverypayment.minimumdate' | translate:getRecoveryPaymentWriteOffDateArgs() }}
@@ -923,6 +925,7 @@
 
                             <button id="save" type="submit"
                                     has-permission='{{taskPermissionName}}'
+                                    ng-disabled="isFormLoading()"
                                     wz-next class="btn btn-primary">
                                 {{ 'label.button.save' | translate }}
                             </button>
@@ -1021,7 +1024,8 @@
                                     translate}}
                                 </button>
                                 <button id="save" type="submit" has-permission='{{taskPermissionName}}' wz-next class="btn btn-primary"
-                                        ng-disabled="(action === 'editdisbursedate' && loanactionform.updatedPrincipal.$invalid)
+                                        ng-disabled="isFormLoading()
+                                            || (action === 'editdisbursedate' && loanactionform.updatedPrincipal.$invalid)
                                             || ((action === 'approve' || action === 'adddisbursedetails') && tranchePrincipalMismatch)">{{
                                     'label.button.save' | translate}}
                                 </button>

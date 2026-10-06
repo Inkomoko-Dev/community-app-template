@@ -127,7 +127,45 @@
                 }
             };
 
+            scope.formLoading = 0;
+            var startLoading = function () {
+                var finished = false;
+                scope.formLoading++;
+                return function () {
+                    if (!finished) {
+                        finished = true;
+                        scope.formLoading--;
+                    }
+                };
+            };
+            scope.isFormLoading = function () {
+                return scope.formLoading > 0;
+            };
+
+            var showApprovalStageDate = function (title, labelName, modelName) {
+                scope.title = title;
+                scope.labelName = labelName;
+                scope.modelName = modelName;
+                scope.formData[scope.modelName] = new Date();
+            };
+
+            var approvalStageDateLabels = {
+                approve: 'Approved on date',
+                reviewapplication: 'Review application date',
+                collateralreview: 'Collateral review date',
+                prepareandsigncontract: 'Prepare and sign contract date'
+            };
+
+            var loadApprovalTemplate = function () {
+                var finishLoading = startLoading();
+                resourceFactory.loanTemplateResource.get({
+                    loanId: scope.accountId,
+                    templateType: 'approval'
+                }, finishLoading, finishLoading);
+            };
+
             scope.loadIcReviewTemplate = function(levelNumber, onLoaded) {
+                var finishLoading = startLoading();
                 var params = {
                     loanId: scope.accountId,
                     templateType: 'icreview'
@@ -136,12 +174,13 @@
                     params.approvingLevelNumber = levelNumber;
                 }
                 resourceFactory.loanTemplateResource.get(params, function (data) {
+                    finishLoading();
                     scope.icreviewTemplate = data;
                     scope.applyIcReviewTemplateDefaults(data);
                     if (onLoaded) {
                         onLoaded(data);
                     }
-                });
+                }, finishLoading);
             };
 
             scope.isICReview = scope.action === 'icreviewlevelone' || scope.action === 'icreviewleveltwo' || scope.action === 'icreviewlevelthree' || scope.action === 'icreviewlevelfour' || scope.action === 'icreviewlevelfive' || (scope.isDynamicIcReviewLevel(scope.action) && scope.action.indexOf('rejecticreviewlevel') !== 0);
@@ -620,6 +659,8 @@
                 case "approve":
                     scope.taskPermissionName = 'APPROVE_LOAN';
                     scope.noteFieldMandatory = true;
+                    showApprovalStageDate('label.heading.approveloanaccount', 'label.input.approvedondate', 'approvedOnDate');
+                    var finishApprovalLoading = startLoading();
                     
                     // First get loan account details first to set loanCountry and loanCurrencyCode!
                     resourceFactory.LoanAccountResource.getLoanAccountDetails({
@@ -670,10 +711,10 @@
                                 loanId: scope.accountId,
                                 templateType: 'approval'
                             }, function (data) {
-                                scope.title = 'label.heading.approveloanaccount';
-                                scope.labelName = 'label.input.approvedondate';
-                                scope.modelName = 'approvedOnDate';
-                                scope.formData[scope.modelName] = new Date();
+                                finishApprovalLoading();
+                                if (!scope.formData.approvedOnDate) {
+                                    scope.formData.approvedOnDate = new Date();
+                                }
                                 scope.showApprovalAmount = true;
                                 scope.showAmountField = true;
                                 scope.isTransaction = !scope.enableThirdPartyDisbursement;
@@ -732,9 +773,9 @@
                                 scope.isLoanDisbursementRequestEnabled = true;
                                 scope.fetchEntities('m_loan', 'APPROVE');
                                 scope.fetchEntities('m_loan', 'APPROVE', scope.productId);
-                            });
-                        });
-                    });
+                            }, finishApprovalLoading);
+                        }, finishApprovalLoading);
+                    }, finishApprovalLoading);
                     break;
                 case "reject":
                     scope.title = 'label.heading.rejectloanaccount';
@@ -1072,15 +1113,17 @@
                     scope.taskPermissionName = 'REMOVELOANOFFICER_LOAN';
                     break;
                 case "modifytransaction":
+                    scope.title = 'label.heading.editloanaccounttransaction';
+                    scope.labelName = 'label.input.transactiondate';
+                    scope.modelName = 'transactionDate';
+                    var finishTransactionLoading = startLoading();
                     resourceFactory.loanTrxnsResource.get({
                             loanId: scope.accountId,
                             transactionId: routeParams.transactionId,
                             template: 'true'
                         },
                         function (data) {
-                            scope.title = 'label.heading.editloanaccounttransaction';
-                            scope.labelName = 'label.input.transactiondate';
-                            scope.modelName = 'transactionDate';
+                            finishTransactionLoading();
                             scope.paymentTypes = data.paymentTypeOptions || [];
                             scope.formData.transactionAmount = data.amount;
                             scope.formData[scope.modelName] = new Date(data.date) || new Date();
@@ -1094,7 +1137,7 @@
                                 scope.formData.receiptNumber = data.paymentDetailData.receiptNumber;
                                 scope.formData.bankNumber = data.paymentDetailData.bankNumber;
                             }
-                        });
+                        }, finishTransactionLoading);
                     scope.showDateField = true;
                     scope.showNoteField = false;
                     scope.showAmountField = true;
@@ -1310,17 +1353,9 @@
                     break;
                 case "reviewapplication":
                     scope.taskPermissionName = 'ACCEPT_LOANAPPLICATIONREVIEW';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'approval'
-                    }, function (data) {
-
-                        scope.title = 'label.heading.reviewapplicationloanaccount';
-                        scope.labelName = 'label.input.reviewApplicationOn';
-                        scope.modelName = 'loanReviewOnDate';
-                        scope.formData[scope.modelName] = new Date();
-                        scope.noteFieldMandatory = true;
-                    });
+                    showApprovalStageDate('label.heading.reviewapplicationloanaccount', 'label.input.reviewApplicationOn', 'loanReviewOnDate');
+                    scope.noteFieldMandatory = true;
+                    loadApprovalTemplate();
 
                     break;
                 case "rejectreviewapplication":
@@ -1332,17 +1367,9 @@
                     break;
                 case "collateralreview":
                     scope.taskPermissionName = 'ACCEPT_LOANCOLLATERALREVIEW';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'approval'
-                    }, function (data) {
-
-                        scope.title = 'label.heading.collateralreviewloanaccount';
-                        scope.labelName = 'label.input.collateralReviewOn';
-                        scope.modelName = 'collateralReviewOn';
-                        scope.formData[scope.modelName] = new Date();
-                        scope.noteFieldMandatory = true;
-                    });
+                    showApprovalStageDate('label.heading.collateralreviewloanaccount', 'label.input.collateralReviewOn', 'collateralReviewOn');
+                    scope.noteFieldMandatory = true;
+                    loadApprovalTemplate();
 
                     break;
                 case "rejectduediligence":
@@ -1361,11 +1388,8 @@
                     break;
                 case "icreviewlevelone":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELONE';
+                    showApprovalStageDate('label.heading.icreviewleveloneloanaccount', 'label.input.icReviewOn', 'icReviewOn');
                     scope.loadIcReviewTemplate(1, function () {
-                        scope.title = 'label.heading.icreviewleveloneloanaccount';
-                        scope.labelName = 'label.input.icReviewOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
                     });
@@ -1380,11 +1404,8 @@
                     break;
                 case "icreviewleveltwo":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELTWO';
+                    showApprovalStageDate('label.heading.icreviewleveltwoloanaccount', 'label.input.icReviewOn', 'icReviewOn');
                     scope.loadIcReviewTemplate(2, function (data) {
-                        scope.title = 'label.heading.icreviewleveltwoloanaccount';
-                        scope.labelName = 'label.input.icReviewOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 2);
@@ -1400,11 +1421,8 @@
                     break;
                 case "icreviewlevelthree":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELTHREE';
+                    showApprovalStageDate('label.heading.icreviewlevelthreeloanaccount', 'label.input.icReviewOn', 'icReviewOn');
                     scope.loadIcReviewTemplate(3, function (data) {
-                        scope.title = 'label.heading.icreviewlevelthreeloanaccount';
-                        scope.labelName = 'label.input.icReviewOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 3);
@@ -1420,11 +1438,8 @@
                     break;
                 case "icreviewlevelfour":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELFOUR';
+                    showApprovalStageDate('label.heading.icreviewlevelfourloanaccount', 'label.input.icReviewOn', 'icReviewOn');
                     scope.loadIcReviewTemplate(4, function (data) {
-                        scope.title = 'label.heading.icreviewlevelfourloanaccount';
-                        scope.labelName = 'label.input.icReviewOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 4);
@@ -1440,11 +1455,8 @@
                     break;
                 case "icreviewlevelfive":
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVELFIVE';
+                    showApprovalStageDate('label.heading.icreviewlevelfiveloanaccount', 'label.input.icReviewOn', 'icReviewOn');
                     scope.loadIcReviewTemplate(5, function (data) {
-                        scope.title = 'label.heading.icreviewlevelfiveloanaccount';
-                        scope.labelName = 'label.input.icReviewOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, 5);
@@ -1478,11 +1490,8 @@
                     var dynamicLevelNumber = scope.getIcReviewLevelNumber(scope.action);
                     var levelWord = scope.action.replace('icreviewlevel', '').toUpperCase();
                     scope.taskPermissionName = 'ACCEPT_LOANICREVIEWDECISIONLEVEL' + levelWord;
+                    showApprovalStageDate('label.heading.icreviewlevel' + scope.action.replace('icreviewlevel', '') + 'loanaccount', 'label.input.icReviewOn', 'icReviewOn');
                     scope.loadIcReviewTemplate(dynamicLevelNumber, function (data) {
-                        scope.title = 'label.heading.icreviewlevel' + scope.action.replace('icreviewlevel', '') + 'loanaccount';
-                        scope.labelName = 'label.input.icReviewOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
                         scope.noteFieldMandatory = true;
                         scope.showRejectButton = true;
                         scope.icReviewPreviousRecommendedAmount = icReviewLoanDecisionDataObjectToArray(data.loanDecisionData, dynamicLevelNumber);
@@ -1511,17 +1520,9 @@
                     break;
                 case "prepareandsigncontract":
                     scope.taskPermissionName = 'ACCEPT_LOANPREPAREANDSIGNCONTRACT';
-                    resourceFactory.loanTemplateResource.get({
-                        loanId: scope.accountId,
-                        templateType: 'approval'
-                    }, function (data) {
-
-                        scope.title = 'label.heading.prepareandsigncontractloanaccount';
-                        scope.labelName = 'label.input.prepareAndSignContractOn';
-                        scope.modelName = 'icReviewOn';
-                        scope.formData[scope.modelName] = new Date();
-                        scope.noteFieldMandatory = true;
-                    });
+                    showApprovalStageDate('label.heading.prepareandsigncontractloanaccount', 'label.input.prepareAndSignContractOn', 'icReviewOn');
+                    scope.noteFieldMandatory = true;
+                    loadApprovalTemplate();
 
                     break;
                 case "rejectprepareandsigncontract":
@@ -1654,6 +1655,17 @@
                 scope.processDate = false;
                 scope.error = null;
 
+                if (scope.isFormLoading()) {
+                    scope.error = 'The form is still loading. Please wait a moment and try again.';
+                    return;
+                }
+
+                var requiredDateLabel = scope.isICReview ? 'IC review date' : approvalStageDateLabels[scope.action];
+                if (requiredDateLabel && !scope.formData[scope.modelName]) {
+                    scope.error = requiredDateLabel + ' is required.';
+                    return;
+                }
+
                 // Prepare form data by filtering based on payment type (Cash vs Bank)
                 scope.filterDisburseFormData();
 
@@ -1676,6 +1688,8 @@
                 }
 
                 var submitData = angular.copy(scope.formData);
+                delete submitData['undefined'];
+                delete submitData['null'];
                 restorePersistedDisbursementRecipientDetails(submitData);
 
                 var isDisbursementReviewAction = scope.action === "approveDisbursement"
