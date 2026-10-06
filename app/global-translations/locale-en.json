@@ -5867,6 +5867,7 @@
   "label.message.historicalpenaltywaiver.willbeheld": "Submitting will create an approval request. Nothing on the loan changes until it is approved.",
   "label.message.historicalpenaltywaiver.periodclosed": "The effective date falls in a closed accounting period and corrections there are switched off. This waiver cannot be posted.",
   "label.message.nodataavailable": "No data available",
+  "label.message.loan.action.form.loading": "Loading details, please wait...",
   "label.input.reason": "Reason",
   "label.input.amountpaid": "Paid",
   "label.input.amountwaived": "Waived",
