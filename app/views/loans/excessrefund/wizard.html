@@ -1,0 +1,66 @@
+<div class="content-container" ng-controller="ExcessRefundWizardController">
+    <ul class="breadcrumb">
+        <li><a href="#/excessrefunds">{{'label.heading.excessrefunds' | translate}}</a></li>
+        <li class="active">{{'label.heading.excessrefundwizard' | translate}}</li>
+    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><strong>Step {{step}} of 6</strong></div>
+        <div class="panel-body">
+            <div ng-if="step === 1">
+                <label>Loan ID</label>
+                <input type="number" class="form-control" ng-model="formData.loanId"/>
+                <button class="btn btn-primary m-t-10" ng-click="loadTemplate()">Load excess</button>
+            </div>
+            <div ng-if="step === 2 && template">
+                <p>Account: <strong>{{template.accountNo}}</strong></p>
+                <p>Total overpaid: <strong>{{template.totalOverpaid}} {{template.currencyCode}}</strong></p>
+                <button class="btn btn-primary" ng-click="next()">Continue</button>
+            </div>
+            <div ng-if="step === 3">
+                <label>Channel</label>
+                <select class="form-control" ng-model="formData.beneficiary.channel">
+                    <option value="MOBILE_MONEY">Mobile Money</option>
+                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                </select>
+                <label>Beneficiary name</label>
+                <input class="form-control" ng-model="formData.beneficiary.beneficiaryName"/>
+                <div ng-if="formData.beneficiary.channel === 'MOBILE_MONEY'">
+                    <label>MSISDN</label>
+                    <input class="form-control" ng-model="formData.beneficiary.msisdn"/>
+                </div>
+                <div ng-if="formData.beneficiary.channel === 'BANK_TRANSFER'">
+                    <label>Account number</label>
+                    <input class="form-control" ng-model="formData.beneficiary.accountNumber"/>
+                    <label>Bank code</label>
+                    <input class="form-control" ng-model="formData.beneficiary.bankCode"/>
+                    <label>Bank name</label>
+                    <input class="form-control" ng-model="formData.beneficiary.bankName"/>
+                </div>
+                <button class="btn btn-default" ng-click="back()">Back</button>
+                <button class="btn btn-primary" ng-click="next()">Continue</button>
+            </div>
+            <div ng-if="step === 4">
+                <label>Amount</label>
+                <input type="number" class="form-control" ng-model="formData.amount"/>
+                <label>Payment mode</label>
+                <select class="form-control" ng-model="formData.paymentMode">
+                    <option value="MANUAL">Manual</option>
+                    <option value="PAYMENT_HUB">Payment Hub</option>
+                </select>
+                <button class="btn btn-default" ng-click="back()">Back</button>
+                <button class="btn btn-primary" ng-click="next()">Continue</button>
+            </div>
+            <div ng-if="step === 5">
+                <p>Review refund for loan {{formData.loanId}} amount {{formData.amount}} via {{formData.paymentMode}}.</p>
+                <button class="btn btn-default" ng-click="back()">Back</button>
+                <button class="btn btn-primary" ng-click="next()">Continue</button>
+            </div>
+            <div ng-if="step === 6">
+                <p>Submit for maker-checker approval.</p>
+                <button class="btn btn-default" ng-click="back()">Back</button>
+                <button class="btn btn-primary" ng-click="submit()" has-permission="CREATE_EXCESS_REFUND">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

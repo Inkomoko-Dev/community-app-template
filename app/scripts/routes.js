@@ -863,6 +863,18 @@
             .when('/addproductmix', {
                 templateUrl: 'views/products/productmix/addproductmix.html'
             })
+            .when('/excessrefunds', {
+                templateUrl: 'views/loans/excessrefund/list.html'
+            })
+            .when('/excessrefunds/create', {
+                templateUrl: 'views/loans/excessrefund/wizard.html'
+            })
+            .when('/excessrefunds/bulk', {
+                templateUrl: 'views/loans/excessrefund/bulk.html'
+            })
+            .when('/excessrefunds/:refundId', {
+                templateUrl: 'views/loans/excessrefund/detail.html'
+            })
             .when('/bulkloan', {
                 templateUrl: 'views/organization/bulkloan.html'
             })

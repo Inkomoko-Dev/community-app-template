@@ -1,0 +1,69 @@
+<div class="content-container" ng-controller="ExcessRefundListController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.heading.excessrefunds' | translate}}</li>
+    </ul>
+
+    <ul class="nav nav-tabs">
+        <li ng-class="{active: activeTab === 'single'}"><a href="" ng-click="setTab('single')">Single</a></li>
+        <li ng-class="{active: activeTab === 'bulk'}"><a href="" ng-click="setTab('bulk')">Bulk</a></li>
+        <li ng-class="{active: activeTab === 'reports'}"><a href="" ng-click="setTab('reports')">Reports</a></li>
+    </ul>
+
+    <div class="toolbar clearfix" ng-show="activeTab === 'single'">
+        <div class="pull-left">
+            <h4>{{'label.heading.excessrefunds' | translate}}</h4>
+        </div>
+        <div class="pull-right">
+            <button class="btn btn-default" ng-click="exportCsv()" has-permission="READ_EXCESS_REFUND">Export CSV</button>
+            <button class="btn btn-default" ng-click="openBulk()" has-permission="CREATE_EXCESS_REFUND_BATCH">{{'label.button.bulkexcessrefund' | translate}}</button>
+            <button class="btn btn-primary" ng-click="create()" has-permission="CREATE_EXCESS_REFUND">{{'label.button.createexcessrefund' | translate}}</button>
+        </div>
+    </div>
+
+    <div class="panel panel-default" ng-show="activeTab === 'single'">
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Loan</th>
+                    <th>Client</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Mode</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in refunds">
+                    <td>{{row.id}}</td>
+                    <td>{{row.loanAccountNo}}</td>
+                    <td>{{row.clientDisplayName}}</td>
+                    <td>{{row.amount}} {{row.currencyCode}}</td>
+                    <td>{{row.statusLabel}}</td>
+                    <td>{{row.paymentModeLabel}}</td>
+                    <td><a href="" ng-click="open(row.id)">Open</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel panel-default" ng-show="activeTab === 'bulk'">
+        <div class="panel-body">
+            <p>Create a bulk excess refund batch with per-line validation and maker-checker approval.</p>
+            <button class="btn btn-primary" ng-click="openBulk()" has-permission="CREATE_EXCESS_REFUND_BATCH">{{'label.button.bulkexcessrefund' | translate}}</button>
+        </div>
+    </div>
+
+    <div class="panel panel-default" ng-show="activeTab === 'reports'">
+        <div class="panel-body">
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="report in reportLinks">
+                    <a href="#{{report.path}}">{{report.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

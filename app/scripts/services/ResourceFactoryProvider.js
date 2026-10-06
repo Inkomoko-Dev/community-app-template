@@ -268,6 +268,19 @@
                         getAllCollaterals: { method: 'GET', params: {}, isArray: true },
                         put: { method: 'PUT', params: {} }
                     }),
+                    excessRefundResource: defineResource(apiVer + "/excess-refunds/:refundId", { refundId: '@refundId', loanId: '@loanId', status: '@status', batchId: '@batchId', command: '@command' }, {
+                        getAll: { method: 'GET', isArray: true },
+                        get: { method: 'GET' },
+                        save: { method: 'POST' },
+                        command: { method: 'POST', params: { command: '@command' } }
+                    }),
+                    excessRefundTemplateResource: defineResource(apiVer + "/loans/:loanId/excess-refund-template", { loanId: '@loanId' }, {
+                        get: { method: 'GET' }
+                    }),
+                    excessRefundBatchResource: defineResource(apiVer + "/excess-refund-batches/:batchId", { batchId: '@batchId', command: '@command' }, {
+                        save: { method: 'POST' },
+                        command: { method: 'POST', params: { command: '@command' } }
+                    }),
                     loanChargeTemplateResource: defineResource(apiVer + "/loans/:loanId/charges/template", { loanId: '@loanId' }, {
                         get: { method: 'GET', params: {} }
                     }),
