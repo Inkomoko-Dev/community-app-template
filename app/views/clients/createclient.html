@@ -204,23 +204,25 @@
                   </div>
                   <div class="form-group">
                      <label class="control-label col-sm-2" ng-hide="showNonPersonOptions">{{'label.input.dateofbirth' |
-                        translate}}</label>
+                        translate}}<span class="required">*</span></label>
                      <label class="control-label col-sm-2"
                         ng-show="showNonPersonOptions">{{'label.input.incorporationdate' | translate}}</label>
                      <div class="col-sm-3">
                         <input id="dateofbirth" type="text" name="dateofbirth" datepicker-pop="dd MMMM yyyy"
                            ng-model="first.dateOfBirth" is-open="opened1" min="minDate" max="restrictDate"
-                           class="form-control" />
+                           class="form-control" ng-required="!showNonPersonOptions" late-validate />
+                        <form-validate valattributeform="createclientform" valattribute="dateofbirth" />
                      </div>
                      <div data-ng-switch on="showNonPersonOptions">
                         <div data-ng-switch-when="false">
-                           <label class="control-label col-sm-2">{{'label.input.gender' | translate}}</label>
+                           <label class="control-label col-sm-2">{{'label.input.gender' | translate}}<span class="required">*</span></label>
                            <div class="col-sm-3">
-                              <select id="genderId" ng-model="formData.genderId" class="form-control"
+                              <select id="genderId" name="genderId" ng-model="formData.genderId" class="form-control" required late-validate
                                  ng-options="gender.id as gender.name for gender in genderOptions"
                                  value="{{gender.id}}">
                                  <option value="">--{{'label.menu.gender' | translate}}--</option>
                               </select>
+                              <form-validate valattributeform="createclientform" valattribute="genderId" />
                            </div>
                         </div>
                      </div>

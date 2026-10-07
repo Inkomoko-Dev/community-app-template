@@ -578,6 +578,40 @@
                 return true;
             };
 
+            // CGLT-632: the breakdown is calculated as at the write-off date, so re-fetch whenever the user changes it.
+            scope.onWriteOffDateChange = function () {
+                if (!scope.isWriteOffAction || !scope.formData.transactionDate) {
+                    return;
+                }
+                var selectedDate = dateFilter(scope.formData.transactionDate, scope.df);
+                if (selectedDate !== scope.writeOffBreakdownDate) {
+                    scope.loadWriteOffBreakdown(selectedDate);
+                }
+            };
+
+            scope.loadWriteOffBreakdown = function (selectedDate) {
+                var params = {loanId: scope.accountId, command: 'writeoff'};
+                if (selectedDate) {
+                    params.locale = scope.optlang.code;
+                    params.dateFormat = scope.df;
+                    params.transactionDate = selectedDate;
+                }
+                resourceFactory.loanTrxnsTemplateResource.get(params, function (data) {
+                    scope.writeOffBreakdownDate = selectedDate || dateFilter(new Date(data.date), scope.df);
+                    if (!scope.formData[scope.modelName]) {
+                        scope.formData[scope.modelName] = new Date(data.date) || new Date();
+                    }
+                    scope.writeOffAmount = data.amount;
+                    scope.writeOffPrincipal = data.principalPortion;
+                    scope.writeOffRecognisedInterest = data.interestPortion;
+                    scope.writeOffFees = data.feeChargesPortion;
+                    scope.writeOffPenalties = data.penaltyChargesPortion;
+                    scope.futureInterestCancelled = data.futureInterestCancelled;
+                    scope.productBasis = data.productBasis;
+                    scope.isLoanWriteOff = true;
+                });
+            };
+
             switch (scope.action) {
                 case "approve":
                     scope.taskPermissionName = 'APPROVE_LOAN';
@@ -958,14 +992,8 @@
                     break;
                 case "writeoff":
                     scope.modelName = 'transactionDate';
-                    resourceFactory.loanTrxnsTemplateResource.get({
-                        loanId: scope.accountId,
-                        command: 'writeoff'
-                    }, function (data) {
-                        scope.formData[scope.modelName] = new Date(data.date) || new Date();
-                        scope.writeOffAmount = data.amount;
-                        scope.isLoanWriteOff = true;
-                    });
+                    scope.isWriteOffAction = true;
+                    scope.loadWriteOffBreakdown();
                     scope.title = 'label.heading.writeoffloanaccount';
                     scope.labelName = 'label.input.writeoffondate';
                     scope.taskPermissionName = 'WRITEOFF_LOAN';
@@ -982,6 +1010,7 @@
                         scope.writeOffAmount = data.amount;
                         scope.formData.transactionAmount = data.amount;
                         scope.isLoanWriteOff = true;
+                        scope.futureInterestCancelled = data.futureInterestCancelled;
                     });
                     scope.title = 'label.heading.payoffloanaccount';
                     scope.labelName = 'label.input.payoffondate';
@@ -1703,7 +1732,7 @@
                 }
                 // Mirror the backend rule: bank (non-cash, non-mobile-money) payments to the client
                 // require account number + bank name, otherwise approval is rejected server-side
-                if (!scope.isSouthSudanSspLoan() && scope.isLoanDisbursementRequestEnabled
+                if (scope.isLoanDisbursementRequestEnabled
                         && scope.isClientBankPayment()
                         && (!scope.formData.clientAccountNumber || !scope.formData.clientBankName)) {
                     scope.error = 'Client bank details (Account Number, Bank Name) are required for bank disbursement. Enter them under Payment Details or update the client\'s Other Info.';
@@ -1833,6 +1862,18 @@
                 if (scope.action === "undoapproval" || scope.action === "undodisbursal" || scope.action === "reject" || scope.action === "withdrawnByClient") {
                     delete submitData.locale;
                     delete submitData.dateFormat;
+                    if (scope.action === "undoapproval" || scope.action === "undodisbursal") {
+                        delete submitData.paymentTo;
+                        delete submitData.beneficiaryName;
+                        delete submitData.clientPhoneNumber;
+                        delete submitData.clientAccountNumber;
+                        delete submitData.clientBankName;
+                        delete submitData.disbursementType;
+                        delete submitData.fxRate;
+                        delete submitData.usdAmount;
+                        delete submitData.fxSource;
+                        delete submitData.fxTimestamp;
+                    }
                 } else {
                     submitData.locale = scope.optlang.code;
                     submitData.dateFormat = scope.df;
@@ -2215,6 +2256,7 @@
             scope.$watch('formData.transactionDate', function () {
                 scope.validateRecoveryPaymentDate();
                 scope.onDateChange();
+                scope.onWriteOffDateChange();
             });
 
 
@@ -2279,6 +2321,10 @@
                 
                 // For South Sudan loans, do NOT filter the vendor details!
                 if (isSouthSudan) {
+                    if (scope.shouldShowPaymentRecipientInfo() && scope.isPaymentToClient() && !isCashPayment
+                            && !scope.isVendorRecipient()) {
+                        scope.applyClientPaymentDetailsFromOtherInfo();
+                    }
                     return;
                 }
                 
@@ -2462,32 +2508,63 @@
                     && (!scope.formData.clientAccountNumber || !scope.formData.clientBankName);
             };
 
+            scope.clientBankDetailsMessageKey = function () {
+                if (scope.isReviewBankDetailsMissing()) {
+                    return 'label.message.client.bank.details.not.captured';
+                }
+                var hasAccountNumber = scope.clientOtherInfoHas('bankAccountNumber');
+                var hasBankName = scope.clientOtherInfoHas('clientBankName');
+                if (hasAccountNumber && !hasBankName) {
+                    return 'label.message.client.bank.name.missing';
+                }
+                if (!hasAccountNumber && hasBankName) {
+                    return 'label.message.client.bank.account.missing';
+                }
+                return 'label.message.client.bank.details.missing';
+            };
+
             scope.shouldRevealClientBankDetails = function () {
                 return scope.isClientBankDetailsMissing() || scope.isClientBankPaymentReview();
             };
 
+            scope.clientPaymentFieldValue = function (field) {
+                if (field === 'bankAccountNumber') return scope.formData.clientAccountNumber;
+                if (field === 'clientBankName') return scope.formData.clientBankName;
+                return scope.formData[field];
+            };
+
             scope.isClientPaymentFieldLocked = function (field) {
                 if (!scope.isPaymentToClient()) return false;
+                if (!scope.clientPaymentFieldValue(field)) return false;
                 // Non-approval screens (e.g. disbursement review) keep the fields read-only as before
                 if (!scope.isApprovalAction()) return true;
                 return scope.clientOtherInfoHas(field);
             };
 
+            scope.isVendorRecipient = function () {
+                return scope.isPaymentToSupplier() || scope.isVendorDisbursement();
+            };
+
+            scope.applyClientPaymentDetailsFromOtherInfo = function () {
+                // Prefer the client's stored Other Info, but keep manually entered values when it's blank
+                const info = scope.clientOtherInfoData || {};
+                scope.formData.clientPhoneNumber = info.telephoneNumber || info.clientPhoneNumber || scope.formData.clientPhoneNumber || '';
+                scope.formData.clientAccountNumber = info.bankAccountNumber || scope.formData.clientAccountNumber || '';
+                scope.formData.clientBankName = info.bank && info.bank.bankName
+                    ? info.bank.bankName
+                    : (info.bankName || scope.formData.clientBankName || '');
+            };
+
             scope.setPaymentRecipientInfo = function () {
-                if (scope.isSouthSudanSspLoan()) {
-                    // For South Sudan loans, leave saved vendor details as is!
+                if (scope.isSouthSudanSspLoan() && scope.isVendorRecipient()) {
+                    // For South Sudan vendor disbursements, leave saved vendor details as is!
                     return;
                 }
                 if (!scope.shouldShowPaymentRecipientInfo()) {
                     return;
                 }
                 if (scope.isPaymentToClient()) {
-                    // Prefer the client's stored Other Info, but keep manually entered values when it's blank
-                    scope.formData.clientPhoneNumber = scope.clientOtherInfoData.telephoneNumber || scope.clientOtherInfoData.clientPhoneNumber || scope.formData.clientPhoneNumber || '';
-                    scope.formData.clientAccountNumber = scope.clientOtherInfoData.bankAccountNumber || scope.formData.clientAccountNumber || '';
-                    scope.formData.clientBankName = scope.clientOtherInfoData.bank && scope.clientOtherInfoData.bank.bankName
-                        ? scope.clientOtherInfoData.bank.bankName
-                        : (scope.clientOtherInfoData.bankName || scope.formData.clientBankName || '');
+                    scope.applyClientPaymentDetailsFromOtherInfo();
                     scope.formData.beneficiaryName = scope.clientName || scope.clientOtherInfoData.clientName
                         || scope.clientOtherInfoData.displayName || '';
                 } else {
