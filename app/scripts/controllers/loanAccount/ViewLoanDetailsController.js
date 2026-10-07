@@ -62,6 +62,44 @@
                 return details[0];
             }
 
+            scope.queryingPaymentStatus = false;
+            scope.queryPaymentHubStatus = function (loanId) {
+                if (scope.queryingPaymentStatus) {
+                    return;
+                }
+                scope.queryingPaymentStatus = true;
+                scope.paymentHubStatusResult = null;
+                resourceFactory.PaymentHubDisbursementStatusResource.check({ loanId: loanId }, {}, function (data) {
+                    scope.queryingPaymentStatus = false;
+                    var status = data && data.status;
+                    var alertClass = 'alert-info';
+                    if (status === 'SUCCESS') {
+                        alertClass = 'alert-success';
+                    } else if (status === 'FAILED' || status === 'PENDING_ERROR') {
+                        alertClass = 'alert-danger';
+                    }
+                    scope.paymentHubStatusResult = {
+                        alertClass: alertClass,
+                        message: data.message || 'Payment Hub status checked.',
+                        reason: data.reason,
+                        reference: data.transactionRef
+                    };
+                    if (status && status !== 'PENDING') {
+                        fetchLoanAccountDetails();
+                    }
+                }, function (error) {
+                    scope.queryingPaymentStatus = false;
+                    var errors = error && error.data && error.data.errors;
+                    var backendError = errors && errors.length ? errors[0] : null;
+                    scope.paymentHubStatusResult = {
+                        alertClass: 'alert-danger',
+                        message: backendError && backendError.defaultUserMessage
+                            ? backendError.defaultUserMessage
+                            : 'The Payment Hub status could not be checked. Please try again.'
+                    };
+                });
+            };
+
             scope.interval = interval(function () {
                 if(scope.isPendingDisbursement && !scope.isReadyForStaffThirdPartyDisbursement){
                     fetchLoanAccountDetails();

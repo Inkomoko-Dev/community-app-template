@@ -316,6 +316,9 @@
                         getLoanAccountDetails: { method: 'GET', params: {} },
                         update: { method: 'PUT' }
                     }),
+                    PaymentHubDisbursementStatusResource: defineResource(apiVer + "/loans/:loanId/paymenthub-disbursement-status", { loanId: '@loanId' }, {
+                        check: { method: 'POST' }
+                    }),
                     glimLoan: defineResource(apiVer + "/loans/glimAccount/:glimId", { glimId: '@glimId', command: '@command' }, {
                         post: { method: 'POST', params: {} }
                     }),
