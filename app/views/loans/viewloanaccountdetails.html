@@ -9,6 +9,16 @@
             {{'label.bank.disbursement.reference' | translate}}: {{bankDisbursementResult.reference}}
         </span>
     </div>
+    <div class="alert alert-dismissible fade in" ng-class="paymentHubStatusResult.alertClass" ng-if="paymentHubStatusResult" role="alert">
+        <button type="button" class="close" ng-click="paymentHubStatusResult = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{paymentHubStatusResult.message}}
+        <span ng-if="paymentHubStatusResult.reason"> {{paymentHubStatusResult.reason}}</span>
+        <span ng-if="paymentHubStatusResult.reference">
+            {{'label.bank.disbursement.reference' | translate}}: {{paymentHubStatusResult.reference}}
+        </span>
+    </div>
     <div ng-show="isCrbVerificationInProgress"
          style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: wait;">
         <div style="background: #fff; padding: 24px 32px; border-radius: 4px; text-align: center;">
@@ -268,6 +278,11 @@
                 </div>
                 <div class="pull-right btn-group">
                     <a href="#/creditBureauSummary/{{loandetails.id}}/{{productId}}" ng-show="cblpstatusactive" class="btn btn-primary">{{'label.button.creditcheck' | translate}}</a>
+
+                    <a class="btn btn-primary" ng-show="isPendingDisbursement" ng-click="queryPaymentHubStatus(loandetails.id)"
+                       ng-disabled="queryingPaymentStatus" has-permission="DISBURSE_LOAN">
+                        <i class="fa" ng-class="queryingPaymentStatus ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>&nbsp;{{'label.button.queryPaymentStatus' | translate}}
+                    </a>
 
                     <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
                        class="btn btn-primary" has-permission='{{button.taskPermissionName}}'><i
