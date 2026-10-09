@@ -77,4 +77,28 @@ describe("CGLT-782 disbursement request keeps the approved amount", function () 
         expect(scope.disbursementDetails[0].principal).toEqual(250000);
         expect(scope.showTrancheAmountTotal).toEqual(250000);
     });
+
+    it("keeps a remaining tranche that is already within the approved amount", function () {
+        createController();
+
+        var display = scope.approvedDisbursementDisplay(
+            {approvedPrincipal: 250000, approvedICReview: 250000, proposedPrincipal: 300000},
+            {amount: 150000, remainingUndisbursedAmount: 150000}
+        );
+
+        expect(display.amount).toEqual(150000);
+        expect(display.remaining).toEqual(150000);
+    });
+
+    it("caps a stale remaining tranche to remaining approved after a partial disbursement", function () {
+        createController();
+
+        var display = scope.approvedDisbursementDisplay(
+            {approvedPrincipal: 250000, proposedPrincipal: 300000},
+            {amount: 200000, remainingUndisbursedAmount: 150000}
+        );
+
+        expect(display.amount).toEqual(150000);
+        expect(display.remaining).toEqual(150000);
+    });
 });
