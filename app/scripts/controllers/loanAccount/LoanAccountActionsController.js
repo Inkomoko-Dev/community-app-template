@@ -755,6 +755,7 @@
                                 scope.isTransaction = !scope.enableThirdPartyDisbursement;
                                 scope.showMfiCode = scope.isTransaction;
                                 scope.formData.approvedLoanAmount = data.approvalAmount;
+                                scope.alignUndisbursedTranchesToApprovedAmount(scope.formData.approvedLoanAmount);
                                 scope.formData.transactionAmount = data.netDisbursalAmount;
                                 scope.loanCurrencyCode = data.currency ? data.currency.code : scope.loanCurrencyCode;
                                 scope.paymentTypes = data.paymentTypeOptions;
@@ -891,8 +892,9 @@
                                 }) || savedDetail;
                             }
                             scope.currentTrancheNumber = templateData.trancheNumber;
-                            scope.remainingUndisbursedAmount = templateData.remainingUndisbursedAmount;
-                            scope.currentTranchePrincipal = templateData.amount;
+                            var approvedDisplay = scope.approvedDisbursementDisplay(data, templateData);
+                            scope.remainingUndisbursedAmount = approvedDisplay.remaining;
+                            scope.currentTranchePrincipal = approvedDisplay.amount;
                             scope.loanCurrencyCode = templateData.currency ? templateData.currency.code : scope.loanCurrencyCode;
                             scope.paymentTypes = templateData.paymentTypeOptions;
                             if (scope.paymentTypes && scope.paymentTypes.length > 0) {
@@ -935,11 +937,12 @@
                             }
                             cachePersistedDisbursementRecipientDetails(scope.formData);
                             
-                            scope.formData.transactionAmount = templateData.netDisbursalAmount || '';
-                            // For tranche disbursement reviews the gross amount booked by Fineract is
-                            // the selected tranche principal. principalPortion may represent the full
-                            // approved loan and must not be shown as the amount of this disbursement.
-                            scope.principalPortion = scope.currentTranchePrincipal || templateData.principalPortion || '';
+                            if (Number(templateData.amount) === approvedDisplay.amount) {
+                                scope.formData.transactionAmount = templateData.netDisbursalAmount || approvedDisplay.amount || '';
+                            } else {
+                                scope.formData.transactionAmount = approvedDisplay.amount;
+                            }
+                            scope.principalPortion = approvedDisplay.amount || templateData.principalPortion || '';
                             scope.interestPortion = templateData.interestPortion || '';
                             scope.feeChargesPortion = templateData.feeChargesPortion || '';
                             scope.formData[scope.modelName] = new Date();
@@ -1576,6 +1579,46 @@
             var parseTrancheAmount = function (amount) {
                 var parsed = Number(String(amount == null ? 0 : amount).replace(/,/g, ''));
                 return isNaN(parsed) ? 0 : parsed;
+            };
+
+            var approvedPrincipalFromLoan = function (loan) {
+                return parseTrancheAmount(loan && (loan.approvedPrincipal || loan.approvedICReview));
+            };
+
+            scope.alignUndisbursedTranchesToApprovedAmount = function (approvedAmount) {
+                var approved = parseTrancheAmount(approvedAmount);
+                if (!(approved > 0) || !scope.disbursementDetails || !scope.disbursementDetails.length) {
+                    return;
+                }
+                var undisbursed = [];
+                for (var i in scope.disbursementDetails) {
+                    if (!scope.disbursementDetails[i].actualDisbursementDate) {
+                        undisbursed.push(scope.disbursementDetails[i]);
+                    }
+                }
+                if (undisbursed.length === 1) {
+                    undisbursed[0].principal = approved;
+                    scope.showTrancheAmountTotal = 0;
+                    for (var j in scope.disbursementDetails) {
+                        scope.showTrancheAmountTotal += parseTrancheAmount(scope.disbursementDetails[j].principal);
+                    }
+                    if (scope.validateTranchePrincipalTotal) {
+                        scope.validateTranchePrincipalTotal();
+                    }
+                }
+            };
+
+            scope.approvedDisbursementDisplay = function (loan, templateData) {
+                var approved = approvedPrincipalFromLoan(loan);
+                var remaining = parseTrancheAmount(templateData && templateData.remainingUndisbursedAmount);
+                var amount = parseTrancheAmount(templateData && templateData.amount);
+                if (approved > 0 && (remaining <= 0 || remaining > approved)) {
+                    remaining = approved;
+                }
+                if (approved > 0 && (amount <= 0 || amount > remaining)) {
+                    amount = remaining > 0 ? remaining : approved;
+                }
+                return {amount: amount, remaining: remaining};
             };
 
             var formatTrancheDate = function (date) {
