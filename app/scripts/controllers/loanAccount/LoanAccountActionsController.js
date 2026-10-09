@@ -937,11 +937,7 @@
                             }
                             cachePersistedDisbursementRecipientDetails(scope.formData);
                             
-                            if (Number(templateData.amount) === approvedDisplay.amount) {
-                                scope.formData.transactionAmount = templateData.netDisbursalAmount || approvedDisplay.amount || '';
-                            } else {
-                                scope.formData.transactionAmount = approvedDisplay.amount;
-                            }
+                            scope.formData.transactionAmount = scope.cappedDisbursementTransactionAmount(approvedDisplay, templateData);
                             scope.principalPortion = approvedDisplay.amount || templateData.principalPortion || '';
                             scope.interestPortion = templateData.interestPortion || '';
                             scope.feeChargesPortion = templateData.feeChargesPortion || '';
@@ -1591,13 +1587,17 @@
                     return;
                 }
                 var undisbursed = [];
+                var disbursedTotal = 0;
                 for (var i in scope.disbursementDetails) {
                     if (!scope.disbursementDetails[i].actualDisbursementDate) {
                         undisbursed.push(scope.disbursementDetails[i]);
+                    } else {
+                        disbursedTotal += parseTrancheAmount(scope.disbursementDetails[i].principal);
                     }
                 }
                 if (undisbursed.length === 1) {
-                    undisbursed[0].principal = approved;
+                    var remaining = approved - disbursedTotal;
+                    undisbursed[0].principal = remaining > 0 ? remaining : 0;
                     scope.showTrancheAmountTotal = 0;
                     for (var j in scope.disbursementDetails) {
                         scope.showTrancheAmountTotal += parseTrancheAmount(scope.disbursementDetails[j].principal);
@@ -1606,6 +1606,24 @@
                         scope.validateTranchePrincipalTotal();
                     }
                 }
+            };
+
+            scope.cappedDisbursementTransactionAmount = function (approvedDisplay, templateData) {
+                if (!approvedDisplay) {
+                    return '';
+                }
+                if (Number(templateData && templateData.amount) === approvedDisplay.amount) {
+                    return (templateData && templateData.netDisbursalAmount) || approvedDisplay.amount || '';
+                }
+                var disbursementCharges = 0;
+                if (templateData && templateData.trancheNumber === 1 && templateData.amount != null && templateData.netDisbursalAmount != null) {
+                    disbursementCharges = parseTrancheAmount(templateData.amount) - parseTrancheAmount(templateData.netDisbursalAmount);
+                    if (disbursementCharges < 0) {
+                        disbursementCharges = 0;
+                    }
+                }
+                var cappedNet = approvedDisplay.amount - disbursementCharges;
+                return cappedNet < 0 ? 0 : cappedNet;
             };
 
             scope.approvedDisbursementDisplay = function (loan, templateData) {

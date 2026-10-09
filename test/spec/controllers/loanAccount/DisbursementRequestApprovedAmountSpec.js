@@ -101,4 +101,29 @@ describe("CGLT-782 disbursement request keeps the approved amount", function () 
         expect(display.amount).toEqual(150000);
         expect(display.remaining).toEqual(150000);
     });
+
+    it("subtracts disbursement charges when the form amount is capped to remaining approved", function () {
+        createController();
+
+        expect(scope.cappedDisbursementTransactionAmount(
+            {amount: 250000, remaining: 250000},
+            {amount: 300000, netDisbursalAmount: 290000, trancheNumber: 1}
+        )).toEqual(240000);
+    });
+
+    it("aligns the only open tranche to remaining approved after a disbursed tranche", function () {
+        createController("approve");
+        scope.disbursementDetails = [
+            {id: 1, principal: 100000, actualDisbursementDate: [2026, 9, 1]},
+            {id: 2, principal: 200000}
+        ];
+        scope.formData = scope.formData || {};
+        scope.formData.approvedLoanAmount = 250000;
+
+        scope.alignUndisbursedTranchesToApprovedAmount(250000);
+
+        expect(scope.disbursementDetails[0].principal).toEqual(100000);
+        expect(scope.disbursementDetails[1].principal).toEqual(150000);
+        expect(scope.showTrancheAmountTotal).toEqual(250000);
+    });
 });
