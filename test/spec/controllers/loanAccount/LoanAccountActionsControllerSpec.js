@@ -120,6 +120,10 @@ describe("LoanAccountActionsController", function () {
 
         expect(this.scope.error).toEqual('The bank rejected this disbursement. Please contact support.');
         expect(this.rootScope.errorStatus).toBeNull();
-        expect(this.rootScope.errorDetails).toEqual([]);
+        expect(this.rootScope.errorDetails).toEqual([{
+            field: '',
+            code: '',
+            message: 'The bank rejected this disbursement. Please contact support.'
+        }]);
     });
 });

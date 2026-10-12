@@ -636,7 +636,13 @@
                             scope.submittedDatatables.push(scope.datatables[cnt].registeredTableName);
                             loop.next();
                         },function(){
-                            rootScope.errorDetails[0].push({datatable:scope.datatables[cnt].registeredTableName});
+                            rootScope.errorDetails = rootScope.errorDetails || [];
+                            rootScope.errorDetails.push({
+                                code: 'error.msg.datatable.entry.failed',
+                                datatable: scope.datatables[cnt].registeredTableName,
+                                args: {params: [{value: scope.datatables[cnt].registeredTableName}]},
+                                message: 'Could not save the ' + scope.datatables[cnt].registeredTableName + ' entry.'
+                            });
                             loop.break();
                         });
 

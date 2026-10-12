@@ -13,15 +13,31 @@
                 };
             };
 
+            function presentActionError(message, field, code) {
+                scope.error = message;
+                var payload = [{
+                    field: field || '',
+                    code: code || '',
+                    message: message
+                }];
+                if (rootScope.presentUserErrors) {
+                    rootScope.presentUserErrors(payload, null);
+                } else {
+                    rootScope.errorStatus = null;
+                    rootScope.errorDetails = payload;
+                }
+                if (window.scrollTo) {
+                    window.scrollTo(0, 0);
+                }
+            }
+
             scope.showBankDisbursementFailure = function (response) {
                 var errors = response && response.data && response.data.errors;
                 var backendError = errors && errors.length ? errors[0] : null;
-                rootScope.errorDetails = [];
-                rootScope.errorStatus = null;
-                scope.error = backendError && backendError.defaultUserMessage
+                var message = backendError && backendError.defaultUserMessage
                     ? backendError.defaultUserMessage
                     : 'The disbursement could not be sent to the bank. Please check your connection and try again.';
-                window.scrollTo(0, 0);
+                presentActionError(message, '', backendError && backendError.userMessageGlobalisationCode);
             };
             
             // Pre-fetch loan details to get currency code for South Sudan logic
@@ -550,21 +566,34 @@
                 }
             }
 
+            function eachDisplayedError(details, visitor) {
+                if (!details || !details.length) {
+                    return;
+                }
+                for (var i = 0; i < details.length; i++) {
+                    var entry = details[i];
+                    if (Object.prototype.toString.call(entry) === '[object Array]') {
+                        for (var j = 0; j < entry.length; j++) {
+                            visitor(entry[j]);
+                        }
+                    } else {
+                        visitor(entry);
+                    }
+                }
+            }
+
             function findRecoveryPaymentBackendError() {
                 if (!scope.isRecoveryPaymentAction || !rootScope.errorDetails) {
                     return null;
                 }
 
-                for (var i = 0; i < rootScope.errorDetails.length; i++) {
-                    for (var j = 0; j < rootScope.errorDetails[i].length; j++) {
-                        var error = rootScope.errorDetails[i][j];
-                        if (error && error.field === 'transactionDate' && error.code === recoveryPaymentDateValidationCode) {
-                            return error;
-                        }
+                var match = null;
+                eachDisplayedError(rootScope.errorDetails, function (error) {
+                    if (!match && error && error.field === 'transactionDate' && error.code === recoveryPaymentDateValidationCode) {
+                        match = error;
                     }
-                }
-
-                return null;
+                });
+                return match;
             }
 
             function clearRecoveryPaymentBackendError() {
@@ -572,22 +601,15 @@
                     return;
                 }
 
-                var filteredErrors = [];
-                for (var i = 0; i < rootScope.errorDetails.length; i++) {
-                    var remainingErrors = [];
-                    for (var j = 0; j < rootScope.errorDetails[i].length; j++) {
-                        var error = rootScope.errorDetails[i][j];
-                        if (!(error && error.field === 'transactionDate' && error.code === recoveryPaymentDateValidationCode)) {
-                            remainingErrors.push(error);
-                        }
+                var remainingErrors = [];
+                eachDisplayedError(rootScope.errorDetails, function (error) {
+                    if (!(error && error.field === 'transactionDate' && error.code === recoveryPaymentDateValidationCode)) {
+                        remainingErrors.push(error);
                     }
-                    if (remainingErrors.length > 0) {
-                        filteredErrors.push(remainingErrors);
-                    }
-                }
+                });
 
-                if (filteredErrors.length > 0) {
-                    rootScope.errorDetails = filteredErrors;
+                if (remainingErrors.length > 0) {
+                    rootScope.errorDetails = remainingErrors;
                 } else {
                     delete rootScope.errorDetails;
                 }
@@ -1707,6 +1729,14 @@
             scope.submit = function () {
                 scope.processDate = false;
                 scope.error = null;
+                scope.errorStatus = null;
+                scope.errorDetails = [];
+                if (rootScope.dismissUserErrors) {
+                    rootScope.dismissUserErrors();
+                } else {
+                    rootScope.errorStatus = null;
+                    rootScope.errorDetails = [];
+                }
 
                 if (scope.isFormLoading()) {
                     scope.error = 'The form is still loading. Please wait a moment and try again.';
@@ -1775,26 +1805,26 @@
 
                 // Only validate the note field if it is shown and mandatory
                 if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
-                    scope.error = 'Note field is mandatory';
+                    presentActionError('Note field is mandatory', 'note', 'validation.msg.user.notes.required');
                     return; // Prevent submission if note is invalid
                 }
                 // Skip supplier payment validation for third-party disbursement - details come from partner instruction
                 if (scope.isSupplierNonCashPayment() && !scope.enableThirdPartyDisbursement) {
                     // Phone number is always required for supplier payments
                     if (!scope.formData.clientPhoneNumber) {
-                        scope.error = 'Phone number is mandatory for vendor disbursement';
+                        presentActionError('Phone number is mandatory for vendor disbursement', 'clientPhoneNumber', 'error.msg.loanapproval.phone.required');
                         return;
                     }
                     // Bank details only required for non-mobile-money payments
                     if (!scope.isMobileMoneyPayment()) {
                         if (!scope.formData.clientAccountNumber || !scope.formData.clientBankName) {
-                            scope.error = 'Account number and bank name are mandatory for bank vendor disbursement';
+                            presentActionError('Account number and bank name are mandatory for bank vendor disbursement', 'clientAccountNumber', 'error.msg.loanapproval.bank.vendor.required');
                             return;
                         }
                     }
                     // Beneficiary name is always required
                     if (!scope.formData.beneficiaryName) {
-                        scope.error = 'Beneficiary name is mandatory for vendor disbursement';
+                        presentActionError('Beneficiary name is mandatory for vendor disbursement', 'beneficiaryName', 'error.msg.loanapproval.beneficiary.required');
                         return;
                     }
                 }
@@ -1803,12 +1833,12 @@
                 if (scope.isLoanDisbursementRequestEnabled
                         && scope.isClientBankPayment()
                         && (!scope.formData.clientAccountNumber || !scope.formData.clientBankName)) {
-                    scope.error = 'Client bank details (Account Number, Bank Name) are required for bank disbursement. Enter them under Payment Details or update the client\'s Other Info.';
+                    presentActionError('Client bank details (Account Number, Bank Name) are required for bank disbursement. Enter them under Payment Details or update the client\'s Other Info.', 'clientAccountNumber', 'error.msg.loanapproval.client.bank.required');
                     scope.showPaymentDetails = true;
                     return;
                 }
                 if (scope.shouldShowFxDetails() && !scope.formData.fxRate) {
-                    scope.error = 'FX rate is mandatory for vendor disbursement in SSP';
+                    presentActionError('FX rate is mandatory for vendor disbursement in SSP', 'fxRate', 'validation.msg.loanapproval.fxRate.required');
                     return;
                 }
                 var params = {command: scope.action};
@@ -1820,7 +1850,7 @@
                 if (scope.action === "approve") {
                     scope.addTrancheAmounts();
                     if (!scope.validateApprovalTranchePrincipalTotal()) {
-                        scope.error = 'Total tranche amount must equal the approved loan principal.';
+                        presentActionError('Total tranche amount must equal the approved loan principal.', 'updatedPrincipal', 'error.msg.loan.tranche.total');
                         return;
                     }
                     if (scope.enableThirdPartyDisbursement) {
@@ -2004,7 +2034,7 @@
                         if (scope.loanactionform && scope.loanactionform.updatedPrincipal) {
                             scope.loanactionform.updatedPrincipal.$setTouched();
                         }
-                        scope.error = 'Total tranche amount must equal the approved loan principal.';
+                        presentActionError('Total tranche amount must equal the approved loan principal.', 'updatedPrincipal', 'error.msg.loan.tranche.total');
                         return;
                     }
                     submitData.expectedDisbursementDate = dateFilter(scope.formData.expectedDisbursementDate, scope.df);
@@ -2032,15 +2062,21 @@
                     }, submitData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
                     }, function (response) {
+                        if (rootScope.errorDetails && rootScope.errorDetails.length) {
+                            if (window.scrollTo) {
+                                window.scrollTo(0, 0);
+                            }
+                            return;
+                        }
                         var errors = response && response.data && response.data.errors;
-                        scope.error = errors && errors.length && errors[0].defaultUserMessage
+                        presentActionError(errors && errors.length && errors[0].defaultUserMessage
                             ? errors[0].defaultUserMessage
                             : (response && response.data && response.data.defaultUserMessage)
-                                || 'Unable to update the tranche. Please review the tranche details and try again.';
+                                || 'Unable to update the tranche. Please review the tranche details and try again.');
                     });
                 } else if (scope.action === "adddisbursedetails" || scope.action === "deletedisbursedetails") {
                     if (scope.action === "adddisbursedetails" && !scope.validateTranchePrincipalTotal()) {
-                        scope.error = 'Total tranche amount must equal the approved loan principal.';
+                        presentActionError('Total tranche amount must equal the approved loan principal.', 'updatedPrincipal', 'error.msg.loan.tranche.total');
                         return;
                     }
                     submitData.disbursementData = [];
@@ -2057,11 +2093,17 @@
                     resourceFactory.LoanAddTranchesResource.update({loanId: routeParams.id}, submitData, function (data) {
                         location.path('/viewloanaccount/' + data.loanId);
                     }, function (response) {
+                        if (rootScope.errorDetails && rootScope.errorDetails.length) {
+                            if (window.scrollTo) {
+                                window.scrollTo(0, 0);
+                            }
+                            return;
+                        }
                         var errors = response && response.data && response.data.errors;
-                        scope.error = errors && errors.length && errors[0].defaultUserMessage
+                        presentActionError(errors && errors.length && errors[0].defaultUserMessage
                             ? errors[0].defaultUserMessage
                             : (response && response.data && response.data.defaultUserMessage)
-                                || 'Unable to update the tranche details. Please review the tranches and try again.';
+                                || 'Unable to update the tranche details. Please review the tranches and try again.');
                     });
                 } else if (scope.action == "deleteloancharge") {
                     resourceFactory.LoanAccountResource.delete({
@@ -2319,7 +2361,13 @@
                             loop.next();
 
                         }, function () {
-                            rootScope.errorDetails[0].push({datatable: scope.datatables[cnt].registeredTableName});
+                            rootScope.errorDetails = rootScope.errorDetails || [];
+                            rootScope.errorDetails.push({
+                                code: 'error.msg.datatable.entry.failed',
+                                datatable: scope.datatables[cnt].registeredTableName,
+                                args: {params: [{value: scope.datatables[cnt].registeredTableName}]},
+                                message: 'Could not save the ' + scope.datatables[cnt].registeredTableName + ' entry.'
+                            });
                             loop.break();
                         });
 
@@ -2792,7 +2840,7 @@
             scope.handleReject = function () {
                 // Only validate the note field if it is shown and mandatory
                 if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
-                    scope.error = 'Note field is mandatory';
+                    presentActionError('Note field is mandatory', 'note', 'validation.msg.user.notes.required');
                     return; // Prevent submission if note is invalid
                 }
                 switch (scope.action) {

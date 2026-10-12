@@ -63,7 +63,13 @@
                     })
                     .catch(err => {
                         console.error(err);
-                        alert("Failed to download template. Please check your authentication.");
+                        (scope.$root.presentUserErrors || function (errors) {
+                            scope.$root.errorStatus = null;
+                            scope.$root.errorDetails = errors;
+                        })([{
+                            code: 'error.msg.import.template.download.failed',
+                            message: 'The template could not be downloaded. Check that you are signed in and try again.'
+                        }], null);
                     });
             };
 

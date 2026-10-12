@@ -12,6 +12,7 @@
                     <h3 class="panel-title">{{'label.heading.partnerassignment' | translate}}</h3>
                 </div>
                 <div class="panel-body">
+                    <api-validate></api-validate>
                     <div class="alert alert-info" ng-if="partnerClient">
                         <strong>Current Assignment:</strong> {{partnerClient.partnerCode}}
                         <span ng-if="partnerClient.status"> ({{partnerClient.status}})</span>
