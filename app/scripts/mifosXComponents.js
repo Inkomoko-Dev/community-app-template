@@ -153,6 +153,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'accounting/provisioning/ViewProvisioningEntryController',
             'accounting/provisioning/ViewAllProvisoningEntriesController',
             'accounting/provisioning/ViewProvisioningJournalEntriesController',
+            'accounting/provisioning/ViewProvisionJournalsController',
+            'accounting/provisioning/ViewProvisionJournalController',
             'accounting/AccFreqPostingController',
             'accounting/AccCoaController',
             'accounting/AccCreateGLAccountController',

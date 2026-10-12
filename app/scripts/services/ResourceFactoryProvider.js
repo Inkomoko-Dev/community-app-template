@@ -1043,6 +1043,10 @@
                     provisioningjournals: defineResource(apiVer + "/journalentries/provisioning", {}, {
                         get: { method: 'GET', params: {} }
                     }),
+                    provisioningJournals: defineResource(apiVer + "/provisioningentries/provisionjournals/:journalId", { journalId: '@journalId' }, {
+                        get: { method: 'GET', params: {} },
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
                     provisioningentriesSearch: defineResource(apiVer + "/provisioningentries/entries", {}, {
                         get: { method: 'GET', params: {} }
                     }),

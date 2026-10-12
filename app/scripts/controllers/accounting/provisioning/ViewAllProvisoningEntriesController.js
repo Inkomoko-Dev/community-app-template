@@ -10,6 +10,10 @@
                 location.path('/viewprovisioningjournalentry/' + id);
             };
 
+            scope.viewProvisionJournals = function (id) {
+                location.path('/viewprovisionjournals/' + id);
+            };
+
             scope.recreate = function (id) {
                 resourceFactory.provisioningentries.reCreateProvisioningEntries({entryId: id}, this.formData, function (data) {
                     location.path('/viewprovisioningentry/'+id);

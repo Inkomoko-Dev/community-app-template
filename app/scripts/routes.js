@@ -503,6 +503,15 @@
             .when('/viewprovisioningjournalentry/:entryId',{
                 templateUrl: 'views/accounting/provisioning/ViewProvisioningJournalEntries.html'
             })
+            .when('/viewprovisionjournals',{
+                templateUrl: 'views/accounting/provisioning/ViewProvisionJournals.html'
+            })
+            .when('/viewprovisionjournals/:entryId',{
+                templateUrl: 'views/accounting/provisioning/ViewProvisionJournals.html'
+            })
+            .when('/viewprovisionjournal/:journalId',{
+                templateUrl: 'views/accounting/provisioning/ViewProvisionJournal.html'
+            })
             .when('/viewcode/:id', {
                 templateUrl: 'views/system/viewcode.html'
             })

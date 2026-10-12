@@ -12,6 +12,9 @@
             <a href="#/createprovisioningentries" class="btn btn-primary pull-right"
                has-permission='CREATE_PROVISIONENTRIES'><i class="fa fa-plus "></i>&nbsp;&nbsp;{{'label.button.createprovisioning.entry'
                 | translate}}</a>
+            <a href="#/viewprovisionjournals" class="btn btn-default pull-right" style="margin-right:8px;"
+               has-permission='CREATE_PROVISIONENTRIES'><i class="fa fa-list "></i>&nbsp;&nbsp;{{'label.button.viewprovisionjournals'
+                | translate}}</a>
             <br>
             <hr/>
             <table class="table">
@@ -23,6 +26,7 @@
                     <th>{{'label.heading.viewreport' | translate}}</th>
                     <th>{{'label.heading.recreateprovisioning' | translate}}</th>
                     <th>{{'label.heading.viewjournals' | translate}}</th>
+                    <th>{{'label.heading.viewprovisionjournals' | translate}}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -43,6 +47,11 @@
                     <td>
                         <button class="btn btn-info" id="viewjournals" data-ng-click="viewJournals(entryObject.id)" type="submit" name="viewjournals"
                         ng-disabled="!entryObject.journalEntry"><i class="fa fa-eye"></i>&nbsp;&nbsp;{{'label.button.view' | translate}}</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-info" id="viewprovisionjournals" data-ng-click="viewProvisionJournals(entryObject.id)" type="submit" name="viewprovisionjournals">
+                            <i class="fa fa-eye"></i>&nbsp;&nbsp;{{'label.button.view' | translate}}
+                        </button>
                     </td>
 
                 </tr>
