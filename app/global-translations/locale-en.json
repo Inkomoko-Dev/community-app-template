@@ -6189,6 +6189,8 @@
   "label.heading.excessrefundwizard": "Create Excess Refund",
   "label.heading.excessrefunddetail": "Excess Refund Detail",
   "label.heading.excessrefundbulk": "Bulk Excess Refunds",
+  "label.msg.excessrefund.no.overpayment": "This loan has no unallocated overpayment. Excess Refund only applies while total overpaid is greater than zero. If surplus was moved by Deposit Redraw, use redraw withdrawal instead of Excess Refund.",
+  "label.msg.excessrefund.redraw.balance.hint": "Current redraw balance:",
   "error.msg.no.connection": "No connection. Check your network and try again. If this continues, contact support.",
   "error.msg.session.expired": "Your session has expired. Sign in again.",
   "error.msg.not.authorized.escalation": "You do not have permission to do this. Contact your supervisor if you need access.",

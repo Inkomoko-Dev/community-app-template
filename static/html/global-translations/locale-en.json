@@ -5434,6 +5434,8 @@
   "label.button.bulkexcessrefund": "Bulk Refunds",
   "label.heading.excessrefundwizard": "Create Excess Refund",
   "label.heading.excessrefunddetail": "Excess Refund Detail",
-  "label.heading.excessrefundbulk": "Bulk Excess Refunds"
+  "label.heading.excessrefundbulk": "Bulk Excess Refunds",
+  "label.msg.excessrefund.no.overpayment": "This loan has no unallocated overpayment. Excess Refund only applies while total overpaid is greater than zero. If surplus was moved by Deposit Redraw, use redraw withdrawal instead of Excess Refund.",
+  "label.msg.excessrefund.redraw.balance.hint": "Current redraw balance:"
 
 }

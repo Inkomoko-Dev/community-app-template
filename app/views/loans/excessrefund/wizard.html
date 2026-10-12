@@ -15,7 +15,14 @@
             <div ng-if="step === 2 && template">
                 <p>Account: <strong>{{template.accountNo}}</strong></p>
                 <p>Total overpaid: <strong>{{template.totalOverpaid}} {{template.currencyCode}}</strong></p>
-                <button class="btn btn-primary" ng-click="next()">Continue</button>
+                <div class="alert alert-warning" ng-if="!template.totalOverpaid || template.totalOverpaid == 0">
+                    <p>{{'label.msg.excessrefund.no.overpayment' | translate}}</p>
+                    <p ng-if="template.redrawBalance > 0">
+                        {{'label.msg.excessrefund.redraw.balance.hint' | translate}}
+                        <strong>{{template.redrawBalance}} {{template.currencyCode}}</strong>
+                    </p>
+                </div>
+                <button class="btn btn-primary" ng-click="next()" ng-disabled="!template.totalOverpaid || template.totalOverpaid == 0">Continue</button>
             </div>
             <div ng-if="step === 3">
                 <label>Channel</label>
