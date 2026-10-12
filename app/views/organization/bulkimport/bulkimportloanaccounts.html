@@ -91,7 +91,7 @@
                     <td>{{import.totalRecords}}</td>
                     <td>{{import.successCount}}</td>
                     <td>{{import.failureCount}}</td>
-                    <td ng-show='import.completed'><a target="_blank" href="{{hostUrl}}{{import.docUrl}}" has-permission='READ_DOCUMENT'><i
+                    <td ng-show='import.completed'><a href="" ng-click="downloadBulkImportOutput(import); $event.preventDefault()" has-permission='READ_DOCUMENT'><i
                             class="fa fa-cloud-download"></i></a></td>
 
                 </tr>
