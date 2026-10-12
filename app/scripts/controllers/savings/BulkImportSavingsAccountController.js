@@ -74,6 +74,7 @@
                     data: {file: scope.formData.file,locale:scope.optlang.code,dateFormat:scope.df},
                 }).then(function (data) {
                     // to fix IE not refreshing the model
+                    scope.refreshImportTable();
                     if (!scope.$$phase) {
                         scope.$apply();
                     }

@@ -14,7 +14,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'SessionManager',
             'Paginator',
             'UIConfigService',
-            'BulkReschedulePreviewHelper'
+            'BulkReschedulePreviewHelper',
+            'BulkImportHelper'
         ],
 
         controllers: [
