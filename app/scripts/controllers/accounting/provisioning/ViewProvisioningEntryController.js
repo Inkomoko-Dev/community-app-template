@@ -6,6 +6,7 @@
             scope.totalReservedAmount;
             scope.formData = {};
             scope.transactions = [];
+            scope.entryId = routeParams.entryId;
 
             scope.formatClassificationType = function (classificationType) {
                 if (classificationType === 'WRITTEN_OFF_PORTFOLIO') {

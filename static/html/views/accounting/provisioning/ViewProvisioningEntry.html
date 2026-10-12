@@ -12,6 +12,10 @@
             <form name="createprovisioningcriteriaform" novalidate="" class="form-horizontal" rc-submit="submit()">
                 <api-validate></api-validate>
                 <fieldset>
+                    <a class="btn btn-info pull-right" has-permission='CREATE_PROVISIONENTRIES'
+                       href="#/viewprovisionjournals/{{entryId}}">
+                        <i class="fa fa-list"></i>&nbsp;&nbsp;{{'label.button.viewprovisionjournals' | translate}}
+                    </a>
                     <h3 class="bolder">{{'label.heading.createdby' | translate}} {{':  '}} {{createdby}} &nbsp;&nbsp;&nbsp;&nbsp;
                         {{'label.heading.createdon' | translate}} {{':  '}} {{createdDate | DateFormat}}&nbsp;&nbsp;&nbsp;&nbsp;
                         {{'label.heading.amounttobereserved' | translate}} {{':  '}} {{totalReservedAmount | number}}
