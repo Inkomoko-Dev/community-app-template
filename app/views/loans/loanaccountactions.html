@@ -18,7 +18,7 @@
         <fieldset>
             <div class="alert alert-info" ng-show="isDisbursementReviewAction() && currentTrancheNumber">
                 <strong>Tranche {{currentTrancheNumber}}</strong>
-                <span> &mdash; Principal: {{currentTranchePrincipal | number}}</span>
+                <span> &mdash; {{ 'label.heading.approvedamount' | translate }}: {{currentTranchePrincipal | number}}</span>
                 <span> &mdash; Remaining undisbursed amount: {{remainingUndisbursedAmount | number}} {{loanCurrencyCode}}</span>
             </div>
             <div ng-show="submittedDatatables.length > 0" uib-alert type="success">
@@ -177,7 +177,7 @@
             </div>
             <div ng-show="disbursementDetails">
             <div class="form-group" ng-show="showAmountField && !(action === 'approve' && approveTranches)">
-                    <label class="control-label col-sm-2" for="transactionAmount">{{ 'label.input.transactionamount' |
+                    <label class="control-label col-sm-2" for="transactionAmount">{{ (isDisbursementReviewAction() ? 'label.heading.approvedamount' : 'label.input.transactionamount') |
                         translate}}<span class="required">*</span></label>
 
                     <div class="col-sm-3">
