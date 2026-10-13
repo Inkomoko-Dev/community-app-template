@@ -78,7 +78,7 @@
                  }
 
              };
-            scope.refreshImportTable=function () {
+            scope.refreshImportTable=function (onLoaded) {
                 resourceFactory.importResource.getImports({entityType: "client"}, function (data) {
 
                     for (var l in data) {
@@ -87,6 +87,9 @@
                         data[l].docUrl = importdocs;
                     }
                     scope.imports = data;
+                    if (onLoaded) {
+                        onLoaded();
+                    }
                 });
             };
          
@@ -95,12 +98,17 @@
                      url: $rootScope.hostUrl + API_VERSION + '/clients/uploadtemplate?legalFormType='+scope.formData.entityType+'',
                      data: {file: scope.formData.file,locale:scope.optlang.code,dateFormat:scope.df},
                  }).then(function (data) {
-                         // to fix IE not refreshing the model
-                         scope.refreshImportTable();
-                         if (!scope.$$phase) {
-                             scope.$apply();
-                         }
-                     });
+                     // to fix IE not refreshing the model
+                     $rootScope.finishBulkImportUpload(scope, data);
+                     if (!scope.$$phase) {
+                         scope.$apply();
+                     }
+                 }, function (error) {
+                     $rootScope.failBulkImportUpload(scope, error);
+                     if (!scope.$$phase) {
+                         scope.$apply();
+                     }
+                 });
              };
         }
     });

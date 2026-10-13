@@ -433,6 +433,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'FormValidateDirective',
             'FormSubmitValidateDirective',
             'ApiValidationDirective',
+            'BulkImportResultsDirective',
             'HasPermissionDirective',
             'ActivitiesDisplayPanelDirective',
             'ScrollbarTopDirective',
