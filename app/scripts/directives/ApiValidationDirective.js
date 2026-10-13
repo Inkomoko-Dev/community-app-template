@@ -5,8 +5,8 @@
                 restrict: 'E',
                 scope: {},
                 link: function (scope, element) {
-                    var template = '<div class="alert alert-danger" role="alert" aria-live="assertive" ng-show="visible">' +
-                        '<button type="button" class="close" ng-click="dismiss()" aria-label="{{dismissLabel}}">' +
+                    var template = '<div class="alert alert-danger api-error-banner" role="alert" aria-live="assertive" ng-if="visible">' +
+                        '<button type="button" class="close" ng-click="dismiss($event)" aria-label="{{dismissLabel}}">' +
                         '<span aria-hidden="true">&times;</span></button>' +
                         '<div ng-if="statusMessage"><i class="fa fa-exclamation-circle"></i> {{statusMessage}}</div>' +
                         '<div ng-repeat="error in apiErrors track by $index">' +
@@ -44,14 +44,20 @@
                     }
 
                     function ensureInlineStyle() {
-                        if (typeof document === 'undefined' || document.getElementById('api-validation-error-style')) {
+                        if (typeof document === 'undefined') {
                             return;
                         }
-                        var style = document.createElement('style');
-                        style.id = 'api-validation-error-style';
-                        style.textContent = '.api-validation-error{border-color:#a94442 !important;}' +
+                        var style = document.getElementById('api-validation-error-style');
+                        if (!style) {
+                            style = document.createElement('style');
+                            style.id = 'api-validation-error-style';
+                            document.head.appendChild(style);
+                        }
+                        style.textContent = 'api-validate{display:block;}' +
+                            '.api-error-banner{position:relative;overflow:hidden;padding-right:36px;}' +
+                            '.api-error-banner>.close{float:none;position:absolute;top:8px;right:12px;}' +
+                            '.api-validation-error{border-color:#a94442 !important;}' +
                             '.api-field-error{color:#a94442;display:block;margin-top:4px;}';
-                        document.head.appendChild(style);
                     }
 
                     function renderInline(errors) {
@@ -110,23 +116,46 @@
                         renderInline(scope.apiErrors);
                     }
 
-                    scope.dismiss = function () {
-                        if (scope.$parent) {
-                            if (scope.$parent.errorDetails) {
-                                scope.$parent.errorDetails = [];
+                    function clearOwnedErrors(start) {
+                        var cursor = start;
+                        while (cursor) {
+                            if (Object.prototype.hasOwnProperty.call(cursor, 'errorDetails')) {
+                                cursor.errorDetails = [];
                             }
-                            if (scope.$parent.errorStatus) {
-                                scope.$parent.errorStatus = null;
+                            if (Object.prototype.hasOwnProperty.call(cursor, 'errorStatus')) {
+                                cursor.errorStatus = null;
                             }
+                            cursor = cursor.$parent;
                         }
+                    }
+
+                    function hideBanner() {
+                        scope.apiErrors = [];
+                        scope.statusMessage = null;
+                        scope.visible = false;
+                        renderInline([]);
+                    }
+
+                    scope.dismiss = function ($event) {
+                        if ($event && $event.preventDefault) {
+                            $event.preventDefault();
+                            $event.stopPropagation();
+                        }
+                        clearOwnedErrors(scope.$parent);
                         if ($rootScope.dismissUserErrors) {
                             $rootScope.dismissUserErrors();
                         } else {
                             $rootScope.errorStatus = null;
                             $rootScope.errorDetails = [];
+                            $rootScope._apiInlineSignature = '';
                         }
-                        refresh();
+                        $rootScope.$broadcast('cbs-dismiss-user-errors');
                     };
+
+                    scope.$on('cbs-dismiss-user-errors', function () {
+                        clearOwnedErrors(scope.$parent);
+                        hideBanner();
+                    });
 
                     scope.$watch(function () {
                         return JSON.stringify({
@@ -135,6 +164,8 @@
                         });
                     }, refresh);
 
+                    element.css('display', 'block');
+                    ensureInlineStyle();
                     element.html('').append($compile(template)(scope));
                     refresh();
                 }

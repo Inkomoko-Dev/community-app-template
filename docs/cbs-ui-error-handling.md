@@ -24,7 +24,7 @@ The UI never shows `developerMessage`, raw parameter values, or the response bod
 
 ## How long it stays
 
-The banner stays until the user dismisses it, leaves the screen, or refreshes. A later request for a different action, including a successful one, does not clear it. Inside a dialog, it stays until dismiss, dialog close, or refresh. Submitting the same action again clears the previous banner before the new result is shown.
+The banner stays until the user dismisses it, leaves the screen, or refreshes. Dismiss removes the message and the close button from every banner on the screen. A later request for a different action, including a successful one, does not clear it. Inside a dialog, it stays until dismiss, dialog close, or refresh. Submitting the same action again clears the previous banner before the new result is shown.
 
 ## When the server message is missing
 
