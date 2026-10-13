@@ -6141,6 +6141,13 @@
   "label.button.bulkexcessrefund": "Bulk Refunds",
   "label.heading.excessrefundwizard": "Create Excess Refund",
   "label.heading.excessrefunddetail": "Excess Refund Detail",
-  "label.heading.excessrefundbulk": "Bulk Excess Refunds"
+  "label.heading.excessrefundbulk": "Bulk Excess Refunds",
+  "label.button.downloadresults": "Download results",
+  "label.button.showfailurereasons": "Show reasons",
+  "label.msg.bulkimport.failurereasonsinfile": "{{count}} row(s) failed. The reason for each failed row is in the result file Status column.",
+  "label.msg.bulkimport.statuscolumn": "Failed row reasons from the result file Status column:",
+  "label.msg.bulkimport.loadingfailurereasons": "Reading failure reasons from the result file...",
+  "label.msg.bulkimport.morefailurereasons": "Showing {{shown}} of {{total}} failed rows. Download the result file for the rest.",
+  "label.msg.bulkimport.failurerowlabel": "Row {{row}}:"
 
 }

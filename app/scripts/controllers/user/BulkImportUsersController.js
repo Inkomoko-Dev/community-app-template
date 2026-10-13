@@ -92,7 +92,7 @@
                     });
             };
 
-            scope.refreshImportTable=function () {
+            scope.refreshImportTable=function (onLoaded) {
                 resourceFactory.importResource.getImports({entityType: "users"}, function (data) {
 
                     for (var l in data) {
@@ -101,6 +101,9 @@
                         data[l].docUrl = importdocs;
                     }
                     scope.imports = data;
+                    if (onLoaded) {
+                        onLoaded();
+                    }
                 });
             };
 
@@ -111,7 +114,12 @@
                     data: {file: scope.formData.file,locale:scope.optlang.code,dateFormat:scope.df},
                 }).then(function (data) {
                     // to fix IE not refreshing the model
-                    scope.refreshImportTable();
+                    $rootScope.finishBulkImportUpload(scope, data);
+                    if (!scope.$$phase) {
+                        scope.$apply();
+                    }
+                }, function (error) {
+                    $rootScope.failBulkImportUpload(scope, error);
                     if (!scope.$$phase) {
                         scope.$apply();
                     }
