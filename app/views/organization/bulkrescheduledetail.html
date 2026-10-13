@@ -174,7 +174,7 @@
         </div>
     </div>
 
-    <div class="panel panel-warning" ng-if="canApprove && isPendingApproval()">
+    <div class="panel panel-warning" ng-if="canApprove && isPendingApproval() && isAssignedApprover()">
         <div class="panel-heading"><strong>{{'label.bulkreschedule.approvalactions' | translate}}</strong></div>
         <div class="panel-body">
             <p>{{'label.bulkreschedule.approve.help' | translate}}</p>

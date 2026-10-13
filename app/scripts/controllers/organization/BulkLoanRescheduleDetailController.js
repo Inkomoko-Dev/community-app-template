@@ -128,6 +128,13 @@
                 var status = scope.request && scope.request.status;
                 return String(status || '').toUpperCase() === 'PENDING_APPROVAL';
             };
+            scope.currentUserId = function () {
+                return scope.currentSession && scope.currentSession.user && scope.currentSession.user.userId;
+            };
+            scope.isAssignedApprover = function () {
+                var currentUserId = scope.currentUserId();
+                return currentUserId && scope.request && Number(scope.request.approverId) === Number(currentUserId);
+            };
             scope.isExecutionActive = function () {
                 var status = String(scope.request && scope.request.status || '').toUpperCase();
                 return status === 'APPROVED' || status === 'EXECUTING' || status === 'ROLLING_BACK' || status === 'PREVIEWING';
@@ -248,7 +255,7 @@
                 return Math.min(scope.previewQuery.page * scope.previewQuery.pageSize, scope.previewQuery.total);
             };
             scope.approve = function () {
-                if (!scope.canApprove || !scope.isPendingApproval() || scope.state.approving) { return; }
+                if (!scope.canApprove || !scope.isAssignedApprover() || !scope.isPendingApproval() || scope.state.approving) { return; }
                 if (!scope.decision.reason || !scope.decision.reason.trim()) {
                     scope.errorStatus = $translate.instant('label.bulkreschedule.error.approvalreason');
                     return;
@@ -263,7 +270,7 @@
                 );
             };
             scope.reject = function () {
-                if (!scope.canApprove || !scope.isPendingApproval() || scope.state.rejecting) { return; }
+                if (!scope.canApprove || !scope.isAssignedApprover() || !scope.isPendingApproval() || scope.state.rejecting) { return; }
                 if (!scope.decision.reason || !scope.decision.reason.trim()) {
                     scope.errorStatus = $translate.instant('label.bulkreschedule.error.rejectionreason');
                     return;
