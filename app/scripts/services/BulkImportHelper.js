@@ -4,7 +4,7 @@
         }
     });
     mifosX.ng.services.service('BulkImportHelper', [mifosX.services.BulkImportHelper]).run(
-        ['$rootScope', 'webStorage', 'localStorageService', '$http', '$timeout', '$filter', function ($rootScope, webStorage, localStorageService, $http, $timeout, $filter) {
+        ['$rootScope', '$http', '$timeout', '$filter', function ($rootScope, $http, $timeout, $filter) {
             var FAILURE_MESSAGE_LIMIT = 20;
             var FAILURE_BANNER_LIMIT = 8;
 
@@ -25,14 +25,32 @@
                 return null;
             }
 
-            function authHeaders() {
-                var sessionData = webStorage.get('sessionData');
-                var headers = { "Authorization": "Basic " + sessionData.authenticationKey };
-                var userData = localStorageService.getFromLocalStorage('userData');
-                if (userData && userData.isTwoFactorAuthenticationRequired && userData.authenticated) {
-                    headers["Fineract-Platform-TFA-Token"] = $http.defaults.headers.common['Fineract-Platform-TFA-Token'];
+            function outputFileName(importDocument) {
+                var name = importDocument && importDocument.name ? String(importDocument.name) : "import-output.xls";
+                if (!/\.xls$/i.test(name)) {
+                    name += ".xls";
                 }
-                return headers;
+                return name;
+            }
+
+            function getOutputFile(importDocument) {
+                return $http.get($rootScope.hostUrl + importDocument.docUrl, {
+                    responseType: "arraybuffer"
+                });
+            }
+
+            function saveOutputFile(data, fileName) {
+                var blob = new Blob([data], {type: "application/vnd.ms-excel"});
+                var blobUrl = window.URL.createObjectURL(blob);
+                var link = document.createElement("a");
+                link.href = blobUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                $timeout(function () {
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 1000);
             }
 
             function errorArgs(temp) {
@@ -80,6 +98,18 @@
                     errorObj.userMessage = fillPlaceholders(temp.defaultUserMessage, args);
                 }
                 return errorObj;
+            }
+
+            function showProcessingFailure(scope, message) {
+                var errorArray = [];
+                angular.forEach(String(message).split('\n'), function (line) {
+                    var text = line.replace(/^\s+|\s+$/g, '');
+                    if (text) {
+                        errorArray.push({userMessage: text, code: text, args: {params: []}});
+                    }
+                });
+                scope.errorStatus = null;
+                scope.errorDetails = [errorArray];
             }
 
             function clearBulkImportErrors(scope) {
@@ -181,15 +211,8 @@
                     return;
                 }
                 importDocument.failureMessagesLoading = true;
-                fetch($rootScope.hostUrl + importDocument.docUrl, {
-                    method: 'GET',
-                    headers: authHeaders()
-                }).then(function (response) {
-                    if (!response.ok) {
-                        throw new Error("Import output download failed");
-                    }
-                    return response.arrayBuffer();
-                }).then(function (buffer) {
+                getOutputFile(importDocument).then(function (response) {
+                    var buffer = response.data;
                     var parsed = readXlsStatusFailures(buffer);
                     $timeout(function () {
                         importDocument.failureMessagesLoading = false;
@@ -219,6 +242,12 @@
                 clearBulkImportErrors(scope);
                 var importId = uploadedImportId(response);
                 var attempts = 0;
+                var previousMaxId = 0;
+                angular.forEach(scope.imports, function (item) {
+                    if (item && Number(item.importId) > previousMaxId) {
+                        previousMaxId = Number(item.importId);
+                    }
+                });
                 if (scope.bulkImportPoll) {
                     $timeout.cancel(scope.bulkImportPoll);
                 }
@@ -230,25 +259,34 @@
                         }
                     });
                 }
+                function uploadedRow(items) {
+                    var match = null;
+                    angular.forEach(items, function (item) {
+                        if (!item || item.importId == null) {
+                            return;
+                        }
+                        var itemId = Number(item.importId);
+                        if (importId != null && itemId === Number(importId)) {
+                            match = item;
+                        } else if (importId == null && itemId > previousMaxId && (!match || itemId > Number(match.importId))) {
+                            match = item;
+                        }
+                    });
+                    return match;
+                }
                 function poll() {
                     scope.refreshImportTable(function () {
-                        var row = null;
-                        angular.forEach(scope.imports, function (item) {
-                            if (importId != null && item.importId == importId) {
-                                row = item;
-                            }
-                        });
-                        if (row && row.completed) {
-                            if (row.failureCount > 0) {
-                                $rootScope.loadBulkImportFailureReasons(scope, row, true);
-                            }
+                        var row = uploadedRow(scope.imports);
+                        var finished = row && (row.completed === true || row.completed === 'true');
+                        var failed = row && !finished && row.failureMessage;
+                        if (!finished && !failed && attempts < 90) {
+                            attempts++;
+                            scope.bulkImportPoll = $timeout(poll, 1000);
                             return;
                         }
-                        if (attempts >= 90) {
-                            return;
+                        if (failed) {
+                            showProcessingFailure(scope, row.failureMessage);
                         }
-                        attempts++;
-                        scope.bulkImportPoll = $timeout(poll, 1000);
                     });
                 }
                 poll();
@@ -258,21 +296,8 @@
                 if (!importDocument || !importDocument.docUrl) {
                     return;
                 }
-                fetch($rootScope.hostUrl + importDocument.docUrl, {
-                    method: 'GET',
-                    headers: authHeaders()
-                }).then(function (response) {
-                    if (!response.ok) {
-                        throw new Error("Import output download failed");
-                    }
-                    return response.blob();
-                }).then(function (blob) {
-                    var blobUrl = window.URL.createObjectURL(blob);
-                    var link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = importDocument.name || "import-output.xls";
-                    link.click();
-                    window.URL.revokeObjectURL(blobUrl);
+                getOutputFile(importDocument).then(function (response) {
+                    saveOutputFile(response.data, outputFileName(importDocument));
                 }).catch(function (err) {
                     console.error(err);
                     alert("Failed to download import output. Please check your authentication.");
