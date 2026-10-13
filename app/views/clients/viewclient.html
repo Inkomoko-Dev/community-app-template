@@ -308,7 +308,7 @@
 											<a href="#/clients/survey/{{client.id}}">{{'label.survey' | translate}}</a>
 										</li>
 										<li class="{{button.icon}}">
-											<a href="#/selfservice/createuser/{{client.id}}">{{'label.createselfserviceuser' | translate}}</a>
+											<a href="#/selfservice/createuser/{{client.id}}" has-permission='CREATE_USER'>{{'label.createselfserviceuser' | translate}}</a>
 										</li>
 										<li data-ng-show="client.status.value=='Active' && client.legalForm.id==1 && isClientOtherInfoEnabled">
 											<a href="#/clientOtherInfo/{{client.id}}" has-permission='READ_CLIENTOTHERINFO'>{{'label.button.clientOtherInfo' | translate}}</a>

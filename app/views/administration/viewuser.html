@@ -139,7 +139,7 @@
                         <th>{{'label.heading.action' | translate}}</th>
                         <th>{{'label.heading.madeby' | translate}}</th>
                         <th>{{'label.heading.madedate' | translate}}</th>
-                        <th>{{'label.heading.notes' | translate}}</th>
+                        <th has-permission='UPDATE_USER'>{{'label.heading.notes' | translate}}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -147,7 +147,7 @@
                         <td>{{audit.actionName}}</td>
                         <td>{{audit.maker}}</td>
                         <td>{{audit.madeOnDate | date:'d MMM y h:mm:ss'}}</td>
-                        <td>{{audit.notes}}</td>
+                        <td has-permission='UPDATE_USER'>{{audit.notes}}</td>
                     </tr>
                     </tbody>
                 </table>

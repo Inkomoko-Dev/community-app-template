@@ -1,6 +1,10 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        CreateSelfServiceUserController: function (scope, resourceFactory, routeParams,$uibModal) {
+        CreateSelfServiceUserController: function (scope, resourceFactory, routeParams,$uibModal, location) {
+            if (!scope.hasPermission('CREATE_USER')) {
+                location.path('/viewclient/' + routeParams.clientId);
+                return;
+            }
             // TODO: Add Account Is Active Logic through email validation
             scope.accountActive = false;    
             scope.available = [];
@@ -51,7 +55,7 @@
 
         }
     });
-    mifosX.ng.application.controller('CreateSelfServiceUserController', ['$scope', 'ResourceFactory', '$routeParams','$uibModal', mifosX.controllers.CreateSelfServiceUserController]).run(function ($log) {
+    mifosX.ng.application.controller('CreateSelfServiceUserController', ['$scope', 'ResourceFactory', '$routeParams','$uibModal', '$location', mifosX.controllers.CreateSelfServiceUserController]).run(function ($log) {
         $log.info("CreateSelfServiceUserController initialized");
     });
 }(mifosX.controllers || {}));

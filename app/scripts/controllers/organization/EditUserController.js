@@ -1,6 +1,10 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         EditUserController: function (scope, routeParams, resourceFactory, location) {
+            if (!scope.hasPermission('UPDATE_USER')) {
+                location.path('/viewuser/' + routeParams.id);
+                return;
+            }
 
             scope.formData = {};
             scope.offices = [];

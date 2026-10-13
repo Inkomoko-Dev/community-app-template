@@ -1,6 +1,10 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         CreateUserController: function (scope, resourceFactory, location) {
+            if (!scope.hasPermission('CREATE_USER')) {
+                location.path('/users/');
+                return;
+            }
             scope.offices = [];
             scope.available = [];
             scope.selected = [];
