@@ -12,7 +12,8 @@
                             '<label ng-hide="errorStatus">' +
                                 '<i class="fa fa-exclamation-circle"></i>&nbsp;' +
                                 '<span ng-show="error.field">{{error.field | translate}}: </span>' +
-                                '{{error.code | translate:error.args}}' +
+                                '<span ng-if="error.userMessage">{{error.userMessage}}</span>' +
+                                '<span ng-if="!error.userMessage">{{error.code | translate:error.args}}</span>' +
                                 '<span ng-show="error.datatable"> - {{error.datatable}}</span>' +
                             '</label>' +
                         '</div></div></div>';
