@@ -10,7 +10,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'SessionManager.js',
             'Paginator.js',
             'UIConfigService.js',
-            'BulkReschedulePreviewHelper.js'
+            'BulkReschedulePreviewHelper.js',
+            'BulkImportHelper.js'
         ],
         controllers: [
             'controllers.js'
