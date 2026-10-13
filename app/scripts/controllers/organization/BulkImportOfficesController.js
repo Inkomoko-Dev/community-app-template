@@ -12,7 +12,7 @@
              };
 
              scope.refreshImportTable=function (onLoaded) {
-                resourceFactory.importResource.getImports({entityType: "offices"}, function (data) {
+                resourceFactory.importResource.getImports({_: new Date().getTime(), entityType: "offices"}, function (data) {
 
                     for (var l in data) {
                         var importdocs = {};
@@ -34,14 +34,8 @@
                  }).then(function (data) {
                      // to fix IE not refreshing the model
                      $rootScope.finishBulkImportUpload(scope, data);
-                     if (!scope.$$phase) {
-                         scope.$apply();
-                     }
                  }, function (error) {
                      $rootScope.failBulkImportUpload(scope, error);
-                     if (!scope.$$phase) {
-                         scope.$apply();
-                     }
                  });
              };
         }
