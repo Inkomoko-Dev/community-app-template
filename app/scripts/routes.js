@@ -623,6 +623,15 @@
             .when('/editPaymentType/:id', {
                 templateUrl: 'views/organization/editpaymenttype.html'
             })
+            .when('/externalorganizationmappings', {
+                templateUrl: 'views/organization/externalorganizationmappings.html'
+            })
+            .when('/createexternalorganizationmapping', {
+                templateUrl: 'views/organization/createexternalorganizationmapping.html'
+            })
+            .when('/editexternalorganizationmapping/:id', {
+                templateUrl: 'views/organization/editexternalorganizationmapping.html'
+            })
             .when('/reports/:type', {
                 templateUrl: 'views/reports/view_reports.html'
             })

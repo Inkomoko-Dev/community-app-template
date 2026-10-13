@@ -1047,6 +1047,14 @@
                         get: { method: 'GET', params: {} },
                         getAll: { method: 'GET', params: {}, isArray: true }
                     }),
+                    externalOrganizationMappingResource: defineResource(apiVer + "/externalorganizationmappings/:mappingId", { mappingId: '@mappingId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        get: { method: 'GET', params: {} },
+                        update: { method: 'PUT', params: {} }
+                    }),
+                    externalOrganizationMappingImportResource: defineResource(apiVer + "/externalorganizationmappings/import", {}, {
+                        post: { method: 'POST' }
+                    }),
                     provisioningentriesSearch: defineResource(apiVer + "/provisioningentries/entries", {}, {
                         get: { method: 'GET', params: {} }
                     }),

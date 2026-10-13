@@ -1,0 +1,96 @@
+<div class="content-container" ng-controller="ExternalOrganizationMappingController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.externalorganizationmapping' | translate}}</li>
+    </ul>
+    <script type="text/ng-template" id="deleteExternalOrganizationMapping.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.heading.delete' | translate}}</h3>
+        </div>
+        <div class="modal-body">
+            <br>
+            <button class="btn btn-default" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
+            <button class="btn btn-primary" ng-click="delete()">{{'label.button.confirm' | translate}}</button>
+        </div>
+    </script>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <div class="row">
+                    <div class="col-md-5">
+                        <input ng-autofocus="true" ng-model="filterText" type="text" class="form-control"
+                               placeholder="{{'label.input.filtermappings' | translate}}">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="pull-right">
+                            <input id="mappingCsvFile" type="file" accept=".csv,text/csv" class="hidden"
+                                   ngf-select="onCsvSelected($files)">
+                            <a class="btn btn-default" ng-click="exportCsv()">
+                                <i class="fa fa-download"></i>&nbsp;{{'label.button.exportcsv' | translate}}</a>
+                            <a class="btn btn-default" has-permission='CREATE_EXTERNALORGANIZATIONMAPPING'
+                               ng-click="triggerImport()">
+                                <i class="fa fa-upload"></i>&nbsp;{{'label.button.importcsv' | translate}}</a>
+                            <a href="#/createexternalorganizationmapping" class="btn btn-primary"
+                               has-permission='CREATE_EXTERNALORGANIZATIONMAPPING'>
+                                <i class="fa fa-plus"></i>&nbsp;{{'label.button.addmapping' | translate}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-muted">{{'label.view.externalorganizationmappinghelp' | translate}}</p>
+            <div class="alert alert-info" ng-if="importing">{{'label.heading.importingmappings' | translate}}</div>
+            <div class="alert alert-success" ng-if="importResult && !(importResult.errors && importResult.errors.length)">
+                {{'label.heading.importresult' | translate}}:
+                {{importResult.created}} {{'label.heading.created' | translate}},
+                {{importResult.updated}} {{'label.heading.updated' | translate}},
+                {{importResult.skipped}} {{'label.heading.skipped' | translate}}
+            </div>
+            <div class="alert alert-warning" ng-if="importResult && importResult.errors && importResult.errors.length">
+                {{'label.heading.importresult' | translate}}:
+                {{importResult.created}} {{'label.heading.created' | translate}},
+                {{importResult.updated}} {{'label.heading.updated' | translate}},
+                {{importResult.skipped}} {{'label.heading.skipped' | translate}}
+                <ul>
+                    <li ng-repeat="error in importResult.errors">{{error}}</li>
+                </ul>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.office' | translate}}</th>
+                        <th>{{'label.heading.externalsystem' | translate}}</th>
+                        <th>{{'label.heading.externalid' | translate}}</th>
+                        <th>{{'label.heading.externalname' | translate}}</th>
+                        <th>{{'label.heading.currency' | translate}}</th>
+                        <th>{{'label.heading.status' | translate}}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="mapping in mappings | filter:filterText">
+                        <td>{{mapping.officeName}}</td>
+                        <td>{{mapping.externalSystem}}</td>
+                        <td>{{mapping.externalId}}</td>
+                        <td>{{mapping.externalName}}</td>
+                        <td>{{mapping.currencyCode}}</td>
+                        <td>
+                            <span class="label label-success" ng-if="mapping.active">{{'label.heading.active' | translate}}</span>
+                            <span class="label label-default" ng-if="!mapping.active">{{'label.heading.inactive' | translate}}</span>
+                        </td>
+                        <td class="text-right">
+                            <a class="btn btn-primary btn-sm" has-permission='UPDATE_EXTERNALORGANIZATIONMAPPING'
+                               ng-click="showEdit(mapping.id)"><i class="fa fa-edit"></i></a>
+                            <a class="btn btn-danger btn-sm" has-permission='DELETE_EXTERNALORGANIZATIONMAPPING'
+                               ng-click="deleteMapping(mapping.id)"><i class="fa fa-times"></i></a>
+                        </td>
+                    </tr>
+                    <tr ng-if="!mappings.length">
+                        <td colspan="7">{{'label.nodata' | translate}}. {{'label.view.exportthenimport' | translate}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
