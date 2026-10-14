@@ -1392,7 +1392,13 @@
                     location.path('/creditreport/thitsaworkCreditbureau/'+scope.creditbureau);
                 }
                else{
-                   alert("Please Select Respective integrated Credit Bureau");
+                    (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        code: 'error.msg.creditbureau.select',
+                        message: 'Select an integrated credit bureau.'
+                    }], null);
                }
             };
 
@@ -1423,7 +1429,13 @@
                 if (creditBureauId == 1) { //id 1 is assigned for ThitsaWorks CreditBureau
                     location.path('/creditreport/thitsaworkDownloadCreditbureau/' + routeParams.id +'/'+ scope.creditbureau);
                 }else{
-                    alert("Please Select Respective integrated Credit Bureau");
+                     (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        code: 'error.msg.creditbureau.select',
+                        message: 'Select an integrated credit bureau.'
+                    }], null);
                 }
             };
 
@@ -1439,7 +1451,13 @@
                     location.path('/creditreport/thitsaworkCreditbureau/'+scope.creditbureau);
                 }
                else{
-                   alert("Please Select Respective integrated Credit Bureau");
+                    (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        code: 'error.msg.creditbureau.select',
+                        message: 'Select an integrated credit bureau.'
+                    }], null);
                }
             };
 
@@ -1470,7 +1488,13 @@
                 if (creditBureauId == 1) { //id 1 is assigned for ThitsaWorks CreditBureau
                     location.path('/creditreport/thitsaworkDownloadCreditbureau/' + routeParams.id +'/'+ scope.creditbureau);
                 }else{
-                    alert("Please Select Respective integrated Credit Bureau");
+                     (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        code: 'error.msg.creditbureau.select',
+                        message: 'Select an integrated credit bureau.'
+                    }], null);
                 }
             };
 

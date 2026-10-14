@@ -8,6 +8,16 @@
             scope.searchText = '';
             scope.pageSize = 10;
 
+            function showCrbError(message) {
+                if (scope.$root.errorStatus || (scope.$root.errorDetails && scope.$root.errorDetails.length)) {
+                    return;
+                }
+                (scope.$root.presentUserErrors || function (errors) {
+                    scope.$root.errorStatus = null;
+                    scope.$root.errorDetails = errors;
+                })([{message: message}], null);
+            }
+
             /**
              * Fetch all CRB posting logs
              */
@@ -16,7 +26,7 @@
                     scope.postingLogs = data || [];
                     scope.applyFilters();
                 }, function (data) {
-                    scope.error = 'Unable to fetch CRB posting logs. Error: ' + (data.defaultUserMessage || 'Unknown error');
+                    showCrbError('Unable to fetch CRB posting logs. ' + ((data && data.defaultUserMessage) || 'Try again. If this continues, contact support.'));
                 });
             };
 
@@ -103,7 +113,7 @@
                     scope.success = 'Retry posting initiated successfully. Log entry has been queued for reprocessing.';
                     fetchAllPostingLogs();
                 }).catch(function (error) {
-                    scope.error = 'Failed to retry posting. Error: ' + (error.data.defaultUserMessage || 'Unknown error');
+                    showCrbError('Failed to retry posting. ' + ((error.data && error.data.defaultUserMessage) || 'Try again. If this continues, contact support.'));
                 });
             };
 
@@ -121,7 +131,7 @@
                     scope.success = 'Loan record marked as fixed and has been rescheduled for retry.';
                     fetchAllPostingLogs();
                 }).catch(function (error) {
-                    scope.error = 'Failed to mark loan as fixed. Error: ' + (error.data.defaultUserMessage || 'Unknown error');
+                    showCrbError('Failed to mark loan as fixed. ' + ((error.data && error.data.defaultUserMessage) || 'Try again. If this continues, contact support.'));
                 });
             };
 
@@ -142,7 +152,13 @@
             scope.exportToCSV = function () {
 
                 if (scope.filteredLogs.length === 0) {
-                    alert('No logs to export');
+                    (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        code: 'error.msg.crb.no.logs',
+                        message: 'No logs to export.'
+                    }], null);
                     return;
                 }
 

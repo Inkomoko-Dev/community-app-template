@@ -579,7 +579,13 @@
                                                 }) {
                 const selectedIds = Object.keys(template).filter(id => template[id]);
                 if (selectedIds.length === 0) {
-                    window.alert("No items selected for this action.");
+                    (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        code: 'error.msg.bulk.none.selected',
+                        message: 'No items selected for this action.'
+                    }], null);
                     return;
                 }
 
@@ -644,13 +650,28 @@
                             failedItems.forEach(f => { msg += `\n  Item ${f.id}: ${f.reason}`; });
                         }
 
-                        window.alert(msg);
+                        if (failedItems.length > 0) {
+                            (scope.$root.presentUserErrors || function (errors) {
+                                scope.$root.errorStatus = null;
+                                scope.$root.errorDetails = errors;
+                            })([{message: msg}], null);
+                        } else {
+                            window.alert(msg);
+                        }
                     },
                     function (error) {
                         console.error("Batch request failed:", error);
-                        if (!isBankDisbursement) {
-                            window.alert(`${failureMessage || "Batch request failed"}: ${JSON.stringify(error)}`);
+                        if (scope.$root.errorStatus || (scope.$root.errorDetails && scope.$root.errorDetails.length)) {
+                            return;
                         }
+                        (scope.$root.presentUserErrors || function (errors) {
+                            scope.$root.errorStatus = null;
+                            scope.$root.errorDetails = errors;
+                        })([{
+                            message: isBankDisbursement
+                                ? 'The disbursement could not be sent. Please contact support.'
+                                : (failureMessage || 'The batch request failed. Try again. If this continues, contact support.')
+                        }], null);
                     }
                 );
             };
@@ -665,7 +686,12 @@
 
                 $scope.confirm = () => {
                     if (config.requireReason && !$scope.reason.trim()) {
-                        window.alert("Please provide a reason.");
+                        $scope.errorDetails = [{
+                            field: 'reason',
+                            code: 'error.msg.field.required',
+                            args: {params: [{value: 'Reason'}]},
+                            message: 'A reason is required.'
+                        }];
                         return;
                     }
 

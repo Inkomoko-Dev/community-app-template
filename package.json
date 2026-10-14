@@ -45,7 +45,7 @@
     "requirejs": "2.3.6"
   },
   "scripts": {
-    "test": "grunt test --verbose"
+    "test": "node --test test/apiErrorMessage.test.js && grunt test --verbose"
   },
   "engines": {
     "node": ">=0.8.0"

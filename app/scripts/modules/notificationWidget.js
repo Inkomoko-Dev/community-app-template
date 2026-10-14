@@ -14,16 +14,58 @@ angular.module('notificationWidget', [])
         $httpProvider.interceptors.push(function ($q, $injector, $location, $rootScope) {
             var notificationChannel, $http;
 
-            function removeErrors() {
-                var $inputs = $(':input');
-                $inputs.each(function () {
-                    $(this).removeClass("validationerror");
-                });
+            function translateCode(code, params) {
+                try {
+                    var $translate = $injector.get('$translate');
+                    var translated = $translate.instant(code, params || {});
+                    if (!translated || translated === code) {
+                        return null;
+                    }
+                    return translated;
+                } catch (ignore) {
+                    return null;
+                }
+            }
+
+            function clearFieldMarkers() {
+                if (typeof $ === 'undefined') {
+                    return;
+                }
+                $('.api-field-error').remove();
+                $(':input').removeClass('validationerror api-validation-error');
+            }
+
+            function clearDisplayedErrors() {
+                $rootScope.errorStatus = null;
+                $rootScope.errorDetails = [];
+                $rootScope._apiInlineSignature = '';
+                $rootScope._apiErrorRequestKey = null;
+                clearFieldMarkers();
+            }
+
+            function publishErrors(parsed, config) {
+                $rootScope.errorStatus = parsed.errorStatus || null;
+                $rootScope.errorDetails = parsed.errorDetails || [];
+                $rootScope._apiErrorRequestKey = config ? ApiErrorMessage.requestKey(config.method, config.url) : null;
+                $rootScope._apiErrorGeneration = ($rootScope._apiErrorGeneration || 0) + 1;
+                if (parsed.developerMessage || parsed.raw) {
+                    console.error('API error', {
+                        developerMessage: parsed.developerMessage || null,
+                        body: parsed.raw
+                    });
+                }
+            }
+
+            function isBatchRequest(url) {
+                return url && url.indexOf && url.indexOf('batches') > 0;
             }
 
             return {
                 request: function (config) {
                     $rootScope.blockUI = true;
+                    if (ApiErrorMessage.shouldClearForRequest(config && config.method, config && config.url, $rootScope._apiErrorRequestKey)) {
+                        clearDisplayedErrors();
+                    }
 
                     // get requestNotificationChannel via $injector because of circular dependency problem
                     notificationChannel = notificationChannel || $injector.get('requestNotificationChannel');
@@ -48,20 +90,13 @@ angular.module('notificationWidget', [])
                 },
                 response: function (response) {
                     $rootScope.blockUI = false;
-                    // clear previous errors for a success request.
-                    delete $rootScope.errorStatus;
-                    delete $rootScope.errorDetails;
-
-                    removeErrors();
 
                     //contains the responses successful and failed responses
                     $rootScope.successfulResponses = [];
                     $rootScope.failedResponses = [];
 
                     //check for batch API errors
-                    if (response.config.url.indexOf &&
-                        response.config.url.indexOf('batches') > 0) {
-
+                    if (isBatchRequest(response.config && response.config.url) && response.data && response.data.length) {
                         for (var i = 0; i < response.data.length; i++) {
                             var currResponse = response.data[i];
                             if (currResponse.statusCode == 200) {
@@ -71,24 +106,10 @@ angular.module('notificationWidget', [])
                             }
                         }
 
-                        //pass failed responses to error function
                         if ($rootScope.failedResponses.length > 0) {
-                            var errResponse = response;
-                            errResponse.data = $rootScope.failedResponses;
-                            $rootScope.errorDetails = [];
-                            var errorArray = new Array();
-                            for(var i in $rootScope.failedResponses) {
-                                var errorObj = new Object();
-                                errorObj.code = JSON.parse($rootScope.failedResponses[i].body).errors[0].userMessageGlobalisationCode;
-                                errorObj.body = JSON.parse($rootScope.failedResponses[i].body).errors[0].userMessageGlobalisationCode;
-                                errorArray[i] = errorObj;
-                            }
-                            $rootScope.errorDetails.push(errorArray);
-                            return $q.reject($rootScope.errorDetails);
-                            //set the value of response only to successful responses
-                            response.data = $rootScope.successfulResponses;
+                            publishErrors(ApiErrorMessage.parseBatchFailures($rootScope.failedResponses, translateCode), response.config);
+                            return $q.reject(response);
                         }
-
                     }
 
                     // get $http via $injector because of circular dependency problem
@@ -126,12 +147,8 @@ angular.module('notificationWidget', [])
                 },
                 responseError: function (rejection) {
                     $rootScope.blockUI = false;
-                    delete $rootScope.errorStatus;
-                    delete $rootScope.errorDetails;
-                    removeErrors();
-                    // get $http via $injector because of circular dependency problem
-                    //console.log(response.data);
 
+                    // get $http via $injector because of circular dependency problem
                     $http = $http || $injector.get('$http');
                     // don't send notification until all requests are complete
                     if ($http.pendingRequests.length < 1) {
@@ -141,92 +158,102 @@ angular.module('notificationWidget', [])
                         notificationChannel.requestEnded();
                     }
 
-                    $rootScope.errorDetails = [];
-                    //works with batch requests as well
-                    //now our data array will hold the return response
-                    //either it's a batch response or a normal response
-                    var data = [];
                     var requestUrl = rejection && rejection.config ? rejection.config.url || '' : '';
-                    if (requestUrl.indexOf('batches') > 0) {
-                        data = rejection.data;
-                    }
-                    else {
-                        //just push a single response into data
-                        var res = {};
-                        res.body = JSON.stringify(rejection.data);
-                        data.push(res);
-                    }
-
-                    if (!rejection.status || rejection.status === 0 || rejection.status === -1) {
-                        $rootScope.errorStatus = 'No connection. Verify application is running.';
-                    } else if (rejection.status == 401) {
-                        $rootScope.errorStatus = 'Unauthorized';
-                    } else if (rejection.status == 405) {
-                        $rootScope.errorStatus = 'HTTP verb not supported [405]';
-                    } else if (rejection.status == 500) {
-                        $rootScope.errorStatus = 'Internal Server Error [500].';
+                    var parsed;
+                    if (isBatchRequest(requestUrl) && rejection && Object.prototype.toString.call(rejection.data) === '[object Array]') {
+                        parsed = ApiErrorMessage.parseBatchFailures(rejection.data, translateCode);
                     } else {
-                        for(var i = 0; i < data.length; i++) {
-                            //console.log(data[i]);
-                            var jsonErrors = null;
-                            try {
-                                jsonErrors = angular.isString(data[i].body) ? JSON.parse(data[i].body) : data[i].body;
-                            } catch (e) {
-                                jsonErrors = null;
-                            }
-
-                            if (!jsonErrors) {
-                                if (!$rootScope.errorStatus) {
-                                    $rootScope.errorStatus = 'Request failed.';
-                                }
-                                continue;
-                            }
-
-                            var valErrors = jsonErrors.errors;
-                            var errorArray = new Array();
-                            var arrayIndex = 0;
-                            if (valErrors) {
-                                for (var j in valErrors) {
-                                    var temp = valErrors[j];
-                                    // add error class to input in dialog
-                                    var fieldId = '#' + temp.parameterName;
-                                    $(fieldId).addClass("validationerror");
-
-                                    // for views using ui add the classes instead of ids
-                                    var fieldClass = "."+temp.parameterName;
-                                    $(fieldClass).eq(data[i].requestId).addClass("validationerror");
-
-                                    var errorObj = new Object();
-                                    errorObj.field = temp.parameterName;
-                                    errorObj.code = temp.userMessageGlobalisationCode;
-                                    errorObj.body = jsonErrors;
-                                    errorObj.args = {params: []};
-                                    for (var k in temp.args) {
-                                        errorObj.args.params.push({value: temp.args[k].value});
-                                    }
-                                    errorArray[arrayIndex] = errorObj;
-                                    arrayIndex++;
-                                };
-                            } else {
-                                /***
-                                 * Update user password api call won't return errors array,
-                                 * if user enters a password which is used previously
-                                 */
-                                if (jsonErrors.userMessageGlobalisationCode) {
-                                    var errorObj = new Object();
-                                    errorObj.code = jsonErrors.userMessageGlobalisationCode;
-                                    errorArray[arrayIndex] = errorObj;
-                                    arrayIndex++;
-                                }
-                            }
-                            $rootScope.errorDetails.push(errorArray);
-                            console.log(errorArray);
-                        }
+                        var status = rejection ? rejection.status : 0;
+                        parsed = ApiErrorMessage.parseHttpError(status, rejection ? rejection.data : null, translateCode);
                     }
+                    publishErrors(parsed, rejection && rejection.config);
                     return $q.reject(rejection);
                 }
             }
         })
+    }])
+    .run(['$rootScope', function ($rootScope) {
+        function clearFieldMarkers() {
+            if (typeof $ === 'undefined') {
+                return;
+            }
+            $('.api-field-error').remove();
+            $(':input').removeClass('validationerror api-validation-error');
+        }
+
+        $rootScope.dismissUserErrors = function () {
+            $rootScope.errorStatus = null;
+            $rootScope.errorDetails = [];
+            $rootScope._apiInlineSignature = '';
+            $rootScope._apiErrorRequestKey = null;
+            clearFieldMarkers();
+        };
+
+        $rootScope.presentUserErrors = function (errors, status) {
+            $rootScope.errorDetails = errors || [];
+            $rootScope.errorStatus = status || null;
+            $rootScope._apiErrorRequestKey = null;
+            $rootScope._apiErrorGeneration = ($rootScope._apiErrorGeneration || 0) + 1;
+        };
+
+        $rootScope.$on('$routeChangeStart', function () {
+            $rootScope.dismissUserErrors();
+        });
+    }])
+    .directive('form', ['$injector', '$timeout', function ($injector, $timeout) {
+        return {
+            restrict: 'E',
+            require: 'form',
+            link: function (scope, element, attrs, formCtrl) {
+                element.on('submit', function () {
+                    var $rootScope = $injector.get('$rootScope');
+                    var generation = $rootScope._apiErrorGeneration || 0;
+                    var hadClientError = !$rootScope._apiErrorRequestKey &&
+                        ($rootScope.errorStatus || ($rootScope.errorDetails && $rootScope.errorDetails.length));
+                    $timeout(function () {
+                        var $http = $injector.get('$http');
+                        var pendingWrite = false;
+                        angular.forEach($http.pendingRequests, function (request) {
+                            if (request.method && request.method !== 'GET') {
+                                pendingWrite = true;
+                            }
+                        });
+                        var stillSame = ($rootScope._apiErrorGeneration || 0) === generation;
+                        if (hadClientError && stillSame && (pendingWrite || !formCtrl.$invalid)) {
+                            if ($rootScope.dismissUserErrors) {
+                                $rootScope.dismissUserErrors();
+                            }
+                            return;
+                        }
+                        if (!formCtrl.$invalid || pendingWrite) {
+                            return;
+                        }
+                        if ($rootScope.errorStatus || ($rootScope.errorDetails && $rootScope.errorDetails.length)) {
+                            return;
+                        }
+                        var seen = {};
+                        var errors = [];
+                        element.find('.ng-invalid').each(function () {
+                            var field = this.getAttribute('name') || this.getAttribute('id');
+                            if (!field || seen[field] || field === formCtrl.$name) {
+                                return;
+                            }
+                            seen[field] = true;
+                            var required = this.hasAttribute('required') || (this.className || '').indexOf('ng-invalid-required') !== -1;
+                            var label = ApiErrorMessage.humanizeField(field);
+                            errors.push({
+                                field: field,
+                                code: required ? 'error.msg.field.required' : 'error.msg.field.invalid',
+                                args: {params: [{value: label}]}
+                            });
+                        });
+                        if (errors.length) {
+                            $rootScope.presentUserErrors(errors, null);
+                        }
+                    });
+                });
+            }
+        };
     }])
     // declare the notification pub/sub channel
     .factory('requestNotificationChannel', ['$rootScope', function ($rootScope) {

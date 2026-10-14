@@ -36,7 +36,14 @@
 
             scope.assignPartner = function () {
                 if (!scope.formData.partnerCode) {
-                    alert('Please select a partner');
+                    (scope.$root.presentUserErrors || function (errors) {
+                        scope.$root.errorStatus = null;
+                        scope.$root.errorDetails = errors;
+                    })([{
+                        field: 'partner',
+                        code: 'error.msg.partner.required',
+                        message: 'Select a partner.'
+                    }], null);
                     return;
                 }
 
@@ -47,20 +54,17 @@
                         alert('Partner assigned successfully');
                         location.path('/viewclient/' + scope.clientId);
                     },
-                    function (error) {
-                        var errorMessage = 'Error assigning partner';
-                        if (error && error.data) {
-                            if (error.data.defaultUserMessage) {
-                                errorMessage += ': ' + error.data.defaultUserMessage;
-                            } else if (error.data.developerMessage) {
-                                errorMessage += ': ' + error.data.developerMessage;
-                            } else if (error.data.errors && error.data.errors.length && error.data.errors[0].defaultUserMessage) {
-                                errorMessage += ': ' + error.data.errors[0].defaultUserMessage;
-                            }
-                        } else if (error && error.statusText) {
-                            errorMessage += ': ' + error.statusText;
+                    function () {
+                        if (scope.$root.errorStatus || (scope.$root.errorDetails && scope.$root.errorDetails.length)) {
+                            return;
                         }
-                        alert(errorMessage);
+                        (scope.$root.presentUserErrors || function (errors) {
+                            scope.$root.errorStatus = null;
+                            scope.$root.errorDetails = errors;
+                        })([{
+                            code: 'error.msg.partner.assign.failed',
+                            message: 'The partner could not be assigned. Try again. If this continues, contact support.'
+                        }], null);
                     }
                 );
             };
@@ -77,12 +81,17 @@
                         scope.formData.reason = '';
                         alert('Partner assignment removed successfully');
                         location.path('/viewclient/' + scope.clientId);
-                    }, function (error) {
-                        var errorMessage = 'Error removing partner';
-                        if (error && error.data && error.data.defaultUserMessage) {
-                            errorMessage += ': ' + error.data.defaultUserMessage;
+                    }, function () {
+                        if (scope.$root.errorStatus || (scope.$root.errorDetails && scope.$root.errorDetails.length)) {
+                            return;
                         }
-                        alert(errorMessage);
+                        (scope.$root.presentUserErrors || function (errors) {
+                            scope.$root.errorStatus = null;
+                            scope.$root.errorDetails = errors;
+                        })([{
+                            code: 'error.msg.partner.remove.failed',
+                            message: 'The partner assignment could not be removed. Try again. If this continues, contact support.'
+                        }], null);
                     });
             };
 

@@ -12,15 +12,10 @@
             </div>
 
             <!-- Alert Messages -->
-            <div ng-if="error" class="alert alert-danger alert-dismissible fade in" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <strong>Error:</strong> {{ error }}
-            </div>
+            <api-validate></api-validate>
 
-            <div ng-if="success" class="alert alert-success alert-dismissible fade in" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <div ng-if="success" class="alert alert-success" role="alert">
+                <button type="button" class="close" ng-click="success = null" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <strong>Success:</strong> {{ success }}

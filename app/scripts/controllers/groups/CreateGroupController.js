@@ -108,7 +108,14 @@
                     });
 
                     if (exists) {
-                        alert('Client ['+ availableClient.displayName +'] already added. Please select another client.');
+                        (scope.$root.presentUserErrors || function (errors) {
+                            scope.$root.errorStatus = null;
+                            scope.$root.errorDetails = errors;
+                        })([{
+                            code: 'error.msg.group.client.already.added',
+                            message: 'Client [' + availableClient.displayName + '] is already added. Select another client.',
+                            args: {params: [{value: availableClient.displayName}]}
+                        }], null);
                     } else {
                         var temp = {
                             id: availableClient.id,
