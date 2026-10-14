@@ -1,0 +1,74 @@
+<div class="content-container" ng-controller="ViewProvisionJournalController">
+    <ul class="breadcrumb">
+        <li><a href="#/accounting">{{'label.anchor.accounting' | translate}}</a></li>
+        <li><a href="#/viewprovisioningentries">{{'label.anchor.viewprovisioningeentries' | translate}}</a></li>
+        <li><a href="#/viewprovisionjournals{{entryPath}}">{{'label.anchor.viewprovisionjournals' | translate}}</a></li>
+        <li class="active">{{journal.number}}</li>
+    </ul>
+    <div class="card" ng-if="journal">
+        <div class="content">
+            <div class="pull-right">
+                <span class="label label-warning" ng-if="journal.status === 'CREATED'">{{'label.heading.pending' | translate}}</span>
+                <span class="label label-success" ng-if="journal.status === 'POSTED'">{{'label.heading.posted' | translate}}</span>
+                <span class="label label-danger" ng-if="journal.status === 'FAILED'">{{'label.heading.failed' | translate}}</span>
+                <span class="label label-info" ng-if="journal.reversal">{{'label.heading.reversal' | translate}}</span>
+            </div>
+            <h3 class="bolder">{{journal.number}}</h3>
+            <table class="table table-condensed width100">
+                <tr>
+                    <td class="width20">{{'label.heading.reference' | translate}}</td>
+                    <td>{{journal.reference}}</td>
+                    <td class="width20">{{'label.heading.accountingdate' | translate}}</td>
+                    <td>{{journal.date | DateFormat}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.journal' | translate}}</td>
+                    <td>{{'label.heading.loanlossprovision' | translate}}</td>
+                    <td>{{'label.heading.name' | translate}}</td>
+                    <td>{{journal.name}}</td>
+                </tr>
+                <tr>
+                    <td>{{'label.heading.cbsreference' | translate}}</td>
+                    <td>{{journal.journalReference}}</td>
+                    <td>{{'label.heading.currency' | translate}}</td>
+                    <td>{{journal.currencyCode}}</td>
+                </tr>
+                <tr ng-if="journal.postedJournalId">
+                    <td>{{'label.heading.postedjournalid' | translate}}</td>
+                    <td>{{journal.postedJournalId}}</td>
+                    <td>{{'label.heading.createdon' | translate}}</td>
+                    <td>{{journal.postedAt | DateFormat}}</td>
+                </tr>
+            </table>
+            <div class="alert alert-danger" ng-if="journal.failureReason">
+                <strong>{{'label.heading.failurereason' | translate}}:</strong> {{journal.failureReason}}
+            </div>
+            <h4>{{'label.heading.journalitems' | translate}}</h4>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.account' | translate}}</th>
+                        <th class="text-right">{{'label.heading.debit' | translate}}</th>
+                        <th class="text-right">{{'label.heading.credit' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in journal.journalItems">
+                        <td>{{item.accountCode}} {{item.accountName}}</td>
+                        <td class="text-right">{{item.debit | number:2}} {{journal.currencyCode}}</td>
+                        <td class="text-right">{{item.credit | number:2}} {{journal.currencyCode}}</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr class="graybg">
+                        <th></th>
+                        <th class="text-right">{{journal.totalDebit | number:2}} {{journal.currencyCode}}</th>
+                        <th class="text-right">{{journal.totalCredit | number:2}} {{journal.currencyCode}}</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

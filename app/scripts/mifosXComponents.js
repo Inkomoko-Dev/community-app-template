@@ -14,7 +14,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'SessionManager',
             'Paginator',
             'UIConfigService',
-            'BulkReschedulePreviewHelper'
+            'BulkReschedulePreviewHelper',
+            'BulkImportHelper'
         ],
 
         controllers: [
@@ -149,10 +150,15 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/ViewPaymentTypeController',
             'organization/CreatePaymentTypeController',
             'organization/EditPaymentTypeController',
+            'organization/ExternalOrganizationMappingController',
+            'organization/CreateExternalOrganizationMappingController',
+            'organization/EditExternalOrganizationMappingController',
             'accounting/provisioning/CreateProvisoningEntriesController',
             'accounting/provisioning/ViewProvisioningEntryController',
             'accounting/provisioning/ViewAllProvisoningEntriesController',
             'accounting/provisioning/ViewProvisioningJournalEntriesController',
+            'accounting/provisioning/ViewProvisionJournalsController',
+            'accounting/provisioning/ViewProvisionJournalController',
             'accounting/AccFreqPostingController',
             'accounting/AccCoaController',
             'accounting/AccCreateGLAccountController',
@@ -459,6 +465,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'FormValidateDirective',
             'FormSubmitValidateDirective',
             'ApiValidationDirective',
+            'BulkImportResultsDirective',
             'HasPermissionDirective',
             'ActivitiesDisplayPanelDirective',
             'ScrollbarTopDirective',

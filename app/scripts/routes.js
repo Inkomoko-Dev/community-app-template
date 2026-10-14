@@ -503,6 +503,15 @@
             .when('/viewprovisioningjournalentry/:entryId',{
                 templateUrl: 'views/accounting/provisioning/ViewProvisioningJournalEntries.html'
             })
+            .when('/viewprovisionjournals',{
+                templateUrl: 'views/accounting/provisioning/ViewProvisionJournals.html'
+            })
+            .when('/viewprovisionjournals/:entryId',{
+                templateUrl: 'views/accounting/provisioning/ViewProvisionJournals.html'
+            })
+            .when('/viewprovisionjournal/:journalId',{
+                templateUrl: 'views/accounting/provisioning/ViewProvisionJournal.html'
+            })
             .when('/viewcode/:id', {
                 templateUrl: 'views/system/viewcode.html'
             })
@@ -613,6 +622,15 @@
             })
             .when('/editPaymentType/:id', {
                 templateUrl: 'views/organization/editpaymenttype.html'
+            })
+            .when('/externalorganizationmappings', {
+                templateUrl: 'views/organization/externalorganizationmappings.html'
+            })
+            .when('/createexternalorganizationmapping', {
+                templateUrl: 'views/organization/createexternalorganizationmapping.html'
+            })
+            .when('/editexternalorganizationmapping/:id', {
+                templateUrl: 'views/organization/editexternalorganizationmapping.html'
             })
             .when('/reports/:type', {
                 templateUrl: 'views/reports/view_reports.html'

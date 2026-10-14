@@ -1,0 +1,76 @@
+<div class="content-container" ng-controller="ViewProvisionJournalsController">
+    <ul class="breadcrumb">
+        <li><a href="#/accounting">{{'label.anchor.accounting' | translate}}</a></li>
+        <li><a href="#/viewprovisioningentries">{{'label.anchor.viewprovisioningeentries' | translate}}</a></li>
+        <li ng-if="entryId"><a href="#/viewprovisioningentry/{{entryId}}">{{'label.anchor.provisionigetriespreview' | translate}}</a></li>
+        <li class="active">{{'label.anchor.viewprovisionjournals' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.heading.provisionjournals' | translate}}</h4>
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <select class="form-control" ng-model="statusFilter">
+                        <option value="">{{'label.heading.all' | translate}}</option>
+                        <option value="CREATED">{{'label.heading.pending' | translate}}</option>
+                        <option value="POSTED">{{'label.heading.posted' | translate}}</option>
+                        <option value="FAILED">{{'label.heading.failed' | translate}}</option>
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <input class="form-control" type="text" datepicker-pop="dd MMMM yyyy"
+                           ng-model="dateFilter" is-open="opened"
+                           placeholder="{{'label.heading.date' | translate}}"/>
+                </div>
+                <div class="col-sm-3">
+                    <a ng-click="load()" class="btn btn-primary">
+                        <i class="fa fa-search"></i>&nbsp;{{'label.button.search' | translate}}
+                    </a>
+                    <a ng-click="clearFilters()" class="btn btn-default">
+                        <i class="fa fa-undo"></i>
+                    </a>
+                </div>
+            </div>
+            <br/>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr class="graybg">
+                        <th>{{'label.heading.date' | translate}}</th>
+                        <th>{{'label.heading.number' | translate}}</th>
+                        <th>{{'label.heading.reference' | translate}}</th>
+                        <th>{{'label.heading.name' | translate}}</th>
+                        <th>{{'label.heading.total' | translate}}</th>
+                        <th>{{'label.heading.currency' | translate}}</th>
+                        <th>{{'label.heading.status' | translate}}</th>
+                        <th>{{'label.heading.createdon' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="pointer-main" ng-repeat="journal in journals" ng-class="{'info': journal.reversal}"
+                        data-ng-click="routeTo(journal.id)">
+                        <td class="pointer">{{journal.date | DateFormat}}</td>
+                        <td class="pointer">{{journal.number}}</td>
+                        <td class="pointer">{{journal.reference}}</td>
+                        <td class="pointer">{{journal.name}}</td>
+                        <td class="pointer">{{journal.total | number:2}} {{journal.currencyCode}}</td>
+                        <td class="pointer">{{journal.currencyCode}}</td>
+                        <td class="pointer">
+                            <span class="label label-warning" ng-if="journal.status === 'CREATED'">{{'label.heading.pending' | translate}}</span>
+                            <span class="label label-success" ng-if="journal.status === 'POSTED'">{{'label.heading.posted' | translate}}</span>
+                            <span class="label label-danger" ng-if="journal.status === 'FAILED'">{{'label.heading.failed' | translate}}</span>
+                            <span class="label label-info" ng-if="journal.reversal">&nbsp;{{'label.heading.reversal' | translate}}</span>
+                        </td>
+                        <td class="pointer">{{journal.createdAt | DateFormat}}</td>
+                    </tr>
+                    <tr ng-if="journals.length === 0">
+                        <td colspan="8">{{'label.nodata' | translate}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

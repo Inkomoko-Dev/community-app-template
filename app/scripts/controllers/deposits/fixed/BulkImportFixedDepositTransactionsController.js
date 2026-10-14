@@ -28,8 +28,8 @@
                 scope.formData.file = files[0];
             };
 
-            scope.refreshImportTable=function () {
-                resourceFactory.importResource.getImports({entityType: "fixeddeposittransactions"}, function (data) {
+            scope.refreshImportTable=function (onLoaded) {
+                resourceFactory.importResource.getImports({_: new Date().getTime(), entityType: "fixeddeposittransactions"}, function (data) {
 
                     for (var l in data) {
                         var importdocs = {};
@@ -37,6 +37,9 @@
                         data[l].docUrl = importdocs;
                     }
                     scope.imports = data;
+                    if (onLoaded) {
+                        onLoaded();
+                    }
                 });
             };
 
@@ -46,9 +49,9 @@
                     data: {file: scope.formData.file,locale:scope.optlang.code,dateFormat:scope.df},
                 }).then(function (data) {
                     // to fix IE not refreshing the model
-                    if (!scope.$$phase) {
-                        scope.$apply();
-                    }
+                    $rootScope.finishBulkImportUpload(scope, data);
+                }, function (error) {
+                    $rootScope.failBulkImportUpload(scope, error);
                 });
             };
         }

@@ -1,0 +1,72 @@
+<div class="content-container" ng-controller="CreateExternalOrganizationMappingController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/externalorganizationmappings">{{'label.anchor.externalorganizationmapping' | translate}}</a></li>
+        <li class="active">{{'label.anchor.createexternalorganizationmapping' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div class="toolbar">
+                <h4>{{'label.anchor.createexternalorganizationmapping' | translate}}</h4>
+            </div>
+            <br>
+            <form name="createexternalorganizationmapping" novalidate="" class="form-horizontal" rc-submit="submit()">
+                <api-validate></api-validate>
+                <fieldset>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.office' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <select id="officeId" chosen="offices" ng-model="formData.officeId" class="form-control" required
+                                    ng-options="office.id as office.name for office in offices">
+                                <option value="">{{'label.selectoffice' | translate}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.externalsystem' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" ng-model="formData.externalSystem" class="form-control" required/>
+                            <span class="help-block">{{'label.view.externalsystemhelp' | translate}}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.externalid' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" ng-model="formData.externalId" class="form-control" required
+                                   placeholder="{{'label.input.externalidplaceholder' | translate}}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.externalname' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" ng-model="formData.externalName" class="form-control" required
+                                   placeholder="{{'label.input.externalnameplaceholder' | translate}}"/>
+                            <span class="help-block">{{'label.view.externalnamehelp' | translate}}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.currency' | translate}}</label>
+                        <div class="col-sm-4">
+                            <input type="text" ng-model="formData.currencyCode" class="form-control" maxlength="10"
+                                   placeholder="KES"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.active' | translate}}</label>
+                        <div class="col-sm-4">
+                            <label class="checkbox control-label">
+                                <input type="checkbox" ng-model="formData.active"/>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 paddedleft">
+                        <a href="#/externalorganizationmappings" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
+                        <button type="submit" class="btn btn-primary" has-permission='CREATE_EXTERNALORGANIZATIONMAPPING'>
+                            {{'label.button.save' | translate}}
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
