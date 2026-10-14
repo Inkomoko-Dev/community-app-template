@@ -1008,6 +1008,8 @@
   "error.msg.client.duplicate.accountNo": "A client with account no. `{{params[0].value}}` already exists.",
   "error.msg.client.id.invalid": "Client does not exist.",
   "error.msg.client.not.active.exception": "The Client with ID `{{params[0].value}}` is not active.",
+  "error.msg.client.address.location.required": "Location is required",
+  "validation.msg.Address.location.cannot.be.blank": "Location is required",
   "validation.msg.clientIdentifier.documentKey.cannot.be.blank": "Identification Number is mandatory.",
   "validation.msg.clientIdentifier.documentTypeId.cannot.be.blank": "Identity document type is mandatory.",
   "error.msg.clientIdentifier.type.duplicate": "Active client identity document of type `{{params[0].value}}` already exists for this client.",

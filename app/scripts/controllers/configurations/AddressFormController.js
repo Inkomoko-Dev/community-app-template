@@ -62,6 +62,10 @@
 
             $scope.updateaddress=function()
             {
+                $scope.addressSubmitted = true;
+                if (!$scope.formData.location || !String($scope.formData.location).trim()) {
+                    return;
+                }
 
                 $scope.formData.locale="en";
                 resourceFactory.clientAddress.put({'clientId': routeParams.id,'type':$scope.addressTypeId},$scope.formData,function (data) {
@@ -71,6 +75,10 @@
             }
 
             $scope.submit = function () {
+                $scope.addressSubmitted = true;
+                if (!$scope.formData.location || !String($scope.formData.location).trim()) {
+                    return;
+                }
 
                 resourceFactory.clientAddress.save({'clientId': routeParams.id,'type':$scope.addressTypeId},$scope.formData,function (data) {
 

@@ -328,6 +328,13 @@
             };
 
             scope.submit = function () {
+                if (scope.enableAddress === true) {
+                    for (var i = 0; i < scope.addressArray.length; i++) {
+                        if (!scope.addressArray[i].location || !String(scope.addressArray[i].location).trim()) {
+                            return;
+                        }
+                    }
+                }
                 var reqDate = dateFilter(scope.first.date, scope.df);
 
                 this.formData.locale = scope.optlang.code;
@@ -417,6 +424,9 @@
                         }
                         if (scope.addressArray[i].street) {
                             temp.street = scope.addressArray[i].street;
+                        }
+                        if (scope.addressArray[i].location) {
+                            temp.location = scope.addressArray[i].location;
                         }
                         if(scope.addressArray[i].addressLine1)
                         {

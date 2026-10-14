@@ -1193,6 +1193,18 @@
                                     <form-validate valattributeform="createclientform" valattribute="addressType" />
                                  </div>
                               </div>
+                              <div class="form-group">
+                                 <label class="control-label col-sm-3">{{ 'label.input.location' | translate }}<span class="required">*</span></label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="location{{$index}}" ng-model="addressArray[$index].location"
+                                          class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <small class="error" ng-show="(rc.createclientform.attempted || createclientform.$submitted) && createclientform['location'+$index].$error.required">
+                                       {{ 'error.msg.client.address.location.required' | translate }}
+                                    </small>
+                                 </div>
+                              </div>
                               <div class="form-group" ng-show="street">
                                  <div class="control-label col-sm-3">
                                     <label>{{ 'label.input.street' | translate }}</label>
