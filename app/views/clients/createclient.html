@@ -1172,7 +1172,7 @@
                         <div class="panel panel-default">
                            <div class="panel-heading">
                               <div class="pull-right">
-                                 <a ng-click="removeAddress($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
+                                 <a ng-show="addressArray.length > 1" ng-click="removeAddress($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
                               </div>
                               <h5 class="heading-title text-muted">{{'label.input.address' | translate}} {{$index + 1}}</h5>
                            </div>
