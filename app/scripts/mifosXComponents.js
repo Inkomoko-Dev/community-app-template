@@ -13,7 +13,8 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'SessionManager',
             'Paginator',
             'UIConfigService',
-            'NotificationResponseHeaderProvider'
+            'NotificationResponseHeaderProvider',
+            'BulkImportHelper'
         ],
 
         controllers: [
@@ -432,6 +433,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'FormValidateDirective',
             'FormSubmitValidateDirective',
             'ApiValidationDirective',
+            'BulkImportResultsDirective',
             'HasPermissionDirective',
             'ActivitiesDisplayPanelDirective',
             'ScrollbarTopDirective',

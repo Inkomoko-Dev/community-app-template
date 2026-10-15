@@ -5576,5 +5576,12 @@
   "label.input.allsuppliertypes": "All types",
   "label.input.allcountries": "All countries",
   "label.input.allsyncstatuses": "All sync statuses",
+  "label.button.downloadresults": "Download results",
+  "label.button.showfailurereasons": "Show reasons",
+  "label.msg.bulkimport.failurereasonsinfile": "{{count}} row(s) failed. The reason for each failed row is in the result file Status column.",
+  "label.msg.bulkimport.statuscolumn": "Failed row reasons from the result file Status column:",
+  "label.msg.bulkimport.loadingfailurereasons": "Reading failure reasons from the result file...",
+  "label.msg.bulkimport.morefailurereasons": "Showing {{shown}} of {{total}} failed rows. Download the result file for the rest.",
+  "label.msg.bulkimport.failurerowlabel": "Row {{row}}:",
   "----End---": "--End of file--- "
 }
