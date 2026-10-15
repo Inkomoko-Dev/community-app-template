@@ -100,7 +100,7 @@
     		                <uib-accordion close-others="true" ng-repeat="entity in templateEntity">
     		                    <uib-accordion-group heading="{{entity.entityName}}">
     		                        <div ng-repeat="templateKey in entity.templateKeys" class="templatekeys"
-    		                             ng-click="templateKeySelected(templateKey)">{{templateKey}}
+    		                             ng-click="templateKeySelected(templateKey)"><span class="templatekey-label" ng-if="templateKeyLabel(templateKey)">{{templateKeyLabel(templateKey)}} </span>{{templateKeyDisplay(templateKey)}}
     		                        </div>
     		                    </uib-accordion-group>
     		                </uib-accordion>

@@ -21556,6 +21556,13 @@ accordion > div > div > div > a:hover, accordion > div > div > div a:focus {
   font-weight: bold;
   padding: 0.3em 0.6em 0.4em;
 }
+.templatekeys .templatekey-label {
+    display: block;
+    font-weight: normal;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
 
 /********************
  * HTML CSS
