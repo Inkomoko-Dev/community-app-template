@@ -9,7 +9,7 @@
             scope.formData.assignmentDate = new Date();
             scope.restrictDate = new Date();
 
-            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, fields: fields, staffInSelectedOfficeOnly:true}, function (data) {
+            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, fields: fields}, function (data) {
                 if (data.loanOfficerOptions) {
                     scope.loanOfficers = data.loanOfficerOptions;
                     scope.formData.toLoanOfficerId = data.loanOfficerId;

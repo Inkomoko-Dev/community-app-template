@@ -58,7 +58,6 @@
                 scope.inparams.templateType = 'individual';
             }
 
-            scope.inparams.staffInSelectedOfficeOnly = true;
             scope.inparams.vendorClientId = '';
             scope.currencyType;
 
