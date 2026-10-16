@@ -393,7 +393,9 @@ describe("Template editor loan keys", function () {
         this.scope.loanKeys();
         var table = entryByLabel(this.scope.repaymentTemplateKeys, "Schedule table, one row per instalment").html;
         expect(table).toContain("<td>{{#loan.repaymentSchedule.periods}}{{#period}}{{period}}</td>");
-        expect(table).toContain("<td>{{/period}}{{/loan.repaymentSchedule.periods}}</td>");
+        expect(table).toContain("<td>{{/period}}{{/loan.repaymentSchedule.periods}}Total</td>");
+        expect(table).toContain("<td>{{loan.repaymentSchedule.totalRepaymentExpected}}</td></tr></tbody></table>");
+        expect(table).not.toContain("<td>&nbsp;</td><td>&nbsp;</td>");
         expect(table.indexOf("{{#loan.repaymentSchedule.periods}}")).toBeGreaterThan(table.indexOf("<table"));
     });
 
@@ -424,5 +426,46 @@ describe("Template editor loan keys", function () {
         expect(this.scope.templateKeyLabel("{{loan.accountNo}}")).toEqual("");
         expect(this.scope.templateKeyDisplay({label: "Loan cycle", value: "x"})).toEqual("x");
         expect(this.scope.templateKeyDisplay("{{loan.accountNo}}")).toEqual("{{loan.accountNo}}");
+    });
+
+    it("separates repeated disbursement and penalty values", function () {
+        createController(this);
+        this.scope.loanKeys();
+        _.each(this.scope.disbursementTemplateKeys.concat(this.scope.chargesTemplateKeys), function (entry) {
+            expect(entry.value).toMatch(/ \{\{\/loan\.(disbursementDetails|overdueCharges|charges)\}\}$/);
+        });
+    });
+
+    function loadEditScreen(test, template) {
+        new mifosX.controllers.EditTemplateController(test.scope, test.resourceFactory, {}, {id: template.id}, test.rootScope, function () {});
+        var loaded = test.resourceFactory.templateResource.getTemplateDetails.mostRecentCall.args[1];
+        loaded({entities: [{id: 0, name: 'client'}, {id: 1, name: 'loan'}], types: [{id: 0, name: 'Document'}], template: template});
+    }
+
+    var LOAN_MAPPER = {mapperorder: 0, mapperkey: 'loan', mappervalue: 'loans/{{loanId}}?associations=all&tenantIdentifier=default'};
+    var CLIENT_FROM_LOAN_MAPPER = {mapperorder: 1, mapperkey: 'client', mappervalue: 'clients/{{loan.clientId}}?tenantIdentifier=default'};
+
+    it("attaches the client mapper when an existing loan template is opened for editing", function () {
+        loadEditScreen(this, {id: 5, entity: 'loan', type: 'Document', name: 'Agreement', text: '<p>x</p>', mappers: [LOAN_MAPPER]});
+        expect(_.pluck(this.scope.mappers, 'mapperskey')).toEqual(["loan", "client"]);
+        expect(_.pluck(this.scope.mappers, 'mappersorder')).toEqual([0, 1]);
+        expect(this.scope.mappers[1].mappersvalue).toEqual("clients/{{loan.clientId}}?tenantIdentifier=default");
+    });
+
+    it("does not duplicate the client mapper on a loan template that already has one", function () {
+        loadEditScreen(this, {id: 6, entity: 'loan', type: 'Document', name: 'Agreement', text: '<p>x</p>', mappers: [LOAN_MAPPER, CLIENT_FROM_LOAN_MAPPER]});
+        expect(_.pluck(this.scope.mappers, 'mapperskey')).toEqual(["loan", "client"]);
+    });
+
+    it("leaves a client template's mappers alone on the edit screen and switches them with the entity", function () {
+        var clientMapper = {mapperorder: 0, mapperkey: 'client', mappervalue: 'clients/{{clientId}}?tenantIdentifier=default'};
+        loadEditScreen(this, {id: 7, entity: 'client', type: 'Document', name: 'Welcome', text: '<p>x</p>', mappers: [clientMapper]});
+        expect(_.pluck(this.scope.mappers, 'mapperskey')).toEqual(["client"]);
+        this.scope.entityChange(1);
+        expect(_.pluck(this.scope.mappers, 'mapperskey')).toEqual(["loan", "client"]);
+        expect(this.scope.mappers[1].mappersvalue).toEqual("clients/{{loan.clientId}}?tenantIdentifier=default");
+        this.scope.entityChange(0);
+        expect(_.pluck(this.scope.mappers, 'mapperskey')).toEqual(["client"]);
+        expect(this.scope.mappers[0].mappersvalue).toEqual("clients/{{clientId}}?tenantIdentifier=default");
     });
 });

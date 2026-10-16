@@ -45,11 +45,14 @@
                 }
 
                 
-                    scope.clientKeys();
-                    scope.loanKeys();
-                    scope.savingsAccountKeys();
-                    scope.groupKeys();
-                    scope.setEditorText(data.template.text);
+                if (scope.formData.entity === 1) {
+                    attachClientMapper();
+                }
+                scope.clientKeys();
+                scope.loanKeys();
+                scope.savingsAccountKeys();
+                scope.groupKeys();
+                scope.setEditorText(data.template.text);
             });
 
             scope.editorInstance = function () {
@@ -189,21 +192,21 @@
                     "{{loan.repaymentSchedule.totalPaidLate}}", "{{loan.repaymentSchedule.totalOutstanding}}",
                     {label: "First repayment date", value: "{{loan.repaymentSchedule.periods#1.dueDate}}"},
                     {label: "First instalment amount", value: "{{loan.repaymentSchedule.periods#1.totalDueForPeriod}}"},
-                    {label: "Schedule table, one row per instalment", html: '<table border="1" cellpadding="4"><tbody><tr><th>Installment</th><th>Due Date</th><th>Principal</th><th>Interest</th><th>Fees</th><th>Total Due</th></tr><tr><td>{{#loan.repaymentSchedule.periods}}{{#period}}{{period}}</td><td>{{dueDate}}</td><td>{{principalDue}}</td><td>{{interestDue}}</td><td>{{feeChargesDue}}</td><td>{{totalDueForPeriod}}</td></tr><tr><td>{{/period}}{{/loan.repaymentSchedule.periods}}</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>'}];
+                    {label: "Schedule table, one row per instalment", html: '<table border="1" cellpadding="4"><tbody><tr><th>Installment</th><th>Due Date</th><th>Principal</th><th>Interest</th><th>Fees</th><th>Total Due</th></tr><tr><td>{{#loan.repaymentSchedule.periods}}{{#period}}{{period}}</td><td>{{dueDate}}</td><td>{{principalDue}}</td><td>{{interestDue}}</td><td>{{feeChargesDue}}</td><td>{{totalDueForPeriod}}</td></tr><tr><td>{{/period}}{{/loan.repaymentSchedule.periods}}Total</td><td>&nbsp;</td><td>{{loan.repaymentSchedule.totalPrincipalExpected}}</td><td>{{loan.repaymentSchedule.totalInterestCharged}}</td><td>{{loan.repaymentSchedule.totalFeeChargesCharged}}</td><td>{{loan.repaymentSchedule.totalRepaymentExpected}}</td></tr></tbody></table>'}];
                 scope.disbursementTemplateKeys = [
-                    {label: "Disbursement method", value: "{{#loan.disbursementDetails}}{{paymentTypeName}}{{/loan.disbursementDetails}}"},
-                    {label: "Bank name", value: "{{#loan.disbursementDetails}}{{clientBankName}}{{/loan.disbursementDetails}}"},
-                    {label: "Account number", value: "{{#loan.disbursementDetails}}{{clientAccountNumber}}{{/loan.disbursementDetails}}"},
-                    {label: "Mobile number", value: "{{#loan.disbursementDetails}}{{clientPhoneNumber}}{{/loan.disbursementDetails}}"},
-                    {label: "Beneficiary name", value: "{{#loan.disbursementDetails}}{{beneficiaryName}}{{/loan.disbursementDetails}}"},
-                    {label: "Expected disbursement date", value: "{{#loan.disbursementDetails}}{{expectedDisbursementDate}}{{/loan.disbursementDetails}}"},
-                    {label: "Actual disbursement date", value: "{{#loan.disbursementDetails}}{{actualDisbursementDate}}{{/loan.disbursementDetails}}"},
-                    {label: "Disbursed amount", value: "{{#loan.disbursementDetails}}{{principal}}{{/loan.disbursementDetails}}"}
+                    {label: "Disbursement method", value: "{{#loan.disbursementDetails}}{{paymentTypeName}} {{/loan.disbursementDetails}}"},
+                    {label: "Bank name", value: "{{#loan.disbursementDetails}}{{clientBankName}} {{/loan.disbursementDetails}}"},
+                    {label: "Account number", value: "{{#loan.disbursementDetails}}{{clientAccountNumber}} {{/loan.disbursementDetails}}"},
+                    {label: "Mobile number", value: "{{#loan.disbursementDetails}}{{clientPhoneNumber}} {{/loan.disbursementDetails}}"},
+                    {label: "Beneficiary name", value: "{{#loan.disbursementDetails}}{{beneficiaryName}} {{/loan.disbursementDetails}}"},
+                    {label: "Expected disbursement date", value: "{{#loan.disbursementDetails}}{{expectedDisbursementDate}} {{/loan.disbursementDetails}}"},
+                    {label: "Actual disbursement date", value: "{{#loan.disbursementDetails}}{{actualDisbursementDate}} {{/loan.disbursementDetails}}"},
+                    {label: "Disbursed amount", value: "{{#loan.disbursementDetails}}{{principal}} {{/loan.disbursementDetails}}"}
                 ];
                 scope.chargesTemplateKeys = [
-                    {label: "Penalty name", value: "{{#loan.overdueCharges}}{{name}}{{/loan.overdueCharges}}"},
-                    {label: "Penalty rate or amount", value: "{{#loan.overdueCharges}}{{amount}}{{/loan.overdueCharges}}"},
-                    {label: "Penalty calculation method", value: "{{#loan.overdueCharges}}{{chargeCalculationType.value}}{{/loan.overdueCharges}}"},
+                    {label: "Penalty name", value: "{{#loan.overdueCharges}}{{name}} {{/loan.overdueCharges}}"},
+                    {label: "Penalty rate or amount", value: "{{#loan.overdueCharges}}{{amount}} {{/loan.overdueCharges}}"},
+                    {label: "Penalty calculation method", value: "{{#loan.overdueCharges}}{{chargeCalculationType.value}} {{/loan.overdueCharges}}"},
                     {label: "All penalties", value: "{{#loan.overdueCharges}}{{name}}: {{amount}} ({{chargeCalculationType.value}}) {{/loan.overdueCharges}}"},
                     {label: "All loan charges", value: "{{#loan.charges}}{{name}}: {{amount}} ({{chargeCalculationType.value}}) {{/loan.charges}}"}
                 ];
@@ -429,7 +432,24 @@
                 ];
             };
 
+            function attachClientMapper() {
+                if (_.findWhere(scope.mappers, {mapperskey: "client"})) {
+                    return;
+                }
+                scope.mappers.splice(1, 0, {
+                    mapperskey: "client",
+                    mappersvalue: "clients/{{loan.clientId}}?tenantIdentifier=" + $rootScope.tenantIdentifier,
+                    defaultAddIcon: 'false'
+                });
+                _.each(scope.mappers, function (mapper, index) {
+                    mapper.mappersorder = index;
+                });
+            }
+
             scope.entityChange = function (entityId) {
+                scope.mappers = _.reject(scope.mappers, function (mapper) {
+                    return mapper.mappersvalue && mapper.mappersvalue.indexOf('{{loan.clientId}}') !== -1;
+                });
                 if (entityId === 1) {
                     scope.mappers.splice(0, 1, {
                         mappersorder: 0,
@@ -437,6 +457,7 @@
                         mappersvalue: "loans/{{loanId}}?associations=all&tenantIdentifier=" + $rootScope.tenantIdentifier,
                         defaultAddIcon: 'true'
                     });
+                    attachClientMapper();
                     scope.loanKeys();
                     scope.templateKeyEntity = "Loan";
                 } else if (entityId === 0){
