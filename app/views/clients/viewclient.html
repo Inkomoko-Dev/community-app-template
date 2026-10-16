@@ -932,17 +932,17 @@
                                         <td><span class="padded-td">{{client.isStaff}}</span>
                                         </td>
                                     </tr>
-									<tr data-ng-show="client.migrated">
+									<tr>
 										<th class="table-bold">{{ 'label.input.migrated' | translate }}</th>
-										<td><span class="padded-td">{{ 'label.heading.yes' | translate }}</span>
+										<td><span class="padded-td">{{ (client.migrated ? 'label.heading.yes' : 'label.heading.no') | translate }}</span>
 										</td>
 									</tr>
-									<tr data-ng-show="client.migrated && client.migratedOnDate">
+									<tr>
 										<th class="table-bold">{{ 'label.input.migratedOnDate' | translate }}</th>
 										<td><span class="padded-td">{{client.migratedOnDate | DateFormat}}</span>
 										</td>
 									</tr>
-									<tr data-ng-show="client.migrated && client.migratedFromOfficeName">
+									<tr>
 										<th class="table-bold">{{ 'label.input.migratedFromOffice' | translate }}</th>
 										<td><span class="padded-td">{{client.migratedFromOfficeName}}</span>
 										</td>
