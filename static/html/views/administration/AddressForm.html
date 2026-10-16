@@ -22,6 +22,18 @@
                     <form-validate valattributeform="FieldConfiguration" valattribute="addressTypeId" />
                 </div>
             </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="location">{{ 'label.input.location' | translate }}<span class="required">*</span></label>
+                <div class="col-sm-3">
+                    <input type="text" id="location" name="location" ng-model="formData.location" class="form-control" required late-validate>
+                </div>
+                <div class="col-sm-2">
+                    <small class="error" ng-show="(addressSubmitted || FieldConfiguration.$submitted) && FieldConfiguration.location.$error.required">
+                        {{ 'error.msg.client.address.location.required' | translate }}
+                    </small>
+                </div>
+            </div>
             
 			<div class="form-group" ng-show="street">
 				<label class="control-label col-sm-2" for="street">{{

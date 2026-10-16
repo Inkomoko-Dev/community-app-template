@@ -189,6 +189,9 @@
 
             scope.removeAddress=function(index)
             {
+                if (scope.addressArray.length <= 1) {
+                    return;
+                }
                 scope.addressArray.splice(index,1);
             }
 
@@ -327,7 +330,21 @@
                 return scope.df;
             };
 
+            scope.isMissingAddressLocation = function (location) {
+                return !location || !String(location).trim() || String(location).trim().toUpperCase() === 'N/A';
+            };
+
             scope.submit = function () {
+                if (scope.enableAddress === true) {
+                    if (!scope.addressArray.length) {
+                        return;
+                    }
+                    for (var i = 0; i < scope.addressArray.length; i++) {
+                        if (scope.isMissingAddressLocation(scope.addressArray[i].location)) {
+                            return;
+                        }
+                    }
+                }
                 var reqDate = dateFilter(scope.first.date, scope.df);
 
                 this.formData.locale = scope.optlang.code;
@@ -417,6 +434,9 @@
                         }
                         if (scope.addressArray[i].street) {
                             temp.street = scope.addressArray[i].street;
+                        }
+                        if (scope.addressArray[i].location) {
+                            temp.location = scope.addressArray[i].location;
                         }
                         if(scope.addressArray[i].addressLine1)
                         {

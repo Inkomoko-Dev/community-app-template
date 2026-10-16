@@ -107,6 +107,7 @@
                             {
                             $scope.formData.physicalAddressCell=data[i].physicalAddressCell;
                             }
+                            $scope.formData.location=data[i].location;
                             if(data[i].addressTypeId)
                             {
                             $scope.formData.addressTypeId=data[i].addressTypeId;
@@ -130,7 +131,11 @@
 
             $scope.updateaddress=function()
             {
-                
+               $scope.addressSubmitted=true;
+               if(!$scope.formData.location || !String($scope.formData.location).trim())
+               {
+                   return;
+               }
                $scope.formData.locale="en";
                 $scope.formData.addressId=addressId;
                 resourceFactory.clientAddress.put({'clientId': clientId},$scope.formData,function (data) {

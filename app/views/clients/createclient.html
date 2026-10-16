@@ -1172,7 +1172,7 @@
                         <div class="panel panel-default">
                            <div class="panel-heading">
                               <div class="pull-right">
-                                 <a ng-click="removeAddress($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
+                                 <a ng-show="addressArray.length > 1" ng-click="removeAddress($index)" uib-tooltip="{{'label.remove.row' | translate}}"><i class="fa fa-times"></i></a>
                               </div>
                               <h5 class="heading-title text-muted">{{'label.input.address' | translate}} {{$index + 1}}</h5>
                            </div>
@@ -1191,6 +1191,18 @@
                                  </div>
                                  <div class="col-sm-2">
                                     <form-validate valattributeform="createclientform" valattribute="addressType" />
+                                 </div>
+                              </div>
+                              <div class="form-group">
+                                 <label class="control-label col-sm-3">{{ 'label.input.location' | translate }}<span class="required">*</span></label>
+                                 <div class="col-sm-4">
+                                    <input type="text" name="location{{$index}}" ng-model="addressArray[$index].location"
+                                          class="form-control" required late-validate>
+                                 </div>
+                                 <div class="col-sm-2">
+                                    <small class="error" ng-show="(rc.createclientform.attempted || createclientform.$submitted) && createclientform['location'+$index].$error.required">
+                                       {{ 'error.msg.client.address.location.required' | translate }}
+                                    </small>
                                  </div>
                               </div>
                               <div class="form-group" ng-show="street">
