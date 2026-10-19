@@ -168,21 +168,6 @@
                     ensureInlineStyle();
                     element.html('').append($compile(template)(scope));
                     refresh();
-                require: '?ngmodel',
-                link: function (scope, elm, attr, ctrl) {
-                    var template = '<div uib-alert type="danger" ng-show="errorStatus || errorDetails.length > 0">' +
-                        '<label ng-show="errorStatus"><i class="fa fa-exclamation-circle"></i> {{errorStatus}}</label>' +
-                        '<div ng-repeat="errorArray in errorDetails">' +
-                        '<div ng-repeat="error in errorArray">' +
-                            '<label ng-hide="errorStatus">' +
-                                '<i class="fa fa-exclamation-circle"></i>&nbsp;' +
-                                '<span ng-show="error.field">{{error.field | translate}}: </span>' +
-                                '<span ng-if="error.userMessage">{{error.userMessage}}</span>' +
-                                '<span ng-if="!error.userMessage">{{error.code | translate:error.args}}</span>' +
-                                '<span ng-show="error.datatable"> - {{error.datatable}}</span>' +
-                            '</label>' +
-                        '</div></div></div>';
-                    elm.html('').append($compile(template)(scope));
                 }
             };
         }
