@@ -22,10 +22,10 @@ describe("AssignLoanOfficerController", function () {
             function (value) { return value; });
     });
 
-    it("offers loan officers from the loan's office and its parent offices", function () {
+    it("asks for the loan officers who serve the loan's office", function () {
         expect(requestedParams.loanId).toEqual("428160");
         expect(requestedParams.template).toBe(true);
-        expect(requestedParams.staffInSelectedOfficeOnly).not.toBe(true);
+        expect(requestedParams.staffInSelectedOfficeOnly).toBe(true);
         expect(scope.loanOfficers.length).toEqual(2);
         expect(scope.formData.toLoanOfficerId).toEqual(1698);
     });

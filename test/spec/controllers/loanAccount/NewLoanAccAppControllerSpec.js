@@ -16,10 +16,10 @@ describe("NewLoanAccAppController", function () {
             uiConfigService, {}, function () {});
     });
 
-    it("offers loan officers from the client's office and its parent offices", function () {
+    it("asks for the loan officers who serve the client's office", function () {
         expect(requestedParams.resourceType).toEqual("template");
         expect(requestedParams.templateType).toEqual("individual");
         expect(requestedParams.clientId).toEqual("873501");
-        expect(requestedParams.staffInSelectedOfficeOnly).not.toBe(true);
+        expect(requestedParams.staffInSelectedOfficeOnly).toBe(true);
     });
 });
