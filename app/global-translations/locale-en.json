@@ -6210,7 +6210,7 @@
   "error.msg.bulk.none.selected": "No items selected for this action.",
   "error.msg.creditbureau.select": "Select an integrated credit bureau.",
   "error.msg.group.client.already.added": "Client [{{params[0].value}}] is already added. Select another client.",
-  "error.msg.import.template.download.failed": "The template could not be downloaded. Check that you are signed in and try again."
+  "error.msg.import.template.download.failed": "The template could not be downloaded. Check that you are signed in and try again.",
   "label.button.downloadresults": "Download results",
   "label.button.showfailurereasons": "Show reasons",
   "label.msg.bulkimport.failurereasonsinfile": "{{count}} row(s) failed. The reason for each failed row is in the result file Status column.",
