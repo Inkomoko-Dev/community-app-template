@@ -1346,6 +1346,9 @@
             .when('/crbloggerhub', {
                 templateUrl: 'views/reports/crb-logger-hub.html'
             })
+            .when('/kivaloggerhub', {
+                templateUrl: 'views/reports/kiva-logger-hub.html'
+            })
             .when('/addbusinessdetail/:clientId', {
                 templateUrl: 'views/clients/addClientBusinessDetail.html'
              })
