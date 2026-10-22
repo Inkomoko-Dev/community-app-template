@@ -228,6 +228,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'reports/DisbursementReportController',
             'reports/RunDisbursementReportController',
             'reports/CRBLoggerHubController',
+            'reports/KivaLoggerHubController',
             'savings/CreateSavingAccountController',
             'savings/ViewSavingDetailsController',
             'savings/ViewSavingDepositAccrualTransactionController',
