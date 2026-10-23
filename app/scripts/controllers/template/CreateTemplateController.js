@@ -51,48 +51,12 @@
             };
 
             scope.clientKeys = function () {
-                scope.clientTemplateKeys = ["{{client.id}}",
-                                        "{{client.accountNumber}}",
-                                        "{{client.transferToOffice}}",
-                                        "{{client.status}}",
-                                        "{{client.subStatus}}",
-                                        "{{client.activationDate}}",
-                                        "{{client.officeJoiningDate}}",
-                                        "{{client.firstname}}",
-                                        "{{client.middlename}}",
-                                        "{{client.lastname}}",
-                                        "{{client.fullname}}",
-                                        "{{client.displayName}}",
-                                        "{{client.mobileNo}}",
-                                        "{{client.emailAddress}}",
-                                        "{{client.isStaff}}",
-                                        "{{client.externalId}}",
-                                        "{{client.dateOfBirth}}",
-                                        "{{client.gender}}",
-                                        "{{client.staff}}",
-                                        "{{client.accountNumberRequiresAutoGeneration}}",
-                                        "{{client.closureReason}}",
-                                        "{{client.closureDate}}",
-                                        "{{client.rejectionReason}}",
-                                        "{{client.rejectionDate}}",
-                                        "{{client.rejectedBy}}",
-                                        "{{client.withdrawalReason}}",
-                                        "{{client.withdrawalDate}}",
-                                        "{{client.withdrawnBy}}",
-                                        "{{client.reactivateDate}}",
-                                        "{{client.reactivatedBy}}",
-                                        "{{client.closedBy}}",
-                                        "{{client.submittedOnDate}}",
-                                        "{{client.activatedBy}}",
-                                        "{{client.savingsProductId}}",
-                                        "{{client.savingsAccountId}}",
-                                        "{{client.clientType}}",
-                                        "{{client.clientClassification}}",
-                                        "{{client.legalForm}}",
-                                        "{{client.reopenedDate}}",
-                                        "{{client.reopenedBy}}",
-                                        "{{client.proposedTransferDate}}",
-                                        "{{client.clientCollateralManagements}}"];
+                scope.clientTemplateKeys = ["{{client.id}}", "{{client.accountNo}}", "{{client.externalId}}", "{{client.status.value}}",
+                    "{{client.activationDate}}", "{{client.officeName}}", "{{client.staffName}}", "{{client.firstname}}", "{{client.middlename}}",
+                    "{{client.lastname}}", "{{client.displayName}}", "{{client.mobileNo}}", "{{client.emailAddress}}", "{{client.dateOfBirth}}",
+                    "{{client.gender.name}}", "{{client.clientType.name}}", "{{client.clientClassification.name}}", "{{client.legalForm.value}}",
+                    "{{client.timeline.submittedOnDate}}", "{{client.timeline.activatedOnDate}}", "{{client.timeline.activatedByUsername}}",
+                    "{{client.clientAdditionalInfoData.altMobileNo}}", "{{client.clientAdditionalInfoData.title}}"];
                                         scope.additionalInfo = ["{{activity}}","{{time}}","{{clientId}}","{{loanId}}", "{{bvn}}","{{resourceId}}"];
                 scope.templateEntity = [
                     {"entityName": "Client",
@@ -108,6 +72,14 @@
                     {
                         "entityName": "Repayment Schedule",
                         "templateKeys": scope.repaymentTemplateKeys
+                    },
+                    {
+                        "entityName": "Disbursement",
+                        "templateKeys": scope.disbursementTemplateKeys
+                    },
+                    {
+                        "entityName": "Penalties and Charges",
+                        "templateKeys": scope.chargesTemplateKeys
                     },
                     {
                         "entityName": "Loan Product",
@@ -144,6 +116,8 @@
                         "{{loan.loanProductName}}",
                         "{{loan.loanOfficerName}}",
                         "{{loan.loanPurposeName}}",
+                        {label: "Loan cycle", value: "{{loan.loanCounter}}"},
+                        {label: "Product cycle", value: "{{loan.loanProductCounter}}"},
                         "{{loan.fundName}}",
                         "{{loan.department.name}}",
                         "{{loan.status.value}}",
@@ -185,7 +159,27 @@
                     "{{loan.repaymentSchedule.totalPenaltyChargesCharged}}", "{{loan.repaymentSchedule.totalWaived}}",
                     "{{loan.repaymentSchedule.totalWrittenOff}}", "{{loan.repaymentSchedule.totalRepaymentExpected}}",
                     "{{loan.repaymentSchedule.totalRepayment}}", "{{loan.repaymentSchedule.totalPaidInAdvance}}",
-                    "{{loan.repaymentSchedule.totalPaidLate}}", "{{loan.repaymentSchedule.totalOutstanding}}"];
+                    "{{loan.repaymentSchedule.totalPaidLate}}", "{{loan.repaymentSchedule.totalOutstanding}}",
+                    {label: "First repayment date", value: "{{loan.repaymentSchedule.periods#1.dueDate}}"},
+                    {label: "First instalment amount", value: "{{loan.repaymentSchedule.periods#1.totalDueForPeriod}}"},
+                    {label: "Schedule table, one row per instalment", html: '<table border="1" cellpadding="4"><tbody><tr><th>Installment</th><th>Due Date</th><th>Principal</th><th>Interest</th><th>Fees</th><th>Total Due</th></tr><tr><td>{{#loan.repaymentSchedule.periods}}{{#period}}{{period}}</td><td>{{dueDate}}</td><td>{{principalDue}}</td><td>{{interestDue}}</td><td>{{feeChargesDue}}</td><td>{{totalDueForPeriod}}</td></tr><tr><td>{{/period}}{{/loan.repaymentSchedule.periods}}Total</td><td>&nbsp;</td><td>{{loan.repaymentSchedule.totalPrincipalExpected}}</td><td>{{loan.repaymentSchedule.totalInterestCharged}}</td><td>{{loan.repaymentSchedule.totalFeeChargesCharged}}</td><td>{{loan.repaymentSchedule.totalRepaymentExpected}}</td></tr></tbody></table>'}];
+                scope.disbursementTemplateKeys = [
+                    {label: "Disbursement method", value: "{{#loan.disbursementDetails}}{{paymentTypeName}} {{/loan.disbursementDetails}}"},
+                    {label: "Bank name", value: "{{#loan.disbursementDetails}}{{clientBankName}} {{/loan.disbursementDetails}}"},
+                    {label: "Account number", value: "{{#loan.disbursementDetails}}{{clientAccountNumber}} {{/loan.disbursementDetails}}"},
+                    {label: "Mobile number", value: "{{#loan.disbursementDetails}}{{clientPhoneNumber}} {{/loan.disbursementDetails}}"},
+                    {label: "Beneficiary name", value: "{{#loan.disbursementDetails}}{{beneficiaryName}} {{/loan.disbursementDetails}}"},
+                    {label: "Expected disbursement date", value: "{{#loan.disbursementDetails}}{{expectedDisbursementDate}} {{/loan.disbursementDetails}}"},
+                    {label: "Actual disbursement date", value: "{{#loan.disbursementDetails}}{{actualDisbursementDate}} {{/loan.disbursementDetails}}"},
+                    {label: "Disbursed amount", value: "{{#loan.disbursementDetails}}{{principal}} {{/loan.disbursementDetails}}"}
+                ];
+                scope.chargesTemplateKeys = [
+                    {label: "Penalty name", value: "{{#loan.overdueCharges}}{{name}} {{/loan.overdueCharges}}"},
+                    {label: "Penalty rate or amount", value: "{{#loan.overdueCharges}}{{amount}} {{/loan.overdueCharges}}"},
+                    {label: "Penalty calculation method", value: "{{#loan.overdueCharges}}{{chargeCalculationType.value}} {{/loan.overdueCharges}}"},
+                    {label: "All penalties", value: "{{#loan.overdueCharges}}{{name}}: {{amount}} ({{chargeCalculationType.value}}) {{/loan.overdueCharges}}"},
+                    {label: "All loan charges", value: "{{#loan.charges}}{{name}}: {{amount}} ({{chargeCalculationType.value}}) {{/loan.charges}}"}
+                ];
                 scope.loanSummaryTemplateKeys = [
                         "{{loan.summary.principalDisbursed}}",
                         "{{loan.summary.principalPaid}}",
@@ -226,6 +220,12 @@
                     },
                     {"entityName": "Repayment Schedule",
                         "templateKeys": scope.repaymentTemplateKeys
+                    },
+                    {"entityName": "Disbursement",
+                        "templateKeys": scope.disbursementTemplateKeys
+                    },
+                    {"entityName": "Penalties and Charges",
+                        "templateKeys": scope.chargesTemplateKeys
                     },
                     {"entityName": "Loan Product",
                         "templateKeys": scope.loanProductTemplateKeys
@@ -310,6 +310,14 @@
                         "templateKeys": scope.repaymentTemplateKeys
                     },
                     {
+                        "entityName": "Disbursement",
+                        "templateKeys": scope.disbursementTemplateKeys
+                    },
+                    {
+                        "entityName": "Penalties and Charges",
+                        "templateKeys": scope.chargesTemplateKeys
+                    },
+                    {
                         "entityName": "Loan Product",
                         "templateKeys": scope.loanProductTemplateKeys
                     },
@@ -370,6 +378,14 @@
                         "templateKeys": scope.repaymentTemplateKeys
                     },
                     {
+                        "entityName": "Disbursement",
+                        "templateKeys": scope.disbursementTemplateKeys
+                    },
+                    {
+                        "entityName": "Penalties and Charges",
+                        "templateKeys": scope.chargesTemplateKeys
+                    },
+                    {
                         "entityName": "Loan Product",
                         "templateKeys": scope.loanProductTemplateKeys
                     },
@@ -389,7 +405,24 @@
                 scope.setEditorText('');
             };
 
+            function attachClientMapper() {
+                if (_.findWhere(scope.mappers, {mapperskey: "client"})) {
+                    return;
+                }
+                scope.mappers.splice(1, 0, {
+                    mapperskey: "client",
+                    mappersvalue: "clients/{{loan.clientId}}?tenantIdentifier=" + $rootScope.tenantIdentifier,
+                    defaultAddIcon: 'false'
+                });
+                _.each(scope.mappers, function (mapper, index) {
+                    mapper.mappersorder = index;
+                });
+            }
+
             scope.entityChange = function (entityId) {
+                scope.mappers = _.reject(scope.mappers, function (mapper) {
+                    return mapper.mappersvalue && mapper.mappersvalue.indexOf('{{loan.clientId}}') !== -1;
+                });
                 if (entityId === 1) {
                     scope.mappers.splice(0, 1, {
                         mappersorder: 0,
@@ -397,6 +430,7 @@
                         mappersvalue: "loans/{{loanId}}?associations=all&tenantIdentifier=" + $rootScope.tenantIdentifier,
                         defaultAddIcon: 'true'
                     });
+                    attachClientMapper();
                     scope.loanKeys();
                     scope.templateKeyEntity = "Loan";
                 } else if (entityId === 0){
@@ -434,7 +468,24 @@
             };
 
             scope.templateKeySelected = function (templateKey) {
-                scope.insertEditorText(templateKey);
+                if (templateKey && templateKey.html) {
+                    var editor = scope.editorInstance();
+                    if (editor) {
+                        editor.insertHtml(templateKey.html);
+                    } else {
+                        scope.formData.text = (scope.formData.text || '') + templateKey.html;
+                    }
+                    return;
+                }
+                scope.insertEditorText(templateKey && templateKey.value ? templateKey.value : templateKey);
+            };
+
+            scope.templateKeyLabel = function (templateKey) {
+                return templateKey && templateKey.label ? templateKey.label : '';
+            };
+
+            scope.templateKeyDisplay = function (templateKey) {
+                return templateKey && typeof templateKey === 'object' ? (templateKey.value || '') : templateKey;
             };
 
             scope.addMapperKeyValue = function () {
