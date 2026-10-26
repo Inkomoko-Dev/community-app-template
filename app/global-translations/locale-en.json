@@ -613,6 +613,7 @@
   "error.msg.fund.id.invalid": "Fund with identifier `{{params[0].value}}` does not exist.",
   "error.msg.charge.id.invalid": "Charge with identifier `{{params[0].value}}` does not exist.",
   "error.msg.loan.id.is.invalid": "Loan with identifier `{{params[0].value}}` does not exist.",
+  "error.msg.loan.id.invalid": "Loan with identifier {{params[0].value}} does not exist.",
   "error.msg.glaccount.id.invalid": "General Ledger account with identifier `{{params[0].value}}` does not exist.",
   "error.msg.calendar.id.invalid": "Calendar with identifier `{{params[0].value}}` does not exist.",
   "validation.msg.calendar.title.cannot.be.blank": "The Title field is mandatory.",
