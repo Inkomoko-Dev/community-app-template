@@ -159,6 +159,9 @@ angular.module('notificationWidget', [])
                     }
 
                     var requestUrl = rejection && rejection.config ? rejection.config.url || '' : '';
+                    if (rejection && rejection.config && rejection.config.ignoreErrorBanner) {
+                        return $q.reject(rejection);
+                    }
                     var parsed;
                     if (isBatchRequest(requestUrl) && rejection && Object.prototype.toString.call(rejection.data) === '[object Array]') {
                         parsed = ApiErrorMessage.parseBatchFailures(rejection.data, translateCode);
