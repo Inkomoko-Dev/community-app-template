@@ -1706,9 +1706,14 @@
                 }
 
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
+                if (scope.showNoteField && scope.noteFieldMandatory && !((scope.formData.note || '').trim())) {
+                    scope.formData.note = (scope.formData.note || '').trim();
                     scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
+                }
+                if (scope.formData.note) {
+                    scope.formData.note = scope.formData.note.trim();
+                    submitData.note = scope.formData.note;
                 }
                 // Skip supplier payment validation for third-party disbursement - details come from partner instruction
                 if (scope.isSupplierNonCashPayment() && !scope.enableThirdPartyDisbursement) {
@@ -2632,16 +2637,19 @@
             }
 
             scope.rejectDisbursement = function () {
-                var params = {loanId: scope.accountId, command: 'rejectDisbursement'};
+                var note = (scope.formData.note || '').trim();
+                if (!note) {
+                    scope.error = 'Note field is mandatory';
+                    return;
+                }
 
                 var confirmReject = confirm("Are you sure you want to reject this disbursement?");
                 if (!confirmReject) {
                     return;
                 }
 
-                // Call backend API to reject disbursement and move back to awaiting approval
-                resourceFactory.LoanAccountResource.save(params, {}, function (data) {
-                    // Redirect to loan view after successful rejection
+                var params = {loanId: scope.accountId, command: 'rejectDisbursement'};
+                resourceFactory.LoanAccountResource.save(params, { note: note }, function (data) {
                     location.path('/viewloanaccount/' + data.loanId);
                 });
             };
@@ -2700,7 +2708,7 @@
 
             scope.handleReject = function () {
                 // Only validate the note field if it is shown and mandatory
-                if (scope.showNoteField && scope.noteFieldMandatory && !scope.formData.note) {
+                if (scope.showNoteField && scope.noteFieldMandatory && !((scope.formData.note || '').trim())) {
                     scope.error = 'Note field is mandatory';
                     return; // Prevent submission if note is invalid
                 }

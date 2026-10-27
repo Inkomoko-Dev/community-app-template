@@ -614,7 +614,7 @@
                         return;
                     }
 
-                    const extraBody = config.requireReason ? { note: $scope.reason } : config.extraBody || {};
+                    const extraBody = config.requireReason ? { note: $scope.reason.trim() } : config.extraBody || {};
 
                     scope.bulkBatchExecutor({
                         template: config.template,
