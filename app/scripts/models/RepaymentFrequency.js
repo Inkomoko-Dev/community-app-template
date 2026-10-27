@@ -98,10 +98,13 @@
                     resolvedType = this.resolveTypeId(typeValue);
                 }
                 var code = this.codeFrom(every, resolvedType);
-                if (code !== 'CUSTOM') {
-                    return _.find(this.presets, function (item) {
+                if (code && code !== 'CUSTOM') {
+                    var preset = _.find(this.presets, function (item) {
                         return item.code === code;
-                    }).value;
+                    });
+                    if (preset) {
+                        return preset.value;
+                    }
                 }
                 var unit = typeValue;
                 if (!unit && typeof typeId === 'object' && typeId && typeId.value) {
