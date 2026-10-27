@@ -1334,7 +1334,7 @@
                         scope.searchTransaction();
                     });
 
-                    resourceFactory.creditBureauByLoanProductId.get({loanProductId: scope.productId}, function (data) {
+                    resourceFactory.creditBureauByLoanProductId.probe({loanProductId: scope.productId}, function (data) {
                         scope.cblpstatuses = data;
                         scope.cblpstatusactive = data.isActive;
                         scope.cbIsCreditCheckMandatory = data.isCreditCheckMandatory;
