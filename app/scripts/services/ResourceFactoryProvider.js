@@ -1035,7 +1035,8 @@
                         get: { method: 'GET', isArray: true }
                     }),
                     creditBureauByLoanProductId: defineResource(apiVer + "/CreditBureauConfiguration/loanProduct/:loanProductId", { loanProductId: '@loanProductId' }, {
-                        get: { method: 'GET', params: {} }
+                        get: { method: 'GET', params: {} },
+                        probe: { method: 'GET', params: {}, ignoreErrorBanner: true }
                     }),
                     lpdropdown: defineResource(apiVer + "/CreditBureauConfiguration/loanProduct", {}, {
                         get: { method: 'GET', isArray: true }

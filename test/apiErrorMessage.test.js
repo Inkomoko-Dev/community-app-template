@@ -112,6 +112,22 @@ test('normalizes the older nested error list and a flat client-side list', funct
     assert.equal(flat[0].message, 'Select a partner.');
 });
 
+test('keeps the permission name when a translated error is shown again', function () {
+    const once = api.normalizeErrors([{
+        userMessageGlobalisationCode: 'error.msg.permission.code.invalid',
+        defaultUserMessage: 'Permission with Code CREATE_x_partner_client_mapping does not exist',
+        parameterName: 'id',
+        args: [{value: 'CREATE_x_partner_client_mapping'}]
+    }], function (code, params) {
+        var value = params && params.params && params.params[0] ? params.params[0].value : '';
+        return 'Permission with code `' + value + '` does not exist.';
+    });
+    const twice = api.normalizeErrors(once, function () {
+        return 'Permission with code `` does not exist.';
+    });
+    assert.equal(twice[0].message, 'Permission with code `CREATE_x_partner_client_mapping` does not exist.');
+});
+
 test('clears a displayed error only when the same write is submitted again', function () {
     const key = api.requestKey('POST', '/loans/1?command=approve');
     assert.equal(api.shouldClearForRequest('GET', '/loans/1', key), false);
