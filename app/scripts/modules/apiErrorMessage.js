@@ -105,6 +105,10 @@
         }
         var code = error.code || error.userMessageGlobalisationCode || '';
         var params = argumentParams(error);
+        var hasArgs = params && params.params && params.params.length;
+        if (!hasArgs && error.message && error.message !== code) {
+            return error.message;
+        }
         var translated = translateCode(code, params, translate);
         if (translated) {
             return translated;

@@ -83,6 +83,14 @@
             scope.isClientOtherInfoEnabled = data.isClientOtherInfoEnabled;
             scope.isClientRecruitmentSurveyEnabled = data.isClientRecruitmentSurveyEnabled;
 
+            if (scope.employmentInfoEnabled === true) {
+                resourceFactory.employmentInformation.get({clientId: routeParams.id}, function (employmentData) {
+                    scope.employmentInfo = employmentData;
+                }, function () {
+                    scope.employmentInfo = [];
+                });
+            }
+
             });
 
             scope.addExpenses=function()
@@ -242,10 +250,6 @@
             {
                 location.path('/addEmploymentInfo/'+ routeParams.id);
             }
-            resourceFactory.employmentInformation.get({clientId:routeParams.id},function(data)
-              {
-                scope.employmentInfo=data;
-              });
 
             resourceFactory.partnerClientResource.getAssignment({clientId: routeParams.id}, function(data) {
                 if (data && data.partnerCode) {
