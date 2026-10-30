@@ -88,7 +88,7 @@
             };
 
             scope.loanId = routeParams.loanId;
-            scope.formData = {};
+            scope.formData = { recalculateEvenIfObligationsMet: false };
             scope.rejectData = {};
             scope.adjustFuturePayments = true;
             scope.formData.submittedOnDate = new Date();
