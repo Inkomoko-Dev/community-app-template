@@ -34,10 +34,11 @@ The banner stays until the user dismisses it, leaves the screen, or refreshes. D
 | 403 with no user message | You do not have permission to do this. Contact your supervisor if you need access. |
 | 404 | This record could not be found. Refresh the page. If it is still missing, contact support. |
 | 409 with no user message | This record was changed by someone else. Refresh and try again. |
+| 500, 502, or 504 with a Fineract user message | That message. The generic platform sentence and stack traces are not shown. |
 | 500, 502, 504, or a body that is not JSON | Something went wrong on the server. Try again. If it continues, contact support and include the time of this action. |
 | No connection (status 0 or -1) | No connection. Check your network and try again. If this continues, contact support. |
 
-400, 403, 404, 409, and 422 responses that include `errors[]` show those user messages instead of the escalation line.
+400, 403, 404, 409, 422, 500, 502, and 504 responses that include a user message in `errors[]` or `defaultUserMessage` show that message instead of the escalation line.
 
 ## Accessibility
 
