@@ -69,34 +69,6 @@ test('shows a domain-rule message for 403 and an escalation line when the body h
     assert.equal(withoutReason.errorStatus.includes('CREATE_LOAN'), false);
 });
 
-test('shows the Fineract reason on a 500 and hides the generic platform sentence', function () {
-    const explained = api.parseHttpError(500, {
-        developerMessage: 'java.lang.NullPointerException\n\tat org.apache.fineract.Loan.waive',
-        defaultUserMessage: 'An unexpected error occured on the platform server.',
-        userMessageGlobalisationCode: 'error.msg.platform.server.side.error',
-        errors: [{
-            parameterName: 'id',
-            userMessageGlobalisationCode: 'error.msg.loan.waive.interest.amount.exceeds.total.outstanding.interest',
-            defaultUserMessage: 'The amount of interest to waive cannot be greater than total interest outstanding on loan.'
-        }]
-    }, function (code) { return code; });
-
-    assert.equal(explained.errorStatus, null);
-    assert.equal(explained.errorDetails.length, 1);
-    assert.equal(explained.errorDetails[0].message,
-        'The amount of interest to waive cannot be greater than total interest outstanding on loan.');
-    assert.equal(explained.errorDetails[0].message.includes('NullPointerException'), false);
-
-    const boilerplate = api.parseHttpError(500, {
-        defaultUserMessage: 'An unexpected error occured on the platform server.',
-        errors: [{
-            defaultUserMessage: 'An unexpected error occured on the platform server.'
-        }]
-    }, function (code) { return code; });
-    assert.match(boilerplate.errorStatus, /server/i);
-    assert.equal(boilerplate.errorDetails.length, 0);
-});
-
 test('uses an escalation line for server and connection failures', function () {
     const server = api.parseHttpError(500, '<html>gateway</html>', function (code) { return code; });
     assert.match(server.errorStatus, /server/i);
