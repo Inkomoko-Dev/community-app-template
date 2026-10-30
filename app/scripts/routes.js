@@ -890,6 +890,9 @@
             .when('/excessrefunds/bulk', {
                 templateUrl: 'views/loans/excessrefund/bulk.html'
             })
+            .when('/excessrefunds/bulk/:batchId', {
+                templateUrl: 'views/loans/excessrefund/bulk.html'
+            })
             .when('/excessrefunds/:refundId', {
                 templateUrl: 'views/loans/excessrefund/detail.html'
             })
