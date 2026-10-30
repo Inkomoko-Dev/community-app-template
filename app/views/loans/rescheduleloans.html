@@ -19,6 +19,13 @@
                 </div>
             </div>
             <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8">
+                    <input id="recalculateEvenIfObligationsMet" type="checkbox" ng-model="formData.recalculateEvenIfObligationsMet">
+                    &nbsp;<span class="control-label">{{ 'label.input.recalculateEvenIfObligationsMet' | translate }}</span>
+                    <p class="help-block">{{ 'label.input.recalculateEvenIfObligationsMet.help' | translate }}</p>
+                </div>
+            </div>
+            <div class="form-group">
                 <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.input.rescheduleReasonId' | translate}}<span class="required">*</span></label>
 
                 <div class="col-sm-3 paddedbottom10 paddedtop">

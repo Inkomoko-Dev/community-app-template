@@ -143,6 +143,13 @@
                                 ng-options="option.value as option.label for option in installmentStrategyOptions"></select>
                         <span class="error" ng-if="validation.rescheduleFromDateStrategy">{{'label.bulkreschedule.installmentstrategy.required' | translate}}</span>
                     </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" ng-model="formData.reschedulingDetails.recalculateEvenIfObligationsMet">
+                            {{'label.bulkreschedule.recalculateevenifobligationsmet' | translate}}
+                        </label>
+                        <p class="help-block">{{'label.bulkreschedule.recalculateevenifobligationsmet.help' | translate}}</p>
+                    </div>
                     <div class="form-group" ng-class="{'has-error': validation.rescheduleReasonId}">
                         <label>{{'label.bulkreschedule.reschedulereason' | translate}} <span class="required">*</span></label>
                         <select class="form-control" ng-model="formData.reschedulingDetails.rescheduleReasonId"
