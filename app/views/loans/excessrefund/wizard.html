@@ -57,8 +57,13 @@
                     <option value="MANUAL">Manual</option>
                     <option value="PAYMENT_HUB">Payment Hub</option>
                 </select>
+                <label>Payment type</label>
+                <select id="paymentTypeId" class="form-control" ng-model="formData.paymentTypeId"
+                        ng-options="paymentType.id as paymentType.name for paymentType in filteredPaymentTypes()">
+                    <option value="">-- select --</option>
+                </select>
                 <button class="btn btn-default" ng-click="back()">Back</button>
-                <button class="btn btn-primary" ng-click="next()">Continue</button>
+                <button class="btn btn-primary" ng-click="next()" ng-disabled="!formData.paymentTypeId">Continue</button>
             </div>
             <div ng-if="step === 5">
                 <p>Review refund for loan {{formData.loanId}} amount {{formData.amount}} via {{formData.paymentMode}}.</p>

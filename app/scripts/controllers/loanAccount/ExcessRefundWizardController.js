@@ -44,12 +44,29 @@
                     scope.template = data;
                     scope.formData.loanId = data.loanId;
                     scope.formData.amount = data.totalOverpaid;
+                    scope.formData.paymentTypeId = null;
                     scope.prefillBeneficiaryFromTemplate(data);
                     scope.step = 2;
                 });
             };
 
+            scope.filteredPaymentTypes = function () {
+                if (!scope.template || !scope.template.paymentTypeOptions) {
+                    return [];
+                }
+                var channel = scope.formData.beneficiary.channel;
+                return scope.template.paymentTypeOptions.filter(function (pt) {
+                    if (channel === 'MOBILE_MONEY') {
+                        return !!pt.isMobileMoney;
+                    }
+                    return !pt.isMobileMoney;
+                });
+            };
+
             scope.next = function () {
+                if (scope.step === 4 && !scope.formData.paymentTypeId) {
+                    return;
+                }
                 if (scope.step < 6) {
                     scope.step = scope.step + 1;
                 }
