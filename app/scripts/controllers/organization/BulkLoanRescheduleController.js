@@ -870,6 +870,7 @@
                     repaymentEvery: null,
                     repaymentFrequencyType: null,
                     preserveLoanTermDuration: false,
+                    recalculateEvenIfObligationsMet: false,
                     changeRepaymentDate: false,
                     adjustedDueDate: null,
                     introduceGracePeriods: false,

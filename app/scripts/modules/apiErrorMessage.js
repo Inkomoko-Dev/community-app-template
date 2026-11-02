@@ -99,6 +99,26 @@
         return spaced.charAt(0).toUpperCase() + spaced.slice(1);
     }
 
+    function isUserFacingMessage(message) {
+        if (!message) {
+            return false;
+        }
+        var text = String(message).replace(/[ \t]+/g, ' ').trim();
+        if (!text) {
+            return false;
+        }
+        var lower = text.toLowerCase();
+        if (lower === 'an unexpected error occured on the platform server.' ||
+                lower === 'an unexpected error occurred on the platform server.' ||
+                lower === 'internal server error') {
+            return false;
+        }
+        if (text.indexOf('\n') !== -1 || text.indexOf('\tat ') !== -1) {
+            return false;
+        }
+        return true;
+    }
+
     function userText(error, translate) {
         if (!error) {
             return '';
@@ -106,20 +126,19 @@
         var code = error.code || error.userMessageGlobalisationCode || '';
         var params = argumentParams(error);
         var hasArgs = params && params.params && params.params.length;
+        var text = '';
         if (!hasArgs && error.message && error.message !== code) {
-            return error.message;
+            text = error.message;
+        } else {
+            text = translateCode(code, params, translate);
+            if (!text && error.defaultUserMessage) {
+                text = error.defaultUserMessage;
+            }
+            if (!text && error.message && error.message !== code) {
+                text = error.message;
+            }
         }
-        var translated = translateCode(code, params, translate);
-        if (translated) {
-            return translated;
-        }
-        if (error.defaultUserMessage) {
-            return error.defaultUserMessage;
-        }
-        if (error.message && error.message !== code) {
-            return error.message;
-        }
-        return translated || '';
+        return isUserFacingMessage(text) ? text : '';
     }
 
     function toDisplayError(error, translate) {
@@ -202,14 +221,13 @@
     }
 
     function hidesServerBody(status) {
-        return status === 0 || status === -1 || status === undefined || status === null ||
-            status === 401 || status === 405 || status === 500 || status === 502 || status === 504;
+        return status === 0 || status === -1 || status === undefined || status === null || status === 401;
     }
 
     function parseHttpError(status, data, translate) {
         var body = asJson(data);
         var developerMessage = body && body.developerMessage ? body.developerMessage : null;
-        if (hidesServerBody(status) || (!body && (status === 500 || status === 502 || status === 504 || status === 401))) {
+        if (hidesServerBody(status)) {
             return {
                 errorStatus: escalationMessage(status, translate),
                 errorDetails: [],

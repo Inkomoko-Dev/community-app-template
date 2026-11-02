@@ -152,7 +152,8 @@
                 reschedulingDetails: {
                     rescheduleReasonId: null, submittedOnDate: new Date(),
                     rescheduleReasonComment: '', repaymentEvery: null, repaymentFrequencyType: null,
-                    preserveLoanTermDuration: false, adjustedDueDate: null, endDate: null, emi: null,
+                    preserveLoanTermDuration: false, recalculateEvenIfObligationsMet: false,
+                    adjustedDueDate: null, endDate: null, emi: null,
                     graceOnPrincipal: null, graceOnInterest: null, extraTerms: null,
                     newPrincipalDueFixedAmount: null, newFixedPrincipalPercentagePerInstallment: null,
                     overdueChargeHandling: null, carryForwardChargeId: null, carryForwardChargeDueDate: null
