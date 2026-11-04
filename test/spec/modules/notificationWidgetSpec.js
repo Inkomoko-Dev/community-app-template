@@ -1,5 +1,5 @@
 describe('notificationWidget error banner', function () {
-    var $http, $httpBackend, $rootScope, $q;
+    var $http, $httpBackend, $rootScope, $q, $compile, $timeout;
 
     var notAuthorized = {
         httpStatusCode: '403',
@@ -45,11 +45,13 @@ describe('notificationWidget error banner', function () {
 
     beforeEach(module('notificationWidget'));
 
-    beforeEach(inject(function (_$http_, _$httpBackend_, _$rootScope_, _$q_) {
+    beforeEach(inject(function (_$http_, _$httpBackend_, _$rootScope_, _$q_, _$compile_, _$timeout_) {
         $http = _$http_;
         $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
         $q = _$q_;
+        $compile = _$compile_;
+        $timeout = _$timeout_;
     }));
 
     afterEach(function () {
@@ -194,6 +196,174 @@ describe('notificationWidget error banner', function () {
             $rootScope.$broadcast('$routeChangeStart');
 
             expect(bannerShowing()).toBe(false);
+        });
+    });
+
+    describe('a save clicked twice', function () {
+        var returnBody = {note: 'Client asked for a lower amount'};
+        var returnUrl = '/fineract-provider/api/v1/loans/decision/prepareAndSignContract/reject/431738';
+
+        it('sends the save only once while the first one is still running', function () {
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(200, {loanId: 431738});
+            send('POST', returnUrl, returnBody);
+            send('POST', returnUrl, returnBody);
+            $httpBackend.flush();
+
+            expect(bannerShowing()).toBe(false);
+        });
+
+        it('sends the save again when the user retries after it finished', function () {
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(400, {errors: [{userMessageGlobalisationCode: 'validation.msg.loan.prepareandsigncontract.reject.note.cannot.be.blank', defaultUserMessage: 'Note is mandatory.', parameterName: 'note'}]});
+            send('POST', returnUrl, returnBody);
+            $httpBackend.flush();
+
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(200, {loanId: 431738});
+            send('POST', returnUrl, returnBody);
+            $httpBackend.flush();
+
+            expect(bannerShowing()).toBe(false);
+        });
+
+        it('still sends different saves that run at the same time', function () {
+            $httpBackend.expectPOST('/fineract-provider/api/v1/datatables/dt_one/431738', {a: 1}).respond(200, {});
+            $httpBackend.expectPOST('/fineract-provider/api/v1/datatables/dt_one/431738', {a: 2}).respond(200, {});
+            send('POST', '/fineract-provider/api/v1/datatables/dt_one/431738', {a: 1});
+            send('POST', '/fineract-provider/api/v1/datatables/dt_one/431738', {a: 2});
+            $httpBackend.flush();
+        });
+
+        it('does not hold back repeated lookups', function () {
+            $httpBackend.expectGET('/fineract-provider/api/v1/offices').respond(200, []);
+            $httpBackend.expectGET('/fineract-provider/api/v1/offices').respond(200, []);
+            send('GET', '/fineract-provider/api/v1/offices');
+            send('GET', '/fineract-provider/api/v1/offices');
+            $httpBackend.flush();
+        });
+
+        function compileForm(onSubmit) {
+            var scope = $rootScope.$new();
+            scope.save = onSubmit;
+            var element = $compile('<form name="createuserform" novalidate>' +
+                '<button id="cancel" type="button">Cancel</button>' +
+                '<button id="save" type="submit">Submit</button>' +
+                '<button id="locked" type="submit" disabled>Locked</button>' +
+                '</form>')(scope);
+            element.on('submit', function (event) {
+                event.preventDefault();
+                scope.$apply(scope.save);
+            });
+            scope.$digest();
+            return element;
+        }
+
+        function submit(element) {
+            var event = document.createEvent('Event');
+            event.initEvent('submit', true, true);
+            element[0].dispatchEvent(event);
+        }
+
+        function button(element, id) {
+            return element[0].querySelector('#' + id);
+        }
+
+        it('disables the submit button while the save is running and enables it again when it fails', function () {
+            var element = compileForm(function () {
+                send('POST', '/fineract-provider/api/v1/users', {username: 'inkomoko'});
+            });
+            $httpBackend.expectPOST('/fineract-provider/api/v1/users').respond(403, usernameTaken);
+
+            submit(element);
+            $timeout.flush();
+
+            expect(button(element, 'save').disabled).toBe(true);
+            expect(button(element, 'cancel').disabled).toBe(false);
+
+            $httpBackend.flush();
+
+            expect(button(element, 'save').disabled).toBe(false);
+            expect(button(element, 'locked').disabled).toBe(true);
+        });
+
+        it('disables a wizard submit button that saves on click without submitting the form', function () {
+            var scope = $rootScope.$new();
+            var element = $compile('<form name="loanactionform" novalidate>' +
+                '<button id="save" type="submit">Save</button>' +
+                '</form>')(scope);
+            scope.$digest();
+            angular.element(button(element, 'save')).on('click', function (event) {
+                event.preventDefault();
+                scope.$apply(function () {
+                    send('POST', returnUrl, returnBody);
+                });
+            });
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(200, {loanId: 431738});
+
+            button(element, 'save').click();
+            $timeout.flush();
+
+            expect(button(element, 'save').disabled).toBe(true);
+
+            $httpBackend.flush();
+
+            expect(button(element, 'save').disabled).toBe(false);
+        });
+
+                it('disables a wizard submit button whose save starts a moment after the click', function () {
+            var scope = $rootScope.$new();
+            var element = $compile('<form name="loanactionform" novalidate>' +
+                '<button id="save" type="submit">Submit</button>' +
+                '</form>')(scope);
+            scope.$digest();
+            angular.element(button(element, 'save')).on('click', function (event) {
+                event.preventDefault();
+                $timeout(function () {
+                    send('POST', returnUrl, returnBody);
+                }, 50);
+            });
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(200, {loanId: 431738});
+
+            button(element, 'save').click();
+            $timeout.flush();
+
+            expect(button(element, 'save').disabled).toBe(true);
+
+            $httpBackend.flush();
+
+            expect(button(element, 'save').disabled).toBe(false);
+        });
+
+                it('disables the wizard submit button when the click arrives wrapped by jQuery', function () {
+            var scope = $rootScope.$new();
+            var element = $compile('<form name="loanactionform" novalidate>' +
+                '<button id="save" type="submit">Submit</button>' +
+                '</form>')(scope);
+            scope.$digest();
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(200, {loanId: 431738});
+            send('POST', returnUrl, returnBody);
+            $rootScope.$digest();
+
+            element.triggerHandler({
+                type: 'click',
+                target: button(element, 'save'),
+                isDefaultPrevented: function () {
+                    return true;
+                }
+            });
+
+            expect(button(element, 'save').disabled).toBe(true);
+
+            $httpBackend.flush();
+
+            expect(button(element, 'save').disabled).toBe(false);
+        });
+
+                it('leaves the submit button alone when the form sends nothing', function () {
+            var element = compileForm(angular.noop);
+
+            submit(element);
+            $timeout.flush();
+
+            expect(button(element, 'save').disabled).toBe(false);
         });
     });
 });

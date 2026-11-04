@@ -327,6 +327,14 @@
             return !(isRead && activeErrorRequestKey && !isReadKey(activeErrorRequestKey));
         }
 
+        function writeSignature(method, url, params, data) {
+            if (!method || method === 'GET') {
+                return null;
+            }
+            var body = typeof data === 'string' ? data : JSON.stringify(data === undefined ? null : data);
+            return requestKey(method, url) + ' ' + JSON.stringify(params || null) + ' ' + body;
+        }
+
         return {
             ENGLISH: ENGLISH,
             humanizeField: humanizeField,
@@ -337,6 +345,7 @@
             requestKey: requestKey,
             shouldClearForRequest: shouldClearForRequest,
             shouldClearOnSuccess: shouldClearOnSuccess,
-            shouldPublishError: shouldPublishError
+            shouldPublishError: shouldPublishError,
+            writeSignature: writeSignature
         };
 });

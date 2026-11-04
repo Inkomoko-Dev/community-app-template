@@ -190,3 +190,14 @@ test('does not let a cancelled request or a background read replace what the use
     assert.equal(api.shouldPublishError('POST', 'error', saveError), true);
     assert.equal(api.shouldPublishError('POST', 'complete', null), true);
 });
+
+test('identifies a save by what it sends so a repeated click can be recognised', function () {
+    const body = {note: 'Client asked for a lower amount'};
+    const url = '/loans/decision/prepareAndSignContract/reject/431738';
+    assert.equal(api.writeSignature('GET', '/offices', null, null), null);
+    assert.equal(api.writeSignature(undefined, '/offices', null, null), null);
+    assert.equal(api.writeSignature('POST', url, null, body), api.writeSignature('POST', url, null, JSON.stringify(body)));
+    assert.notEqual(api.writeSignature('POST', url, null, body), api.writeSignature('POST', url, null, {note: 'Other'}));
+    assert.notEqual(api.writeSignature('POST', url, null, body), api.writeSignature('PUT', url, null, body));
+    assert.notEqual(api.writeSignature('POST', '/loans/1', {command: 'approve'}, body), api.writeSignature('POST', '/loans/1', {command: 'reject'}, body));
+});
