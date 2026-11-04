@@ -1199,7 +1199,13 @@
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
 
-                    whatsAppInteractiveTicketResource: defineResource(apiVer + "/whatsapp/interactive/tickets/:ticketId", { ticketId: '@ticketId' }, {
+                                        metaWhatsAppConnectivityResource: defineResource(apiVer + "/meta/whatsapp/connectivity", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    metaWhatsAppProviderResource: defineResource(apiVer + "/meta/whatsapp/provider", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+whatsAppInteractiveTicketResource: defineResource(apiVer + "/whatsapp/interactive/tickets/:ticketId", { ticketId: '@ticketId' }, {
                         getAll: { method: 'GET', params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
                         update: { method: 'PUT', params: {} }

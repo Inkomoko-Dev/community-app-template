@@ -3391,6 +3391,7 @@
   "label.button.testallchannels": "Test All Channels",
   "label.button.testwhatsapp": "Test WhatsApp",
   "label.button.testvoice": "Test Voice",
+  "label.button.testconnectivity": "Test Meta connectivity",
   "label.button.send": "Send",
   "label.button.call": "Call",
   "label.view.bulkimport": "Bulk data import using excel spreadsheet templates for clients, offices, etc.",
@@ -6267,4 +6268,9 @@
   "label.msg.bulkimport.morefailurereasons": "Showing {{shown}} of {{total}} failed rows. Download the result file for the rest.",
   "label.msg.bulkimport.failurerowlabel": "Row {{row}}:"
 
+  "label.heading.metawhatsapp": "Meta WhatsApp",
+  "label.heading.metawhatsapp.help": "Meta Cloud API is the primary WhatsApp transport. Campaign templates must exist in Meta Business Manager with matching name, language, and body variable count. Africa's Talking remains WhatsApp fallback; voice and SMS stay on Africa's Talking. Toggle WHATSAPP_PRIMARY_PROVIDER / META_WHATSAPP_ENABLED to cut over. Meta webhook callback must include ?tenantIdentifier=<tenant>.",
+  "label.heading.primaryprovider": "Primary provider",
+  "label.heading.fallbackprovider": "Fallback provider",
+  "label.heading.fallbackenabled": "Fallback enabled"
 }
