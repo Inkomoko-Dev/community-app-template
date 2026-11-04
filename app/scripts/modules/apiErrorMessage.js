@@ -305,6 +305,28 @@
             return requestKey(method, url) === activeErrorRequestKey;
         }
 
+        function isReadKey(key) {
+            return !!key && key.indexOf('GET ') === 0;
+        }
+
+        function shouldClearOnSuccess(method, url, activeErrorRequestKey) {
+            if (!isReadKey(activeErrorRequestKey)) {
+                return false;
+            }
+            if (method && method !== 'GET') {
+                return true;
+            }
+            return requestKey(method, url) === activeErrorRequestKey;
+        }
+
+        function shouldPublishError(method, xhrStatus, activeErrorRequestKey) {
+            if (xhrStatus === 'abort') {
+                return false;
+            }
+            var isRead = !method || method === 'GET';
+            return !(isRead && activeErrorRequestKey && !isReadKey(activeErrorRequestKey));
+        }
+
         return {
             ENGLISH: ENGLISH,
             humanizeField: humanizeField,
@@ -313,6 +335,8 @@
             parseBatchFailures: parseBatchFailures,
             escalationMessage: escalationMessage,
             requestKey: requestKey,
-            shouldClearForRequest: shouldClearForRequest
+            shouldClearForRequest: shouldClearForRequest,
+            shouldClearOnSuccess: shouldClearOnSuccess,
+            shouldPublishError: shouldPublishError
         };
 });

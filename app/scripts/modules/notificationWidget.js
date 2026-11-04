@@ -90,6 +90,10 @@ angular.module('notificationWidget', [])
                 },
                 response: function (response) {
                     $rootScope.blockUI = false;
+                    var succeeded = response && response.config;
+                    if (succeeded && ApiErrorMessage.shouldClearOnSuccess(succeeded.method, succeeded.url, $rootScope._apiErrorRequestKey)) {
+                        clearDisplayedErrors();
+                    }
 
                     //contains the responses successful and failed responses
                     $rootScope.successfulResponses = [];
@@ -160,6 +164,10 @@ angular.module('notificationWidget', [])
 
                     var requestUrl = rejection && rejection.config ? rejection.config.url || '' : '';
                     if (rejection && rejection.config && rejection.config.ignoreErrorBanner) {
+                        return $q.reject(rejection);
+                    }
+                    if (!ApiErrorMessage.shouldPublishError(rejection && rejection.config && rejection.config.method,
+                            rejection && rejection.xhrStatus, $rootScope._apiErrorRequestKey)) {
                         return $q.reject(rejection);
                     }
                     var parsed;
