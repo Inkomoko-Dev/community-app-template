@@ -1,0 +1,114 @@
+<div class="content-container" ng-controller="CreateWhatsAppTemplateController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/whatsappcampaigns">{{'label.anchor.whatsappcampaigns' | translate}}</a></li>
+        <li class="active">{{'label.heading.createwhatsapptemplate' | translate}}</li>
+    </ul>
+    <br>
+
+    <div class="card">
+        <div class="content">
+            <hr>
+            <form name="createwhatsapptemplateform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                <api-validate></api-validate>
+                <fieldset>
+                    <h3>{{'label.heading.whatsapptemplate' | translate}}</h3>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.templateName' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" id="templateName" name="templateName" ng-model="templateData.name"
+                                   class="form-control" placeholder="{{'label.input.templateName.placeholder' | translate}}" required/>
+                        </div>
+                        <div class="col-sm-3">
+                            <form-validate valattributeform="createwhatsapptemplateform" valattribute="templateName"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.languageCode' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" id="languageCode" name="languageCode" ng-model="templateData.language"
+                                   class="form-control" placeholder="{{'label.input.languageCode.placeholder' | translate}}" required/>
+                        </div>
+                        <div class="col-sm-3">
+                            <form-validate valattributeform="createwhatsapptemplateform" valattribute="languageCode"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.input.templateCategory' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-4">
+                            <select id="templateCategory" name="templateCategory" ng-model="templateData.category"
+                                    class="form-control" required
+                                    ng-options="categoryOption.id as categoryOption.value for categoryOption in templateCategoryOptions">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <form-validate valattributeform="createwhatsapptemplateform" valattribute="templateCategory"/>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h3>{{'label.heading.templateComponents' | translate}}</h3>
+                    <p class="help-block">{{'label.help.templatecomponents' | translate}}</p>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.headerComponent' | translate}}</label>
+                        <div class="col-sm-8">
+                            <textarea id="headerText" name="headerText" rows="3"
+                                      ng-model="templateData.components.headerText"
+                                      class="form-control"
+                                      placeholder="{{'label.input.headerText.placeholder' | translate}}"></textarea>
+                            <p class="help-block">{{'label.help.headerText' | translate}}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.bodyComponent' | translate}}<span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea id="bodyText" name="bodyText" rows="5"
+                                      ng-model="templateData.components.bodyText"
+                                      class="form-control"
+                                      placeholder="{{'label.input.bodyText.placeholder' | translate}}" required></textarea>
+                            <p class="help-block">{{'label.help.bodyText' | translate}}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.footerComponent' | translate}}</label>
+                        <div class="col-sm-8">
+                            <textarea id="footerText" name="footerText" rows="3"
+                                      ng-model="templateData.components.footerText"
+                                      class="form-control"
+                                      placeholder="{{'label.input.footerText.placeholder' | translate}}"></textarea>
+                            <p class="help-block">{{'label.help.footerText' | translate}}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">{{'label.heading.phoneButtonText' | translate}}</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="phoneButtonText" name="phoneButtonText" ng-model="templateData.components.phoneButtonText"
+                                   class="form-control" placeholder="{{'label.input.phoneButtonText.placeholder' | translate}}"/>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" id="phoneNumber" name="phoneNumber" ng-model="templateData.components.phoneButtonNumber"
+                                   class="form-control" placeholder="{{'label.input.phoneButtonNumber.placeholder' | translate}}"/>
+                        </div>
+                        <div class="col-sm-3">
+                            <p class="help-block">{{'label.help.phoneButton' | translate}}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="pull-right">
+                        <button id="saveTemplate" type="submit" class="btn btn-primary">{{'label.button.createTemplate' | translate}}</button>
+                        <a href="#/whatsappcampaigns" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

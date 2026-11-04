@@ -92,6 +92,16 @@
                 scope.getBusinessRule();
             };
 
+            scope.onMessageTypeChanged = function () {
+                // When switching from TEMPLATE to FREEFORM, clear template-only fields
+                // to avoid sending blank templateName/languageCode to the backend.
+                if (scope.campaignData.messageType === 'FREEFORM') {
+                    scope.campaignData.atTemplateName = '';
+                    scope.campaignData.languageCode = '';
+                    scope.campaignData.bodyVariableMapping = [];
+                }
+            };
+
             scope.filterBusinessRule = function () {
                 triggeredBusinessRule = [];
                 nonTriggeredBusinessRule = [];
@@ -276,17 +286,19 @@
             }
 
             resourceFactory.whatsAppCampaignTemplateResource.get(function (data) {
-                scope.triggerTypeOptions = data.triggerTypeOptions;
-                scope.businessRuleOptions = data.businessRulesOptions || [];
-                scope.frequencyTypeOptions = data.frequencyTypeOptions;
-                scope.weekDays = data.weekDays;
+    scope.triggerTypeOptions = data.triggerTypeOptions;
+    scope.businessRuleOptions = data.businessRulesOptions || [];
+    scope.frequencyTypeOptions = data.frequencyTypeOptions;
+    scope.weekDays = data.weekDays;
                 scope.recipientTypeOptions = data.recipientTypeOptions || [];
+                scope.messageTypeOptions = [{id: 'TEMPLATE', value: 'Template'}, {id: 'FREEFORM', value: 'Freeform'}];
+                scope.campaignData.messageType = 'TEMPLATE';
                 scope.filterBusinessRule();
-                // Re-apply filter if the user already chose a trigger before options arrived.
-                if (scope.campaignData.triggerType) {
-                    scope.getBusinessRule();
-                }
-            });
+    // Re-apply filter if the user already chose a trigger before options arrived.
+    if (scope.campaignData.triggerType) {
+        scope.getBusinessRule();
+    }
+});
 
             scope.selectedPeriod = function (period) {
                 if (period == 1) {
@@ -344,6 +356,7 @@
                     triggerType: scope.campaignData.triggerType.id,
                     campaignName: scope.campaignData.campaignName,
                     campaignType: 3,
+                    messageType: scope.campaignData.messageType,
                     atTemplateName: scope.campaignData.atTemplateName,
                     languageCode: scope.campaignData.languageCode,
                     bodyVariableMapping: scope.campaignData.bodyVariableMapping,

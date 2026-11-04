@@ -102,6 +102,21 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">{{'label.input.messageType' | translate}} <span class="required">*</span></label>
+                                    <div class="col-sm-3">
+                                        <select id="messageType" name="messageType" ng-model="campaignData.messageType"
+                                                class="form-control" required
+                                                ng-options="messageTypeOption.id as messageTypeOption.value for messageTypeOption in messageTypeOptions"
+                                                data-placeholder="{{'label.menu.messageType' | translate}}" ng-change="onMessageTypeChanged()">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <form-validate valattributeform="createwhatsappform" valattribute="messageType"/>
+                                    </div>
+                                </div>
+
                                 <hr>
                                 <div class="pull-right">
                                     <button id="save1" type="submit" class="btn btn-primary">{{'label.button.proceed' | translate}}</button>
@@ -167,7 +182,7 @@
                 </wz-step>
 
                 <wz-step icon="fa fa-circle-o" wz-title="{{'label.heading.attemplate' | translate}}">
-                    <div class="card-content">
+                    <div class="card-content" ng-if="campaignData.messageType === 'TEMPLATE'">
                         <form name="templateform" novalidate="" class="form-horizontal" rc-submit="submit()">
                             <api-validate></api-validate>
                             <fieldset>
@@ -218,6 +233,31 @@
                                         <button type="button" class="btn btn-default btn-xs" ng-click="removeBodyVariableMapping($index)">{{'label.button.removemapping' | translate}}</button>
                                     </li>
                                 </ol>
+                                <hr>
+                                <div class="pull-right">
+                                    <button id="save3" type="submit" class="btn btn-primary">{{'label.button.proceed' | translate}}</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+
+                    <div class="card-content" ng-if="campaignData.messageType === 'FREEFORM'">
+                        <form name="freeformform" novalidate="" class="form-horizontal" rc-submit="submit()">
+                            <api-validate></api-validate>
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">{{'label.heading.freeformmessage' | translate}}<span class="required">*</span></label>
+                                    <div class="col-sm-8">
+                                        <textarea id="freeformMessage" name="freeformMessage" rows="5"
+                                                  ng-model="campaignData.campaignMessage"
+                                                  ng-init="campaignData.campaignMessage = campaignData.campaignMessage || ''"
+                                                  class="form-control"
+                                                  placeholder="{{'label.input.freeformmessage.placeholder' | translate}}" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info">
+                                    {{'label.help.freeformmessage' | translate}}
+                                </div>
                                 <hr>
                                 <div class="pull-right">
                                     <button id="save3" type="submit" class="btn btn-primary">{{'label.button.proceed' | translate}}</button>
