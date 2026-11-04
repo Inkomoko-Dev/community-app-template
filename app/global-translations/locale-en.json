@@ -6294,8 +6294,10 @@
   "label.msg.bulkimport.statuscolumn": "Failed row reasons from the result file Status column:",
   "label.msg.bulkimport.loadingfailurereasons": "Reading failure reasons from the result file...",
   "label.msg.bulkimport.morefailurereasons": "Showing {{shown}} of {{total}} failed rows. Download the result file for the rest.",
-  "label.msg.bulkimport.failurerowlabel": "Row {{row}}:"
-
+  "label.msg.bulkimport.failurerowlabel": "Row {{row}}:",
+  "error.msg.loan.id.invalid": "Loan with identifier {{params[0].value}} does not exist.",
+  "label.msg.excessrefund.no.overpayment": "This loan has no unallocated overpayment. Excess Refund only applies while total overpaid is greater than zero. If surplus was moved by Deposit Redraw, use redraw withdrawal instead of Excess Refund.",
+  "label.msg.excessrefund.redraw.balance.hint": "Current redraw balance:",
   "label.heading.metawhatsapp": "Meta WhatsApp",
   "label.heading.metawhatsapp.help": "Meta Cloud API is the primary WhatsApp transport. Campaign templates must exist in Meta Business Manager with matching name, language, and body variable count. Africa's Talking remains WhatsApp fallback; voice and SMS stay on Africa's Talking. Toggle WHATSAPP_PRIMARY_PROVIDER / META_WHATSAPP_ENABLED to cut over. Meta webhook callback must include ?tenantIdentifier=<tenant>.",
   "label.heading.primaryprovider": "Primary provider",
