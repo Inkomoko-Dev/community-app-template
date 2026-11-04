@@ -1,6 +1,181 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
         EditLoanAccAppController: function (scope, routeParams, resourceFactory, location, dateFilter, uiConfigService) {
+            function loanOrProductSetting(loanValue, productValue) {
+                if (loanValue === undefined || loanValue === null || String(loanValue).trim() === '') {
+                    return productValue;
+                }
+                return loanValue;
+            }
+
+            function blankTrancheValue(value) {
+                if (value === undefined || value === null || String(value).trim() === '') {
+                    return null;
+                }
+                return value;
+            }
+
+            function prepareTrancheOverrides(formData) {
+                if (!scope.multiDisburseLoan) {
+                    formData.firstInstallmentPrincipal = null;
+                    formData.firstInstallmentAsPercentage = null;
+                    formData.tranchePrincipalPercentages = null;
+                    formData.previousTrancheRepaidPercentage = null;
+                    formData.previousTrancheThresholdAsPercentage = null;
+                    formData.maxOutstandingLoanBalance = null;
+                    delete formData.firstTrancheAmount;
+                    delete formData.firstTrancheAsPercentage;
+                    return;
+                }
+                formData.maxOutstandingLoanBalance = null;
+                formData.firstInstallmentPrincipal = blankTrancheValue(formData.firstInstallmentPrincipal);
+                formData.firstInstallmentAsPercentage = formData.firstInstallmentPrincipal === null ? null : formData.firstInstallmentAsPercentage === true;
+                formData.tranchePrincipalPercentages = null;
+                formData.previousTrancheRepaidPercentage = blankTrancheValue(formData.previousTrancheRepaidPercentage);
+                delete formData.previousTrancheThresholdAsPercentage;
+                delete formData.firstTrancheAmount;
+                delete formData.firstTrancheAsPercentage;
+                if (formData.disbursementData) {
+                    var row;
+                    for (row = 0; row < formData.disbursementData.length; row++) {
+                        formData.disbursementData[row].principalAsPercentage = formData.disbursementData[row].principalAsPercentage === true;
+                        if (!formData.disbursementData[row].principalAsPercentage) {
+                            formData.disbursementData[row].principalPercentage = null;
+                        } else {
+                            formData.disbursementData[row].principalPercentage = blankTrancheValue(
+                                formData.disbursementData[row].principalPercentage);
+                        }
+                        if (row === 0) {
+                            formData.disbursementData[row].previousTrancheRepaidMinimum = null;
+                            formData.disbursementData[row].previousTrancheRepaidAsPercentage = null;
+                        } else {
+                            formData.disbursementData[row].previousTrancheRepaidAsPercentage = formData.disbursementData[row].previousTrancheRepaidAsPercentage === true;
+                            formData.disbursementData[row].previousTrancheRepaidMinimum = blankTrancheValue(
+                                formData.disbursementData[row].previousTrancheRepaidMinimum);
+                        }
+                    }
+                }
+            }
+
+            function trancheDecimalPlaces() {
+                if (scope.loanaccountinfo && scope.loanaccountinfo.currency && scope.loanaccountinfo.currency.decimalPlaces !== undefined && scope.loanaccountinfo.currency.decimalPlaces !== null) {
+                    return scope.loanaccountinfo.currency.decimalPlaces;
+                }
+                return 2;
+            }
+
+            function roundTrancheMoney(value, factor) {
+                return Math.round(value * factor) / factor;
+            }
+
+            scope.applyFirstTrancheAndRemainder = function () {
+                if (!scope.multiDisburseLoan || !scope.formData || !scope.formData.disbursementData || !scope.formData.disbursementData.length) {
+                    return;
+                }
+                var principal = Number(String(scope.formData.principal == null ? '' : scope.formData.principal).replace(/,/g, ''));
+                if (!isFinite(principal)) {
+                    return;
+                }
+                var factor = Math.pow(10, trancheDecimalPlaces());
+                var rows = scope.formData.disbursementData;
+                var first;
+                if (scope.formData.firstTrancheAsPercentage === true) {
+                    var pct = Number(scope.formData.firstTrancheAmount);
+                    if (!isFinite(pct) || pct <= 0 || pct > 100) {
+                        return;
+                    }
+                    first = roundTrancheMoney(principal * pct / 100, factor);
+                    rows[0].principalAsPercentage = true;
+                    rows[0].principalPercentage = scope.formData.firstTrancheAmount;
+                } else {
+                    first = Number(String(scope.formData.firstTrancheAmount == null ? '' : scope.formData.firstTrancheAmount).replace(/,/g, ''));
+                    if (!isFinite(first) || first < 0) {
+                        return;
+                    }
+                    if (first > principal) {
+                        first = principal;
+                    }
+                    first = roundTrancheMoney(first, factor);
+                    rows[0].principalAsPercentage = false;
+                    rows[0].principalPercentage = null;
+                }
+                if (rows[0].actualDisbursementDate) {
+                    first = Number(String(rows[0].principal == null ? 0 : rows[0].principal).replace(/,/g, ''));
+                } else {
+                    rows[0].principal = first;
+                }
+                var rest = rows.length - 1;
+                if (rest <= 0) {
+                    return;
+                }
+                var remaining = roundTrancheMoney(principal - first, factor);
+                if (remaining < 0) {
+                    remaining = 0;
+                }
+                var share = roundTrancheMoney(remaining / rest, factor);
+                var allocated = 0;
+                var i;
+                for (i = 1; i < rows.length; i++) {
+                    if (rows[i].actualDisbursementDate) {
+                        allocated = roundTrancheMoney(allocated + Number(String(rows[i].principal == null ? 0 : rows[i].principal).replace(/,/g, '')), factor);
+                        continue;
+                    }
+                    var amount = i === rows.length - 1 ? roundTrancheMoney(remaining - allocated, factor) : share;
+                    if (amount < 0) {
+                        amount = 0;
+                    }
+                    rows[i].principalAsPercentage = false;
+                    rows[i].principalPercentage = null;
+                    rows[i].principal = amount;
+                    allocated = roundTrancheMoney(allocated + amount, factor);
+                }
+            };
+
+            scope.syncTranchePercentageAmounts = function () {
+                scope.applyFirstTrancheAndRemainder();
+            };
+
+            scope.onTrancheRowChanged = function (index) {
+                if (index !== 0 || !scope.formData.disbursementData || !scope.formData.disbursementData.length) {
+                    return;
+                }
+                var row = scope.formData.disbursementData[0];
+                scope.formData.firstTrancheAsPercentage = row.principalAsPercentage === true;
+                scope.formData.firstTrancheAmount = row.principalAsPercentage === true ? row.principalPercentage : row.principal;
+                scope.applyFirstTrancheAndRemainder();
+            };
+
+            scope.seedMinimumTranches = function () {
+                var product = (scope.loanaccountinfo && scope.loanaccountinfo.product) || {};
+                if (!scope.formData.disbursementData) {
+                    scope.formData.disbursementData = [];
+                }
+                if (scope.formData.disbursementData.length === 0) {
+                    scope.formData.firstTrancheAsPercentage = product.firstTrancheAsPercentage === true;
+                    scope.formData.firstTrancheAmount = product.firstTrancheAmount;
+                    var minimum = parseInt(product.minTrancheCount, 10);
+                    if (!isFinite(minimum) || minimum < 1) {
+                        minimum = 1;
+                    }
+                    var maximum = parseInt(product.maxTrancheCount, 10);
+                    if (isFinite(maximum) && maximum > 0 && minimum > maximum) {
+                        minimum = maximum;
+                    }
+                    var i;
+                    for (i = 0; i < minimum; i++) {
+                        var row = {principalAsPercentage: false};
+                        if (i > 0) {
+                            row.previousTrancheRepaidAsPercentage = false;
+                        }
+                        scope.formData.disbursementData.push(row);
+                    }
+                    scope.applyFirstTrancheAndRemainder();
+                    return;
+                }
+                var firstRow = scope.formData.disbursementData[0];
+                scope.formData.firstTrancheAsPercentage = firstRow.principalAsPercentage === true;
+                scope.formData.firstTrancheAmount = firstRow.principalAsPercentage === true ? firstRow.principalPercentage : firstRow.principal;
+            };
 
             scope.previewRepayment = false;
             scope.formData = {};
@@ -224,7 +399,19 @@
                 scope.formData.graceOnInterestCharged = scope.loanaccountinfo.graceOnInterestCharged;
                 scope.formData.syncDisbursementWithMeeting = scope.loanaccountinfo.syncDisbursementWithMeeting;
                 scope.formData.fixedEmiAmount = scope.loanaccountinfo.fixedEmiAmount;
-                scope.formData.maxOutstandingLoanBalance = scope.loanaccountinfo.maxOutstandingLoanBalance;
+                scope.formData.maxOutstandingLoanBalance = null;
+                var trancheProduct = scope.loanaccountinfo.product || {};
+                scope.formData.previousTrancheRepaidPercentage = loanOrProductSetting(scope.loanaccountinfo.previousTrancheRepaidPercentage, trancheProduct.previousTrancheRepaidPercentage);
+                if (scope.loanaccountinfo.firstInstallmentPrincipal === undefined || scope.loanaccountinfo.firstInstallmentPrincipal === null || String(scope.loanaccountinfo.firstInstallmentPrincipal).trim() === '') {
+                    scope.formData.firstInstallmentPrincipal = trancheProduct.firstInstallmentPrincipal;
+                    scope.formData.firstInstallmentAsPercentage = trancheProduct.firstInstallmentAsPercentage === true;
+                } else {
+                    scope.formData.firstInstallmentPrincipal = scope.loanaccountinfo.firstInstallmentPrincipal;
+                    scope.formData.firstInstallmentAsPercentage = scope.loanaccountinfo.firstInstallmentAsPercentage === true;
+                }
+                if (scope.multiDisburseLoan) {
+                    scope.seedMinimumTranches();
+                }
                 scope.formData.createStandingInstructionAtDisbursement = scope.loanaccountinfo.createStandingInstructionAtDisbursement;
                 scope.formData.isTopup = scope.loanaccountinfo.isTopup;
                 scope.formData.loanIdToClose = scope.loanaccountinfo.closureLoanId;
@@ -374,11 +561,22 @@
             }
 
             scope.addTranches = function () {
-                scope.formData.disbursementData.push({
-                });
+                if (!scope.formData.disbursementData || scope.formData.disbursementData.length === 0) {
+                    scope.seedMinimumTranches();
+                    return;
+                }
+                var row = {principalAsPercentage: false, previousTrancheRepaidAsPercentage: false};
+                var preset = blankTrancheValue(scope.formData.previousTrancheRepaidPercentage);
+                if (preset !== null && Number(preset) > 0 && Number(preset) < 100) {
+                    row.previousTrancheRepaidAsPercentage = true;
+                    row.previousTrancheRepaidMinimum = preset;
+                }
+                scope.formData.disbursementData.push(row);
+                scope.applyFirstTrancheAndRemainder();
             };
             scope.deleteTranches = function (index) {
                 scope.formData.disbursementData.splice(index, 1);
+                scope.applyFirstTrancheAndRemainder();
             }
 
 
@@ -461,6 +659,7 @@
                     delete this.formData.interestRateDifferential ;
                     delete this.formData.isFloatingInterestRate ;
                 }
+                prepareTrancheOverrides(this.formData);
                 var schedulePreviewData = angular.copy(this.formData);
                 delete schedulePreviewData.thirdPartyDisbursementProvider;
                 resourceFactory.loanResource.save({command: 'calculateLoanSchedule'}, schedulePreviewData, function (data) {
@@ -557,6 +756,7 @@
                 if(this.formData.interestCalculationPeriodType == 0){
                     this.formData.allowPartialPeriodInterestCalcualtion = false;
                 }
+                prepareTrancheOverrides(this.formData);
                 resourceFactory.loanResource.put({loanId: routeParams.id}, this.formData, function (data) {
                     location.path('/viewloanaccount/' + data.loanId);
                 });

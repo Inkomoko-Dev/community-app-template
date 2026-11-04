@@ -1176,7 +1176,17 @@
                             <tr>
                                 <td>
                                     {{'label.input.outstandingloanbalance' | translate}} : &nbsp;{{loandetails.maxOutstandingLoanBalance| number}}&nbsp;
+                                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.maxAllowedOutstandingBalance' | translate }}" tooltip-append-to-body="true"></i>
                                 </td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.input.firstinstallmentprincipal' | translate}} : &nbsp;
+                                    <span ng-if="loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal}}%</span>
+                                    <span ng-if="loandetails.firstInstallmentPrincipal && !loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal | number}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="loandetails.previousTrancheRepaidPercentage">
+                                <td>{{'label.input.previoustrancherrepaidpercentage' | translate}} : &nbsp;{{loandetails.previousTrancheRepaidPercentage | number}}</td>
                             </tr>
                             <tr>
                                 <td>
@@ -1199,12 +1209,23 @@
                                 <th align="left">{{'label.input.expecteddisbursementon' | translate}}</th>
                                 <th align="left">{{'label.input.disbursedon' | translate}}</th>
                                 <th align="left">{{'label.input.principal' | translate}}</th>
+                                <th align="left">{{ 'label.input.trancheminimumrepaid' | translate }}
+                                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.previousrepaidaspercentage' | translate }}" tooltip-append-to-body="true"></i>
+                                </th>
                                 <th align="left">&nbsp;</th>
                             </tr>
                             <tr ng-repeat="disbursementDetail in loandetails.disbursementDetails">
                                 <td>{{disbursementDetail.expectedDisbursementDate | DateFormat}}</td>
                                 <td>{{disbursementDetail.actualDisbursementDate | DateFormat}}</td>
-                                <td>{{disbursementDetail.principal | number}}</td>
+                                <td>
+                                    <span ng-if="disbursementDetail.principalAsPercentage">{{disbursementDetail.principalPercentage | number}}% ({{disbursementDetail.principal | number}})</span>
+                                    <span ng-if="!disbursementDetail.principalAsPercentage">{{disbursementDetail.principal | number}}</span>
+                                </td>
+                                <td>
+                                    <span ng-if="!disbursementDetail.previousTrancheRepaidMinimum">&mdash;</span>
+                                    <span ng-if="disbursementDetail.previousTrancheRepaidMinimum && disbursementDetail.previousTrancheRepaidAsPercentage !== false">{{disbursementDetail.previousTrancheRepaidMinimum | number}}%</span>
+                                    <span ng-if="disbursementDetail.previousTrancheRepaidMinimum && disbursementDetail.previousTrancheRepaidAsPercentage === false">{{disbursementDetail.previousTrancheRepaidMinimum | number}}</span>
+                                </td>
                                 <td>
                                     <div ng-show="disbursementDetail.actualDisbursementDate != null"><i class="fa fa-check "></i>
                                     </div>
