@@ -98,6 +98,10 @@
                         <td>{{ 'label.heading.banknumber' | translate}}</td>
                         <td>{{transaction.paymentDetailData.bankNumber}}</td>
                     </tr>
+                    <tr ng-show="transaction.paymentDetailData.mfiCode">
+                        <td>{{ 'label.anchor.mfiCode' | translate}}</td>
+                        <td>{{transaction.paymentDetailData.mfiCode}}</td>
+                    </tr>
                 </table>
             </div>
         </div>

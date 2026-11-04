@@ -1190,6 +1190,7 @@
                                 scope.formData.routingCode = data.paymentDetailData.routingCode;
                                 scope.formData.receiptNumber = data.paymentDetailData.receiptNumber;
                                 scope.formData.bankNumber = data.paymentDetailData.bankNumber;
+                                scope.formData.mfiCode = data.paymentDetailData.mfiCode;
                             }
                         }, finishTransactionLoading);
                     scope.showDateField = true;
@@ -1835,6 +1836,11 @@
                 delete submitData['undefined'];
                 delete submitData['null'];
                 restorePersistedDisbursementRecipientDetails(submitData);
+
+                // Trim leading/trailing whitespace from MFI code before submission
+                if (submitData.mfiCode) {
+                    submitData.mfiCode = submitData.mfiCode.trim();
+                }
 
                 var isDisbursementReviewAction = scope.action === "approveDisbursement"
                     || scope.action === "disbursementpreapprovalrequest"

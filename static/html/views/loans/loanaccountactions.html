@@ -478,6 +478,15 @@
                                        ng-model="formData.bankNumber" ng-disabled="isReadOnly">
                             </div>
                         </div>
+                        <div class="form-group"  ng-show="!showClientOtherInfoForm">
+                            <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' |
+                                translate}}</label>
+
+                            <div class="col-sm-3">
+                                <input id="mfiCode" class="form-control" type="text"
+                                       ng-model="formData.mfiCode" ng-disabled="isReadOnly">
+                            </div>
+                        </div>
 
                         <div class="form-group"  ng-show="showClientOtherInfoForm">
                             <label class="control-label col-sm-2" for="clientPhoneNumber">
