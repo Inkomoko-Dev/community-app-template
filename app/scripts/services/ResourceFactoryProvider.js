@@ -277,6 +277,9 @@
                     excessRefundTemplateResource: defineResource(apiVer + "/loans/:loanId/excess-refund-template", { loanId: '@loanId' }, {
                         get: { method: 'GET' }
                     }),
+                    excessRefundTemplateByAccountResource: defineResource(apiVer + "/loans/by-account/:accountNo/excess-refund-template", { accountNo: '@accountNo' }, {
+                        get: { method: 'GET' }
+                    }),
                     excessRefundBatchResource: defineResource(apiVer + "/excess-refund-batches/:batchId", { batchId: '@batchId', command: '@command' }, {
                         save: { method: 'POST' },
                         command: { method: 'POST', params: { command: '@command' } }
