@@ -9,6 +9,12 @@
         <api-validate></api-validate>
         <fieldset>
             <legend>{{'label.heading.viewreschedulerequest' | translate }}</legend>
+            <div class="alert alert-warning" ng-if="multiTrancheNotice">
+                <p><strong>{{ 'label.heading.multitranche.reschedule' | translate }}</strong></p>
+                <ul>
+                    <li ng-repeat="line in multiTrancheWarnings track by $index">{{ line }}</li>
+                </ul>
+            </div>
             <div class="btn-group pull-right">
                     <button type="button" ng-click="reject()"  class="btn btn-warning" has-permission="REJECT_RESCHEDULELOAN"><i class="fa fa-times"></i>
                         {{'label.button.reject' | translate}}</button>
