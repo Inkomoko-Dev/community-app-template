@@ -333,6 +333,9 @@
                         getLoanAccountDetails: { method: 'GET', params: {} },
                         update: { method: 'PUT' }
                     }),
+                    trancheReleaseReportResource: defineResource(apiVer + "/loans/:loanId/tranche-release-report", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
                     PaymentHubDisbursementStatusResource: defineResource(apiVer + "/loans/:loanId/paymenthub-disbursement-status", { loanId: '@loanId' }, {
                         check: { method: 'POST' }
                     }),
