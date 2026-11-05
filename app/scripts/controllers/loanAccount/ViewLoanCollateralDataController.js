@@ -4,7 +4,7 @@
 
             scope.loanId = routeParams.id;
             scope.collateralId = routeParams.collateralId;
-            resourceFactory.loancollateralResource.get({collateralId: scope.collateralId}, function (data) {
+            resourceFactory.loanResource.get({ resourceType: 'collaterals', loanId: scope.loanId, resourceId: scope.collateralId}, function (data) {
                 scope.collateral = data;
             });
         }
