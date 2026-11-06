@@ -10,12 +10,25 @@
         <div class="alert alert-danger" ng-if="error">{{error}}</div>
         <fieldset>
             <legend>{{'label.heading.rescheduleloan' | translate}}</legend>
+            <div class="alert alert-danger" ng-if="multiTrancheNotice.nothingDisbursed">
+                {{ 'validation.msg.rescheduleloan.multiTranche.nothing.disbursed' | translate }}
+            </div>
+            <div class="alert alert-warning" ng-if="multiTrancheNotice && !multiTrancheNotice.nothingDisbursed">
+                <p><strong>{{ 'label.heading.multitranche.reschedule' | translate }}</strong></p>
+                <ul>
+                    <li ng-repeat="line in multiTrancheWarnings track by $index">{{ line }}</li>
+                </ul>
+                <label>
+                    <input id="acknowledgeMultiTrancheReschedule" type="checkbox" ng-model="formData.acknowledgeMultiTrancheReschedule">
+                    {{ 'label.input.acknowledgeMultiTrancheReschedule' | translate }}
+                </label>
+            </div>
             <div class="form-group">
                 <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.input.installmentOn' | translate}}<span class="required">*</span></label>
 
                 <div class="col-sm-3">
                     <input id="rescheduleFromDate" type="text" name="rescheduleFromDate" datepicker-pop="dd MMMM yyyy"ng-disabled="!adjustFuturePayments"
-                           class="form-control paddedbottom10 paddedtop" ng-model="formData.rescheduleFromDate" is-open="opened" min="'2000-01-01'" max="restrictDate"/>
+                           class="form-control paddedbottom10 paddedtop" ng-model="formData.rescheduleFromDate" ng-change="refreshMultiTrancheWarning()" is-open="opened" min="'2000-01-01'" max="restrictDate"/>
                 </div>
             </div>
             <div class="form-group">
@@ -245,7 +258,7 @@
 
                 <button type="button" data-ng-click="cancel()" class="btn btn-default">{{ 'label.button.cancel' | translate }}</button>
 
-                <button type="button" data-ng-click="submit()" class="btn btn-primary"  has-permission='CREATE_RESCHEDULELOAN'>
+                <button type="button" data-ng-click="submit()" class="btn btn-primary" ng-disabled="multiTrancheNotice.nothingDisbursed" has-permission='CREATE_RESCHEDULELOAN'>
                     {{'label.button.save' | translate}}
 
                 </button>

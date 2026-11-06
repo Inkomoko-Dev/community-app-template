@@ -11,6 +11,19 @@
                 <div class="alert alert-danger" ng-if="error">{{error}}</div>
                 <fieldset>
                     <legend>{{'label.heading.approveloanreschedule' | translate}}</legend>
+                    <div class="alert alert-danger" ng-if="multiTrancheNotice.nothingDisbursed">
+                        {{ 'validation.msg.rescheduleloan.multiTranche.nothing.disbursed' | translate }}
+                    </div>
+                    <div class="alert alert-warning" ng-if="multiTrancheNotice && !multiTrancheNotice.nothingDisbursed">
+                        <p><strong>{{ 'label.heading.multitranche.reschedule' | translate }}</strong></p>
+                        <ul>
+                            <li ng-repeat="line in multiTrancheWarnings track by $index">{{ line }}</li>
+                        </ul>
+                        <label>
+                            <input id="acknowledgeMultiTrancheReschedule" type="checkbox" ng-model="formData.acknowledgeMultiTrancheReschedule">
+                            {{ 'label.input.acknowledgeMultiTrancheReschedule' | translate }}
+                        </label>
+                    </div>
 
                     <label class="control-label col-sm-2">{{'label.input.approvedOnDate' | translate}}<span class="required">*</span></label>
                     <div class="col-sm-3">
@@ -23,7 +36,7 @@
                     <div style="padding-left: 100px;">
                         <button id="cancel" ng-click="cancel()" class="btn btn-default ">{{ 'label.button.cancel' | translate }}</button>
 
-                        <button id="save" ng-click="approve()" type="submit" class="btn btn-primary"  has-permission="APPROVE_RESCHEDULELOAN">
+                        <button id="save" ng-click="approve()" type="submit" class="btn btn-primary" ng-disabled="multiTrancheNotice.nothingDisbursed" has-permission="APPROVE_RESCHEDULELOAN">
                             {{'label.button.save' | translate}}
 
                         </button>

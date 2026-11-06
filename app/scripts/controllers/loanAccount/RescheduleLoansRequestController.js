@@ -106,7 +106,22 @@
                 scope.transactionTemplateDate = normalizeDate(data.loanTransactionData.date);
             });
 
-            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, associations: 'repaymentSchedule'}, function (data) {
+            function translateNotice(key, params) {
+                return $translate.instant(key, params);
+            }
+
+            scope.refreshMultiTrancheWarning = function () {
+                scope.multiTrancheNotice = MultiTrancheRescheduleNotice.assess(scope.loanAccount, scope.formData.rescheduleFromDate);
+                scope.multiTrancheWarnings = MultiTrancheRescheduleNotice.lines(scope.multiTrancheNotice, translateNotice);
+            };
+            scope.$watch('formData.rescheduleFromDate', function () {
+                if (scope.loanAccount) {
+                    scope.refreshMultiTrancheWarning();
+                }
+            });
+
+            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, associations: 'repaymentSchedule,multiDisburseDetails'}, function (data) {
+                scope.loanAccount = data;
                 scope.currentRepaymentEvery = data.repaymentEvery;
                 scope.currentRepaymentFrequencyType = data.repaymentFrequencyType;
                 scope.repaymentFrequencyTypeOptions = normalizeRepaymentFrequencyOptions(data);
@@ -117,6 +132,7 @@
                 scope.formData.loanTermFrequency = data.termFrequency;
                 scope.formData.loanTermFrequencyType = data.termPeriodFrequencyType ? data.termPeriodFrequencyType.id : null;
                 mifosX.models.RepaymentFrequency.bindTo(scope);
+                scope.refreshMultiTrancheWarning();
             });
 
             scope.cancel = function () {
@@ -158,6 +174,15 @@
                     || repaymentFrequencyChanged;
                 if (!hasOption) {
                     scope.error = $translate.instant('validation.msg.rescheduleloan.graceOnPrincipal.cannot.be.blank');
+                    return;
+                }
+                scope.refreshMultiTrancheWarning();
+                if (scope.multiTrancheNotice && scope.multiTrancheNotice.nothingDisbursed) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.multiTranche.nothing.disbursed');
+                    return;
+                }
+                if (scope.multiTrancheNotice && !scope.formData.acknowledgeMultiTrancheReschedule) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.acknowledgeMultiTrancheReschedule.required');
                     return;
                 }
 
@@ -214,6 +239,10 @@
                 } else {
                     delete this.formData.endDate;
                     delete this.formData.emi;
+                }
+
+                if (!scope.multiTrancheNotice) {
+                    delete this.formData.acknowledgeMultiTrancheReschedule;
                 }
 
                 if (repaymentFrequencyChanged) {

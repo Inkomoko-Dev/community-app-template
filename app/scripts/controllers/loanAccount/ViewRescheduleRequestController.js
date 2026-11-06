@@ -1,12 +1,25 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        ViewRescheduleRequestController: function (scope, resourceFactory, routeParams, location, dateFilter) {
+        ViewRescheduleRequestController: function (scope, resourceFactory, routeParams, location, dateFilter, $translate) {
             scope.requestId = routeParams.requestId;
             scope.loanId = routeParams.loanId;
 
             function toTime(date) {
                 return angular.isArray(date) ? new Date(date[0], date[1] - 1, date[2]).getTime() : new Date(date).getTime();
             }
+
+            function refreshMultiTrancheWarning() {
+                var fromDate = scope.loanRescheduleDetails ? scope.loanRescheduleDetails.rescheduleFromDate : null;
+                scope.multiTrancheNotice = MultiTrancheRescheduleNotice.assess(scope.loanAccount, fromDate);
+                scope.multiTrancheWarnings = MultiTrancheRescheduleNotice.lines(scope.multiTrancheNotice, function (key, params) {
+                    return $translate.instant(key, params);
+                });
+            }
+
+            resourceFactory.loanResource.get({loanId: scope.loanId, associations: 'multiDisburseDetails'}, function (loan) {
+                scope.loanAccount = loan;
+                refreshMultiTrancheWarning();
+            });
 
             resourceFactory.loanRescheduleResource.get({scheduleId:scope.requestId}, function (data) {
                 scope.loanRescheduleDetails = data;
@@ -74,6 +87,7 @@
                 scope.loanRescheduleDetails.principalAmountChange.sort(function (a, b) {
                     return toTime(a.date) - toTime(b.date);
                 });
+                refreshMultiTrancheWarning();
             });
 
             scope.reject = function(){
@@ -95,7 +109,7 @@
 
         }
     });
-    mifosX.ng.application.controller('ViewRescheduleRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', mifosX.controllers.ViewRescheduleRequestController]).run(function ($log) {
+    mifosX.ng.application.controller('ViewRescheduleRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', '$translate', mifosX.controllers.ViewRescheduleRequestController]).run(function ($log) {
         $log.info("ViewRescheduleRequestController initialized");
     });
 }(mifosX.controllers || {}));
