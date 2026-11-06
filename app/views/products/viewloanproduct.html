@@ -408,12 +408,26 @@
     <td colspan="3">{{loanproduct.multiDisburseLoan}}</td>
 </tr>
 <tr ng-show="loanproduct.multiDisburseLoan">
+    <td>{{'label.input.mintranchecount' | translate}}</td>
+    <td colspan="3">{{loanproduct.minTrancheCount}}</td>
+</tr>
+<tr ng-show="loanproduct.multiDisburseLoan">
     <td>{{'label.input.maxtranchecount' | translate}}</td>
     <td colspan="3">{{loanproduct.maxTrancheCount}}</td>
 </tr>
 <tr ng-show="loanproduct.multiDisburseLoan">
-    <td>{{'label.input.outstandingloanbalance' | translate}}</td>
-    <td colspan="3">{{loanproduct.outstandingLoanBalance}}</td>
+    <td>{{'label.input.defaultfirsttranche' | translate}}</td>
+    <td colspan="3">
+        <span ng-if="loanproduct.firstTrancheAsPercentage">{{loanproduct.firstTrancheAmount}}%</span>
+        <span ng-if="loanproduct.firstTrancheAmount && !loanproduct.firstTrancheAsPercentage">{{loanproduct.firstTrancheAmount}}</span>
+    </td>
+</tr>
+<tr ng-show="loanproduct.multiDisburseLoan">
+    <td>{{'label.input.defaultfirstrepaymentprincipal' | translate}}</td>
+    <td colspan="3">
+        <span ng-if="loanproduct.firstInstallmentAsPercentage">{{loanproduct.firstInstallmentPrincipal}}%</span>
+        <span ng-if="loanproduct.firstInstallmentPrincipal && !loanproduct.firstInstallmentAsPercentage">{{loanproduct.firstInstallmentPrincipal}}</span>
+    </td>
 </tr>
 <tr>
     <td colspan="4"><br/></td>
