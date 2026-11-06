@@ -12,6 +12,8 @@ module.exports = function (config) {
         './app/bower_components/underscore/underscore-min.js',
         './app/bower_components/requirejs/require.js',
         './app/scripts/mifosX.js',
+        './app/scripts/modules/apiErrorMessage.js',
+        './app/scripts/modules/notificationWidget.js',
         './app/scripts/models/*.js',
         './app/scripts/services/*.js',
         './app/scripts/directives/*.js',

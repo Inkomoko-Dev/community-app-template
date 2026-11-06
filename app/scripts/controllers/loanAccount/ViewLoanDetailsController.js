@@ -855,11 +855,13 @@
                     // CGLT-656: the corrections already made on this loan, and how far each one got. A user without
                     // READ_HISTORICALPENALTYWAIVER simply sees no tab rather than an error.
                     scope.historicalPenaltyWaivers = [];
-                    resourceFactory.historicalPenaltyWaiversByLoanResource.getAll({ loanId: routeParams.id }, function (data) {
-                        scope.historicalPenaltyWaivers = data || [];
-                    }, function () {
-                        scope.historicalPenaltyWaivers = [];
-                    });
+                    if (scope.hasPermission('READ_HISTORICALPENALTYWAIVER')) {
+                        resourceFactory.historicalPenaltyWaiversByLoanResource.getAll({ loanId: routeParams.id }, function (data) {
+                            scope.historicalPenaltyWaivers = data || [];
+                        }, function () {
+                            scope.historicalPenaltyWaivers = [];
+                        });
+                    }
                     scope.loanCollaterals = [];
                     resourceFactory.loanResource.getAllCollaterals({ loanId: routeParams.id, resourceType: 'collaterals' }, function (data) {
                         scope.loanCollaterals = data || [];
