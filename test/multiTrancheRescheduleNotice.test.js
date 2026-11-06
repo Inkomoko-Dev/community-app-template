@@ -23,7 +23,37 @@ test('a later disbursed tranche is called out when the reschedule date is on or 
     const lines = notice.lines(assessment, function (key) {
         return key;
     });
-    assert.equal(lines.length, 3);
+    assert.equal(lines.length, 4);
     assert.equal(lines[1], 'label.warning.multitranche.reschedule.later.disbursed');
-    assert.equal(lines[2], 'label.warning.multitranche.reschedule.pending');
+    assert.equal(lines[2], 'label.warning.multitranche.reschedule.later.folded');
+    assert.equal(lines[3], 'label.warning.multitranche.reschedule.pending');
+});
+
+test('a later tranche is not described as folded when the selected date is after it', function () {
+    const assessment = notice.assess({
+        multiDisburseLoan: true,
+        disbursementDetails: [
+            {principal: 100000, actualDisbursementDate: [2026, 1, 15]},
+            {principal: 40000, actualDisbursementDate: [2026, 8, 1]}
+        ]
+    }, [2026, 9, 1]);
+
+    assert.equal(assessment.includesLaterDisbursement, false);
+    const lines = notice.lines(assessment, function (key) {
+        return key;
+    });
+    assert.equal(lines.indexOf('label.warning.multitranche.reschedule.later.folded'), -1);
+    assert.notEqual(lines.indexOf('label.warning.multitranche.reschedule.later.disbursed'), -1);
+});
+
+test('a multi-tranche loan with nothing disbursed is blocked instead of confirmed', function () {
+    const assessment = notice.assess({
+        multiDisburseLoan: true,
+        disbursementDetails: [{principal: 100000}]
+    }, [2026, 7, 1]);
+
+    assert.equal(assessment.nothingDisbursed, true);
+    assert.deepEqual(notice.lines(assessment, function (key) {
+        return key;
+    }), []);
 });

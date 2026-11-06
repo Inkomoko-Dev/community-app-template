@@ -177,6 +177,10 @@
                     return;
                 }
                 scope.refreshMultiTrancheWarning();
+                if (scope.multiTrancheNotice && scope.multiTrancheNotice.nothingDisbursed) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.multiTranche.nothing.disbursed');
+                    return;
+                }
                 if (scope.multiTrancheNotice && !scope.formData.acknowledgeMultiTrancheReschedule) {
                     scope.error = $translate.instant('validation.msg.rescheduleloan.acknowledgeMultiTrancheReschedule.required');
                     return;

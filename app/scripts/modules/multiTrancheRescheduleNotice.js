@@ -62,18 +62,20 @@
             }
         }
         var from = dayNumber(rescheduleFromDate);
+        var nothingDisbursed = disbursedCount === 0 && pendingCount > 0;
         return {
             disbursedCount: disbursedCount,
             disbursedPrincipal: disbursedPrincipal,
             pendingCount: pendingCount,
             pendingPrincipal: pendingPrincipal,
             latestDisbursementLabel: latest === null ? '' : new Date(latest).toDateString(),
-            includesLaterDisbursement: disbursedCount > 1 && from !== null && latest !== null && from <= latest
+            includesLaterDisbursement: disbursedCount > 1 && from !== null && latest !== null && from <= latest,
+            nothingDisbursed: nothingDisbursed
         };
     }
 
     function lines(notice, translate) {
-        if (!notice) {
+        if (!notice || notice.nothingDisbursed) {
             return [];
         }
         var text = typeof translate === 'function' ? translate : function (key) {
@@ -84,7 +86,10 @@
             amount: notice.disbursedPrincipal
         })];
         if (notice.disbursedCount > 1) {
-            result.push(text('label.warning.multitranche.reschedule.later.disbursed', {
+            result.push(text('label.warning.multitranche.reschedule.later.disbursed'));
+        }
+        if (notice.includesLaterDisbursement) {
+            result.push(text('label.warning.multitranche.reschedule.later.folded', {
                 date: notice.latestDisbursementLabel
             }));
         }

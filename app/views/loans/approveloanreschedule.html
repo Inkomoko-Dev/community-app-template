@@ -11,7 +11,10 @@
                 <div class="alert alert-danger" ng-if="error">{{error}}</div>
                 <fieldset>
                     <legend>{{'label.heading.approveloanreschedule' | translate}}</legend>
-                    <div class="alert alert-warning" ng-if="multiTrancheNotice">
+                    <div class="alert alert-danger" ng-if="multiTrancheNotice.nothingDisbursed">
+                        {{ 'validation.msg.rescheduleloan.multiTranche.nothing.disbursed' | translate }}
+                    </div>
+                    <div class="alert alert-warning" ng-if="multiTrancheNotice && !multiTrancheNotice.nothingDisbursed">
                         <p><strong>{{ 'label.heading.multitranche.reschedule' | translate }}</strong></p>
                         <ul>
                             <li ng-repeat="line in multiTrancheWarnings track by $index">{{ line }}</li>
@@ -33,7 +36,7 @@
                     <div style="padding-left: 100px;">
                         <button id="cancel" ng-click="cancel()" class="btn btn-default ">{{ 'label.button.cancel' | translate }}</button>
 
-                        <button id="save" ng-click="approve()" type="submit" class="btn btn-primary"  has-permission="APPROVE_RESCHEDULELOAN">
+                        <button id="save" ng-click="approve()" type="submit" class="btn btn-primary" ng-disabled="multiTrancheNotice.nothingDisbursed" has-permission="APPROVE_RESCHEDULELOAN">
                             {{'label.button.save' | translate}}
 
                         </button>

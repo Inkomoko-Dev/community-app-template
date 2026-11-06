@@ -9,7 +9,10 @@
         <api-validate></api-validate>
         <fieldset>
             <legend>{{'label.heading.viewreschedulerequest' | translate }}</legend>
-            <div class="alert alert-warning" ng-if="multiTrancheNotice">
+            <div class="alert alert-danger" ng-if="multiTrancheNotice.nothingDisbursed">
+                {{ 'validation.msg.rescheduleloan.multiTranche.nothing.disbursed' | translate }}
+            </div>
+            <div class="alert alert-warning" ng-if="multiTrancheNotice && !multiTrancheNotice.nothingDisbursed">
                 <p><strong>{{ 'label.heading.multitranche.reschedule' | translate }}</strong></p>
                 <ul>
                     <li ng-repeat="line in multiTrancheWarnings track by $index">{{ line }}</li>
