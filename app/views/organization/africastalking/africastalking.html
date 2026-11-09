@@ -588,53 +588,6 @@
                     </div>
                 </uib-tab>
 
-                <uib-tab heading="{{'label.heading.metawhatsapp' | translate}}" has-permission='READ_COMMUNICATION'>
-                    <br>
-                    <div class="alert alert-info">
-                        {{'label.heading.metawhatsapp.help' | translate}}
-                    </div>
-                    <div class="alert alert-danger" ng-if="metaProviderError">{{metaProviderError}}</div>
-                    <table class="table" ng-if="metaProvider">
-                        <tbody>
-                        <tr>
-                            <td><strong>{{'label.heading.primaryprovider' | translate}}</strong></td>
-                            <td>{{metaProvider.primaryProvider}}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>{{'label.heading.fallbackprovider' | translate}}</strong></td>
-                            <td>{{metaProvider.fallbackProvider}}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>{{'label.heading.fallbackenabled' | translate}}</strong></td>
-                            <td>{{metaProvider.fallbackEnabled}}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>META configured</strong></td>
-                            <td>{{metaProvider.META_configured}}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>AFRICASTALKING configured</strong></td>
-                            <td>{{metaProvider.AFRICASTALKING_configured}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <button type="button" class="btn btn-default" data-ng-click="loadMetaProvider()">
-                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;{{'label.button.refresh' | translate}}
-                    </button>
-                    <button type="button" class="btn btn-primary" data-ng-click="testMetaConnectivity()">
-                        <i class="fa fa-plug"></i>&nbsp;&nbsp;{{'label.button.testconnectivity' | translate}}
-                    </button>
-                    <div class="alert alert-info" ng-if="metaConnectivityResult" style="margin-top:12px;">
-                        Primary={{metaConnectivityResult.primaryProvider}},
-                        Fallback={{metaConnectivityResult.fallbackProvider}},
-                        META={{metaConnectivityResult.META_configured}},
-                        AT={{metaConnectivityResult.AFRICASTALKING_configured}}
-                        <div ng-if="metaConnectivityResult.webhookCallbackPath">
-                            Callback: {{metaConnectivityResult.webhookCallbackPath}}
-                        </div>
-                    </div>
-                </uib-tab>
-
             </uib-tabset>
         </div>
     </div>

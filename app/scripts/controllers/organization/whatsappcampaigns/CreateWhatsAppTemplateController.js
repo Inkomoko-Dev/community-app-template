@@ -79,7 +79,21 @@
                     location.path('/whatsappcampaigns');
                 }, function (response) {
                     scope.isButtonDisabled = false;
-                    scope.errorMessage = response.data && response.data.userMessage ? response.data.userMessage : 'Template creation failed.';
+                    scope.errorStatus = response.status;
+                    scope.errorDetails = [];
+                    if (response.data && response.data.errors) {
+                        scope.errorDetails = response.data.errors;
+                    } else if (response.data && (response.data.userMessage || response.data.defaultUserMessage)) {
+                        scope.errorDetails.push({
+                            userMessageGlobalisationCode: 'error.msg.generic',
+                            defaultUserMessage: response.data.userMessage || response.data.defaultUserMessage
+                        });
+                    } else {
+                        scope.errorDetails.push({
+                            userMessageGlobalisationCode: 'error.msg.generic',
+                            defaultUserMessage: 'Template creation failed.'
+                        });
+                    }
                 });
             };
 

@@ -36,6 +36,14 @@
                 scope.campaignData.bodyVariableMapping.splice(index, 1);
             };
 
+            // FREEFORM uses ${columnName} placeholders (CBS WhatsAppFreeformMessageResolver).
+            scope.insertFreeformPlaceholder = function (columnName) {
+                if (!scope.campaignData.campaignMessage) {
+                    scope.campaignData.campaignMessage = '';
+                }
+                scope.campaignData.campaignMessage += ' ${' + columnName + '}';
+            };
+
             scope.reportSelected = function (reportName) {
                 scope.reqFields = [];
                 scope.reportParams = [];
@@ -211,11 +219,16 @@
                 scope.paramValues.reportName = scope.formData.reportSource;
                 scope.previewData = {
                     runReportId: scope.campaignData.report.reportId,
-                    atTemplateName: scope.campaignData.atTemplateName,
-                    languageCode: scope.campaignData.languageCode,
+                    messageType: scope.campaignData.messageType,
                     bodyVariableMapping: scope.campaignData.bodyVariableMapping,
                     paramValue: scope.paramValues
                 };
+                if (scope.campaignData.messageType === 'FREEFORM') {
+                    scope.previewData.message = scope.campaignData.campaignMessage;
+                } else {
+                    scope.previewData.atTemplateName = scope.campaignData.atTemplateName;
+                    scope.previewData.languageCode = scope.campaignData.languageCode;
+                }
                 resourceFactory.whatsAppCampaignResource.preview({additionalParam: 'preview'}, scope.previewData, function (data) {
                     scope.previewMessageText = data.previewMessage;
                     scope.previewBodyValues = data.bodyValues;
@@ -291,8 +304,10 @@
                 scope.frequencyTypeOptions = data.frequencyTypeOptions;
                 scope.weekDays = data.weekDays;
                 scope.recipientTypeOptions = data.recipientTypeOptions || [];
-                scope.messageTypeOptions = [{id: 'TEMPLATE', value: 'Template'}, {id: 'FREEFORM', value: 'Freeform'}];
-                scope.campaignData.messageType = 'TEMPLATE';
+                scope.messageTypeOptions = [{id: 'FREEFORM', value: 'Freeform'}, {id: 'TEMPLATE', value: 'Template'}];
+                // Default FREEFORM until an Africa's Talking template is approved.
+                scope.campaignData.messageType = 'FREEFORM';
+                scope.onMessageTypeChanged();
                 scope.filterBusinessRule();
                 // Re-apply filter if the user already chose a trigger before options arrived.
                 if (scope.campaignData.triggerType) {
@@ -352,14 +367,15 @@
                     scheduledDateTime = dateFilter(scheduledDateTime, scope.dft);
                 }
 
+                var isFreeform = scope.campaignData.messageType === 'FREEFORM';
                 scope.submissionData = {
                     triggerType: scope.campaignData.triggerType.id,
                     campaignName: scope.campaignData.campaignName,
                     campaignType: 3,
                     messageType: scope.campaignData.messageType,
-                    atTemplateName: scope.campaignData.atTemplateName,
-                    languageCode: scope.campaignData.languageCode,
-                    bodyVariableMapping: scope.campaignData.bodyVariableMapping,
+                    atTemplateName: isFreeform ? '' : scope.campaignData.atTemplateName,
+                    languageCode: isFreeform ? '' : scope.campaignData.languageCode,
+                    bodyVariableMapping: isFreeform ? [] : scope.campaignData.bodyVariableMapping,
                     message: scope.campaignData.campaignMessage || "",
                     dateFormat: scope.df,
                     locale: scope.optlang.code,

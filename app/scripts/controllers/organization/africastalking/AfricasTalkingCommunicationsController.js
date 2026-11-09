@@ -467,28 +467,7 @@
                 });
             };
 
-            
-            scope.loadMetaProvider = function () {
-                scope.metaProviderError = null;
-                resourceFactory.metaWhatsAppProviderResource.get({}, function (data) {
-                    scope.metaProvider = data;
-                }, function (error) {
-                    scope.metaProviderError = (error && error.data && error.data.defaultUserMessage) || 'Unable to load Meta WhatsApp provider status';
-                });
-            };
-
-            scope.testMetaConnectivity = function () {
-                scope.metaProviderError = null;
-                resourceFactory.metaWhatsAppConnectivityResource.get({}, function (data) {
-                    scope.metaConnectivityResult = data;
-                    scope.metaProvider = data;
-                }, function (error) {
-                    scope.metaProviderError = (error && error.data && error.data.defaultUserMessage) || 'Meta WhatsApp connectivity check failed';
-                });
-            };
-
             scope.refreshAll = function () {
-                scope.loadMetaProvider();
                 scope.loadMessages(function () {
                     scope.loadVoiceCalls(function () {
                         scope.loadInteractiveDashboard();

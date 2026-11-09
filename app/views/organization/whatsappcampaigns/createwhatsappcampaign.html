@@ -258,6 +258,14 @@
                                 <div class="alert alert-info">
                                     {{'label.help.freeformmessage' | translate}}
                                 </div>
+                                <h3>{{'label.heading.templateparameters' | translate}}</h3>
+                                <p class="help-block">{{'label.help.freeformplaceholders' | translate}}</p>
+                                <span ng-repeat="columnHeader in reportData.columnHeaders">
+                                    <strong>
+                                        <a class="reportColumns" style="cursor:pointer" ng-click="insertFreeformPlaceholder(columnHeader.columnName)">{{columnHeader.columnName}}</a>
+                                        <a class="reportColumns" ng-if="!$last">, </a>
+                                    </strong>
+                                </span>
                                 <hr>
                                 <div class="pull-right">
                                     <button id="save3" type="submit" class="btn btn-primary">{{'label.button.proceed' | translate}}</button>
@@ -286,24 +294,29 @@
                                             <td>{{campaignData.report.reportName}}</td>
                                         </tr>
                                         <tr>
+                                            <td>{{'label.input.messageType' | translate}}</td>
+                                            <td>{{campaignData.messageType}}</td>
+                                        </tr>
+                                        <tr ng-if="campaignData.messageType === 'TEMPLATE'">
                                             <td>{{'label.input.atTemplateName' | translate}}</td>
                                             <td>{{campaignData.atTemplateName}}</td>
                                         </tr>
-                                        <tr>
+                                        <tr ng-if="campaignData.messageType === 'TEMPLATE'">
                                             <td>{{'label.input.languageCode' | translate}}</td>
                                             <td>{{campaignData.languageCode}}</td>
                                         </tr>
                                         <tr ng-if="campaignData.campaignMessage">
-                                            <td>{{'label.heading.templatemsg' | translate}}</td>
+                                            <td ng-if="campaignData.messageType === 'TEMPLATE'">{{'label.heading.templatemsg' | translate}}</td>
+                                            <td ng-if="campaignData.messageType === 'FREEFORM'">{{'label.heading.freeformmessage' | translate}}</td>
                                             <td style="white-space: pre-wrap;">{{campaignData.campaignMessage}}</td>
                                         </tr>
-                                        <tr>
+                                        <tr ng-if="campaignData.messageType === 'TEMPLATE'">
                                             <td>{{'label.heading.bodyVariableMapping' | translate}}</td>
                                             <td>{{campaignData.bodyVariableMapping.join(', ')}}</td>
                                         </tr>
                                         <tr>
                                             <td>{{'label.heading.preview' | translate}}</td>
-                                            <td>{{previewMessageText}}</td>
+                                            <td style="white-space: pre-wrap;">{{previewMessageText}}</td>
                                         </tr>
                                         <tr ng-if="previewEnqueueableCount !== undefined">
                                             <td>Enqueueable recipients</td>
