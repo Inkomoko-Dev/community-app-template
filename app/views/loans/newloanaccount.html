@@ -48,6 +48,18 @@
                                 </select>
                             </td>
                         </tr>
+                        <tr ng-if="creditDecision.eligible">
+                            <td class="width14">
+                                <label for="creditDecisionRequested">{{ 'label.creditdecision.loan.request' | translate }}:&nbsp;</label>
+                                <i class="fa fa-question-circle" uib-tooltip="{{'label.creditdecision.loan.request.help' | translate:{profile: creditDecision.profileName} }}"></i>
+                            </td>
+                            <td class="paddedbottom20" colspan="3">
+                                <label class="checkbox-inline">
+                                    <input id="creditDecisionRequested" type="checkbox" ng-model="creditDecision.requested"/>
+                                    {{ 'label.creditdecision.loan.request.check' | translate }}
+                                </label>
+                            </td>
+                        </tr>
                         <tr ng-show="formData.productId">
                             <td class="width14">
                                 <label>{{ 'label.input.loanpurpose' | translate }} <span class="required">*</span>:&nbsp;</label>

@@ -1,0 +1,60 @@
+<div class="content-container cd" ng-controller="CreateCreditDecisionProfileController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.create.heading' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <h3 class="cd-title" style="margin-bottom: 18px;">{{'label.creditdecision.create.heading' | translate}}</h3>
+            <form name="createprofileform" novalidate class="cd-form wide" rc-submit="submit()">
+                <api-validate></api-validate>
+
+                <div class="form-group">
+                    <label>{{'label.creditdecision.create.name' | translate}}</label>
+                    <input type="text" class="form-control" ng-model="formData.name" required
+                           placeholder="{{'label.creditdecision.create.name.example' | translate}}">
+                    <div class="text-danger cd-small" ng-if="submitted && !formData.name">{{'label.creditdecision.create.name.required' | translate}}</div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{'label.creditdecision.create.products' | translate}}</label>
+                    <p class="help-block" style="margin-top: 0;">{{'label.creditdecision.create.products.help' | translate}}</p>
+                    <div class="cd-picker">
+                        <div class="cd-picker-bar">
+                            <input type="text" class="form-control input-sm" ng-model="picker.q" placeholder="{{'label.creditdecision.products.search' | translate}}">
+                            <span class="cd-muted cd-small">{{formData.productIds.length}} {{'label.creditdecision.selected' | translate}}</span>
+                        </div>
+                        <div class="cd-picker-body">
+                            <div ng-repeat="group in productGroups" ng-show="(group.products | filter:{name: picker.q}).length">
+                                <div class="cd-currency">{{group.currencyCode}}</div>
+                                <div class="cd-picker-grid">
+                                    <label class="cd-pick" ng-repeat="product in group.products | filter:{name: picker.q}" ng-class="{taken: product.claimedByProfileId}"
+                                           title="{{product.claimedByProfileId ? ('label.creditdecision.usedby' | translate) + ' ' + product.claimedByProfileName : product.name}}">
+                                        <input type="checkbox" ng-checked="isSelected(product)" ng-disabled="product.claimedByProfileId" ng-click="toggle(product)">
+                                        <span class="cd-pick-name">{{product.name}}</span>
+                                        <small ng-if="product.claimedByProfileId">&middot; {{product.claimedByProfileName}}</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-danger cd-small" ng-if="submitted && !formData.productIds.length">{{'label.creditdecision.create.products.required' | translate}}</div>
+                </div>
+
+                <div class="form-group" ng-if="profiles.length">
+                    <label>{{'label.creditdecision.create.copy' | translate}}</label>
+                    <select class="form-control" ng-model="formData.copyFromProfileId"
+                            ng-options="profile.id as profile.name for profile in profiles">
+                        <option value="">{{'label.creditdecision.create.copy.none' | translate}}</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary" has-permission='CREATE_CREDITDECISION'>{{'label.creditdecision.button.createdraft' | translate}}</button>
+                    <a href="#/creditdecision" class="btn btn-link">{{'label.button.cancel' | translate}}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

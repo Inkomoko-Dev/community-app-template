@@ -1381,6 +1381,51 @@
                     }),
                     loanClassificationAuditResource: defineResource(apiVer + "/loans/:loanId/classification/audit", { loanId: '@loanId' }, {
                         getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionCatalogueResource: defineResource(apiVer + "/creditdecision/catalogue", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionProductsResource: defineResource(apiVer + "/creditdecision/products", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionProfileResource: defineResource(apiVer + "/creditdecision/profiles/:profileId", { profileId: '@profileId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, url: baseUrl + apiVer + '/creditdecision/profiles' },
+                        get: { method: 'GET', params: {} },
+                        save: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/profiles' }
+                    }),
+                    creditDecisionVersionResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/versions/:versionNo", { profileId: '@profileId', versionNo: '@versionNo' }, {
+                        saveDraft: { method: 'PUT', params: {} },
+                        newDraft: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/profiles/:profileId/versions' },
+                        command: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionModeResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/mode", { profileId: '@profileId' }, {
+                        update: { method: 'PUT', params: {} }
+                    }),
+                    creditDecisionConnectionResource: defineResource(apiVer + "/creditdecision/connection", {}, {
+                        get: { method: 'GET', params: {} },
+                        update: { method: 'PUT', params: {} }
+                    }),
+                    creditDecisionLogResource: defineResource(apiVer + "/creditdecision/log", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionExceptionsResource: defineResource(apiVer + "/creditdecision/exceptions", {}, {
+                        get: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionLogEntryResource: defineResource(apiVer + "/creditdecision/log/:logId", { logId: '@logId' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionProductProfileResource: defineResource(apiVer + "/creditdecision/products/:productId/profile", { productId: '@productId' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionLoanResource: defineResource(apiVer + "/creditdecision/loans/:loanId", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {} },
+                        command: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionLoanHistoryResource: defineResource(apiVer + "/creditdecision/loans/:loanId/history", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionLoanFlagResource: defineResource(apiVer + "/creditdecision/loans/:loanId/flag", { loanId: '@loanId' }, {
+                        update: { method: 'PUT', params: {} }
                     })
                 };
             }];

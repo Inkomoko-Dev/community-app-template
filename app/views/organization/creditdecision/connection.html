@@ -1,0 +1,61 @@
+<div class="content-container cd" ng-controller="CreditDecisionConnectionController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.connection' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+            <api-validate></api-validate>
+            <div class="cd-note ok" ng-if="saved"><span><i class="fa fa-check"></i>&nbsp; {{'label.creditdecision.connection.saved' | translate}}</span></div>
+
+            <form name="connectionform" novalidate class="cd-form" ng-if="form" rc-submit="save()">
+                <div class="form-group">
+                    <label>{{'label.creditdecision.connection.sending' | translate}}</label><br>
+                    <div class="cd-seg">
+                        <button type="button" ng-class="{on: form.enabled}" ng-click="form.enabled = true">{{'label.creditdecision.connection.on' | translate}}</button>
+                        <button type="button" ng-class="{on: !form.enabled}" ng-click="form.enabled = false">{{'label.creditdecision.connection.off' | translate}}</button>
+                    </div>
+                    <p class="help-block" ng-if="form.enabled">{{'label.creditdecision.connection.sending.help' | translate}}</p>
+                    <p class="help-block cd-pending" ng-if="!form.enabled">{{'label.creditdecision.connection.paused' | translate}}</p>
+                </div>
+
+                <div class="form-group">
+                    <label>{{'label.creditdecision.connection.provider' | translate}}</label>
+                    <input type="text" class="form-control" ng-model="form.provider" maxlength="100">
+                    <p class="help-block">{{'label.creditdecision.connection.provider.help' | translate}}</p>
+                </div>
+
+                <div class="form-group">
+                    <label>{{'label.creditdecision.connection.endpoint' | translate}}</label>
+                    <input type="text" class="form-control cd-mono" ng-model="form.endpointUrl" placeholder="https://">
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4 form-group">
+                        <label>{{'label.creditdecision.connection.timeout' | translate}}</label>
+                        <input type="number" min="1" max="120" class="form-control" ng-model="form.timeoutSeconds">
+                    </div>
+                    <div class="col-sm-4 form-group">
+                        <label>{{'label.creditdecision.connection.retries' | translate}}</label>
+                        <input type="number" min="0" max="10" class="form-control" ng-model="form.retries">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{'label.creditdecision.connection.noreply' | translate}}</label>
+                    <div class="radio"><label><input type="radio" ng-model="form.onNoReply" value="RETRY"> {{'label.creditdecision.connection.noreply.retry' | translate}}</label></div>
+                    <div class="radio"><label><input type="radio" ng-model="form.onNoReply" value="ALERT"> {{'label.creditdecision.connection.noreply.alert' | translate}}</label></div>
+                </div>
+
+                <p class="help-block">{{'label.creditdecision.connection.credentials.help' | translate}}</p>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" has-permission='UPDATE_CREDITDECISIONCONNECTION'>{{'label.button.save' | translate}}</button>
+                    <span class="cd-muted cd-small" ng-if="updatedBy">&nbsp;{{'label.creditdecision.connection.lastchanged' | translate:{by: updatedBy} }}</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

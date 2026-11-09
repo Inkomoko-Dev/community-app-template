@@ -1,0 +1,35 @@
+<div class="content-container cd" ng-controller="CreditDecisionCatalogueController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.catalogue' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+            <p class="cd-lead">{{'label.creditdecision.catalogue.intro' | translate}}</p>
+
+            <div class="cd-group" ng-repeat="group in groups">
+                <div class="cd-group-head">
+                    <strong>{{group.name}}</strong>
+                    <span class="cd-muted cd-small">{{group.source}}</span>
+                </div>
+                <table class="cd-table">
+                    <tbody>
+                    <tr ng-repeat="item in group.items">
+                        <td style="width: 34%;">
+                            {{item.label}}
+                            <span class="cd-sub">{{item.description}}</span>
+                        </td>
+                        <td style="width: 26%;"><span class="cd-mono cd-small">{{item.defaultField}}</span></td>
+                        <td class="cd-small">
+                            <span ng-repeat="profile in usedBy(item)"><a href="#/creditdecision/profile/{{profile.id}}">{{profile.name}}</a>{{$last ? '' : ', '}}</span>
+                            <span class="cd-muted" ng-if="!usedBy(item).length">{{'label.creditdecision.catalogue.none' | translate}}</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

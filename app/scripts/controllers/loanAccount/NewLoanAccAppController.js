@@ -251,8 +251,33 @@
                 }
             });
 
+            /*
+             * Applications for a product that belongs to a credit decision profile can ask for an automated credit
+             * decision. It is off unless the person ticks the box. The flag is saved right after the loan exists.
+             */
+            scope.creditDecision = {eligible: false, requested: false, profileName: ''};
+
+            function loadCreditDecisionOffer(loanProductId) {
+                scope.creditDecision = {eligible: false, requested: false, profileName: ''};
+                if (!loanProductId || !scope.hasPermission || !scope.hasPermission('UPDATE_CREDITDECISIONLOAN')) {
+                    return;
+                }
+                resourceFactory.creditDecisionProductProfileResource.get({productId: loanProductId}, function (data) {
+                    if (scope.formData.productId === loanProductId && data && data.profileId) {
+                        scope.creditDecision.eligible = true;
+                        scope.creditDecision.profileName = data.profileName;
+                    }
+                });
+            }
+
+            function openNewLoan(loanId) {
+                scope.carryForwardLoanTerm = 0;
+                location.path('/viewloanaccount/' + loanId);
+            }
+
             scope.loanProductChange = function (loanProductId) {
                 scope.inparams.productId = loanProductId;
+                loadCreditDecisionOffer(loanProductId);
                 resourceFactory.clientcollateralTemplateResource.getAllCollaterals({clientId: scope.clientId, prodId: loanProductId}, function(data) {
                         scope.collateralsData = data;
                         scope.collateralsData = scope.collateralsData.filter((collateral) => collateral.quantity != 0);
@@ -778,8 +803,16 @@
                 }
                 prepareTrancheOverrides(this.formData);
                 resourceFactory.loanResource.save(this.formData, function (data) {
-                    scope.carryForwardLoanTerm = 0;
-                    location.path('/viewloanaccount/' + data.loanId);
+                    if (scope.creditDecision.eligible && scope.creditDecision.requested) {
+                        // the loan page shows the flag and lets the person set it again if this call fails
+                        resourceFactory.creditDecisionLoanFlagResource.update({loanId: data.loanId}, {required: true}, function () {
+                            openNewLoan(data.loanId);
+                        }, function () {
+                            openNewLoan(data.loanId);
+                        });
+                    } else {
+                        openNewLoan(data.loanId);
+                    }
                 });
             };
 
