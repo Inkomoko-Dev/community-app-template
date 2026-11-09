@@ -37,6 +37,14 @@
                 scope.enableAddress=data.isAddressEnabled;
                 scope.businessOwnerEnabled=data.isBusinessOwnerEnabled;
                 scope.employmentInfoEnabled=data.isEmploymentInfoEnabled;
+                // Fetch employment rows only when the client template enables them.
+                // This backend has no /clients/{id}/employmentInfo resource, so calling
+                // it for every client returns 404 and the page shows "No connection".
+                if (scope.employmentInfoEnabled === true) {
+                    resourceFactory.employmentInformation.get({clientId: routeParams.id}, function (employmentData) {
+                        scope.employmentInfo = employmentData;
+                    });
+                }
                 if(scope.enableAddress===true)
                 {
 
