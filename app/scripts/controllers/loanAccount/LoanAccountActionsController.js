@@ -1045,6 +1045,7 @@
                     scope.title = 'label.heading.loanrepayments';
                     scope.labelName = 'label.input.transactiondate';
                     scope.isTransaction = true;
+                    scope.showMfiCode = true;
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'REPAYMENT_LOAN';
                     break;
@@ -1071,6 +1072,7 @@
                     scope.title = 'label.heading.prepayloan';
                     scope.labelName = 'label.input.transactiondate';
                     scope.isTransaction = true;
+                    scope.showMfiCode = true;
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'REPAYMENT_LOAN';
                     scope.action = 'repayment';
@@ -2632,8 +2634,10 @@
             };
 
             scope.isMfiCodeReadOnly = function () {
-                const isApprovalOrDRStage = scope.action === "approve" || scope.action === "disbursementpreapprovalrequest";
-                return !isApprovalOrDRStage;
+                const isApprovalOrDRStage = scope.action === "approve"
+                    || scope.action === "disbursementpreapprovalrequest";
+                const isRepaymentOrPrepay = scope.action === "repayment";
+                return !(isApprovalOrDRStage || isRepaymentOrPrepay);
             };
 
             scope.isCashPayment = function () {
