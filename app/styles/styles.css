@@ -20690,6 +20690,34 @@ span.required {
 .card .statusprogresscompletedtab {
   color: #298A08;
 }
+/* line 518, ../styles-dev/main/components/_content.scss */
+.card .statuspendingdisbursement {
+  color: #40E0D0;
+}
+/* line 522, ../styles-dev/main/components/_content.scss */
+.card .statusrepaymentnotmet {
+  color: #FF8C00;
+}
+/* line 526, ../styles-dev/main/components/_content.scss */
+.card .statusrepaymentmet {
+  color: #1E90FF;
+}
+/* line 530, ../styles-dev/main/components/_content.scss */
+.card .statusawaitingsurvey {
+  color: #DAA520;
+}
+/* line 534, ../styles-dev/main/components/_content.scss */
+.card .statussurveysuccessful {
+  color: #228B22;
+}
+/* line 538, ../styles-dev/main/components/_content.scss */
+.card .statustrancheexpired {
+  color: #B22222;
+}
+/* line 542, ../styles-dev/main/components/_content.scss */
+.card .statusrequirereview {
+  color: #8B008B;
+}
 /* line 505, ../styles-dev/main/components/_content.scss */
 .card a {
   cursor: pointer;

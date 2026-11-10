@@ -519,6 +519,30 @@ span.required {
    color: #40E0D0;
 }
 
+.statusrepaymentnotmet {
+   color: #FF8C00;
+}
+
+.statusrepaymentmet {
+   color: #1E90FF;
+}
+
+.statusawaitingsurvey {
+   color: #DAA520;
+}
+
+.statussurveysuccessful {
+   color: #228B22;
+}
+
+.statustrancheexpired {
+   color: #B22222;
+}
+
+.statusrequirereview {
+   color: #8B008B;
+}
+
   a{
     cursor: pointer;
   }
