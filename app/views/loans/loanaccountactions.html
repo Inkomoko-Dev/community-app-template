@@ -3,7 +3,7 @@
         <h3 class="bolder">{{ 'label.heading.trancheminimum' | translate }}</h3>
     </div>
     <div class="modal-body">
-        <p>{{ message }}</p>
+        <p ng-repeat="line in messages track by $index">{{ line }}</p>
         <p>{{ 'label.warning.tranche.minimum.choose' | translate }}</p>
     </div>
     <div class="modal-footer">

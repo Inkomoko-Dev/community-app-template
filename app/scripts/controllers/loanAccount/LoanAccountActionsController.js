@@ -7,11 +7,21 @@
 
             scope.trancheMinimumProceed = false;
 
-            function trancheMinimumMessage(report) {
-                return translate.instant('label.warning.tranche.minimum.not.met', {
-                    repaid: filter('number')(report.principalRepaid),
-                    required: filter('number')(report.requiredPrincipal)
-                });
+            function trancheWarningMessages(report) {
+                var messages = [];
+                if (report.minimumNotMet) {
+                    messages.push(translate.instant('label.warning.tranche.minimum.not.met', {
+                        repaid: filter('number')(report.principalRepaid),
+                        required: filter('number')(report.requiredPrincipal)
+                    }));
+                }
+                if (report.surveyOutstanding) {
+                    messages.push(translate.instant('label.warning.tranche.survey.outstanding'));
+                }
+                if (report.surveyNegative) {
+                    messages.push(translate.instant('label.warning.tranche.survey.negative'));
+                }
+                return messages;
             }
 
             function openTrancheMinimumDialog() {
@@ -23,8 +33,8 @@
                     templateUrl: 'trancheMinimumDialog.html',
                     backdrop: 'static',
                     keyboard: false,
-                    controller: function ($scope, $uibModalInstance, message) {
-                        $scope.message = message;
+                    controller: function ($scope, $uibModalInstance, messages) {
+                        $scope.messages = messages;
                         $scope.proceed = function () {
                             $uibModalInstance.close('proceed');
                         };
@@ -33,8 +43,8 @@
                         };
                     },
                     resolve: {
-                        message: function () {
-                            return scope.trancheMinimumMessage;
+                        messages: function () {
+                            return scope.trancheWarningMessages;
                         }
                     }
                 }).result.then(function (choice) {
@@ -52,8 +62,8 @@
 
             function loadTrancheReleaseWarning() {
                 resourceFactory.trancheReleaseReportResource.get({ loanId: scope.accountId }, function (report) {
-                    scope.trancheReleaseWarning = report && report.minimumNotMet ? report : null;
-                    scope.trancheMinimumMessage = scope.trancheReleaseWarning ? trancheMinimumMessage(scope.trancheReleaseWarning) : null;
+                    scope.trancheWarningMessages = report ? trancheWarningMessages(report) : [];
+                    scope.trancheReleaseWarning = scope.trancheWarningMessages.length ? report : null;
                     scope.trancheMinimumProceed = false;
                     if (scope.trancheReleaseWarning) {
                         openTrancheMinimumDialog();
