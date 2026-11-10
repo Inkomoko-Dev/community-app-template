@@ -1309,6 +1309,8 @@
                                                     <th>{{'label.heading.loanaccountnum' | translate}}</th>
                                                     <th>{{'label.heading.loanproduct' | translate}}</th>
                                                     <th>{{'label.heading.principal' | translate}}</th>
+                                                    <th>{{'label.heading.multitranche' | translate}}</th>
+                                                    <th>{{'label.heading.trancheawaitingdisbursal' | translate}}</th>
                                                 </tr>
                                                 </thead>
                                                     <tbody>
@@ -1319,6 +1321,8 @@
                                                         <td><a href="#/viewloanaccount/{{loan.id}}">{{loan.accountNo}}</a></td>
                                                         <td><a href="#/viewloanaccount/{{loan.id}}">{{loan.loanProductName}}</a></td>
                                                         <td>{{loan.principal | number}}</td>
+                                                        <td>{{loan.multiDisburseLoanListing ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
+                                                        <td>{{loan.multiDisburseLoanListing ? (loan.nextTrancheNumber || 1) : ''}}</td>
                                                     </tr>
                                                     </tbody>
                                             </table>
@@ -1416,6 +1420,8 @@
                                                     <th>{{'label.heading.principal' | translate}}</th>
                                                     <th>{{'label.heading.netdisbursement' | translate}}</th>
                                                     <th>{{'label.heading.paymenttype' | translate}}</th>
+                                                    <th>{{'label.heading.multitranche' | translate}}</th>
+                                                    <th>{{'label.heading.trancheawaitingdisbursal' | translate}}</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -1434,6 +1440,8 @@
                                                     <td>{{loan.principal | number}}</td>
                                                     <td>{{loan.expectedNetDisbursalAmount | number}}</td>
                                                     <td>{{loan.paymentType.name}}</td>
+                                                    <td>{{loan.multiDisburseLoanListing ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
+                                                    <td>{{loan.multiDisburseLoanListing ? (loan.nextTrancheNumber || 1) : ''}}</td>
                                                 </tr>
                                                 </tbody>
                                             </table>
