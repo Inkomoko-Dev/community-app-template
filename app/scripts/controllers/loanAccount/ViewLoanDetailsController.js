@@ -811,6 +811,35 @@
                     } else {
                         scope.isPendingDisbursement = false;
                     }
+                    var subStatusId = scope.loandetails.subStatus && scope.loandetails.subStatus.id;
+                    scope.isTrancheMilestoneSubStatus = subStatusId >= 400 && subStatusId <= 450;
+                    scope.statusIconCode = (scope.isPendingDisbursement || scope.isTrancheMilestoneSubStatus)
+                        && scope.loandetails.subStatus
+                        ? scope.loandetails.subStatus.code
+                        : (scope.loandetails.status && scope.loandetails.status.code);
+                    scope.trancheMilestone = null;
+                    scope.trancheReleaseEligibility = null;
+                    if (data.multiDisburseLoan) {
+                        resourceFactory.trancheMilestoneResource.get({ loanKey: routeParams.id }, function (milestone) {
+                            scope.trancheMilestone = milestone;
+                        }, function () {
+                            scope.trancheMilestone = null;
+                        });
+                        resourceFactory.trancheReleaseReportResource.get({ loanId: routeParams.id }, function (report) {
+                            scope.trancheReleaseEligibility = report;
+                        }, function () {
+                            scope.trancheReleaseEligibility = null;
+                        });
+                    }
+                    scope.milestoneYesNo = function (value) {
+                        if (value === true) {
+                            return 'label.heading.yes';
+                        }
+                        if (value === false) {
+                            return 'label.heading.no';
+                        }
+                        return 'label.heading.notavailable';
+                    };
                     scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                     scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
                     scope.isAwaitingPartnerDisbursementInstruction = scope.enableThirdPartyDisbursement

@@ -219,7 +219,7 @@
                             <strong>
 
                                 <i ng-hide="loandetails.inArrears"
-                                        class="fa fa-stop {{isPendingDisbursement ? loandetails.subStatus.code : loandetails.status.code | StatusLookup}}"></i>
+                                        class="fa fa-stop {{statusIconCode | StatusLookup}}"></i>
 
                                 <i ng-show="loandetails.inArrears"
                                    class="fa fa-stop {{loandetails.status.code | StatusLookup}}overdue"></i>
@@ -235,7 +235,7 @@
                                  (!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value == 'PREPARE_AND_SIGN_CONTRACT') ||
                                  (!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loandetails.status.code != 'loanStatusType.submitted.and.pending.approval')"
 
-                                    class="fa fa-stop {{isPendingDisbursement ? loandetails.subStatus.code : loandetails.status.code | StatusLookup}}"></i>
+                                    class="fa fa-stop {{statusIconCode | StatusLookup}}"></i>
 
 
                                  <i ng-show="!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loandetails.status.code == 'loanStatusType.submitted.and.pending.approval'"
@@ -354,6 +354,10 @@
                         </tr>
                         <tr ng-show="isPendingDisbursement">
                             <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
+                        </tr>
+                        <tr ng-show="isTrancheMilestoneSubStatus">
+                            <th class="table-bold-loan">{{'label.heading.milestonestatus' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
                         </tr>
                         <tr ng-show="isAwaitingPartnerDisbursementInstruction">
@@ -1233,6 +1237,110 @@
                                        data-ng-show="showEdit(disbursementDetail)"
                                        href="#/loandisbursedetail/{{loandetails.id}}/editdisbursedate/{{disbursementDetail.id}}"><i
                                             class="fa fa-pencil "></i></a>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="width100 table" ng-show="trancheReleaseEligibility || trancheMilestone">
+                            <tr>
+                                <td colspan="2">
+                                    <b>{{'label.heading.trancheeligibility' | translate}}</b>
+                                </td>
+                            </tr>
+                            <tr ng-show="trancheMilestone.trancheNumber">
+                                <td>{{'label.heading.trancheawaitingdisbursal' | translate}}</td>
+                                <td>{{trancheMilestone.trancheNumber}}</td>
+                            </tr>
+                            <tr ng-show="trancheMilestone.status">
+                                <td>{{'label.heading.milestonestatus' | translate}}</td>
+                                <td>
+                                    <i class="fa fa-stop {{trancheMilestone.status.code | StatusLookup}}"></i>
+                                    {{trancheMilestone.status.value}}
+                                </td>
+                            </tr>
+                            <tr ng-show="trancheMilestone.firstRepaymentDueDate">
+                                <td>{{'label.heading.eligibilitydeadline' | translate}}</td>
+                                <td>{{trancheMilestone.firstRepaymentDueDate | DateFormat}}</td>
+                            </tr>
+                            <tr ng-show="trancheReleaseEligibility">
+                                <td>{{'label.heading.repaymentthreshold' | translate}}</td>
+                                <td>
+                                    <span ng-show="trancheReleaseEligibility.thresholdMet">{{'label.heading.met' | translate}}</span>
+                                    <span ng-show="trancheReleaseEligibility.minimumNotMet">{{'label.heading.notmet' | translate}}</span>
+                                    <span ng-show="trancheReleaseEligibility.principalRepaid != null">
+                                        — {{'label.heading.principalrepaid' | translate}}: {{trancheReleaseEligibility.principalRepaid | number}}
+                                        / {{trancheReleaseEligibility.requiredPrincipal | number}}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr ng-show="trancheReleaseEligibility.milestoneRequired">
+                                <td>{{'label.heading.surveyreadiness' | translate}}</td>
+                                <td>
+                                    <span ng-show="trancheReleaseEligibility.surveyOutstanding">{{'label.warning.tranche.survey.outstanding' | translate}}</span>
+                                    <span ng-show="trancheReleaseEligibility.surveyNegative">{{'label.warning.tranche.survey.negative' | translate}}</span>
+                                    <span ng-hide="trancheReleaseEligibility.surveyOutstanding || trancheReleaseEligibility.surveyNegative">{{'label.heading.ready' | translate}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <small>{{'label.msg.multitranche.eligibility.report' | translate}}</small>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="width100 table" ng-show="trancheMilestone && trancheMilestone.milestoneRequired">
+                            <tr>
+                                <td colspan="2">
+                                    <b>{{'label.heading.milestonesurvey' | translate}}</b>
+                                    <small> — {{'label.msg.milestonesurvey.readonly' | translate}}</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.submissionid' | translate}}</td>
+                                <td>{{trancheMilestone.submissionId || ('label.heading.notavailable' | translate)}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.conductedby' | translate}}</td>
+                                <td>{{trancheMilestone.conductedBy || ('label.heading.notavailable' | translate)}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.conductedon' | translate}}</td>
+                                <td>{{trancheMilestone.conductedOn || ('label.heading.notavailable' | translate)}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.operational' | translate}}</td>
+                                <td>{{milestoneYesNo(trancheMilestone.operational) | translate}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.verifiedbybgs' | translate}}</td>
+                                <td>
+                                    {{milestoneYesNo(trancheMilestone.operationalVerifiedByBgs) | translate}}
+                                    <span ng-show="trancheMilestone.operationalBgsName"> — {{trancheMilestone.operationalBgsName}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.verifiedbyinvestment' | translate}}</td>
+                                <td>
+                                    {{milestoneYesNo(trancheMilestone.operationalVerifiedByInvestment) | translate}}
+                                    <span ng-show="trancheMilestone.operationalInvestmentName"> — {{trancheMilestone.operationalInvestmentName}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.additionalfundingrequired' | translate}}</td>
+                                <td>{{milestoneYesNo(trancheMilestone.additionalFundingRequired) | translate}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.fundingverifiedbybgs' | translate}}</td>
+                                <td>
+                                    {{milestoneYesNo(trancheMilestone.fundingVerifiedByBgs) | translate}}
+                                    <span ng-show="trancheMilestone.fundingBgsName"> — {{trancheMilestone.fundingBgsName}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{'label.heading.fundingverifiedbyinvestment' | translate}}</td>
+                                <td>
+                                    {{milestoneYesNo(trancheMilestone.fundingVerifiedByInvestment) | translate}}
+                                    <span ng-show="trancheMilestone.fundingInvestmentName"> — {{trancheMilestone.fundingInvestmentName}}</span>
                                 </td>
                             </tr>
                         </table>
