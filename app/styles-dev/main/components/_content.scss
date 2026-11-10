@@ -543,6 +543,44 @@ span.required {
    color: #8B008B;
 }
 
+.tranche-section {
+  margin-top: 24px;
+  padding: 16px 16px 8px;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+
+.tranche-section-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.tranche-section-title .fa-question-circle {
+  margin-left: 6px;
+  color: #5b9bd5;
+  cursor: help;
+}
+
+.tranche-section-help {
+  margin: 0 0 12px;
+  color: #666;
+  font-size: 12px;
+}
+
+.tranche-field-label {
+  width: 34%;
+  vertical-align: middle !important;
+  background: #f5f5f5;
+}
+
+.tranche-field-label .fa-question-circle {
+  margin-left: 4px;
+  color: #5b9bd5;
+  cursor: help;
+}
+
   a{
     cursor: pointer;
   }
