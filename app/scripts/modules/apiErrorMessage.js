@@ -305,6 +305,36 @@
             return requestKey(method, url) === activeErrorRequestKey;
         }
 
+        function isReadKey(key) {
+            return !!key && key.indexOf('GET ') === 0;
+        }
+
+        function shouldClearOnSuccess(method, url, activeErrorRequestKey) {
+            if (!isReadKey(activeErrorRequestKey)) {
+                return false;
+            }
+            if (method && method !== 'GET') {
+                return true;
+            }
+            return requestKey(method, url) === activeErrorRequestKey;
+        }
+
+        function shouldPublishError(method, xhrStatus, activeErrorRequestKey) {
+            if (xhrStatus === 'abort') {
+                return false;
+            }
+            var isRead = !method || method === 'GET';
+            return !(isRead && activeErrorRequestKey && !isReadKey(activeErrorRequestKey));
+        }
+
+        function writeSignature(method, url, params, data) {
+            if (!method || method === 'GET') {
+                return null;
+            }
+            var body = typeof data === 'string' ? data : JSON.stringify(data === undefined ? null : data);
+            return requestKey(method, url) + ' ' + JSON.stringify(params || null) + ' ' + body;
+        }
+
         return {
             ENGLISH: ENGLISH,
             humanizeField: humanizeField,
@@ -313,6 +343,9 @@
             parseBatchFailures: parseBatchFailures,
             escalationMessage: escalationMessage,
             requestKey: requestKey,
-            shouldClearForRequest: shouldClearForRequest
+            shouldClearForRequest: shouldClearForRequest,
+            shouldClearOnSuccess: shouldClearOnSuccess,
+            shouldPublishError: shouldPublishError,
+            writeSignature: writeSignature
         };
 });
