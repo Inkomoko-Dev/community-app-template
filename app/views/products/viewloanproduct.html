@@ -408,6 +408,10 @@
     <td colspan="3">{{loanproduct.multiDisburseLoan}}</td>
 </tr>
 <tr ng-show="loanproduct.multiDisburseLoan">
+    <td>{{'label.input.requiremilestonesurvey' | translate}}</td>
+    <td colspan="3">{{loanproduct.requireMilestoneSurvey ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
+</tr>
+<tr ng-show="loanproduct.multiDisburseLoan">
     <td>{{'label.input.mintranchecount' | translate}}</td>
     <td colspan="3">{{loanproduct.minTrancheCount}}</td>
 </tr>
