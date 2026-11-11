@@ -362,6 +362,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/smscampaigns/EditSmsCampaignController',
             'organization/whatsappcampaigns/WhatsAppCampaignsController',
             'organization/whatsappcampaigns/CreateWhatsAppCampaignController',
+            'organization/whatsappcampaigns/CreateWhatsAppTemplateController',
             'organization/whatsappcampaigns/ViewWhatsAppCampaignController',
             'organization/whatsappcampaigns/EditWhatsAppCampaignController',
             'organization/africastalking/AfricasTalkingCommunicationsController',

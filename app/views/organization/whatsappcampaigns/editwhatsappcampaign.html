@@ -2,7 +2,7 @@
     <ul class="breadcrumb">
         <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
         <li><a href="#/whatsappcampaigns">{{'label.anchor.whatsappcampaigns' | translate}}</a></li>
-        <li><a href="#/viewwhatsappcampaign/{{campaignData.id}}">{{campaignData.campaignName}}</a></li>
+        <li ng-if="campaignData.id"><a href="#/viewwhatsappcampaign/{{campaignData.id}}">{{campaignData.campaignName}}</a></li>
         <li class="active">{{'label.anchor.editcampaign' | translate}}</li>
     </ul>
     <div class="card">
@@ -88,51 +88,93 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label col-sm-2">{{'label.input.atTemplateName' | translate}}<span class="required">*</span></label>
+                        <label class="control-label col-sm-2">{{'label.input.messageType' | translate}} <span class="required">*</span></label>
                         <div class="col-sm-3">
-                            <input type="text" id="atTemplateName" name="atTemplateName" ng-model="campaignData.atTemplateName"
-                                   class="form-control" placeholder="{{'label.input.atTemplateName.placeholder' | translate}}" required/>
+                            <select id="messageType" name="messageType" ng-model="campaignData.messageType"
+                                    class="form-control" required
+                                    ng-options="messageTypeOption.id as messageTypeOption.value for messageTypeOption in messageTypeOptions"
+                                    ng-change="onMessageTypeChanged()">
+                            </select>
                         </div>
                         <div class="col-sm-3">
-                            <form-validate valattributeform="editwhatsappform" valattribute="atTemplateName"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2">{{'label.input.languageCode' | translate}}<span class="required">*</span></label>
-                        <div class="col-sm-3">
-                            <input type="text" id="languageCode" name="languageCode" ng-model="campaignData.languageCode"
-                                   class="form-control" placeholder="{{'label.input.languageCode.placeholder' | translate}}" required/>
-                        </div>
-                        <div class="col-sm-3">
-                            <form-validate valattributeform="editwhatsappform" valattribute="languageCode"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2">{{'label.heading.templatemsg' | translate}}</label>
-                        <div class="col-sm-8">
-                            <textarea id="campaignMessage" name="campaignMessage" rows="5"
-                                      ng-model="campaignData.campaignMessage"
-                                      class="form-control"
-                                      placeholder="{{'label.input.whatsapptemplatemsg.placeholder' | translate}}"></textarea>
-                            <p class="help-block">{{'label.input.whatsapptemplatemsg.help' | translate}}</p>
+                            <form-validate valattributeform="editwhatsappform" valattribute="messageType"/>
                         </div>
                     </div>
 
-                    <h3>{{'label.heading.bodyVariableMapping' | translate}}</h3>
-                    <p>{{'label.heading.templateparameters' | translate}}</p>
-                    <span ng-repeat="columnHeader in reportData.columnHeaders">
-                        <strong>
-                            <a class="reportColumns" style="cursor:pointer" ng-click="addBodyVariableMapping(columnHeader.columnName)">{{columnHeader.columnName}}</a>
-                            <a class="reportColumns" ng-if="!$last">, </a>
-                        </strong>
-                    </span>
-                    <br/><br/>
-                    <ol>
-                        <li ng-repeat="mapping in campaignData.bodyVariableMapping track by $index">
-                            {{mapping}}
-                            <button type="button" class="btn btn-default btn-xs" ng-click="removeBodyVariableMapping($index)">{{'label.button.removemapping' | translate}}</button>
-                        </li>
-                    </ol>
+                    <div ng-if="campaignData.messageType === 'TEMPLATE'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{'label.input.atTemplateName' | translate}}<span class="required">*</span></label>
+                            <div class="col-sm-3">
+                                <input type="text" id="atTemplateName" name="atTemplateName" ng-model="campaignData.atTemplateName"
+                                       class="form-control" placeholder="{{'label.input.atTemplateName.placeholder' | translate}}" required/>
+                            </div>
+                            <div class="col-sm-3">
+                                <form-validate valattributeform="editwhatsappform" valattribute="atTemplateName"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{'label.input.languageCode' | translate}}<span class="required">*</span></label>
+                            <div class="col-sm-3">
+                                <input type="text" id="languageCode" name="languageCode" ng-model="campaignData.languageCode"
+                                       class="form-control" placeholder="{{'label.input.languageCode.placeholder' | translate}}" required/>
+                            </div>
+                            <div class="col-sm-3">
+                                <form-validate valattributeform="editwhatsappform" valattribute="languageCode"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{'label.heading.templatemsg' | translate}}</label>
+                            <div class="col-sm-8">
+                                <textarea id="campaignMessage" name="campaignMessage" rows="5"
+                                          ng-model="campaignData.campaignMessage"
+                                          class="form-control"
+                                          placeholder="{{'label.input.whatsapptemplatemsg.placeholder' | translate}}"></textarea>
+                                <p class="help-block">{{'label.input.whatsapptemplatemsg.help' | translate}}</p>
+                            </div>
+                        </div>
+
+                        <h3>{{'label.heading.bodyVariableMapping' | translate}}</h3>
+                        <p>{{'label.heading.templateparameters' | translate}}</p>
+                        <span ng-repeat="columnHeader in reportData.columnHeaders">
+                            <strong>
+                                <a class="reportColumns" style="cursor:pointer" ng-click="addBodyVariableMapping(columnHeader.columnName)">{{columnHeader.columnName}}</a>
+                                <a class="reportColumns" ng-if="!$last">, </a>
+                            </strong>
+                        </span>
+                        <br/><br/>
+                        <ol>
+                            <li ng-repeat="mapping in campaignData.bodyVariableMapping track by $index">
+                                {{mapping}}
+                                <button type="button" class="btn btn-default btn-xs" ng-click="removeBodyVariableMapping($index)">{{'label.button.removemapping' | translate}}</button>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div ng-if="campaignData.messageType === 'FREEFORM'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{'label.heading.freeformmessage' | translate}}<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea id="freeformMessage" name="freeformMessage" rows="5"
+                                          ng-model="campaignData.campaignMessage"
+                                          class="form-control"
+                                          placeholder="{{'label.input.freeformmessage.placeholder' | translate}}" required></textarea>
+                            </div>
+                            <div class="col-sm-3">
+                                <form-validate valattributeform="editwhatsappform" valattribute="freeformMessage"/>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            {{'label.help.freeformmessage' | translate}}
+                        </div>
+                        <h3>{{'label.heading.templateparameters' | translate}}</h3>
+                        <p class="help-block">{{'label.help.freeformplaceholders' | translate}}</p>
+                        <span ng-repeat="columnHeader in reportData.columnHeaders">
+                            <strong>
+                                <a class="reportColumns" style="cursor:pointer" ng-click="insertFreeformPlaceholder(columnHeader.columnName)">{{columnHeader.columnName}}</a>
+                                <a class="reportColumns" ng-if="!$last">, </a>
+                            </strong>
+                        </span>
+                    </div>
                     <br/>
                     <hr>
                     <div class="">

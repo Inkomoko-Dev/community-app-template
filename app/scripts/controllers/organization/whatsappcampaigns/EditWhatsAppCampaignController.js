@@ -22,6 +22,21 @@
                 scope.campaignData.bodyVariableMapping.splice(index, 1);
             };
 
+            scope.insertFreeformPlaceholder = function (columnName) {
+                if (!scope.campaignData.campaignMessage) {
+                    scope.campaignData.campaignMessage = '';
+                }
+                scope.campaignData.campaignMessage += ' ${' + columnName + '}';
+            };
+
+            scope.onMessageTypeChanged = function () {
+                if (scope.campaignData.messageType === 'FREEFORM') {
+                    scope.campaignData.atTemplateName = '';
+                    scope.campaignData.languageCode = '';
+                    scope.campaignData.bodyVariableMapping = [];
+                }
+            };
+
             scope.reportSelected = function (reportName) {
                 scope.reqFields = [];
                 scope.reportParams = [];
@@ -57,6 +72,7 @@
             resourceFactory.whatsAppCampaignResource.get({campaignId: routeParams.campaignId}, function (data) {
                 scope.campaignData.id = data.id;
                 scope.campaignData.campaignName = data.campaignName;
+                scope.campaignData.messageType = data.messageType;
                 scope.campaignData.atTemplateName = data.atTemplateName;
                 scope.campaignData.languageCode = data.languageCode;
                 scope.campaignData.bodyVariableMapping = data.bodyVariableMappingList ? data.bodyVariableMappingList.slice() : [];
@@ -150,6 +166,7 @@
                 scope.triggerTypeOptions = data.triggerTypeOptions;
                 scope.businessRuleOptions = data.businessRulesOptions;
                 scope.recipientTypeOptions = data.recipientTypeOptions || [];
+                scope.messageTypeOptions = [{id: 'FREEFORM', value: 'Freeform'}, {id: 'TEMPLATE', value: 'Template'}];
             });
 
             scope.submit = function () {
@@ -162,13 +179,15 @@
                     scheduledDateTime = dateFilter(scheduledDateTime, scope.dft);
                 }
 
+                var isFreeform = scope.campaignData.messageType === 'FREEFORM';
                 scope.submissionData = {
                     triggerType: scope.campaignData.triggerType,
                     campaignName: scope.campaignData.campaignName,
                     campaignType: scope.campaignData.campaignType,
-                    atTemplateName: scope.campaignData.atTemplateName,
-                    languageCode: scope.campaignData.languageCode,
-                    bodyVariableMapping: scope.campaignData.bodyVariableMapping,
+                    messageType: scope.campaignData.messageType,
+                    atTemplateName: isFreeform ? '' : scope.campaignData.atTemplateName,
+                    languageCode: isFreeform ? '' : scope.campaignData.languageCode,
+                    bodyVariableMapping: isFreeform ? [] : scope.campaignData.bodyVariableMapping,
                     message: scope.campaignData.campaignMessage || "",
                     dateFormat: scope.df,
                     locale: scope.optlang.code,

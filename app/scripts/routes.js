@@ -1166,6 +1166,9 @@
             .when('/editwhatsappcampaign/:campaignId', {
                 templateUrl: 'views/organization/whatsappcampaigns/editwhatsappcampaign.html'
             })
+            .when('/createwhatsapptemplate', {
+                templateUrl: 'views/organization/whatsappcampaigns/createwhatsapptemplate.html'
+            })
             .when('/africastalking', {
                 templateUrl: 'views/organization/africastalking/africastalking.html'
             })
