@@ -20756,6 +20756,9 @@ span.required {
   color: #5b9bd5;
   cursor: help;
 }
+.card .tranche-evidence {
+  white-space: pre-line;
+}
 /* line 505, ../styles-dev/main/components/_content.scss */
 .card a {
   cursor: pointer;

@@ -9,17 +9,27 @@
 
             function trancheWarningMessages(report) {
                 var messages = [];
-                if (report.minimumNotMet) {
+                if (!report || report.subsequentTranche === false) {
+                    return messages;
+                }
+                if (report.thresholdNotConfigured) {
+                    messages.push(translate.instant('label.warning.tranche.threshold.not.configured'));
+                } else if (report.minimumNotMet) {
                     messages.push(translate.instant('label.warning.tranche.minimum.not.met', {
                         repaid: filter('number')(report.principalRepaid),
                         required: filter('number')(report.requiredPrincipal)
                     }));
                 }
-                if (report.surveyOutstanding) {
+                if (report.surveyIncomplete) {
+                    messages.push(translate.instant('label.warning.tranche.survey.incomplete'));
+                } else if (report.surveyOutstanding) {
                     messages.push(translate.instant('label.warning.tranche.survey.outstanding'));
                 }
                 if (report.surveyNegative) {
                     messages.push(translate.instant('label.warning.tranche.survey.negative'));
+                }
+                if (report.pastDeadline && !report.deadlineExceptionApproved) {
+                    messages.push(translate.instant('label.warning.tranche.past.deadline'));
                 }
                 return messages;
             }
@@ -60,14 +70,28 @@
                 });
             }
 
+            function applyTrancheReleaseWarning(report) {
+                scope.trancheWarningReport = report;
+                if (!scope.currentTrancheNumber) {
+                    return;
+                }
+                if (scope.currentTrancheNumber < 2) {
+                    scope.trancheWarningMessages = [];
+                    scope.trancheReleaseWarning = null;
+                    scope.trancheMinimumProceed = false;
+                    return;
+                }
+                scope.trancheWarningMessages = report ? trancheWarningMessages(report) : [];
+                scope.trancheReleaseWarning = scope.trancheWarningMessages.length ? report : null;
+                scope.trancheMinimumProceed = false;
+                if (scope.trancheReleaseWarning) {
+                    openTrancheMinimumDialog();
+                }
+            }
+
             function loadTrancheReleaseWarning() {
                 resourceFactory.trancheReleaseReportResource.get({ loanId: scope.accountId }, function (report) {
-                    scope.trancheWarningMessages = report ? trancheWarningMessages(report) : [];
-                    scope.trancheReleaseWarning = scope.trancheWarningMessages.length ? report : null;
-                    scope.trancheMinimumProceed = false;
-                    if (scope.trancheReleaseWarning) {
-                        openTrancheMinimumDialog();
-                    }
+                    applyTrancheReleaseWarning(report);
                 });
             }
 
@@ -981,6 +1005,9 @@
                                 }) || savedDetail;
                             }
                             scope.currentTrancheNumber = templateData.trancheNumber;
+                            if (scope.trancheWarningReport) {
+                                applyTrancheReleaseWarning(scope.trancheWarningReport);
+                            }
                             var approvedDisplay = scope.approvedDisbursementDisplay(data, templateData);
                             scope.remainingUndisbursedAmount = approvedDisplay.remaining;
                             scope.currentTranchePrincipal = approvedDisplay.amount;

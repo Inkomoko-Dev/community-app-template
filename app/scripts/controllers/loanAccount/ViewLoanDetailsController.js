@@ -840,6 +840,44 @@
                         }
                         return 'label.heading.notavailable';
                     };
+                    scope.surveyAnswerLabel = function (answer) {
+                        if (answer === 'POSITIVE') {
+                            return 'label.heading.survey.positive';
+                        }
+                        if (answer === 'NEGATIVE') {
+                            return 'label.heading.survey.negative';
+                        }
+                        if (answer === 'INCOMPLETE') {
+                            return 'label.heading.survey.incomplete';
+                        }
+                        return 'label.heading.survey.none';
+                    };
+                    scope.openTrancheSurvey = function (tranche) {
+                        $uibModal.open({
+                            templateUrl: 'trancheSurveyWindow.html',
+                            size: 'lg',
+                            controller: function ($scope, $uibModalInstance, selectedTranche, milestoneYesNo) {
+                                $scope.tranche = selectedTranche;
+                                $scope.milestoneYesNo = milestoneYesNo;
+                                $scope.close = function () {
+                                    $uibModalInstance.dismiss('close');
+                                };
+                            },
+                            resolve: {
+                                selectedTranche: function () {
+                                    return tranche;
+                                },
+                                milestoneYesNo: function () {
+                                    return scope.milestoneYesNo;
+                                }
+                            }
+                        });
+                    };
+                    scope.approveDeadlineException = function () {
+                        resourceFactory.trancheMilestoneExceptionResource.save({ loanKey: routeParams.id }, {}, function () {
+                            fetchLoanAccountDetails();
+                        });
+                    };
                     scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;
                     scope.thirdPartyDisbursementProvider = data.thirdPartyDisbursementProvider || null;
                     scope.isAwaitingPartnerDisbursementInstruction = scope.enableThirdPartyDisbursement
