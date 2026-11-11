@@ -76,9 +76,10 @@
         <div class="panel-heading"><strong>{{'label.bulkreschedule.preview' | translate}}</strong></div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-sm-2 col-sm-offset-1"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.totalfound' | translate}}</small><h3 class="text-primary">{{request.metrics.found}}</h3></div></div>
+                <div class="col-sm-2"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.totalfound' | translate}}</small><h3 class="text-primary">{{request.metrics.found}}</h3></div></div>
                 <div class="col-sm-2"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.affected' | translate}}</small><h3 class="text-info">{{request.metrics.affected}}</h3></div></div>
                 <div class="col-sm-2"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.succeeded' | translate}}</small><h3 class="text-success">{{request.metrics.succeeded}}</h3></div></div>
+                <div class="col-sm-2"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.skipped' | translate}}</small><h3 class="text-muted">{{request.metrics.skipped}}</h3></div></div>
                 <div class="col-sm-2"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.excluded' | translate}}</small><h3 class="text-warning">{{request.metrics.excluded}}</h3></div></div>
                 <div class="col-sm-2"><div class="well well-sm"><small class="text-muted">{{'label.bulkreschedule.failed' | translate}}</small><h3 class="text-danger">{{request.metrics.failed}}</h3></div></div>
             </div>
@@ -87,7 +88,9 @@
                 <label>{{'label.bulkreschedule.show' | translate}}&nbsp;</label>
                 <select class="form-control input-sm" ng-model="previewQuery.status" ng-change="filterPreview()">
                     <option value="">{{'label.bulkreschedule.allresults' | translate}}</option><option value="PREVIEW_MATCHED">{{'label.bulkreschedule.available' | translate}}</option>
-                    <option value="EXCLUDED">{{'label.bulkreschedule.excluded' | translate}}</option><option value="FAILED">{{'label.bulkreschedule.failed' | translate}}</option>
+                    <option value="EXCLUDED">{{'label.bulkreschedule.excluded' | translate}}</option>
+                    <option value="SKIPPED">{{'label.bulkreschedule.skipped' | translate}}</option>
+                    <option value="FAILED">{{'label.bulkreschedule.failed' | translate}}</option>
                     <option value="SUCCEEDED">{{'label.bulkreschedule.succeeded' | translate}}</option>
                     <option value="ROLLED_BACK">{{'label.bulkreschedule.status.rolled_back' | translate}}</option>
                 </select>

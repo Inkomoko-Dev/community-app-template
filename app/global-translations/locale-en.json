@@ -6064,6 +6064,7 @@
   "label.bulkreschedule.totalfound": "TOTAL LOANS FOUND",
   "label.bulkreschedule.affected": "AFFECTED LOANS",
   "label.bulkreschedule.excluded": "EXCLUDED",
+  "label.bulkreschedule.skipped": "SKIPPED",
   "label.bulkreschedule.failed": "FAILED / UNAVAILABLE",
   "label.bulkreschedule.preview.help": "Preview data for this request. Approval status is shown above.",
   "label.bulkreschedule.preview.nochanges": "Review the preview below. No loan changes have been applied.",

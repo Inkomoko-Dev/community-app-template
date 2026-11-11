@@ -75,15 +75,17 @@
                 };
                 var found = count(s.found, s.foundCount, s.totalFound, s.totalLoansFound);
                 var excluded = count(s.excluded, s.excludedCount, s.totalExcluded);
+                var skipped = count(s.skipped, s.skippedCount, s.totalSkipped);
                 var failed = count(s.failed, s.failedCount, s.failureCount, s.totalFailed);
                 var affected = count(s.toProcess, s.toProcessCount, s.processed, s.totalToProcess, s.totalSucceeded);
                 if (!affected) {
-                    affected = Math.max(0, found - excluded - failed);
+                    affected = Math.max(0, found - excluded - failed - skipped);
                 }
                 return {
                     found: found,
                     affected: affected,
                     excluded: excluded,
+                    skipped: skipped,
                     failed: failed
                 };
             };
