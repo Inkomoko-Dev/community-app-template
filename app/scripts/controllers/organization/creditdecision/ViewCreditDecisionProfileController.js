@@ -2,7 +2,8 @@
     mifosX.controllers = _.extend(module, {
         ViewCreditDecisionProfileController: function (scope, resourceFactory, routeParams, location, $uibModal, $translate, $timeout) {
             var profileId = routeParams.profileId;
-            var TABS = ['data', 'scope', 'test', 'versions'];
+            var TABS = ['data', 'policy', 'scope', 'test', 'versions', 'history'];
+            var Policy = CreditDecisionPolicy;
 
             scope.section = 'profiles';
             scope.tab = TABS.indexOf(location.search().tab) >= 0 ? location.search().tab : 'data';
@@ -17,6 +18,13 @@
             scope.paramMap = {};
             scope.dirty = false;
             scope.notice = null;
+            scope.policyRules = [];
+            scope.policyGroups = [];
+            scope.countries = [];
+            scope.polSel = Policy.id(Policy.GLOBAL, Policy.EVERYONE);
+            scope.polScopes = [];
+            scope.polCurrent = null;
+            scope.history = [];
 
             // ---- loading ----------------------------------------------------------------------------------
 
@@ -43,7 +51,11 @@
                 }) || scope.profile.versions[0];
                 scope.versionNo = scope.version.versionNo;
                 scope.editable = scope.version.status === 'DRAFT';
-                scope.edit = {params: angular.copy(scope.version.params), productIds: angular.copy(scope.version.productIds)};
+                scope.edit = {
+                    params: angular.copy(scope.version.params),
+                    productIds: angular.copy(scope.version.productIds),
+                    policy: Policy.fromRules(scope.version.rules)
+                };
                 scope.paramMap = {};
                 _.each(scope.edit.params, function (p) {
                     scope.paramMap[p.key] = p;
@@ -58,8 +70,15 @@
                 scope.draft = byStatus('DRAFT');
                 scope.open = scope.pending || scope.draft;
                 refreshChanges();
+                loadHistory();
                 var wanted = keepVersionNo || (scope.open && scope.open.versionNo) || (scope.active && scope.active.versionNo) || profile.versions[0].versionNo;
                 select(wanted);
+            }
+
+            function loadHistory() {
+                resourceFactory.creditDecisionHistoryResource.getAll({profileId: profileId}, function (rows) {
+                    scope.history = rows;
+                });
             }
 
             function load(keepVersionNo) {
@@ -70,6 +89,15 @@
 
             resourceFactory.creditDecisionCatalogueResource.getAll(function (groups) {
                 scope.groups = groups;
+                refreshChanges();
+            });
+            resourceFactory.creditDecisionPolicyResource.get(function (data) {
+                scope.policyRules = data.rules;
+                scope.countries = data.countries;
+                scope.policyGroups = _.map(_.uniq(_.pluck(data.rules, 'group')), function (name) {
+                    return {name: name, rules: _.where(data.rules, {group: name})};
+                });
+                refresh();
                 refreshChanges();
             });
             loadProducts();
@@ -179,9 +207,115 @@
                 scope.built = CreditDecisionRequest.build(scope.edit.params, sample, scope.profile.name + ' v' + scope.version.versionNo);
                 scope.previewJson = JSON.stringify(scope.built.payload, null, 2);
                 scope.validation = CreditDecisionRequest.validate(scope.edit.params, scope.edit.productIds);
+                scope.policyCheck = Policy.validate(scope.edit.policy, scope.policyRules, scope.edit.productIds, currencyOf);
+                scope.canSubmit = scope.validation.ok && scope.policyCheck.ok;
+                scope.polScopes = policyScopes();
+                scope.polCurrent = _.find(scope.polScopes, function (item) {
+                    return item.id === scope.polSel;
+                }) || scope.polScopes[0];
+                scope.polSel = scope.polCurrent.id;
             }
 
+            function currencyOf(productId) {
+                var p = scope.productsById[productId];
+                return p ? p.currencyCode : null;
+            }
+
+            // Everyone, then each country a cap can be set for, then each product this version covers.
+            function policyScopes() {
+                var list = [{id: Policy.id(Policy.GLOBAL, Policy.EVERYONE), scope: Policy.GLOBAL, scopeKey: Policy.EVERYONE}];
+                _.each(scope.countries, function (c) {
+                    list.push({id: Policy.id(Policy.COUNTRY, c.currency), scope: Policy.COUNTRY, scopeKey: c.currency, name: c.name});
+                });
+                _.each(scope.edit.productIds, function (productId) {
+                    list.push({id: Policy.id(Policy.PRODUCT, String(productId)), scope: Policy.PRODUCT, scopeKey: String(productId), name: scope.productName(productId), currency: currencyOf(productId)});
+                });
+                _.each(list, function (item) {
+                    item.count = Policy.overrideCount(scope.edit.policy, item.scope, item.scopeKey);
+                });
+                return list;
+            }
+
+            scope.polInherited = function (def) {
+                var item = scope.polCurrent;
+                if (!item || item.scope === Policy.GLOBAL) {
+                    return '';
+                }
+                var inh = Policy.inherited(scope.edit.policy, item.scope, item.scopeKey, def.key, item.currency);
+                return inh ? String(inh.value) : '';
+            };
+
+            scope.polInheritedFrom = function (def) {
+                var item = scope.polCurrent;
+                var inh = item && item.scope !== Policy.GLOBAL ? Policy.inherited(scope.edit.policy, item.scope, item.scopeKey, def.key, item.currency) : null;
+                return inh ? $translate.instant('label.creditdecision.policy.from.' + inh.from, {key: inh.scopeKey}) : '';
+            };
+
+            scope.polValues = function () {
+                var id = scope.polCurrent.id;
+                scope.edit.policy[id] = scope.edit.policy[id] || {};
+                return scope.edit.policy[id];
+            };
+
+            scope.polError = function (def) {
+                var code = scope.policyCheck && scope.policyCheck.errors[scope.polCurrent.id + '|' + def.key];
+                return code ? $translate.instant('label.creditdecision.policy.error.' + code) : '';
+            };
+
+            scope.polRequired = function (def) {
+                return scope.polCurrent.scope === Policy.GLOBAL && scope.policyCheck && scope.policyCheck.errors['required|' + def.key] ?
+                    $translate.instant('label.creditdecision.policy.error.required') : '';
+            };
+
+            scope.polScopeProblem = function () {
+                var errors = (scope.policyCheck && scope.policyCheck.errors) || {};
+                var id = scope.polCurrent.id;
+                var code = errors['weights|' + id] || errors['order|' + id] || errors['product|' + id];
+                return code ? $translate.instant('label.creditdecision.policy.error.' + code) : '';
+            };
+
+            scope.polWeights = function () {
+                return Policy.weightSum(scope.polValues());
+            };
+
+            scope.policyProblemCount = function () {
+                return scope.policyCheck ? Object.keys(scope.policyCheck.errors).length : 0;
+            };
+
+            scope.policyProblems = function () {
+                var out = [];
+                _.each((scope.policyCheck && scope.policyCheck.errors) || {}, function (code, where) {
+                    var kind = where.split('|')[0];
+                    var name = '';
+                    if (kind === 'weights' || kind === 'order' || kind === 'product') {
+                        var item = _.find(scope.polScopes, {id: where.slice(kind.length + 1)});
+                        name = item ? scope.polScopeName(item) + ': ' : '';
+                    } else if (kind === 'effective') {
+                        name = scope.productName(where.split('|')[1]) + ': ';
+                    } else if (kind === 'required') {
+                        name = scope.ruleLabel(where.split('|')[1]) + ': ';
+                    } else {
+                        var parts = where.split('|');
+                        var scopeItem = _.find(scope.polScopes, {id: parts[0] + '|' + parts[1]});
+                        name = (scopeItem ? scope.polScopeName(scopeItem) + ' · ' : '') + scope.ruleLabel(parts[2]) + ': ';
+                    }
+                    out.push(name + $translate.instant('label.creditdecision.policy.error.' + code));
+                });
+                return out;
+            };
+
+            scope.polScopeName = function (item) {
+                return item.scope === Policy.GLOBAL ? $translate.instant('label.creditdecision.policy.scope.everyone') :
+                    item.scope === Policy.COUNTRY ? item.scopeKey + ' · ' + item.name : item.name;
+            };
+
+            scope.ruleLabel = function (key) {
+                var def = Policy.defOf(scope.policyRules, key);
+                return def ? def.label : key;
+            };
+
             scope.$watch('edit', refresh, true);
+            scope.$watch('polSel', refresh);
             scope.$watch('picked.sampleId', refresh);
             scope.$watch('version', refresh);
 
@@ -207,12 +341,23 @@
                 return $translate.instant('label.creditdecision.policy.' + policy);
             }
 
+            function ruleWhere(c) {
+                if (c.scope === Policy.GLOBAL) {
+                    return $translate.instant('label.creditdecision.policy.scope.everyone');
+                }
+                return c.scope === Policy.COUNTRY ? c.scopeKey : scope.productName(c.scopeKey);
+            }
+
             function changeText(c) {
                 var name = c.kind === 'product' ? scope.productName(c.key) : scope.itemLabel(c.key);
                 var args = {name: name, from: c.from, to: c.to};
                 if (c.kind === 'policy') {
                     args.from = policyLabel(c.from);
                     args.to = policyLabel(c.to);
+                }
+                if (c.kind === 'rule') {
+                    args = {name: scope.ruleLabel(c.key) + ' (' + ruleWhere(c) + ')', from: c.from, to: c.to};
+                    return $translate.instant('label.creditdecision.diff.rule.' + c.type, args);
                 }
                 return $translate.instant('label.creditdecision.diff.' + c.kind + (c.kind === 'product' || c.kind === 'param' ? c.type : ''), args);
             }
@@ -229,6 +374,11 @@
             scope.changesFor = function (version) {
                 var base = scope.active && scope.active.versionNo !== version.versionNo ? scope.active : null;
                 var changes = base ? CreditDecisionRequest.diff(base, version) : [];
+                if (base) {
+                    changes = changes.concat(_.map(Policy.diff(base.rules, version.rules), function (d) {
+                        return _.extend({kind: 'rule'}, d);
+                    }));
+                }
                 return {
                     base: base,
                     lines: _.map(changes, function (c) {
@@ -272,7 +422,11 @@
 
             function saveThen(next) {
                 var no = scope.version.versionNo;
-                api().saveDraft({profileId: profileId, versionNo: no}, {params: scope.edit.params, productIds: scope.edit.productIds}, function (data) {
+                api().saveDraft({profileId: profileId, versionNo: no}, {
+                    params: scope.edit.params,
+                    productIds: scope.edit.productIds,
+                    rules: Policy.toRules(scope.edit.policy, scope.policyRules)
+                }, function (data) {
                     setProfile(data, no);
                     loadProducts();
                     next(no);
@@ -293,7 +447,7 @@
             };
 
             scope.submit = function () {
-                if (!scope.validation.ok) {
+                if (!scope.canSubmit) {
                     return;
                 }
                 saveThen(function (no) {
@@ -339,14 +493,68 @@
                 });
             };
 
+            function takeMode(data, noticeKey) {
+                _.each(['mode', 'modeChangedBy', 'modeChangedOn', 'pendingMode', 'pendingBy', 'pendingOn'], function (field) {
+                    scope.profile[field] = data[field];
+                });
+                loadHistory();
+                notify(noticeKey);
+            }
+
+            // Off and Shadow apply at once. Live is asked for here and a second authorised person approves it.
             scope.setMode = function (mode) {
-                if (mode === scope.profile.mode) {
+                if (mode === scope.profile.mode && !scope.profile.pendingMode) {
                     return;
                 }
                 resourceFactory.creditDecisionModeResource.update({profileId: profileId}, {mode: mode}, function (data) {
-                    scope.profile.mode = data.mode;
-                    notify('label.creditdecision.notice.mode');
+                    takeMode(data, data.pendingMode ? 'label.creditdecision.notice.liverequested' : 'label.creditdecision.notice.mode');
                 });
+            };
+
+            scope.approveMode = function () {
+                resourceFactory.creditDecisionModeResource.command({profileId: profileId, command: 'approve'}, {}, function (data) {
+                    takeMode(data, 'label.creditdecision.notice.livenow');
+                });
+            };
+
+            scope.cancelMode = function () {
+                resourceFactory.creditDecisionModeResource.command({profileId: profileId, command: 'cancel'}, {}, function (data) {
+                    takeMode(data, 'label.creditdecision.notice.livecancelled');
+                });
+            };
+
+            // ---- history ----------------------------------------------------------------------------------
+
+            scope.fieldText = function (field) {
+                if (!field) {
+                    return '';
+                }
+                var parts = field.split('.');
+                if (parts[0] === 'rule' && parts.length >= 4) {
+                    var where = parts[1] === Policy.GLOBAL ? $translate.instant('label.creditdecision.policy.scope.everyone') :
+                        parts[1] === Policy.COUNTRY ? parts[2] : scope.productName(parts[2]);
+                    return scope.ruleLabel(parts[3]) + ' (' + where + ')';
+                }
+                if (parts[0] === 'param' && parts.length === 3) {
+                    return scope.itemLabel(parts[1]) + ' · ' + $translate.instant('label.creditdecision.history.field.' + parts[2]);
+                }
+                if (field === 'products') {
+                    return $translate.instant('label.creditdecision.history.field.products');
+                }
+                return $translate.instant('label.creditdecision.history.field.' + field) === 'label.creditdecision.history.field.' + field ?
+                    field : $translate.instant('label.creditdecision.history.field.' + field);
+            };
+
+            scope.valueText = function (field, value) {
+                if (value === null || value === undefined) {
+                    return '';
+                }
+                if (field === 'products') {
+                    return _.map(String(value).split(', '), function (id) {
+                        return scope.productName(+id);
+                    }).join(', ');
+                }
+                return value;
             };
         }
     });

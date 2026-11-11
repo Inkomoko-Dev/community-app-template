@@ -1403,7 +1403,14 @@
                         command: { method: 'POST', params: {} }
                     }),
                     creditDecisionModeResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/mode", { profileId: '@profileId' }, {
-                        update: { method: 'PUT', params: {} }
+                        update: { method: 'PUT', params: {} },
+                        command: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionPolicyResource: defineResource(apiVer + "/creditdecision/policy", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionHistoryResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/history", { profileId: '@profileId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
                     }),
                     creditDecisionConnectionResource: defineResource(apiVer + "/creditdecision/connection", {}, {
                         get: { method: 'GET', params: {} },

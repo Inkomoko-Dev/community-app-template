@@ -24,7 +24,7 @@
                     <select class="form-control input-sm" ng-model="versionNo" ng-change="pickVersion(versionNo)"
                             ng-options="v.versionNo as ('v' + v.versionNo + ' · ' + ('label.creditdecision.status.' + v.status | translate)) for v in profile.versions"></select>
                     <div class="cd-seg" title="{{'label.creditdecision.mode.help.' + profile.mode | translate}}">
-                        <button type="button" ng-repeat="m in modes" ng-class="{on: profile.mode == m}" ng-click="setMode(m)"
+                        <button type="button" ng-repeat="m in modes" ng-class="{on: profile.mode == m, asked: m == 'LIVE' && profile.pendingMode}" ng-click="setMode(m)"
                                 ng-disabled="(m != 'OFF' && !active) || !hasPermission(m == 'LIVE' ? 'APPROVE_CREDITDECISION' : 'CREATE_CREDITDECISION')">
                             {{'label.creditdecision.mode.' + m | translate}}
                         </button>
@@ -34,6 +34,15 @@
                     </button>
                 </div>
             </div>
+
+            <div class="cd-note warn" ng-if="profile.pendingMode">
+                <span>{{'label.creditdecision.banner.liverequested' | translate:{by: profile.pendingBy, on: (profile.pendingOn | date:'medium')} }}</span>
+                <span>
+                    <a class="btn btn-primary btn-sm" ng-click="approveMode()" has-permission="APPROVE_CREDITDECISION">{{'label.creditdecision.button.approvelive' | translate}}</a>
+                    <a class="btn btn-default btn-sm" ng-click="cancelMode()" has-permission="APPROVE_CREDITDECISION">{{'label.creditdecision.button.cancellive' | translate}}</a>
+                </span>
+            </div>
+            <div class="cd-note" ng-if="profile.mode == 'LIVE' && profile.modeChangedBy && !profile.pendingMode"><span>{{'label.creditdecision.banner.livesince' | translate:{by: profile.modeChangedBy, on: (profile.modeChangedOn | date:'medium')} }}</span></div>
 
             <div class="cd-note warn" ng-if="version.status == 'PENDING' && tab != 'versions'">
                 <span>{{'label.creditdecision.banner.pending.text' | translate:{by: version.preparedBy} }}</span>
@@ -45,9 +54,11 @@
             <div class="cd-bar" style="margin-top: 18px;">
                 <ul class="nav nav-tabs">
                     <li ng-class="{active: tab == 'data'}"><a ng-click="go('data')" class="pointer">{{'label.creditdecision.tab.data' | translate}}</a></li>
+                    <li ng-class="{active: tab == 'policy'}"><a ng-click="go('policy')" class="pointer">{{'label.creditdecision.tab.policy' | translate}}<span class="cd-badge bad" ng-if="editable && policyProblemCount()">{{policyProblemCount()}}</span></a></li>
                     <li ng-class="{active: tab == 'scope'}"><a ng-click="go('scope')" class="pointer">{{'label.creditdecision.tab.scope' | translate}}</a></li>
                     <li ng-class="{active: tab == 'test'}"><a ng-click="go('test')" class="pointer">{{'label.creditdecision.tab.test' | translate}}</a></li>
                     <li ng-class="{active: tab == 'versions'}"><a ng-click="go('versions')" class="pointer">{{'label.creditdecision.tab.versions' | translate}}</a></li>
+                    <li ng-class="{active: tab == 'history'}"><a ng-click="go('history')" class="pointer">{{'label.creditdecision.tab.history' | translate}}</a></li>
                 </ul>
             </div>
 
@@ -92,6 +103,52 @@
                     </div>
                     <div class="col-md-4">
                         <div ng-include="'creditDecisionPreview.html'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ Policy ============ -->
+            <div ng-show="tab == 'policy'">
+                <p class="cd-lead">{{'label.creditdecision.policy.help' | translate}}</p>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="cd-polscopes">
+                            <a ng-repeat="item in polScopes" class="pointer" ng-class="{on: polSel == item.id}" ng-click="$parent.polSel = item.id">
+                                <span>{{polScopeName(item)}}</span>
+                                <small class="cd-muted" ng-if="item.count">{{item.count}}</small>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h5 style="margin-top: 0; font-weight: 600;">{{polScopeName(polCurrent)}}</h5>
+                        <p class="cd-muted cd-small" ng-if="polCurrent.scope != 'GLOBAL'">{{'label.creditdecision.policy.overridehelp' | translate}}</p>
+                        <div class="cd-note warn" ng-if="polScopeProblem()"><span>{{polScopeProblem()}}</span></div>
+                        <div class="cd-group" ng-repeat="group in policyGroups">
+                            <div class="cd-group-head">
+                                <strong>{{group.name}}</strong>
+                                <span class="cd-muted cd-small" ng-if="group.name == 'Scorecard weights'"
+                                      ng-class="{'text-danger': polWeights().any && polWeights().sum != 100}">
+                                    {{'label.creditdecision.policy.weightsum' | translate:{sum: polWeights().sum} }}
+                                </span>
+                            </div>
+                            <div class="cd-row" ng-repeat="def in group.rules" ng-class="{'has-error': polError(def) || polRequired(def)}">
+                                <div class="cd-what">
+                                    <span class="cd-name">{{def.label}}</span>
+                                    <span class="cd-desc">{{def.description}}</span>
+                                </div>
+                                <div class="cd-config">
+                                    <div>
+                                        <div class="input-group input-group-sm" style="width: 190px;">
+                                            <input type="text" class="form-control" ng-model="polValues()[def.key]" ng-disabled="!editable"
+                                                   placeholder="{{polInherited(def)}}" inputmode="decimal">
+                                            <span class="input-group-addon">{{'label.creditdecision.policy.unit.' + def.unit | translate}}</span>
+                                        </div>
+                                        <span class="help-block" ng-if="polError(def) || polRequired(def)">{{polError(def) || polRequired(def)}}</span>
+                                        <span class="cd-muted cd-small" ng-if="polCurrent.scope != 'GLOBAL' && !polValues()[def.key] && polInherited(def)">{{polInheritedFrom(def)}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,22 +252,54 @@
                 </table>
             </div>
 
+            <!-- ============ History ============ -->
+            <div ng-show="tab == 'history'">
+                <p class="cd-lead">{{'label.creditdecision.history.help' | translate}}</p>
+                <div class="cd-muted" ng-if="!history.length">{{'label.creditdecision.history.empty' | translate}}</div>
+                <table class="cd-table" ng-if="history.length">
+                    <thead>
+                    <tr>
+                        <th>{{'label.creditdecision.col.date' | translate}}</th>
+                        <th>{{'label.creditdecision.history.col.by' | translate}}</th>
+                        <th>{{'label.creditdecision.history.col.action' | translate}}</th>
+                        <th>{{'label.creditdecision.history.col.field' | translate}}</th>
+                        <th>{{'label.creditdecision.history.col.before' | translate}}</th>
+                        <th>{{'label.creditdecision.history.col.after' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="h in history">
+                        <td class="cd-muted" style="white-space: nowrap;">{{h.actedOn | date:'medium'}}</td>
+                        <td>{{h.actedBy}}</td>
+                        <td>{{'label.creditdecision.history.action.' + h.action | translate}}<span class="cd-muted" ng-if="h.versionNo"> v{{h.versionNo}}</span></td>
+                        <td>{{fieldText(h.field)}}</td>
+                        <td class="cd-muted">{{valueText(h.field, h.oldValue)}}</td>
+                        <td>{{valueText(h.field, h.newValue)}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <!-- ============ Edit bar ============ -->
             <div class="cd-editbar" ng-if="editable">
                 <div class="cd-small">
                     <span ng-if="validation.noParams">{{'label.creditdecision.editbar.noparams' | translate}}</span>
                     <span ng-if="!validation.noParams && validation.noProducts">{{'label.creditdecision.editbar.noproducts' | translate}}</span>
+                    <span class="text-danger" ng-if="!validation.noParams && !validation.noProducts && !validation.fieldProblems && policyProblemCount()" ng-click="go('policy')" style="cursor: pointer;"
+                          title="{{policyProblems().join(' | ')}}">
+                        {{'label.creditdecision.editbar.policyproblems' | translate:{count: policyProblemCount()} }}
+                    </span>
                     <span class="text-danger" ng-if="!validation.noParams && !validation.noProducts && validation.fieldProblems">
                         {{'label.creditdecision.editbar.fieldproblems' | translate:{count: validation.fieldProblems} }}
                     </span>
-                    <span class="cd-muted" ng-if="validation.ok && dirty">{{'label.creditdecision.editbar.unsaved' | translate}}</span>
-                    <span class="cd-muted" ng-if="validation.ok && !dirty">{{'label.creditdecision.editbar.ready' | translate}}</span>
+                    <span class="cd-muted" ng-if="canSubmit && dirty">{{'label.creditdecision.editbar.unsaved' | translate}}</span>
+                    <span class="cd-muted" ng-if="canSubmit && !dirty">{{'label.creditdecision.editbar.ready' | translate}}</span>
                 </div>
                 <div>
                     <button type="button" class="btn btn-default btn-sm" ng-click="saveDraft()" ng-disabled="!dirty" has-permission="CREATE_CREDITDECISION">
                         {{'label.creditdecision.button.savedraft' | translate}}
                     </button>
-                    <button type="button" class="btn btn-primary btn-sm" ng-click="submit()" ng-disabled="!validation.ok" has-permission="CREATE_CREDITDECISION">
+                    <button type="button" class="btn btn-primary btn-sm" ng-click="submit()" ng-disabled="!canSubmit" has-permission="CREATE_CREDITDECISION">
                         {{'label.creditdecision.button.submit' | translate}}
                     </button>
                 </div>

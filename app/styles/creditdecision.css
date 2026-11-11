@@ -206,3 +206,14 @@ credit-decision-loan { display: block; }
 .cd .cd-pages li.on a { background: #1f2630; color: #fff; }
 .cd .cd-pages li.off a { opacity: .35; pointer-events: none; }
 .cd .cd-pages li.gap span { cursor: default; }
+
+/* Policy tab: the scope list on the left, the settings of the chosen scope on the right */
+.cd .cd-polscopes { display: flex; flex-direction: column; border: 1px solid #e3e7eb; border-radius: 4px; max-height: 560px; overflow-y: auto; }
+.cd .cd-polscopes a { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; color: #3b4350; border-bottom: 1px solid #eef0f3; font-size: 13px; text-decoration: none; }
+.cd .cd-polscopes a:last-child { border-bottom: 0; }
+.cd .cd-polscopes a:hover { background: #f4f6f8; }
+.cd .cd-polscopes a.on { background: #1f2630; color: #fff; }
+.cd .cd-polscopes a.on small { color: #c8d0d8; }
+.cd .cd-badge { display: inline-block; min-width: 18px; margin-left: 6px; padding: 0 5px; border-radius: 9px; font-size: 11px; line-height: 18px; text-align: center; background: #e5e8ec; color: #3b4350; }
+.cd .cd-badge.bad { background: #c0392b; color: #fff; }
+.cd .cd-seg button.asked { background: #fdf8ee; color: #8a5a00; box-shadow: inset 0 -2px 0 #e0a030; }
