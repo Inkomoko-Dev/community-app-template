@@ -1399,6 +1399,7 @@
                             </table>
                             <button type="button" class="btn btn-default"
                                     ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
+                                    has-permission="APPROVE_TRANCHEMILESTONE"
                                     ng-click="approveDeadlineException()">
                                 {{'label.button.approvedeadlineexception' | translate}}
                             </button>
