@@ -1169,6 +1169,10 @@
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
 
+                    africasTalkingTemplateResource: defineResource(apiVer + "/africastalking/template/send", {}, {
+                        save: { method: 'POST', params: {} }
+                    }),
+
                     africasTalkingVoiceCallbackResource: defineResource(apiVer + "/africastalking/voice/callbacks/:callbackId", { callbackId: '@callbackId' }, {
                         getAll: { method: 'GET', url: baseUrl + apiVer + "/africastalking/voice/callbacks", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },

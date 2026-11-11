@@ -8,6 +8,8 @@
             scope.voiceVoicemails = [];
             scope.voiceQueue = [];
             scope.connectivityResult = null;
+            scope.metaProvider = null;
+            scope.metaProviderError = null;
             scope.messagesPerPage = 15;
             scope.voiceCallsPerPage = 15;
             scope.filterText = '';

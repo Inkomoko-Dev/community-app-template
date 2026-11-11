@@ -18,7 +18,7 @@
                     <h3 class="bolder col-md-12">{{campaignData.campaignName}}
                         <div class="pull-right">
                             <div class="btn-group">
-                                <a href="#/editwhatsappcampaign/{{campaignData.id}}" class="btn btn-primary" has-permission='UPDATE_WHATSAPPCAMPAIGN' ng-show="campaignData.campaignStatus.value != 'active'"><i class="icon-edit icon-white"></i>{{'label.button.edit' | translate}}</a>
+                                <a href="#/editwhatsappcampaign/{{campaignData.id}}" class="btn btn-primary" has-permission='UPDATE_WHATSAPPCAMPAIGN' ng-show="campaignData.id && campaignData.campaignStatus.value != 'active'"><i class="icon-edit icon-white"></i>{{'label.button.edit' | translate}}</a>
                                 <a data-ng-click="activateWhatsAppCampaign()" class="btn btn-primary" has-permission='ACTIVATE_WHATSAPPCAMPAIGN' ng-show="campaignData.campaignStatus.value === 'Pending'"><i class="icon-ok-sign icon-white"></i>{{'label.button.activate' | translate}}</a>
                                 <a data-ng-click="closeWhatsAppCampaign()" class="btn btn-primary" has-permission='CLOSE_WHATSAPPCAMPAIGN' ng-show="campaignData.campaignStatus.value != 'closed'"><i class="icon-remove-circle icon-white"></i>{{'label.button.close' | translate}}</a>
                                 <a data-ng-click="reActivateWhatsAppCampaign()" class="btn btn-primary" has-permission='REACTIVATE_WHATSAPPCAMPAIGN' ng-show="campaignData.campaignStatus.value != 'Pending' && campaignData.campaignStatus.value != 'active'"><i class="icon-repeat icon-white"></i>{{'label.button.reactivate' | translate}}</a>
@@ -54,14 +54,18 @@
                                 <td>{{campaignData.recipientType === 'STAFF' ? ('label.input.employees' | translate) : ('label.input.clients' | translate)}}</td>
                             </tr>
                             <tr>
+                                <td><strong>{{ 'label.input.messageType' | translate }}</strong></td>
+                                <td>{{campaignData.messageType}}</td>
+                            </tr>
+                            <tr ng-if="campaignData.messageType === 'TEMPLATE'">
                                 <td><strong>{{ 'label.input.atTemplateName' | translate }}</strong></td>
                                 <td>{{campaignData.atTemplateName}}</td>
                             </tr>
-                            <tr>
+                            <tr ng-if="campaignData.messageType === 'TEMPLATE'">
                                 <td><strong>{{ 'label.input.languageCode' | translate }}</strong></td>
                                 <td>{{campaignData.languageCode}}</td>
                             </tr>
-                            <tr>
+                            <tr ng-if="campaignData.messageType === 'TEMPLATE'">
                                 <td><strong>{{ 'label.heading.bodyVariableMapping' | translate }}</strong></td>
                                 <td>
                                     <span ng-repeat="mapping in campaignData.bodyVariableMappingList track by $index">
@@ -70,8 +74,8 @@
                                 </td>
                             </tr>
                             <tr ng-if="campaignData.message">
-                                <td><strong>{{ 'label.heading.templatemsg' | translate }}</strong></td>
-                                <td>{{campaignData.message}}</td>
+                                <td><strong>{{ campaignData.messageType === 'FREEFORM' ? ('label.heading.freeformmessage' | translate) : ('label.heading.templatemsg' | translate) }}</strong></td>
+                                <td style="white-space: pre-wrap;">{{campaignData.message}}</td>
                             </tr>
                             <tr>
                                 <td><strong>{{ 'label.heading.submittedondate' | translate }}</strong></td>
