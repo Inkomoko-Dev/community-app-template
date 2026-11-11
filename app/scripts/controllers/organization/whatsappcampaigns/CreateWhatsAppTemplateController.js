@@ -76,17 +76,25 @@
 
                 resourceFactory.africasTalkingTemplateResource.save(payload, function (data) {
                     scope.isButtonDisabled = false;
-                    location.path('/whatsappcampaigns');
+                    // Only treat a real resource id as success (API throws on AT rejection).
+                    if (data && (data.resourceId || data.resourceId === 0)) {
+                        location.path('/whatsappcampaigns');
+                        return;
+                    }
+                    scope.errorDetails = [{
+                        userMessageGlobalisationCode: 'error.msg.generic',
+                        defaultUserMessage: 'Template creation failed.'
+                    }];
                 }, function (response) {
                     scope.isButtonDisabled = false;
                     scope.errorStatus = response.status;
                     scope.errorDetails = [];
                     if (response.data && response.data.errors) {
                         scope.errorDetails = response.data.errors;
-                    } else if (response.data && (response.data.userMessage || response.data.defaultUserMessage)) {
+                    } else if (response.data && (response.data.userMessage || response.data.defaultUserMessage || response.data.developerMessage)) {
                         scope.errorDetails.push({
                             userMessageGlobalisationCode: 'error.msg.generic',
-                            defaultUserMessage: response.data.userMessage || response.data.defaultUserMessage
+                            defaultUserMessage: response.data.userMessage || response.data.defaultUserMessage || response.data.developerMessage
                         });
                     } else {
                         scope.errorDetails.push({

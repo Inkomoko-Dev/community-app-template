@@ -72,7 +72,7 @@
             resourceFactory.whatsAppCampaignResource.get({campaignId: routeParams.campaignId}, function (data) {
                 scope.campaignData.id = data.id;
                 scope.campaignData.campaignName = data.campaignName;
-                scope.campaignData.messageType = data.messageType || (data.atTemplateName ? 'TEMPLATE' : 'FREEFORM');
+                scope.campaignData.messageType = data.messageType;
                 scope.campaignData.atTemplateName = data.atTemplateName;
                 scope.campaignData.languageCode = data.languageCode;
                 scope.campaignData.bodyVariableMapping = data.bodyVariableMappingList ? data.bodyVariableMappingList.slice() : [];

@@ -35,7 +35,7 @@
                 <tbody>
                 <tr class="pointer-main" dir-paginate="whatsAppCampaign in whatsAppCampaigns | filter:{campaignName:filterText} | itemsPerPage: whatsAppCampaignsPerPage">
                     <td class="pointer" data-ng-click="routeTo(whatsAppCampaign.id)">{{whatsAppCampaign.campaignName}}</td>
-                    <td class="pointer" data-ng-click="routeTo(whatsAppCampaign.id)">{{whatsAppCampaign.messageType || (whatsAppCampaign.atTemplateName ? 'TEMPLATE' : 'FREEFORM')}}</td>
+                    <td class="pointer" data-ng-click="routeTo(whatsAppCampaign.id)">{{whatsAppCampaign.messageType}}</td>
                     <td class="pointer" data-ng-click="routeTo(whatsAppCampaign.id)">{{whatsAppCampaign.atTemplateName || '—'}}</td>
                     <td class="pointer" data-ng-click="routeTo(whatsAppCampaign.id)">{{whatsAppCampaign.campaignType.value}}</td>
                     <td class="pointer" data-ng-click="routeTo(whatsAppCampaign.id)">{{whatsAppCampaign.triggerType.value}}</td>
