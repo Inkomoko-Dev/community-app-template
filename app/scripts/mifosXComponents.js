@@ -31,6 +31,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'loanAccount/AdjustRepaymentSchedule',
             'loanAccount/NewLoanAccAppController',
             'loanAccount/LoanAccountActionsController',
+            'loanAccount/CreditDecisionLoanPageController',
             'loanAccount/AddLoanChargeController',
             'loanAccount/AdjustLoanInsuranceChargeController',
             'loanAccount/HistoricalPenaltyWaiverController',
@@ -340,6 +341,13 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/loanclassification/EditLoanClassificationConfigController',
             'organization/loanclassification/ViewLoanClassificationConfigController',
             'organization/loanclassification/LoanClassificationSummaryController',
+            'organization/creditdecision/CreditDecisionProfilesController',
+            'organization/creditdecision/CreateCreditDecisionProfileController',
+            'organization/creditdecision/ViewCreditDecisionProfileController',
+            'organization/creditdecision/CreditDecisionCatalogueController',
+            'organization/creditdecision/CreditDecisionLogController',
+            'organization/creditdecision/CreditDecisionExceptionsController',
+            'organization/creditdecision/CreditDecisionConnectionController',
             'accounting/DefineOpeningBalancesController',
             'configurations/ExternalServicesController',
             'configurations/EditExternalServicesConfigurationController',
@@ -480,6 +488,9 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'NumberOnlyDirective',
             'LimitFileSizeDirective',
             'NumberOnlyFormatDirective',
+            'CreditDecisionLoanDirective',
+            'CreditDecisionRecordDirective',
+            'CreditDecisionHistoryDirective',
         ]
     };
 

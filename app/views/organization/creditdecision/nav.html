@@ -1,0 +1,12 @@
+<div class="cd-bar">
+    <ul class="nav nav-tabs">
+        <li ng-class="{active: section == 'profiles'}"><a href="#/creditdecision">{{'label.creditdecision.nav.profiles' | translate}}</a></li>
+        <li ng-class="{active: section == 'catalogue'}"><a href="#/creditdecision/catalogue">{{'label.creditdecision.nav.catalogue' | translate}}</a></li>
+        <li ng-class="{active: section == 'log'}"><a href="#/creditdecision/log">{{'label.creditdecision.nav.log' | translate}}</a></li>
+        <li ng-class="{active: section == 'exceptions'}"><a href="#/creditdecision/exceptions">{{'label.creditdecision.nav.exceptions' | translate}}</a></li>
+        <li ng-class="{active: section == 'connection'}"><a href="#/creditdecision/connection">{{'label.creditdecision.nav.connection' | translate}}</a></li>
+    </ul>
+    <a href="#/creditdecision/create" class="btn btn-primary btn-sm" ng-if="section == 'profiles' && profiles.length" has-permission='CREATE_CREDITDECISION'>
+        <i class="fa fa-plus"></i>&nbsp;{{'label.creditdecision.button.newprofile' | translate}}
+    </a>
+</div>

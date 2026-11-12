@@ -202,6 +202,9 @@
             .when('/adjustrepaymentschedule/:accountId', {
                 templateUrl: 'views/loans/AdjustRepaymentSchdule.html'
             })
+            .when('/loanaccount/:id/creditdecision', {
+                templateUrl: 'views/loans/creditdecisionloan.html'
+            })
             .when('/loanaccount/:id/:action', {
                 templateUrl: 'views/loans/loanaccountactions.html'
             })
@@ -1072,6 +1075,27 @@
             })
             .when('/loanclassificationsummary', {
                 templateUrl: 'views/organization/loanclassification/LoanClassificationSummary.html'
+            })
+            .when('/creditdecision', {
+                templateUrl: 'views/organization/creditdecision/profiles.html'
+            })
+            .when('/creditdecision/create', {
+                templateUrl: 'views/organization/creditdecision/createprofile.html'
+            })
+            .when('/creditdecision/profile/:profileId', {
+                templateUrl: 'views/organization/creditdecision/profile.html'
+            })
+            .when('/creditdecision/catalogue', {
+                templateUrl: 'views/organization/creditdecision/catalogue.html'
+            })
+            .when('/creditdecision/log', {
+                templateUrl: 'views/organization/creditdecision/log.html'
+            })
+            .when('/creditdecision/exceptions', {
+                templateUrl: 'views/organization/creditdecision/exceptions.html'
+            })
+            .when('/creditdecision/connection', {
+                templateUrl: 'views/organization/creditdecision/connection.html'
             })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'

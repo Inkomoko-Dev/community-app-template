@@ -305,6 +305,9 @@
                 </div>
             </div>
             <hr>
+            <div style="padding: 0 10px;">
+                <credit-decision-loan loan="loandetails"></credit-decision-loan>
+            </div>
             <br>
             <div class="row" style="margin-left:-1px;margin-right: 1px;">
                 <div class="col-sm-8 col-md-8">
@@ -1573,6 +1576,10 @@
                                 </table>
                             </div>
                         </div>
+                    </uib-tab>
+                    <uib-tab ng-show="creditDecisionHasRecord()" heading="{{'label.creditdecision.tab' | translate}}">
+                        <credit-decision-record status="creditDecision"></credit-decision-record>
+                        <credit-decision-history status="creditDecision"></credit-decision-history>
                     </uib-tab>
                     <uib-tab ng-show="loandetails.loanDueDiligenceData" heading="{{'label.heading.duediligencedetail' | translate}}">
                         <table class="table table-striped">

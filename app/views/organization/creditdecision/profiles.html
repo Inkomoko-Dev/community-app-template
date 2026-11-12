@@ -1,0 +1,64 @@
+<div class="content-container cd" ng-controller="CreditDecisionProfilesController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li class="active">{{'label.anchor.creditdecision' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+
+            <div class="cd-empty" ng-if="loaded && !profiles.length">
+                <i class="fa fa-sliders"></i>
+                <p>{{'label.creditdecision.profiles.none' | translate}}</p>
+                <a href="#/creditdecision/create" class="btn btn-primary" has-permission='CREATE_CREDITDECISION'>
+                    <i class="fa fa-plus"></i>&nbsp;{{'label.creditdecision.button.newprofile' | translate}}
+                </a>
+            </div>
+
+            <div ng-if="profiles.length">
+                <p class="cd-lead">{{'label.creditdecision.profiles.intro' | translate}}</p>
+                <table class="cd-table hover">
+                    <thead>
+                    <tr>
+                        <th>{{'label.creditdecision.profiles.col.profile' | translate}}</th>
+                        <th>{{'label.creditdecision.profiles.col.mode' | translate}}</th>
+                        <th>{{'label.creditdecision.profiles.col.live' | translate}}</th>
+                        <th>{{'label.creditdecision.profiles.col.datasent' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="profile in profiles" ng-click="open(profile)">
+                        <td>
+                            <strong>{{profile.name}}</strong>
+                            <span class="cd-sub">{{profile.productSummary}}</span>
+                        </td>
+                        <td>
+                            <span class="cd-dot" ng-class="profile.mode.toLowerCase()"></span>{{'label.creditdecision.mode.' + profile.mode | translate}}
+                        </td>
+                        <td>
+                            <span ng-if="profile.active">v{{profile.active.versionNo}}</span>
+                            <span class="cd-muted" ng-if="!profile.active">{{'label.creditdecision.noneyet' | translate}}</span>
+                            <span class="cd-sub cd-pending" ng-if="profile.pending">v{{profile.pending.versionNo}} {{'label.creditdecision.status.PENDING' | translate}}</span>
+                            <span class="cd-sub" ng-if="profile.draft && !profile.pending">v{{profile.draft.versionNo}} {{'label.creditdecision.status.DRAFT' | translate}}</span>
+                        </td>
+                        <td>
+                            {{profile.sentCount}} {{'label.creditdecision.parameters' | translate}}
+                            <span class="cd-sub">{{profile.productCount}} {{'label.creditdecision.products' | translate}}</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="cd-muted cd-small" style="margin-top: 22px;" ng-if="unassigned.length">
+                    <a class="pointer cd-muted" ng-click="ui.showUnassigned = !ui.showUnassigned">
+                        <i class="fa" ng-class="ui.showUnassigned ? 'fa-caret-down' : 'fa-caret-right'"></i>
+                        {{'label.creditdecision.unassigned.heading' | translate}} ({{unassigned.length}})
+                    </a>
+                    <div ng-show="ui.showUnassigned" style="margin-top: 6px; max-height: 160px; overflow-y: auto;">
+                        <span ng-repeat="product in unassigned">{{product.name}} {{product.currencyCode}}{{$last ? '' : ', '}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

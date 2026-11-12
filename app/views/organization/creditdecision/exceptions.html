@@ -1,0 +1,66 @@
+<div class="content-container cd" ng-controller="CreditDecisionExceptionsController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.exceptions' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+            <api-validate></api-validate>
+
+            <p class="cd-muted">{{'label.creditdecision.exceptions.intro' | translate}}</p>
+
+            <div class="cd-summary" ng-if="loaded">
+                <span class="cd-muted" ng-if="rows.length">{{'label.creditdecision.exceptions.count' | translate:{n: rows.length} }}</span>
+                <a class="cd-clear" id="cd-exceptions-refresh" ng-click="load()"><i class="fa fa-refresh"></i> {{'label.creditdecision.exceptions.refresh' | translate}}</a>
+                <i class="fa fa-spinner fa-spin cd-muted" ng-if="loading"></i>
+            </div>
+
+            <table class="cd-table" id="cd-exceptions" ng-if="rows.length">
+                <thead>
+                <tr>
+                    <th>{{'label.creditdecision.log.col.application' | translate}}</th>
+                    <th>{{'label.creditdecision.exceptions.col.problem' | translate}}</th>
+                    <th>{{'label.creditdecision.exceptions.col.failures' | translate}}</th>
+                    <th>{{'label.creditdecision.exceptions.col.last' | translate}}</th>
+                    <th>{{'label.creditdecision.exceptions.col.next' | translate}}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in rows track by row.loanId">
+                    <td>
+                        <a ng-href="#/loanaccount/{{row.loanId}}/creditdecision"><strong>{{row.applicationRef}}</strong></a>
+                        <span class="cd-sub cd-mono">{{row.customerRef}}</span>
+                        <span class="cd-sub">{{row.productName}}</span>
+                    </td>
+                    <td>
+                        <span class="cd-dot" ng-class="dot(row)"></span>{{'label.creditdecision.exceptions.kind.' + row.kind | translate}}
+                        <span class="cd-sub" ng-if="row.message">{{row.message}}</span>
+                        <span class="cd-sub cd-mono" ng-if="row.requestId">{{row.requestId}}</span>
+                    </td>
+                    <td>{{row.failureCount || '-'}}</td>
+                    <td class="cd-muted cd-small">{{row.lastAttemptOn ? (row.lastAttemptOn | date:'medium') : '-'}}</td>
+                    <td class="cd-small">
+                        {{next(row).key | translate:{at: (next(row).at | date:'medium')} }}
+                        <span class="cd-sub" ng-if="row.alertedOn"><i class="fa fa-bell"></i> {{'label.creditdecision.exceptions.alerted' | translate:{at: (row.alertedOn | date:'medium')} }}</span>
+                    </td>
+                    <td class="text-right">
+                        <button type="button" class="btn btn-default btn-sm" id="cd-exception-retry-{{row.loanId}}" ng-if="hasPermission('SEND_CREDITDECISIONLOAN') && row.kind != 'HELD'"
+                                ng-disabled="row.busy" ng-click="retry(row)">
+                            <i class="fa fa-spinner fa-spin" ng-if="row.busy"></i><i class="fa fa-refresh" ng-if="!row.busy"></i> {{'label.creditdecision.exceptions.retry' | translate}}
+                        </button>
+                        <a class="btn btn-default btn-sm" ng-if="row.kind == 'HELD'" ng-href="#/editloanaccount/{{row.loanId}}">{{'label.creditdecision.loan.editapplication' | translate}}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="cd-empty" ng-if="loaded && !rows.length && !failed">
+                <i class="fa fa-check-circle"></i>
+                <p>{{'label.creditdecision.exceptions.none' | translate}}</p>
+            </div>
+        </div>
+    </div>
+</div>

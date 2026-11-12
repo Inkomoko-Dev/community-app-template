@@ -12,6 +12,32 @@
             scope.hideAccrualTransactions = false;
             scope.isHideAccrualsCheckboxChecked = true;
             scope.loandetails = [];
+            // The automated credit decision of this application: the card on the page reports it, and the buttons and the
+            // "Automated Credit Decision" tab follow it.
+            scope.creditDecision = null;
+            var creditDecisionButtonsOf = null;
+            var creditDecisionBaseButtons = null;
+            function applyCreditDecisionButtons() {
+                var logic = window.CreditDecisionLoan;
+                if (!logic || !scope.buttons || !scope.buttons.singlebuttons || !scope.creditDecision) {
+                    return;
+                }
+                if (creditDecisionButtonsOf !== scope.buttons) {
+                    creditDecisionButtonsOf = scope.buttons;
+                    creditDecisionBaseButtons = scope.buttons.singlebuttons.slice();
+                }
+                var stage = scope.loandetails && scope.loandetails.loanDecisionState ? scope.loandetails.loanDecisionState.value : null;
+                scope.buttons.singlebuttons = logic.adjustButtons(creditDecisionBaseButtons, scope.creditDecision, stage,
+                    !!(scope.loandetails && scope.loandetails.isExtendLoanLifeCycleConfig));
+            }
+            scope.$on('creditDecisionLoaded', function (event, data) {
+                scope.creditDecision = data;
+                applyCreditDecisionButtons();
+            });
+            scope.$watch('buttons', applyCreditDecisionButtons);
+            scope.creditDecisionHasRecord = function () {
+                return !!window.CreditDecisionLoan && window.CreditDecisionLoan.hasRecord(scope.creditDecision);
+            };
             scope.isPendingDisbursement = false;
             scope.projectionSize = 0;
             scope.totalIncome = [];
@@ -635,6 +661,9 @@
                         break;
                     case "rejectreviewapplication":
                         location.path('/loanaccount/' + accountId + '/rejectreviewapplication');
+                        break;
+                    case "creditdecision":
+                        location.path('/loanaccount/' + accountId + '/creditdecision');
                         break;
                     case "duediligence":
                         location.path('/viewloanaccount/' + accountId + '/duediligence');
