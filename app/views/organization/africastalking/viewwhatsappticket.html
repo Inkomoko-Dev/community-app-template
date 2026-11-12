@@ -23,6 +23,7 @@
                 <tr><td>{{'label.heading.sladue' | translate}}</td><td>{{ticket.slaDueAt}} <span ng-if="ticket.slaBreached" class="text-danger">({{'label.heading.slabreached' | translate}})</span></td></tr>
                 <tr><td>{{'label.heading.customerrequest' | translate}}</td><td>{{ticket.customerMessage}}</td></tr>
                 <tr><td>{{'label.heading.summary' | translate}}</td><td>{{ticket.summary}}</td></tr>
+                <tr><td>{{'label.heading.resolutionnotes' | translate}}</td><td>{{ticket.resolutionNotes || '-'}}</td></tr>
             </table>
             <h5>{{'label.heading.updateticket' | translate}}</h5>
             <form class="form-horizontal" ng-submit="saveTicket()">
@@ -45,6 +46,12 @@
                     <label class="control-label col-sm-2">{{'label.heading.summary' | translate}}</label>
                     <div class="col-sm-6">
                         <textarea class="form-control" rows="3" ng-model="updateForm.summary"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2">{{'label.heading.resolutionnotes' | translate}}</label>
+                    <div class="col-sm-6">
+                        <textarea class="form-control" rows="3" ng-model="updateForm.resolutionNotes"></textarea>
                     </div>
                 </div>
                 <div class="form-group">

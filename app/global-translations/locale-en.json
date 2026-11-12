@@ -3264,6 +3264,7 @@
   "label.heading.sladue": "SLA Due",
   "label.heading.slabreached": "SLA Breached",
   "label.heading.customerrequest": "Customer Request",
+  "label.heading.resolutionnotes": "Resolution Notes",
   "label.heading.updateticket": "Update Ticket",
   "label.heading.conversationhistory": "Conversation History",
   "label.heading.activesessions": "Active Sessions",
