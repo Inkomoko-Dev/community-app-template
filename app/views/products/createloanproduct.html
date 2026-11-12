@@ -1287,6 +1287,12 @@
                         <input type="checkbox" ng-model="formData.multiDisburseLoan"/>
                     </label>
                 </div>
+                <label class="control-label col-sm-3 col-sm-offset-1" ng-show="formData.multiDisburseLoan">{{ 'label.input.requiremilestonesurvey' | translate }}</label>
+                <div class="checkbox col-sm-3" ng-show="formData.multiDisburseLoan">
+                    <label>
+                        <input type="checkbox" id="requireMilestoneSurvey" ng-model="formData.requireMilestoneSurvey"/>
+                    </label>
+                </div>
             </div>
             <div class="form-group" ng-show="formData.multiDisburseLoan">
                 <label class="control-label col-sm-2">{{ 'label.input.mintranchecount' | translate }}
@@ -2303,6 +2309,10 @@
                 <tr class="toppadding">
                     <td>{{'label.input.multidisburseloan' | translate}}</td>
                     <td colspan="3">{{loanproduct.multiDisburseLoan}}</td>
+                </tr>
+                <tr ng-show="loanproduct.multiDisburseLoan">
+                    <td>{{'label.input.requiremilestonesurvey' | translate}}</td>
+                    <td colspan="3">{{loanproduct.requireMilestoneSurvey ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
                 </tr>
                 <tr ng-show="loanproduct.multiDisburseLoan">
                     <td>{{'label.input.mintranchecount' | translate}}</td>

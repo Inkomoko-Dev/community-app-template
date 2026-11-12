@@ -16,8 +16,10 @@
             formData.firstTrancheAsPercentage = null;
             formData.firstTrancheAmount = null;
             formData.minTrancheCount = null;
+            formData.requireMilestoneSurvey = false;
             return;
         }
+        formData.requireMilestoneSurvey = formData.requireMilestoneSurvey === true;
         formData.firstInstallmentPrincipal = blankTrancheValue(formData.firstInstallmentPrincipal);
         formData.firstInstallmentAsPercentage = formData.firstInstallmentPrincipal === null ? null : formData.firstInstallmentAsPercentage === true;
         formData.minTrancheCount = blankTrancheValue(formData.minTrancheCount);
@@ -142,6 +144,7 @@
                     firstTrancheAmount: scope.product.firstTrancheAmount,
                     tranchePrincipalPercentages: scope.product.tranchePrincipalPercentages,
                     previousTrancheRepaidPercentage: scope.product.previousTrancheRepaidPercentage,
+                    requireMilestoneSurvey: scope.product.requireMilestoneSurvey === true,
                     daysInYearType: scope.product.daysInYearType.id,
                     daysInMonthType: scope.product.daysInMonthType.id,
                     isInterestRecalculationEnabled: scope.product.isInterestRecalculationEnabled,

@@ -72,6 +72,76 @@
             <button class="btn btn-warning" ng-click="cancel()">{{'label.button.cancel' | translate}}</button>
         </div>
     </script>
+    <script type="text/ng-template" id="trancheSurveyWindow.html">
+        <div class="modal-header silver">
+            <h3 class="bolder">{{'label.heading.milestonesurvey' | translate}} {{tranche.trancheNumber}}</h3>
+        </div>
+        <div class="modal-body">
+            <p class="tranche-section-help">{{'label.msg.milestonesurvey.readonly' | translate}}</p>
+            <p ng-if="!tranche.survey || !tranche.survey.submissionId" class="text-muted">{{'label.msg.tranche.nosurvey' | translate}}</p>
+            <table class="table table-bordered table-striped width100" ng-if="tranche.survey && tranche.survey.submissionId">
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.submissionid' | translate}}</th>
+                    <td>{{tranche.survey.submissionId}}</td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.conductedby' | translate}}</th>
+                    <td>{{tranche.survey.conductedBy || ('label.heading.notavailable' | translate)}}</td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.conductedon' | translate}}</th>
+                    <td>{{tranche.survey.conductedOn || ('label.heading.notavailable' | translate)}}</td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.operational' | translate}}</th>
+                    <td>{{milestoneYesNo(tranche.survey.operational) | translate}}</td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.verifiedbybgs' | translate}}</th>
+                    <td>
+                        {{milestoneYesNo(tranche.survey.operationalVerifiedByBgs) | translate}}
+                        <span ng-show="tranche.survey.operationalBgsName"> — {{tranche.survey.operationalBgsName}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.verifiedbyinvestment' | translate}}</th>
+                    <td>
+                        {{milestoneYesNo(tranche.survey.operationalVerifiedByInvestment) | translate}}
+                        <span ng-show="tranche.survey.operationalInvestmentName"> — {{tranche.survey.operationalInvestmentName}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.additionalfundingrequired' | translate}}</th>
+                    <td>{{milestoneYesNo(tranche.survey.additionalFundingRequired) | translate}}</td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.fundingverifiedbybgs' | translate}}</th>
+                    <td>
+                        {{milestoneYesNo(tranche.survey.fundingVerifiedByBgs) | translate}}
+                        <span ng-show="tranche.survey.fundingBgsName"> — {{tranche.survey.fundingBgsName}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.fundingverifiedbyinvestment' | translate}}</th>
+                    <td>
+                        {{milestoneYesNo(tranche.survey.fundingVerifiedByInvestment) | translate}}
+                        <span ng-show="tranche.survey.fundingInvestmentName"> — {{tranche.survey.fundingInvestmentName}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.comments' | translate}}</th>
+                    <td>{{tranche.survey.comments || ('label.heading.notavailable' | translate)}}</td>
+                </tr>
+                <tr>
+                    <th class="table-bold-loan">{{'label.heading.evidencereferences' | translate}}</th>
+                    <td class="tranche-evidence">{{tranche.survey.evidenceReferences || ('label.heading.notavailable' | translate)}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" ng-click="close()">{{'label.button.close' | translate}}</button>
+        </div>
+    </script>
     <script type="text/ng-template" id="renameDocumentDialog.html">
         <div class="modal-header silver">
             <h3 class="bolder">{{'label.heading.renamedocument' | translate}}</h3>
@@ -219,7 +289,7 @@
                             <strong>
 
                                 <i ng-hide="loandetails.inArrears"
-                                        class="fa fa-stop {{isPendingDisbursement ? loandetails.subStatus.code : loandetails.status.code | StatusLookup}}"></i>
+                                        class="fa fa-stop {{statusIconCode | StatusLookup}}"></i>
 
                                 <i ng-show="loandetails.inArrears"
                                    class="fa fa-stop {{loandetails.status.code | StatusLookup}}overdue"></i>
@@ -235,7 +305,7 @@
                                  (!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value == 'PREPARE_AND_SIGN_CONTRACT') ||
                                  (!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loandetails.status.code != 'loanStatusType.submitted.and.pending.approval')"
 
-                                    class="fa fa-stop {{isPendingDisbursement ? loandetails.subStatus.code : loandetails.status.code | StatusLookup}}"></i>
+                                    class="fa fa-stop {{statusIconCode | StatusLookup}}"></i>
 
 
                                  <i ng-show="!loandetails.inArrears && loandetails.isExtendLoanLifeCycleConfig && loandetails.loanDecisionState != null && loandetails.loanDecisionState.value != 'PREPARE_AND_SIGN_CONTRACT' && loandetails.status.code == 'loanStatusType.submitted.and.pending.approval'"
@@ -357,6 +427,10 @@
                         </tr>
                         <tr ng-show="isPendingDisbursement">
                             <th class="table-bold-loan">{{'label.heading.disbursementStatus' | translate}}</th>
+                            <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
+                        </tr>
+                        <tr ng-show="isTrancheMilestoneSubStatus">
+                            <th class="table-bold-loan">{{'label.heading.milestonestatus' | translate}}</th>
                             <td><span class="padded-td">{{loandetails.subStatus.value}}</span></td>
                         </tr>
                         <tr ng-show="isAwaitingPartnerDisbursementInstruction">
@@ -1193,7 +1267,12 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <b>{{'label.heading.tranchedetails' | translate}}</b>
+                                    <h4 class="tranche-section-title">
+                                        {{'label.heading.tranchedetails' | translate}}
+                                        <i class="fa fa-question-circle"
+                                           uib-tooltip="{{ 'label.tooltip.tranchedetails' | translate }}"
+                                           tooltip-append-to-body="true"></i>
+                                    </h4>
                                 </td>
                                 <td align="right">
                                 <a type="button" ng-show="showAddDeleteTrancheButtons('adddisbursedetails')" class="btn btn-primary" align="right"
@@ -1207,11 +1286,17 @@
                                 </td>
                             </tr>
                         </table>
-                        <table class="width100">
+                        <table class="table table-bordered width100">
                             <tr class="graybg" ng-show="loandetails.disbursementDetails.length>0">
-                                <th align="left">{{'label.input.expecteddisbursementon' | translate}}</th>
-                                <th align="left">{{'label.input.disbursedon' | translate}}</th>
-                                <th align="left">{{'label.input.principal' | translate}}</th>
+                                <th align="left">{{'label.input.expecteddisbursementon' | translate}}
+                                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.expecteddisbursementon' | translate }}" tooltip-append-to-body="true"></i>
+                                </th>
+                                <th align="left">{{'label.input.disbursedon' | translate}}
+                                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.disbursedon' | translate }}" tooltip-append-to-body="true"></i>
+                                </th>
+                                <th align="left">{{'label.input.principal' | translate}}
+                                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.trancheprincipal' | translate }}" tooltip-append-to-body="true"></i>
+                                </th>
                                 <th align="left">{{ 'label.input.trancheminimumrepaid' | translate }}
                                     <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.previousrepaidaspercentage' | translate }}" tooltip-append-to-body="true"></i>
                                 </th>
@@ -1239,6 +1324,122 @@
                                 </td>
                             </tr>
                         </table>
+
+                        <div class="tranche-section" ng-show="trancheReleaseEligibility || trancheMilestone">
+                            <h4 class="tranche-section-title">
+                                {{'label.heading.trancheeligibility' | translate}}
+                                <i class="fa fa-question-circle"
+                                   uib-tooltip="{{ 'label.tooltip.trancheeligibility' | translate }}"
+                                   tooltip-append-to-body="true"></i>
+                            </h4>
+                            <p class="tranche-section-help">{{'label.msg.multitranche.eligibility.report' | translate}}</p>
+                            <table class="table table-bordered table-striped width100">
+                                <tr ng-show="trancheMilestone.trancheNumber">
+                                    <th class="table-bold-loan tranche-field-label">
+                                        {{'label.heading.trancheawaitingdisbursal' | translate}}
+                                        <i class="fa fa-question-circle"
+                                           uib-tooltip="{{ 'label.tooltip.trancheawaitingdisbursal' | translate }}"
+                                           tooltip-append-to-body="true"></i>
+                                    </th>
+                                    <td>{{trancheMilestone.trancheNumber}}</td>
+                                </tr>
+                                <tr ng-show="trancheMilestone.status">
+                                    <th class="table-bold-loan tranche-field-label">
+                                        {{'label.heading.milestonestatus' | translate}}
+                                        <i class="fa fa-question-circle"
+                                           uib-tooltip="{{ 'label.tooltip.milestonestatus' | translate }}"
+                                           tooltip-append-to-body="true"></i>
+                                    </th>
+                                    <td>
+                                        <i class="fa fa-stop {{trancheMilestone.status.code | StatusLookup}}"></i>
+                                        {{trancheMilestone.status.value}}
+                                    </td>
+                                </tr>
+                                <tr ng-show="trancheMilestone.firstRepaymentDueDate">
+                                    <th class="table-bold-loan tranche-field-label">
+                                        {{'label.heading.eligibilitydeadline' | translate}}
+                                        <i class="fa fa-question-circle"
+                                           uib-tooltip="{{ 'label.tooltip.eligibilitydeadline' | translate }}"
+                                           tooltip-append-to-body="true"></i>
+                                    </th>
+                                    <td>{{trancheMilestone.firstRepaymentDueDate | DateFormat}}</td>
+                                </tr>
+                                <tr ng-show="trancheReleaseEligibility.subsequentTranche">
+                                    <th class="table-bold-loan tranche-field-label">
+                                        {{'label.heading.repaymentthreshold' | translate}}
+                                        <i class="fa fa-question-circle"
+                                           uib-tooltip="{{ 'label.tooltip.repaymentthreshold' | translate }}"
+                                           tooltip-append-to-body="true"></i>
+                                    </th>
+                                    <td>
+                                        <span ng-show="trancheReleaseEligibility.thresholdNotConfigured">{{'label.warning.tranche.threshold.not.configured' | translate}}</span>
+                                        <span ng-show="trancheReleaseEligibility.thresholdMet">{{'label.heading.met' | translate}}</span>
+                                        <span ng-show="trancheReleaseEligibility.minimumNotMet">{{'label.heading.notmet' | translate}}</span>
+                                        <span ng-show="trancheReleaseEligibility.principalRepaid != null">
+                                            — {{'label.heading.principalrepaid' | translate}}: {{trancheReleaseEligibility.principalRepaid | number}}
+                                            / {{trancheReleaseEligibility.requiredPrincipal | number}}
+                                        </span>
+                                        <span ng-hide="trancheReleaseEligibility.thresholdMet || trancheReleaseEligibility.minimumNotMet || trancheReleaseEligibility.principalRepaid != null || trancheReleaseEligibility.thresholdNotConfigured"
+                                              class="text-muted">{{'label.heading.notavailable' | translate}}</span>
+                                    </td>
+                                </tr>
+                                <tr ng-show="trancheReleaseEligibility.milestoneRequired && trancheReleaseEligibility.subsequentTranche">
+                                    <th class="table-bold-loan tranche-field-label">
+                                        {{'label.heading.surveyreadiness' | translate}}
+                                        <i class="fa fa-question-circle"
+                                           uib-tooltip="{{ 'label.tooltip.surveyreadiness' | translate }}"
+                                           tooltip-append-to-body="true"></i>
+                                    </th>
+                                    <td>
+                                        <div ng-show="trancheReleaseEligibility.surveyIncomplete">{{'label.warning.tranche.survey.incomplete' | translate}}</div>
+                                        <div ng-show="trancheReleaseEligibility.surveyOutstanding && !trancheReleaseEligibility.surveyIncomplete">{{'label.warning.tranche.survey.outstanding' | translate}}</div>
+                                        <div ng-show="trancheReleaseEligibility.surveyNegative">{{'label.warning.tranche.survey.negative' | translate}}</div>
+                                        <div ng-show="trancheReleaseEligibility.pastDeadline && !trancheReleaseEligibility.deadlineExceptionApproved">{{'label.warning.tranche.past.deadline' | translate}}</div>
+                                        <div ng-show="trancheReleaseEligibility.deadlineExceptionApproved">{{'label.msg.deadlineexception.approved' | translate}}</div>
+                                        <span ng-hide="trancheReleaseEligibility.surveyOutstanding || trancheReleaseEligibility.surveyIncomplete || trancheReleaseEligibility.surveyNegative || (trancheReleaseEligibility.pastDeadline && !trancheReleaseEligibility.deadlineExceptionApproved)">{{'label.heading.ready' | translate}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <button type="button" class="btn btn-default"
+                                    ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
+                                    has-permission="APPROVE_TRANCHEMILESTONE"
+                                    ng-click="approveDeadlineException()">
+                                {{'label.button.approvedeadlineexception' | translate}}
+                            </button>
+                        </div>
+
+                        <div class="tranche-section" ng-show="trancheMilestone && trancheMilestone.milestoneRequired && trancheMilestone.tranches && trancheMilestone.tranches.length">
+                            <h4 class="tranche-section-title">
+                                {{'label.heading.milestonesurvey' | translate}}
+                                <i class="fa fa-question-circle"
+                                   uib-tooltip="{{ 'label.tooltip.milestonesurvey' | translate }}"
+                                   tooltip-append-to-body="true"></i>
+                            </h4>
+                            <p class="tranche-section-help">{{'label.msg.milestonesurvey.readonly' | translate}}</p>
+                            <table class="table table-bordered table-striped width100">
+                                <tr class="graybg">
+                                    <th>{{'label.heading.tranche' | translate}}</th>
+                                    <th>{{'label.input.expecteddisbursementon' | translate}}</th>
+                                    <th>{{'label.heading.status' | translate}}</th>
+                                    <th>{{'label.heading.milestonesurvey' | translate}}</th>
+                                    <th></th>
+                                </tr>
+                                <tr ng-repeat="tranche in trancheMilestone.tranches">
+                                    <td>{{tranche.trancheNumber}}</td>
+                                    <td>{{tranche.expectedDisbursementDate | DateFormat}}</td>
+                                    <td>
+                                        <span ng-show="tranche.disbursed">{{'label.heading.disbursed' | translate}}</span>
+                                        <span ng-show="tranche.waiting">{{'label.heading.waiting' | translate}}</span>
+                                    </td>
+                                    <td>{{surveyAnswerLabel(tranche.surveyAnswer) | translate}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-default btn-sm" ng-click="openTrancheSurvey(tranche)">
+                                            {{'label.heading.viewsurvey' | translate}}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
                         <table class="width100">
                             <tr>

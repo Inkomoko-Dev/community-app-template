@@ -1,9 +1,99 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        LoanAccountActionsController: function (scope, rootScope, resourceFactory, location, routeParams, dateFilter) {
+        LoanAccountActionsController: function (scope, rootScope, resourceFactory, location, routeParams, dateFilter, translate, filter, $uibModal) {
 
             scope.action = routeParams.action || "";
             scope.accountId = routeParams.id;
+
+            scope.trancheMinimumProceed = false;
+
+            function trancheWarningMessages(report) {
+                var messages = [];
+                if (!report || report.subsequentTranche === false) {
+                    return messages;
+                }
+                if (report.thresholdNotConfigured) {
+                    messages.push(translate.instant('label.warning.tranche.threshold.not.configured'));
+                } else if (report.minimumNotMet) {
+                    messages.push(translate.instant('label.warning.tranche.minimum.not.met', {
+                        repaid: filter('number')(report.principalRepaid),
+                        required: filter('number')(report.requiredPrincipal)
+                    }));
+                }
+                if (report.surveyIncomplete) {
+                    messages.push(translate.instant('label.warning.tranche.survey.incomplete'));
+                } else if (report.surveyOutstanding) {
+                    messages.push(translate.instant('label.warning.tranche.survey.outstanding'));
+                }
+                if (report.surveyNegative) {
+                    messages.push(translate.instant('label.warning.tranche.survey.negative'));
+                }
+                if (report.pastDeadline && !report.deadlineExceptionApproved) {
+                    messages.push(translate.instant('label.warning.tranche.past.deadline'));
+                }
+                return messages;
+            }
+
+            function openTrancheMinimumDialog() {
+                if (!$uibModal || scope.trancheMinimumDialogOpen) {
+                    return;
+                }
+                scope.trancheMinimumDialogOpen = true;
+                $uibModal.open({
+                    templateUrl: 'trancheMinimumDialog.html',
+                    backdrop: 'static',
+                    keyboard: false,
+                    controller: function ($scope, $uibModalInstance, messages) {
+                        $scope.messages = messages;
+                        $scope.proceed = function () {
+                            $uibModalInstance.close('proceed');
+                        };
+                        $scope.cancel = function () {
+                            $uibModalInstance.close('cancel');
+                        };
+                    },
+                    resolve: {
+                        messages: function () {
+                            return scope.trancheWarningMessages;
+                        }
+                    }
+                }).result.then(function (choice) {
+                    scope.trancheMinimumDialogOpen = false;
+                    if (choice === 'proceed') {
+                        scope.trancheMinimumProceed = true;
+                    } else {
+                        location.path('/viewloanaccount/' + scope.accountId);
+                    }
+                }, function () {
+                    scope.trancheMinimumDialogOpen = false;
+                    location.path('/viewloanaccount/' + scope.accountId);
+                });
+            }
+
+            function applyTrancheReleaseWarning(report) {
+                scope.trancheWarningReport = report;
+                if (!scope.currentTrancheNumber) {
+                    return;
+                }
+                if (scope.currentTrancheNumber < 2) {
+                    scope.trancheWarningMessages = [];
+                    scope.trancheReleaseWarning = null;
+                    scope.trancheMinimumProceed = false;
+                    return;
+                }
+                scope.trancheWarningMessages = report ? trancheWarningMessages(report) : [];
+                scope.trancheReleaseWarning = scope.trancheWarningMessages.length ? report : null;
+                scope.trancheMinimumProceed = false;
+                if (scope.trancheReleaseWarning) {
+                    openTrancheMinimumDialog();
+                }
+            }
+
+            function loadTrancheReleaseWarning() {
+                resourceFactory.trancheReleaseReportResource.get({ loanId: scope.accountId }, function (report) {
+                    applyTrancheReleaseWarning(report);
+                });
+            }
 
             scope.showBankDisbursementSuccess = function (outcome) {
                 rootScope.bankDisbursementResult = {
@@ -867,6 +957,7 @@
                 case "disbursementpreapprovalrequest":
                 case "approveDisbursement":
                 case "disbursementapproval":
+                    loadTrancheReleaseWarning();
                     var isDisbursementReviewTitle = scope.action === "approveDisbursement" || scope.action === "disbursementapproval";
 
                     // These actions should be read-only
@@ -914,6 +1005,9 @@
                                 }) || savedDetail;
                             }
                             scope.currentTrancheNumber = templateData.trancheNumber;
+                            if (scope.trancheWarningReport) {
+                                applyTrancheReleaseWarning(scope.trancheWarningReport);
+                            }
                             var approvedDisplay = scope.approvedDisbursementDisplay(data, templateData);
                             scope.remainingUndisbursedAmount = approvedDisplay.remaining;
                             scope.currentTranchePrincipal = approvedDisplay.amount;
@@ -1668,7 +1762,47 @@
                 return dateFilter(date, scope.df);
             };
 
+            scope.syncTranchePercentageAmounts = function () {
+                var base = parseTrancheAmount(scope.formData.approvedLoanAmount);
+                if (!isFinite(base) || base <= 0 || !scope.disbursementDetails) {
+                    return;
+                }
+                var rows = scope.disbursementDetails;
+                var remaining = base;
+                var i;
+                for (i = 0; i < rows.length; i++) {
+                    var amount;
+                    if (rows[i].actualDisbursementDate) {
+                        amount = parseTrancheAmount(rows[i].principal);
+                    } else if (rows[i].principalAsPercentage === true) {
+                        var share = Number(rows[i].principalPercentage);
+                        if (!isFinite(share) || share <= 0 || share > 100) {
+                            continue;
+                        }
+                        amount = Math.round(remaining * share) / 100;
+                        if (amount > remaining) {
+                            amount = Math.round(remaining * 100) / 100;
+                        }
+                        rows[i].principal = amount;
+                    } else {
+                        amount = parseTrancheAmount(rows[i].principal);
+                        if (!isFinite(amount) || amount < 0) {
+                            continue;
+                        }
+                        if (amount > remaining) {
+                            amount = Math.round(remaining * 100) / 100;
+                            rows[i].principal = amount;
+                        }
+                    }
+                    remaining = Math.round((remaining - amount) * 100) / 100;
+                    if (remaining < 0) {
+                        remaining = 0;
+                    }
+                }
+            };
+
             scope.addTrancheAmounts = function () {
+                scope.syncTranchePercentageAmounts();
                 scope.showTrancheAmountTotal = 0;
                 for (var i in scope.disbursementDetails) {
                     scope.showTrancheAmountTotal += parseTrancheAmount(scope.disbursementDetails[i].principal);
@@ -1783,6 +1917,10 @@
                         tranche[field] = scope.disbursementDetails[0][field];
                     });
                 }
+                tranche.principalAsPercentage = false;
+                if (scope.disbursementDetails.length > 0) {
+                    tranche.previousTrancheRepaidAsPercentage = false;
+                }
                 scope.disbursementDetails.push(tranche);
                 scope.addTrancheAmounts();
             };
@@ -1801,6 +1939,10 @@
 
                 if (scope.isFormLoading()) {
                     scope.error = 'The form is still loading. Please wait a moment and try again.';
+                    return;
+                }
+
+                if (scope.trancheReleaseWarning && !scope.trancheMinimumProceed) {
                     return;
                 }
 
@@ -1939,6 +2081,10 @@
                             submitData.disbursementData.push({
                                 id: scope.disbursementDetails[i].id,
                                 principal: scope.disbursementDetails[i].principal,
+                                principalAsPercentage: scope.disbursementDetails[i].principalAsPercentage === true,
+                                principalPercentage: scope.disbursementDetails[i].principalAsPercentage === true ? scope.disbursementDetails[i].principalPercentage : null,
+                                previousTrancheRepaidAsPercentage: Number(i) === 0 ? null : scope.disbursementDetails[i].previousTrancheRepaidAsPercentage === true,
+                                previousTrancheRepaidMinimum: Number(i) === 0 ? null : scope.disbursementDetails[i].previousTrancheRepaidMinimum,
                                 expectedDisbursementDate: dateFilter(scope.disbursementDetails[i].expectedDisbursementDate, scope.df),
                                 loanChargeId: scope.disbursementDetails[i].loanChargeId,
                                 paymentTypeId: scope.disbursementDetails[i].paymentTypeId,
@@ -2118,6 +2264,10 @@
                         submitData.disbursementData.push({
                             id: scope.disbursementDetails[i].id,
                             principal: scope.disbursementDetails[i].principal,
+                            principalAsPercentage: scope.disbursementDetails[i].principalAsPercentage === true,
+                            principalPercentage: scope.disbursementDetails[i].principalAsPercentage === true ? scope.disbursementDetails[i].principalPercentage : null,
+                            previousTrancheRepaidAsPercentage: Number(i) === 0 ? null : scope.disbursementDetails[i].previousTrancheRepaidAsPercentage === true,
+                            previousTrancheRepaidMinimum: Number(i) === 0 ? null : scope.disbursementDetails[i].previousTrancheRepaidMinimum,
                             expectedDisbursementDate: formatTrancheDate(scope.disbursementDetails[i].expectedDisbursementDate),
                             loanChargeId: scope.disbursementDetails[i].loanChargeId
                         });
@@ -2150,6 +2300,10 @@
                         submitData.disbursementData.push({
                             id: scope.disbursementDetails[i].id,
                             principal: scope.disbursementDetails[i].principal,
+                            principalAsPercentage: scope.disbursementDetails[i].principalAsPercentage === true,
+                            principalPercentage: scope.disbursementDetails[i].principalAsPercentage === true ? scope.disbursementDetails[i].principalPercentage : null,
+                            previousTrancheRepaidAsPercentage: Number(i) === 0 ? null : scope.disbursementDetails[i].previousTrancheRepaidAsPercentage === true,
+                            previousTrancheRepaidMinimum: Number(i) === 0 ? null : scope.disbursementDetails[i].previousTrancheRepaidMinimum,
                             expectedDisbursementDate: formatTrancheDate(scope.disbursementDetails[i].expectedDisbursementDate),
                             loanChargeId: scope.disbursementDetails[i].loanChargeId
                         });
@@ -2953,7 +3107,7 @@
 
         }
     });
-    mifosX.ng.application.controller('LoanAccountActionsController', ['$scope', '$rootScope', 'ResourceFactory', '$location', '$routeParams', 'dateFilter', mifosX.controllers.LoanAccountActionsController]).run(function ($log) {
+    mifosX.ng.application.controller('LoanAccountActionsController', ['$scope', '$rootScope', 'ResourceFactory', '$location', '$routeParams', 'dateFilter', '$translate', '$filter', '$uibModal', mifosX.controllers.LoanAccountActionsController]).run(function ($log) {
         $log.info("LoanAccountActionsController initialized");
     });
 }(mifosX.controllers || {}));

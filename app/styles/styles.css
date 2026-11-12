@@ -20690,6 +20690,75 @@ span.required {
 .card .statusprogresscompletedtab {
   color: #298A08;
 }
+/* line 518, ../styles-dev/main/components/_content.scss */
+.card .statuspendingdisbursement {
+  color: #40E0D0;
+}
+/* line 522, ../styles-dev/main/components/_content.scss */
+.card .statusrepaymentnotmet {
+  color: #FF8C00;
+}
+/* line 526, ../styles-dev/main/components/_content.scss */
+.card .statusrepaymentmet {
+  color: #1E90FF;
+}
+/* line 530, ../styles-dev/main/components/_content.scss */
+.card .statusawaitingsurvey {
+  color: #DAA520;
+}
+/* line 534, ../styles-dev/main/components/_content.scss */
+.card .statussurveysuccessful {
+  color: #228B22;
+}
+/* line 538, ../styles-dev/main/components/_content.scss */
+.card .statustrancheexpired {
+  color: #B22222;
+}
+/* line 542, ../styles-dev/main/components/_content.scss */
+.card .statusrequirereview {
+  color: #8B008B;
+}
+/* line 546, ../styles-dev/main/components/_content.scss */
+.card .tranche-section {
+  margin-top: 24px;
+  padding: 16px 16px 8px;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+/* line 553, ../styles-dev/main/components/_content.scss */
+.card .tranche-section-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+/* line 560, ../styles-dev/main/components/_content.scss */
+.card .tranche-section-title .fa-question-circle {
+  margin-left: 6px;
+  color: #5b9bd5;
+  cursor: help;
+}
+/* line 566, ../styles-dev/main/components/_content.scss */
+.card .tranche-section-help {
+  margin: 0 0 12px;
+  color: #666;
+  font-size: 12px;
+}
+/* line 572, ../styles-dev/main/components/_content.scss */
+.card .tranche-field-label {
+  width: 34%;
+  vertical-align: middle !important;
+  background: #f5f5f5;
+}
+/* line 578, ../styles-dev/main/components/_content.scss */
+.card .tranche-field-label .fa-question-circle {
+  margin-left: 4px;
+  color: #5b9bd5;
+  cursor: help;
+}
+.card .tranche-evidence {
+  white-space: pre-line;
+}
 /* line 505, ../styles-dev/main/components/_content.scss */
 .card a {
   cursor: pointer;
