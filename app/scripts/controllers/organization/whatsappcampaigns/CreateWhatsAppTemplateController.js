@@ -5,6 +5,7 @@
                 name: '',
                 language: 'en',
                 category: 'UTILITY',
+                markAsApproved: false,
                 components: {
                     headerText: '',
                     bodyText: '',
@@ -27,25 +28,61 @@
                 }
                 scope.isButtonDisabled = true;
 
-                // Build Africa's Talking template creation payload components
+                // Build Africa's Talking template creation payload components.
+                // Docs: example.body_text must list one sample per {{n}} placeholder.
+                var defaultSamples = ['Jane Doe', '1500.00', '000012345', '8500.00', 'Sample5', 'Sample6', 'Sample7', 'Sample8'];
+
+                function maxPlaceholderIndex(text) {
+                    var max = 0;
+                    var re = /\{\{\s*(\d+)\s*\}\}/g;
+                    var match;
+                    while ((match = re.exec(text || '')) !== null) {
+                        var idx = parseInt(match[1], 10);
+                        if (!isNaN(idx) && idx > max) {
+                            max = idx;
+                        }
+                    }
+                    return max;
+                }
+
+                function samplesFor(text) {
+                    var count = maxPlaceholderIndex(text);
+                    var samples = [];
+                    for (var i = 0; i < count; i++) {
+                        samples.push(defaultSamples[i] || ('Sample' + (i + 1)));
+                    }
+                    return samples;
+                }
+
                 var components = {};
 
                 if (scope.templateData.components.headerText) {
+                    var headerText = scope.templateData.components.headerText;
+                    var headerSamples = samplesFor(headerText);
                     components.header = {
                         type: 'HEADER',
                         format: 'TEXT',
-                        text: scope.templateData.components.headerText,
-                        example: { header_text: ['Sample header text'] }
+                        text: headerText
                     };
+                    if (headerSamples.length === 1) {
+                        // AT create_template example uses a string for a single header variable.
+                        components.header.example = { header_text: headerSamples[0] };
+                    } else if (headerSamples.length > 1) {
+                        components.header.example = { header_text: headerSamples };
+                    }
                 }
 
                 if (scope.templateData.components.bodyText) {
+                    var bodyText = scope.templateData.components.bodyText;
+                    var bodySamples = samplesFor(bodyText);
                     components.body = {
                         type: 'BODY',
                         kind: 'TEXT',
-                        text: scope.templateData.components.bodyText,
-                        example: { body_text: ['Sample body text'] }
+                        text: bodyText
                     };
+                    if (bodySamples.length > 0) {
+                        components.body.example = { body_text: bodySamples };
+                    }
                 }
 
                 if (scope.templateData.components.footerText) {
@@ -71,6 +108,7 @@
                     name: scope.templateData.name,
                     language: scope.templateData.language,
                     category: scope.templateData.category,
+                    markAsApproved: !!scope.templateData.markAsApproved,
                     components: components
                 };
 

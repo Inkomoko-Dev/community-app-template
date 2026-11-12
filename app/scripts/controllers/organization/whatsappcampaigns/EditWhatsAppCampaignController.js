@@ -162,11 +162,47 @@
                 });
             };
 
+            scope.atTemplateOptions = [];
+            scope.selectedAtTemplateOption = null;
+            scope.useOtherAtTemplate = false;
+
+            scope.onAtTemplateOptionChanged = function () {
+                if (scope.selectedAtTemplateOption) {
+                    scope.useOtherAtTemplate = false;
+                    scope.campaignData.atTemplateName = scope.selectedAtTemplateOption.name;
+                    scope.campaignData.languageCode = scope.selectedAtTemplateOption.languageCode;
+                }
+            };
+
+            scope.onUseOtherAtTemplateChanged = function () {
+                if (scope.useOtherAtTemplate) {
+                    scope.selectedAtTemplateOption = null;
+                }
+            };
+
             resourceFactory.whatsAppCampaignTemplateResource.get(function (data) {
                 scope.triggerTypeOptions = data.triggerTypeOptions;
                 scope.businessRuleOptions = data.businessRulesOptions;
                 scope.recipientTypeOptions = data.recipientTypeOptions || [];
+                scope.atTemplateOptions = data.atTemplateOptions || [];
                 scope.messageTypeOptions = [{id: 'FREEFORM', value: 'Freeform'}, {id: 'TEMPLATE', value: 'Template'}];
+                if (scope.campaignData.atTemplateName) {
+                    var match = null;
+                    angular.forEach(scope.atTemplateOptions, function (opt) {
+                        if (opt.name === scope.campaignData.atTemplateName
+                                && opt.languageCode === scope.campaignData.languageCode) {
+                            match = opt;
+                        }
+                    });
+                    if (match) {
+                        scope.selectedAtTemplateOption = match;
+                        scope.useOtherAtTemplate = false;
+                    } else {
+                        scope.useOtherAtTemplate = true;
+                    }
+                } else {
+                    scope.useOtherAtTemplate = scope.atTemplateOptions.length === 0;
+                }
             });
 
             scope.submit = function () {
