@@ -2,7 +2,8 @@ define(['underscore'], function () {
     var styles = {
         css: [
             'fontawesome',
-            'styles'
+            'styles',
+            'creditdecision'
         ]
     };
 
