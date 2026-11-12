@@ -103,6 +103,16 @@
                     </div>
 
                     <hr>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2"></label>
+                        <div class="col-sm-8">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="templateData.markAsApproved"/>
+                                {{'label.input.markAtTemplateApproved' | translate}}
+                            </label>
+                            <p class="help-block">{{'label.help.markAtTemplateApproved' | translate}}</p>
+                        </div>
+                    </div>
                     <div class="pull-right">
                         <button id="saveTemplate" type="submit" class="btn btn-primary">{{'label.button.createTemplate' | translate}}</button>
                         <a href="#/whatsappcampaigns" class="btn btn-default">{{'label.button.cancel' | translate}}</a>
