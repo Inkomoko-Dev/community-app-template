@@ -19,6 +19,16 @@
                 return scope.formData.productIds.indexOf(product.id) >= 0;
             };
 
+            scope.nameBlank = function () {
+                return !(scope.formData.name || '').trim();
+            };
+
+            // Do not use HTML required: rc-submit skips the handler when the form is invalid, so the user
+            // got no reason for the silent no-op. Validate here and always show why Create draft did nothing.
+            scope.nameInvalid = function () {
+                return scope.submitted && scope.nameBlank();
+            };
+
             scope.toggle = function (product) {
                 if (product.claimedByProfileId) {
                     return;
@@ -33,7 +43,7 @@
 
             scope.submit = function () {
                 scope.submitted = true;
-                if (!scope.formData.name || !scope.formData.name.trim() || !scope.formData.productIds.length) {
+                if (scope.nameBlank() || !scope.formData.productIds.length) {
                     return;
                 }
                 var body = {

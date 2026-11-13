@@ -170,7 +170,10 @@
                                     <input type="checkbox" ng-checked="hasProduct(product)" ng-click="toggleProduct(product)"
                                            ng-disabled="!editable || usedElsewhere(product)">
                                     <span class="cd-pick-name">{{product.name}}</span>
-                                    <small ng-if="!hasProduct(product) && usedElsewhere(product)">&middot; {{product.claimedByProfileName}}</small>
+                                    <small ng-if="!hasProduct(product) && usedElsewhere(product)">
+                                        &middot; {{'label.creditdecision.usedby' | translate}}
+                                        <a href="#/creditdecision/profile/{{product.claimedByProfileId}}" ng-click="$event.stopPropagation()">{{product.claimedByProfileName}}</a>
+                                    </small>
                                 </label>
                             </div>
                         </div>
