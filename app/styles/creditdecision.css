@@ -114,6 +114,11 @@
 .cd .cd-form { max-width: 620px; }
 .cd .cd-form .form-group > label { font-weight: 600; font-size: 13px; color: #1f2630; }
 .cd .cd-form .help-block { color: #8a94a0; font-size: 12px; }
+.cd .cd-form .form-group.has-error .form-control,
+.cd .cd-form .form-group.has-error .cd-picker { border-color: #d9534f; }
+.cd .cd-form .error { display: block; color: #d9534f; font-size: 12px; margin-top: 6px; }
+.cd .cd-form .required { color: #d9534f; margin-left: 2px; }
+.cd .cd-form .alert-danger { border-radius: 4px; }
 
 /* product picker: a compact, searchable, scrollable grid instead of one checkbox per row */
 .cd .cd-picker { border: 1px solid #e6e9ed; border-radius: 4px; background: #fff; }
