@@ -1281,14 +1281,13 @@
                     <i class="fa fa-question-circle " uib-tooltip="{{'label.tooltip.isMultiDisburseLoan' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </label>
-
                 <div class="checkbox col-sm-2">
                     <label>
                         <input type="checkbox" ng-model="formData.multiDisburseLoan"/>
                     </label>
                 </div>
-                <label class="control-label col-sm-3 col-sm-offset-1" ng-show="formData.multiDisburseLoan">{{ 'label.input.requiremilestonesurvey' | translate }}</label>
-                <div class="checkbox col-sm-3" ng-show="formData.multiDisburseLoan">
+                <label class="control-label col-sm-2 col-sm-offset-2" ng-show="formData.multiDisburseLoan">{{ 'label.input.requiremilestonesurvey' | translate }}</label>
+                <div class="checkbox col-sm-2" ng-show="formData.multiDisburseLoan">
                     <label>
                         <input type="checkbox" id="requireMilestoneSurvey" ng-model="formData.requireMilestoneSurvey"/>
                     </label>
@@ -1303,7 +1302,7 @@
                     <input type="text" class="form-control" id="minTrancheCount" name="minTrancheCount"
                            ng-model="formData.minTrancheCount"/>
                 </div>
-                <label class="control-label col-sm-3 col-sm-offset-1">{{ 'label.input.maxtranchecount' | translate }}
+                <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.maxtranchecount' | translate }}
                     <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.maxtranchecount' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </label>
@@ -1318,32 +1317,36 @@
                        tooltip-append-to-body="true"></i>
                 </label>
                 <div class="col-sm-2">
-                    <input ng-if="formData.firstTrancheAsPercentage" type="text" class="form-control" id="firstTrancheAmount"
-                           name="firstTrancheAmount" ng-model="formData.firstTrancheAmount"
-                           placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
-                    <input ng-if="!formData.firstTrancheAsPercentage" type="text" class="form-control" id="firstTrancheAmount"
-                           name="firstTrancheAmount" number-format ng-model="formData.firstTrancheAmount"/>
+                    <div class="input-group">
+                        <input ng-if="formData.firstTrancheAsPercentage" type="text" class="form-control" id="firstTrancheAmount"
+                               name="firstTrancheAmount" ng-model="formData.firstTrancheAmount"
+                               placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
+                        <input ng-if="!formData.firstTrancheAsPercentage" type="text" class="form-control" id="firstTrancheAmount"
+                               name="firstTrancheAmount" number-format ng-model="formData.firstTrancheAmount"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-class="{'btn-primary': formData.firstTrancheAsPercentage}"
+                                    ng-click="formData.firstTrancheAsPercentage = !formData.firstTrancheAsPercentage"
+                                    uib-tooltip="{{ 'label.tooltip.trancheamountmode' | translate }}" tooltip-append-to-body="true">%</button>
+                        </span>
+                    </div>
                 </div>
-                <div class="checkbox col-sm-1">
-                    <label>
-                        <input type="checkbox" ng-model="formData.firstTrancheAsPercentage"/> %
-                    </label>
-                </div>
-                <label class="control-label col-sm-2">{{ 'label.input.defaultfirstrepaymentprincipal' | translate }}
+                <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.defaultfirstrepaymentprincipal' | translate }}
                     <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.firstinstallmentprincipal' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </label>
                 <div class="col-sm-2">
-                    <input ng-if="formData.firstInstallmentAsPercentage" type="text" class="form-control" id="firstInstallmentPrincipal"
-                           name="firstInstallmentPrincipal" ng-model="formData.firstInstallmentPrincipal"
-                           placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
-                    <input ng-if="!formData.firstInstallmentAsPercentage" type="text" class="form-control" id="firstInstallmentPrincipal"
-                           name="firstInstallmentPrincipal" number-format ng-model="formData.firstInstallmentPrincipal"/>
-                </div>
-                <div class="checkbox col-sm-1">
-                    <label>
-                        <input type="checkbox" ng-model="formData.firstInstallmentAsPercentage"/> %
-                    </label>
+                    <div class="input-group">
+                        <input ng-if="formData.firstInstallmentAsPercentage" type="text" class="form-control" id="firstInstallmentPrincipal"
+                               name="firstInstallmentPrincipal" ng-model="formData.firstInstallmentPrincipal"
+                               placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
+                        <input ng-if="!formData.firstInstallmentAsPercentage" type="text" class="form-control" id="firstInstallmentPrincipal"
+                               name="firstInstallmentPrincipal" number-format ng-model="formData.firstInstallmentPrincipal"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-class="{'btn-primary': formData.firstInstallmentAsPercentage}"
+                                    ng-click="formData.firstInstallmentAsPercentage = !formData.firstInstallmentAsPercentage"
+                                    uib-tooltip="{{ 'label.tooltip.trancheamountmode' | translate }}" tooltip-append-to-body="true">%</button>
+                        </span>
+                    </div>
                 </div>
             </div>
             <h3>{{ 'label.heading.configurableAttributes' | translate }}</h3>
