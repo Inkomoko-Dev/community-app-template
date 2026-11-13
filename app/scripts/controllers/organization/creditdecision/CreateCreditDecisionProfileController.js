@@ -23,8 +23,6 @@
                 return !(scope.formData.name || '').trim();
             };
 
-            // Do not use HTML required: rc-submit skips the handler when the form is invalid, so the user
-            // got no reason for the silent no-op. Validate here and always show why Create draft did nothing.
             scope.nameInvalid = function () {
                 return scope.submitted && scope.nameBlank();
             };
@@ -44,6 +42,11 @@
             scope.submit = function () {
                 scope.submitted = true;
                 if (scope.nameBlank() || !scope.formData.productIds.length) {
+                    // Keep the click from feeling broken: surface why create was blocked.
+                    var nameField = document.getElementById('cd-profile-name');
+                    if (nameField && scope.nameBlank()) {
+                        nameField.focus();
+                    }
                     return;
                 }
                 var body = {
