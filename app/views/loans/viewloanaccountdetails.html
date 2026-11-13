@@ -1397,12 +1397,13 @@
                                     </td>
                                 </tr>
                             </table>
-                            <button type="button" class="btn btn-default"
-                                    ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
-                                    has-permission="APPROVE_TRANCHEMILESTONE"
-                                    ng-click="approveDeadlineException()">
-                                {{'label.button.approvedeadlineexception' | translate}}
-                            </button>
+                            <div class="form-group"
+                                 ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
+                                 has-permission="APPROVE_TRANCHEMILESTONE">
+                                <button type="button" class="btn btn-default" ng-click="openTrancheReview()">
+                                    {{'label.button.reviewtranche' | translate}}
+                                </button>
+                            </div>
                         </div>
 
                         <div class="tranche-section" ng-show="trancheMilestone && trancheMilestone.milestoneRequired && trancheMilestone.tranches && trancheMilestone.tranches.length">

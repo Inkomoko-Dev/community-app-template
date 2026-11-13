@@ -7,6 +7,9 @@
             scope.report = false;
             scope.hidePentahoReport = true;
             scope.formData = {};
+            scope.openTrancheReview = function () {
+                location.path('/viewloanaccount/' + routeParams.id + '/tranchereview').search('fromReview', null);
+            };
             scope.date = {};
             scope.date.payDate = new Date();
             scope.hideAccrualTransactions = false;
@@ -622,7 +625,7 @@
                         location.path('/loanscreenreport/' + accountId);
                         break;
                     case "reschedule":
-                        location.path('/loans/' +accountId + '/reschedule');
+                        location.path('/loans/' + accountId + '/reschedule').search('fromReview', null);
                         break;
                     case "adjustrepaymentschedule":
                         location.path('/adjustrepaymentschedule/'+accountId) ;
@@ -871,11 +874,6 @@
                                     return scope.milestoneYesNo;
                                 }
                             }
-                        });
-                    };
-                    scope.approveDeadlineException = function () {
-                        resourceFactory.trancheMilestoneExceptionResource.save({ loanKey: routeParams.id }, {}, function () {
-                            fetchLoanAccountDetails();
                         });
                     };
                     scope.enableThirdPartyDisbursement = !!data.enableThirdPartyDisbursement;

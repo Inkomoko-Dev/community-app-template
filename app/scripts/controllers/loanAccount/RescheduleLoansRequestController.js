@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        RescheduleLoansRequestController: function (scope, resourceFactory, routeParams, location, dateFilter, $translate) {
+        RescheduleLoansRequestController: function (scope, resourceFactory, routeParams, location, dateFilter, $translate, $window) {
             var fallbackRepaymentFrequencyTypeOptions = [
                 { id: 0, value: 'Days' },
                 { id: 1, value: 'Weeks' },
@@ -88,6 +88,18 @@
             };
 
             scope.loanId = routeParams.loanId;
+            scope.fromManualReview = String(location.search().fromReview || '') === '1';
+            scope.comments = '';
+            if (scope.fromManualReview) {
+                try {
+                    var storedReview = JSON.parse($window.sessionStorage.getItem('trancheManualReviewReschedule') || 'null');
+                    if (storedReview && String(storedReview.loanId) === String(scope.loanId) && storedReview.note) {
+                        scope.comments = storedReview.note;
+                    }
+                } catch (ignored) {
+                    scope.comments = '';
+                }
+            }
             scope.formData = { recalculateEvenIfObligationsMet: false };
             scope.rejectData = {};
             scope.adjustFuturePayments = true;
@@ -136,7 +148,7 @@
             });
 
             scope.cancel = function () {
-                location.path('/viewloanaccount/' + scope.loanId);
+                location.path('/viewloanaccount/' + scope.loanId).search('fromReview', null);
             };
 
             function isBlank(value) {
@@ -144,6 +156,10 @@
             }
 
             scope.submit = function () {
+                if (scope.fromManualReview && isBlank(scope.comments)) {
+                    scope.error = $translate.instant('validation.msg.tranche.review.note.required');
+                    return;
+                }
                 if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
                     return;
                 }
@@ -209,7 +225,7 @@
                     this.formData.carryForwardChargeDueDate =
                         dateFilter(this.formData.carryForwardChargeDueDate, scope.df);
                 }
-                this.formData.rescheduleReasonComment = scope.comments;
+                this.formData.rescheduleReasonComment = scope.fromManualReview ? String(scope.comments).trim() : scope.comments;
 
                 if (scope.changeRepaymentDate && this.formData.adjustedDueDate) {
                     this.formData.adjustedDueDate = dateFilter(this.formData.adjustedDueDate, scope.df);
@@ -263,7 +279,10 @@
                 delete this.formData.loanTermFrequencyType;
                 resourceFactory.loanRescheduleResource.put(this.formData, function (data) {
                     scope.requestId = data.resourceId;
-                    location.path('/loans/' + scope.loanId + '/viewreschedulerequest/'+ data.resourceId);
+                    if (scope.fromManualReview) {
+                        $window.sessionStorage.removeItem('trancheManualReviewReschedule');
+                    }
+                    location.path('/loans/' + scope.loanId + '/viewreschedulerequest/'+ data.resourceId).search('fromReview', null);
                 }, function (response) {
                     var errors = response && response.data && response.data.errors;
                     var backendError = response && response.data;
@@ -277,7 +296,7 @@
 
         }
     });
-    mifosX.ng.application.controller('RescheduleLoansRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', '$translate', mifosX.controllers.RescheduleLoansRequestController]).run(function ($log) {
+    mifosX.ng.application.controller('RescheduleLoansRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', '$translate', '$window', mifosX.controllers.RescheduleLoansRequestController]).run(function ($log) {
         $log.info("RescheduleLoansRequestController initialized");
     });
 }(mifosX.controllers || {}));

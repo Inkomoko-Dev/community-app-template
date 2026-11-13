@@ -342,6 +342,9 @@
                     trancheMilestoneExceptionResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones/deadline-exception", { loanKey: '@loanKey' }, {
                         save: { method: 'POST', params: {} }
                     }),
+                    trancheMilestoneCancelResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones/cancel-undisbursed", { loanKey: '@loanKey' }, {
+                        save: { method: 'POST', params: {} }
+                    }),
                     PaymentHubDisbursementStatusResource: defineResource(apiVer + "/loans/:loanId/paymenthub-disbursement-status", { loanId: '@loanId' }, {
                         check: { method: 'POST' }
                     }),

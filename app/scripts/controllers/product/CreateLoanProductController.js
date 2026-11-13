@@ -17,9 +17,11 @@
             formData.firstTrancheAmount = null;
             formData.minTrancheCount = null;
             formData.requireMilestoneSurvey = false;
+            formData.blockApplicationWhileUnsettled = false;
             return;
         }
         formData.requireMilestoneSurvey = formData.requireMilestoneSurvey === true;
+        formData.blockApplicationWhileUnsettled = formData.blockApplicationWhileUnsettled === true;
         formData.firstInstallmentPrincipal = blankTrancheValue(formData.firstInstallmentPrincipal);
         formData.firstInstallmentAsPercentage = formData.firstInstallmentPrincipal === null ? null : formData.firstInstallmentAsPercentage === true;
         formData.minTrancheCount = blankTrancheValue(formData.minTrancheCount);
