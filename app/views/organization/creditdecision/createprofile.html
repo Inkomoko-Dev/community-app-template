@@ -10,16 +10,17 @@
             <form name="createprofileform" novalidate class="cd-form wide" rc-submit="submit()">
                 <api-validate></api-validate>
 
-                <div class="form-group">
-                    <label>{{'label.creditdecision.create.name' | translate}}</label>
-                    <input type="text" class="form-control" ng-model="formData.name" required
+                <div class="form-group" ng-class="{'has-error': nameInvalid()}">
+                    <label>{{'label.creditdecision.create.name' | translate}}<span class="required">*</span></label>
+                    <input type="text" name="profileName" class="form-control" ng-model="formData.name" required
                            placeholder="{{'label.creditdecision.create.name.example' | translate}}">
-                    <div class="text-danger cd-small" ng-if="submitted && !formData.name">{{'label.creditdecision.create.name.required' | translate}}</div>
+                    <div class="text-danger cd-small" ng-if="nameInvalid()">{{'label.creditdecision.create.name.required' | translate}}</div>
                 </div>
 
                 <div class="form-group">
                     <label>{{'label.creditdecision.create.products' | translate}}</label>
                     <p class="help-block" style="margin-top: 0;">{{'label.creditdecision.create.products.help' | translate}}</p>
+                    <p class="help-block cd-small" style="margin-top: 0;">{{'label.creditdecision.create.products.reassign' | translate}}</p>
                     <div class="cd-picker">
                         <div class="cd-picker-bar">
                             <input type="text" class="form-control input-sm" ng-model="picker.q" placeholder="{{'label.creditdecision.products.search' | translate}}">
@@ -33,7 +34,10 @@
                                            title="{{product.claimedByProfileId ? ('label.creditdecision.usedby' | translate) + ' ' + product.claimedByProfileName : product.name}}">
                                         <input type="checkbox" ng-checked="isSelected(product)" ng-disabled="product.claimedByProfileId" ng-click="toggle(product)">
                                         <span class="cd-pick-name">{{product.name}}</span>
-                                        <small ng-if="product.claimedByProfileId">&middot; {{product.claimedByProfileName}}</small>
+                                        <small ng-if="product.claimedByProfileId">
+                                            &middot; {{'label.creditdecision.usedby' | translate}}
+                                            <a href="#/creditdecision/profile/{{product.claimedByProfileId}}" ng-click="$event.stopPropagation()">{{product.claimedByProfileName}}</a>
+                                        </small>
                                     </label>
                                 </div>
                             </div>

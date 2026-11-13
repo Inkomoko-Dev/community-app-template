@@ -19,6 +19,17 @@
                 return scope.formData.productIds.indexOf(product.id) >= 0;
             };
 
+            scope.nameBlank = function () {
+                return !(scope.formData.name || '').trim();
+            };
+
+            // rc-submit sets rc.<formName>.attempted but skips the handler when Angular marks the form invalid
+            // (empty required name). Use that flag so the mandatory-name message still appears.
+            scope.nameInvalid = function () {
+                var attempted = scope.submitted || (scope.rc && scope.rc.createprofileform && scope.rc.createprofileform.attempted);
+                return attempted && scope.nameBlank();
+            };
+
             scope.toggle = function (product) {
                 if (product.claimedByProfileId) {
                     return;
@@ -33,7 +44,7 @@
 
             scope.submit = function () {
                 scope.submitted = true;
-                if (!scope.formData.name || !scope.formData.name.trim() || !scope.formData.productIds.length) {
+                if (scope.nameBlank() || !scope.formData.productIds.length) {
                     return;
                 }
                 var body = {
