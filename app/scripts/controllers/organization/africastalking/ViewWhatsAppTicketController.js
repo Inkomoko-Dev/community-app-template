@@ -16,6 +16,7 @@
                     scope.updateForm.status = data.status;
                     scope.updateForm.assignedStaffId = data.assignedStaffId;
                     scope.updateForm.summary = data.summary;
+                    scope.updateForm.resolutionNotes = data.resolutionNotes;
                 });
             };
 
@@ -46,6 +47,9 @@
                 }
                 if (scope.updateForm.summary) {
                     payload.summary = scope.updateForm.summary;
+                }
+                if (angular.isDefined(scope.updateForm.resolutionNotes)) {
+                    payload.resolutionNotes = scope.updateForm.resolutionNotes;
                 }
                 resourceFactory.whatsAppInteractiveTicketResource.update({ ticketId: routeParams.ticketId }, payload, function () {
                     scope.saveMessage = 'Ticket updated.';
