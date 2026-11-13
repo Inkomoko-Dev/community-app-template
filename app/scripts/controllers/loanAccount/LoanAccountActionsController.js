@@ -1199,6 +1199,7 @@
                     scope.showNoteField = false;
                     scope.showAmountField = true;
                     scope.isTransaction = true;
+                    scope.showMfiCode = true;
                     scope.showPaymentDetails = false;
                     scope.taskPermissionName = 'ADJUST_LOAN';
                     break;
@@ -2636,7 +2637,8 @@
             scope.isMfiCodeReadOnly = function () {
                 const isApprovalOrDRStage = scope.action === "approve"
                     || scope.action === "disbursementpreapprovalrequest";
-                const isRepaymentOrPrepay = scope.action === "repayment";
+                const isRepaymentOrPrepay = scope.action === "repayment"
+                    || scope.action === "modifytransaction";
                 return !(isApprovalOrDRStage || isRepaymentOrPrepay);
             };
 
