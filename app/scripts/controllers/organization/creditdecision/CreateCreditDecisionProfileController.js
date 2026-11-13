@@ -23,11 +23,10 @@
                 return !(scope.formData.name || '').trim();
             };
 
-            // rc-submit sets rc.<formName>.attempted but skips the handler when Angular marks the form invalid
-            // (empty required name). Use that flag so the mandatory-name message still appears.
+            // Do not use HTML required: rc-submit skips the handler when the form is invalid, so the user
+            // got no reason for the silent no-op. Validate here and always show why Create draft did nothing.
             scope.nameInvalid = function () {
-                var attempted = scope.submitted || (scope.rc && scope.rc.createprofileform && scope.rc.createprofileform.attempted);
-                return attempted && scope.nameBlank();
+                return scope.submitted && scope.nameBlank();
             };
 
             scope.toggle = function (product) {
