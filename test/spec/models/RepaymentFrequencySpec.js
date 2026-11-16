@@ -139,4 +139,68 @@ describe("RepaymentFrequency", function () {
         expect(scope.formData.loanTermFrequency).toEqual(21);
         expect(scope.repaymentFrequencyError).toEqual(null);
     });
+
+    it("rejects repayments below product minimum", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var formData = monthlyForm({ numberOfRepayments: 2, loanTermFrequency: 2 });
+        var product = { minNumberOfRepayments: 6, maxNumberOfRepayments: 24 };
+
+        expect(RF.validate(formData, true, product)).toEqual(
+            'Number of repayments must be between 6 and 24.'
+        );
+    });
+
+    it("rejects repayments above product maximum", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var formData = monthlyForm({ numberOfRepayments: 30, loanTermFrequency: 30 });
+        var product = { minNumberOfRepayments: 6, maxNumberOfRepayments: 24 };
+
+        expect(RF.validate(formData, true, product)).toEqual(
+            'Number of repayments must be between 6 and 24.'
+        );
+    });
+
+    it("allows repayments within product min and max", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var formData = monthlyForm({ numberOfRepayments: 12, loanTermFrequency: 12 });
+        var product = { minNumberOfRepayments: 6, maxNumberOfRepayments: 24 };
+
+        expect(RF.validate(formData, true, product)).toEqual(null);
+    });
+
+    it("enforces only min or only max when the other bound is absent", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var belowMin = monthlyForm({ numberOfRepayments: 3, loanTermFrequency: 3 });
+        var aboveMax = monthlyForm({ numberOfRepayments: 30, loanTermFrequency: 30 });
+
+        expect(RF.validate(belowMin, true, { minNumberOfRepayments: 6 })).toEqual(
+            'Number of repayments must be at least 6.'
+        );
+        expect(RF.validate(aboveMax, true, { maxNumberOfRepayments: 24 })).toEqual(
+            'Number of repayments must be at most 24.'
+        );
+    });
+
+    it("treats equal min and max as fixed number of repayments", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+
+        expect(RF.isFixedNumberOfRepayments({ minNumberOfRepayments: 12, maxNumberOfRepayments: 12 })).toEqual(true);
+        expect(RF.isFixedNumberOfRepayments({ minNumberOfRepayments: 6, maxNumberOfRepayments: 24 })).toEqual(false);
+        expect(RF.isFixedNumberOfRepayments({})).toEqual(false);
+        expect(RF.isFixedNumberOfRepayments(null)).toEqual(false);
+    });
+
+    it("exposes isNumberOfRepaymentsFixed from bindTo when product min equals max", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var scope = {
+            formData: monthlyForm(),
+            loanaccountinfo: {
+                product: { minNumberOfRepayments: 12, maxNumberOfRepayments: 12 }
+            }
+        };
+
+        RF.bindTo(scope);
+
+        expect(scope.isNumberOfRepaymentsFixed()).toEqual(true);
+    });
 });
