@@ -1139,6 +1139,7 @@
                     scope.title = 'label.heading.loanrepayments';
                     scope.labelName = 'label.input.transactiondate';
                     scope.isTransaction = true;
+                    scope.showMfiCode = true;
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'REPAYMENT_LOAN';
                     break;
@@ -1165,6 +1166,7 @@
                     scope.title = 'label.heading.prepayloan';
                     scope.labelName = 'label.input.transactiondate';
                     scope.isTransaction = true;
+                    scope.showMfiCode = true;
                     scope.showAmountField = true;
                     scope.taskPermissionName = 'REPAYMENT_LOAN';
                     scope.action = 'repayment';
@@ -1284,12 +1286,14 @@
                                 scope.formData.routingCode = data.paymentDetailData.routingCode;
                                 scope.formData.receiptNumber = data.paymentDetailData.receiptNumber;
                                 scope.formData.bankNumber = data.paymentDetailData.bankNumber;
+                                scope.formData.mfiCode = data.paymentDetailData.mfiCode;
                             }
                         }, finishTransactionLoading);
                     scope.showDateField = true;
                     scope.showNoteField = false;
                     scope.showAmountField = true;
                     scope.isTransaction = true;
+                    scope.showMfiCode = true;
                     scope.showPaymentDetails = false;
                     scope.taskPermissionName = 'ADJUST_LOAN';
                     break;
@@ -1977,6 +1981,11 @@
                 delete submitData['undefined'];
                 delete submitData['null'];
                 restorePersistedDisbursementRecipientDetails(submitData);
+
+                // Trim leading/trailing whitespace from MFI code before submission
+                if (submitData.mfiCode) {
+                    submitData.mfiCode = submitData.mfiCode.trim();
+                }
 
                 var isDisbursementReviewAction = scope.action === "approveDisbursement"
                     || scope.action === "disbursementpreapprovalrequest"
@@ -2780,8 +2789,11 @@
             };
 
             scope.isMfiCodeReadOnly = function () {
-                const isApprovalOrDRStage = scope.action === "approve" || scope.action === "disbursementpreapprovalrequest";
-                return !isApprovalOrDRStage;
+                const isApprovalOrDRStage = scope.action === "approve"
+                    || scope.action === "disbursementpreapprovalrequest";
+                const isRepaymentOrPrepay = scope.action === "repayment"
+                    || scope.action === "modifytransaction";
+                return !(isApprovalOrDRStage || isRepaymentOrPrepay);
             };
 
             scope.isCashPayment = function () {
