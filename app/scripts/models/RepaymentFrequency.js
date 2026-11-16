@@ -121,6 +121,15 @@
                     formData.numberOfRepayments = term / every;
                 }
             },
+            syncTermFromInstallments: function (formData) {
+                var installments = parseInt(formData.numberOfRepayments, 10);
+                var every = parseInt(formData.repaymentEvery, 10);
+                var freqType = this.resolveTypeId(formData.repaymentFrequencyType);
+                var termType = this.resolveTypeId(formData.loanTermFrequencyType);
+                if (freqType === MONTHS && termType === MONTHS && installments > 0 && every > 0) {
+                    formData.loanTermFrequency = installments * every;
+                }
+            },
             validate: function (formData, hasLoanTerm) {
                 var every = parseInt(formData.repaymentEvery, 10);
                 var freqType = this.resolveTypeId(formData.repaymentFrequencyType);
@@ -177,12 +186,24 @@
                     self.preserveImpliedTerm(data, previousEvery, previousType);
                     scope.repaymentFrequencyTooltipKey = self.tooltipKey(scope.repaymentFrequencyPreset);
                     if (data.loanTermFrequency) {
-                        self.syncInstallmentsFromTerm(data);
+                        var term = parseInt(data.loanTermFrequency, 10);
+                        var every = parseInt(data.repaymentEvery, 10);
+                        var termType = self.resolveTypeId(data.loanTermFrequencyType);
+                        var freqType = self.resolveTypeId(data.repaymentFrequencyType);
+                        if (termType === MONTHS && freqType === MONTHS && term > 0 && every > 0 && (term % every) === 0) {
+                            self.syncInstallmentsFromTerm(data);
+                        } else {
+                            self.syncTermFromInstallments(data);
+                        }
                     }
                     scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency);
                 };
                 scope.onLoanTermOrFrequencyChange = function () {
                     self.syncInstallmentsFromTerm(data);
+                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency);
+                };
+                scope.onNumberOfRepaymentsChange = function () {
+                    self.syncTermFromInstallments(data);
                     scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency);
                 };
                 scope.assertRepaymentFrequencyValid = function (hasLoanTerm) {

@@ -339,6 +339,7 @@
                             </td>
                             <td class="paddedbottom20" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.numberOfRepayments == true">
                                 <input id="numberOfRepayments" class="form-control" name="numofrepayments" type="text" ng-model="formData.numberOfRepayments"
+                                    ng-change="onNumberOfRepaymentsChange()"
                                     required late-Validate>&nbsp;
                                 <form-validate valattributeform="Terms" valattribute="numofrepayments" />
                             </td>
