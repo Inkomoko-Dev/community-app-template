@@ -1038,6 +1038,14 @@
 	    </div>
 	</div>
 	<div class="form-group" ng-show="formData.multiDisburseLoan">
+	    <label class="control-label col-sm-2">{{ 'label.input.blockapplicationwhileunsettled' | translate }}</label>
+	    <div class="checkbox col-sm-2">
+	        <label>
+	            <input type="checkbox" id="blockApplicationWhileUnsettled" ng-model="formData.blockApplicationWhileUnsettled"/>
+	        </label>
+	    </div>
+	</div>
+	<div class="form-group" ng-show="formData.multiDisburseLoan">
 	    <label class="control-label col-sm-2">{{ 'label.input.mintranchecount' | translate }}
 	        <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.mintranchecount' | translate}}" tooltip-append-to-body="true"></i>
 	    </label>

@@ -1294,6 +1294,14 @@
                 </div>
             </div>
             <div class="form-group" ng-show="formData.multiDisburseLoan">
+                <label class="control-label col-sm-2">{{ 'label.input.blockapplicationwhileunsettled' | translate }}</label>
+                <div class="checkbox col-sm-2">
+                    <label>
+                        <input type="checkbox" id="blockApplicationWhileUnsettled" ng-model="formData.blockApplicationWhileUnsettled"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" ng-show="formData.multiDisburseLoan">
                 <label class="control-label col-sm-2">{{ 'label.input.mintranchecount' | translate }}
                     <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.mintranchecount' | translate}}"
                        tooltip-append-to-body="true"></i>
@@ -2316,6 +2324,10 @@
                 <tr ng-show="loanproduct.multiDisburseLoan">
                     <td>{{'label.input.requiremilestonesurvey' | translate}}</td>
                     <td colspan="3">{{loanproduct.requireMilestoneSurvey ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
+                </tr>
+                <tr ng-show="loanproduct.multiDisburseLoan">
+                    <td>{{'label.input.blockapplicationwhileunsettled' | translate}}</td>
+                    <td colspan="3">{{loanproduct.blockApplicationWhileUnsettled ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
                 </tr>
                 <tr ng-show="loanproduct.multiDisburseLoan">
                     <td>{{'label.input.mintranchecount' | translate}}</td>
