@@ -214,6 +214,8 @@ credit-decision-loan { display: block; }
 
 /* Policy tab: the scope list on the left, the settings of the chosen scope on the right */
 .cd .cd-polscopes { display: flex; flex-direction: column; border: 1px solid #e3e7eb; border-radius: 4px; max-height: 560px; overflow-y: auto; }
+.cd .cd-polscope-section + .cd-polscope-section { border-top: 1px solid #e3e7eb; }
+.cd .cd-polscope-label { padding: 8px 12px 4px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #6b7380; }
 .cd .cd-polscopes a { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; color: #3b4350; border-bottom: 1px solid #eef0f3; font-size: 13px; text-decoration: none; }
 .cd .cd-polscopes a:last-child { border-bottom: 0; }
 .cd .cd-polscopes a:hover { background: #f4f6f8; }

@@ -210,6 +210,7 @@
                 scope.policyCheck = Policy.validate(scope.edit.policy, scope.policyRules, scope.edit.productIds, currencyOf);
                 scope.canSubmit = scope.validation.ok && scope.policyCheck.ok;
                 scope.polScopes = policyScopes();
+                scope.polScopeSections = policyScopeSections(scope.polScopes);
                 scope.polCurrent = _.find(scope.polScopes, function (item) {
                     return item.id === scope.polSel;
                 }) || scope.polScopes[0];
@@ -224,7 +225,7 @@
             // Everyone, then each country a cap can be set for, then each product this version covers.
             function policyScopes() {
                 var list = [{id: Policy.id(Policy.GLOBAL, Policy.EVERYONE), scope: Policy.GLOBAL, scopeKey: Policy.EVERYONE}];
-                _.each(scope.countries, function (c) {
+                _.each(scope.countries || [], function (c) {
                     list.push({id: Policy.id(Policy.COUNTRY, c.currency), scope: Policy.COUNTRY, scopeKey: c.currency, name: c.name});
                 });
                 _.each(scope.edit.productIds, function (productId) {
@@ -234,6 +235,16 @@
                     item.count = Policy.overrideCount(scope.edit.policy, item.scope, item.scopeKey);
                 });
                 return list;
+            }
+
+            function policyScopeSections(list) {
+                return [
+                    {label: $translate.instant('label.creditdecision.policy.section.everyone'), items: _.where(list, {scope: Policy.GLOBAL})},
+                    {label: $translate.instant('label.creditdecision.policy.section.countries'), items: _.where(list, {scope: Policy.COUNTRY})},
+                    {label: $translate.instant('label.creditdecision.policy.section.products'), items: _.where(list, {scope: Policy.PRODUCT})}
+                ].filter(function (section) {
+                    return section.items.length;
+                });
             }
 
             scope.polInherited = function (def) {
@@ -305,8 +316,11 @@
             };
 
             scope.polScopeName = function (item) {
+                if (!item) {
+                    return '';
+                }
                 return item.scope === Policy.GLOBAL ? $translate.instant('label.creditdecision.policy.scope.everyone') :
-                    item.scope === Policy.COUNTRY ? item.scopeKey + ' · ' + item.name : item.name;
+                    item.scope === Policy.COUNTRY ? item.name + ' (' + item.scopeKey + ')' : item.name;
             };
 
             scope.ruleLabel = function (key) {
