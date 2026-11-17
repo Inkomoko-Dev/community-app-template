@@ -1401,7 +1401,7 @@
                                 </tr>
                             </table>
                             <div class="form-group"
-                                 ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
+                                 ng-show="showTrancheReview()"
                                  has-permission="APPROVE_TRANCHEMILESTONE">
                                 <button type="button" class="btn btn-default" ng-click="openTrancheReview()">
                                     {{'label.button.reviewtranche' | translate}}

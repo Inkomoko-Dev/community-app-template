@@ -10,6 +10,10 @@
             scope.openTrancheReview = function () {
                 location.path('/viewloanaccount/' + routeParams.id + '/tranchereview').search('fromReview', null);
             };
+            scope.showTrancheReview = function () {
+                var status = scope.trancheMilestone && scope.trancheMilestone.status;
+                return !!(status && status.id === 440);
+            };
             scope.date = {};
             scope.date.payDate = new Date();
             scope.hideAccrualTransactions = false;
