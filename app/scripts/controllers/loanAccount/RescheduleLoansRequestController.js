@@ -125,6 +125,9 @@
             scope.refreshMultiTrancheWarning = function () {
                 scope.multiTrancheNotice = MultiTrancheRescheduleNotice.assess(scope.loanAccount, scope.formData.rescheduleFromDate);
                 scope.multiTrancheWarnings = MultiTrancheRescheduleNotice.lines(scope.multiTrancheNotice, translateNotice);
+                if (scope.fromManualReview && scope.multiTrancheNotice && !scope.multiTrancheNotice.nothingDisbursed) {
+                    scope.formData.acknowledgeMultiTrancheReschedule = true;
+                }
             };
             scope.$watch('formData.rescheduleFromDate', function () {
                 if (scope.loanAccount) {

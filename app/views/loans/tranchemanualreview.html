@@ -61,7 +61,8 @@
             </div>
             <div align="center">
                 <button type="button" class="btn btn-default" ng-click="cancel()" ng-disabled="saving">{{'label.button.cancel' | translate}}</button>
-                <button type="submit" class="btn btn-primary" ng-disabled="saving" has-permission="APPROVE_TRANCHEMILESTONE">
+                <button type="submit" class="btn btn-primary" ng-disabled="saving"
+                        has-permission="{{ formData.decision === 'CANCEL' ? 'CANCEL_TRANCHEMILESTONE' : 'APPROVE_TRANCHEMILESTONE' }}">
                     <span ng-if="formData.decision === 'EXTEND'">{{'label.button.approvedeadlineexception' | translate}}</span>
                     <span ng-if="formData.decision === 'CANCEL'">{{'label.input.reviewdecision.cancel' | translate}}</span>
                     <span ng-if="formData.decision === 'RESCHEDULE'">{{'label.button.continuetoreschedule' | translate}}</span>
