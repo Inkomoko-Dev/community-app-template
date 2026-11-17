@@ -1247,16 +1247,16 @@
                     <uib-tab ng-show="loandetails.multiDisburseLoan" heading="{{'label.heading.tranchedetails' | translate}}">
                         <table class="width100">
 
-                            <tr>
+                            <tr ng-show="loandetails.maxOutstandingLoanBalance">
                                 <td>
                                     {{'label.input.outstandingloanbalance' | translate}} : &nbsp;{{loandetails.maxOutstandingLoanBalance| number}}&nbsp;
                                     <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.maxAllowedOutstandingBalance' | translate }}" tooltip-append-to-body="true"></i>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr ng-show="loandetails.firstInstallmentPrincipal">
                                 <td>{{'label.input.firstinstallmentprincipal' | translate}} : &nbsp;
                                     <span ng-if="loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal}}%</span>
-                                    <span ng-if="loandetails.firstInstallmentPrincipal && !loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal | number}}</span>
+                                    <span ng-if="!loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal | number}}</span>
                                 </td>
                             </tr>
                             <tr ng-show="loandetails.previousTrancheRepaidPercentage">
@@ -1439,15 +1439,15 @@
                             </table>
                         </div>
 
-                        <table class="width100">
+                        <table class="width100" ng-show="loandetails.emiAmountVariations.length>0">
                             <tr>
                                 <td>
                                     {{'label.input.fixedemiamountvariations' | translate}} : &nbsp;&nbsp;
                                 </td>
                             </tr>
                         </table>
-                        <table class="width100 table">
-                            <tr class="graybg" ng-show="loandetails.emiAmountVariations.length>0">
+                        <table class="width100 table" ng-show="loandetails.emiAmountVariations.length>0">
+                            <tr class="graybg">
                                 <th align="left">{{'label.input.emiamoutvariationfrom' | translate}}</th>
                                 <th align="left">{{'label.input.fixedemiamount' | translate}}</th>
                             </tr>
