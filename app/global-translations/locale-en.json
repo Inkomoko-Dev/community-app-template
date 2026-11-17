@@ -4942,6 +4942,8 @@
   "label.heading.tranchedetails": "Loan Tranche Details",
   "label.button.addtranch": "Add Loan Tranche Detail",
   "label.input.multidisburseloan": "Enable Multiple Disbursals",
+  "label.input.loanismultitranche": "This loan is multi-tranche",
+  "label.tooltip.loanismultitranche": "The product allows multiple tranches. Leave this off for a single disbursement and the tranche details stay hidden.",
   "label.input.maxtranchecount": "Maximum Tranche count",
   "label.input.outstandingloanbalance": "Maximum allowed outstanding balance",
   "label.input.firstinstallmentprincipal": "First repayment principal",

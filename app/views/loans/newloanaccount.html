@@ -688,6 +688,15 @@
 
 
                     <div ng-show="loanaccountinfo" ng-hide="previewRepayment">
+                        <div class="row" ng-show="productAllowsMultiDisburse">
+                            <div class="col-sm-12 paddedbottom20">
+                                <label>
+                                    <input id="loanMultiDisburse" type="checkbox" ng-model="formData.multiDisburseLoan" ng-change="onLoanMultiDisburseChanged()"/>
+                                    {{ 'label.input.loanismultitranche' | translate }}
+                                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.loanismultitranche' | translate }}" tooltip-append-to-body="true"></i>
+                                </label>
+                            </div>
+                        </div>
                         <div ng-show="multiDisburseLoan">
                             <hr/>
                             <label>
@@ -1371,16 +1380,16 @@
                                 <label>{{ loanaccountinfo.interestRecalculationData.recalculationCompoundingFrequencyInterval}}</label>
                             </td>
                         </tr>
-                        <tr class="bottomborder toppadding">
+                        <tr class="bottomborder toppadding" ng-show="multiDisburseLoan">
                             <td colspan="7">
                                 <strong>{{'label.heading.tranchedetails' | translate}}</strong>
                             </td>
                         </tr>
-                        <tr class="graybg toppadding">
+                        <tr class="graybg toppadding" ng-show="multiDisburseLoan">
                             <th colspan="4">{{'label.input.expecteddisbursementon' | translate}}</th>
                             <th colspan="3">{{'label.input.principal' | translate}}</th>
                         </tr>
-                        <tr class="toppadding" ng-repeat="disbursementDetail in formData.disbursementData">
+                        <tr class="toppadding" ng-show="multiDisburseLoan" ng-repeat="disbursementDetail in formData.disbursementData">
                             <td colspan="4">{{disbursementDetail.expectedDisbursementDate | DateFormat}}</td>
                             <td colspan="3">{{disbursementDetail.principal}}</td>
                         </tr>

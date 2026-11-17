@@ -16,7 +16,10 @@
             }
 
             function prepareTrancheOverrides(formData) {
+                scope.multiDisburseLoan = scope.productAllowsMultiDisburse === true && formData.multiDisburseLoan === true;
+                formData.multiDisburseLoan = scope.multiDisburseLoan;
                 if (!scope.multiDisburseLoan) {
+                    formData.disbursementData = [];
                     formData.firstInstallmentPrincipal = null;
                     formData.firstInstallmentAsPercentage = null;
                     formData.tranchePrincipalPercentages = null;
@@ -143,6 +146,19 @@
                 scope.formData.firstTrancheAsPercentage = row.principalAsPercentage === true;
                 scope.formData.firstTrancheAmount = row.principalAsPercentage === true ? row.principalPercentage : row.principal;
                 scope.applyFirstTrancheAndRemainder();
+            };
+
+            scope.onLoanMultiDisburseChanged = function () {
+                scope.multiDisburseLoan = scope.productAllowsMultiDisburse === true && scope.formData.multiDisburseLoan === true;
+                if (!scope.multiDisburseLoan) {
+                    scope.formData.disbursementData = [];
+                    scope.formData.firstTrancheAmount = null;
+                    scope.formData.firstTrancheAsPercentage = false;
+                    scope.formData.firstInstallmentPrincipal = null;
+                    scope.formData.firstInstallmentAsPercentage = false;
+                    return;
+                }
+                scope.seedMinimumTranches();
             };
 
             scope.seedMinimumTranches = function () {
@@ -367,7 +383,10 @@
                 if (scope.loanaccountinfo.expectedFirstRepaymentOnDate) {
                     scope.formData.repaymentsStartingFromDate = new Date(scope.loanaccountinfo.expectedFirstRepaymentOnDate);
                 }
-                scope.multiDisburseLoan = scope.loanaccountinfo.multiDisburseLoan;
+                var trancheProductChoice = scope.loanaccountinfo.product || {};
+                scope.productAllowsMultiDisburse = trancheProductChoice.multiDisburseLoan === true;
+                scope.formData.multiDisburseLoan = scope.productAllowsMultiDisburse && scope.loanaccountinfo.multiDisburseLoan !== false;
+                scope.multiDisburseLoan = scope.formData.multiDisburseLoan;
                 scope.formData.productId = scope.loanaccountinfo.loanProductId;
                 scope.formData.fundId = scope.loanaccountinfo.fundId;
                 scope.formData.principal = scope.loanaccountinfo.principal;
