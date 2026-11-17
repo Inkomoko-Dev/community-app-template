@@ -1,4 +1,4 @@
-describe("ViewLoanDetailsController penalty waiver history", function () {
+describe("ViewLoanDetailsController background lookups", function () {
     var resourceFactory;
 
     function approvedLoan() {
@@ -79,25 +79,51 @@ describe("ViewLoanDetailsController penalty waiver history", function () {
                 { getFromLocalStorage: jasmine.createSpy("getFromLocalStorage") });
         } catch (ignore) {
         }
-        return resourceFactory.historicalPenaltyWaiversByLoanResource.getAll;
+        return resourceFactory;
+    }
+
+    function waiverLookup(permissions) {
+        return openLoanAs(permissions).historicalPenaltyWaiversByLoanResource.getAll;
     }
 
     it("does not ask for the waiver history when the user may not read it", function () {
-        var lookup = openLoanAs(["READ_LOAN"]);
+        var lookup = waiverLookup(["READ_LOAN"]);
 
         expect(lookup).not.toHaveBeenCalled();
     });
 
     it("loads the waiver history for a user who may read it", function () {
-        var lookup = openLoanAs(["READ_LOAN", "READ_HISTORICALPENALTYWAIVER"]);
+        var lookup = waiverLookup(["READ_LOAN", "READ_HISTORICALPENALTYWAIVER"]);
 
         expect(lookup).toHaveBeenCalled();
         expect(lookup.mostRecentCall.args[0]).toEqual({ loanId: 432148 });
     });
 
     it("loads the waiver history for a user with all read rights", function () {
-        var lookup = openLoanAs(["ALL_FUNCTIONS_READ"]);
+        var lookup = waiverLookup(["ALL_FUNCTIONS_READ"]);
 
         expect(lookup).toHaveBeenCalled();
+    });
+
+    it("does not ask for the loan classification when the user may not read it", function () {
+        var resources = openLoanAs(["READ_LOAN"]);
+
+        expect(resources.loanClassificationResource.get).not.toHaveBeenCalled();
+        expect(resources.loanClassificationAuditResource.getAll).not.toHaveBeenCalled();
+    });
+
+    it("loads the loan classification for a user who may read it", function () {
+        var resources = openLoanAs(["READ_LOAN", "READ_LOANCLASSIFICATION"]);
+
+        expect(resources.loanClassificationResource.get).toHaveBeenCalled();
+        expect(resources.loanClassificationResource.get.mostRecentCall.args[0]).toEqual({ loanId: 432148 });
+        expect(resources.loanClassificationAuditResource.getAll).toHaveBeenCalled();
+    });
+
+    it("loads the loan classification for a user with all read rights", function () {
+        var resources = openLoanAs(["ALL_FUNCTIONS_READ"]);
+
+        expect(resources.loanClassificationResource.get).toHaveBeenCalled();
+        expect(resources.loanClassificationAuditResource.getAll).toHaveBeenCalled();
     });
 });

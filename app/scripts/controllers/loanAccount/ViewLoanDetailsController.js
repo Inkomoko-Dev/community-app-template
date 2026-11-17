@@ -871,16 +871,18 @@
 
                     scope.loanClassification = {};
                     scope.loanClassificationAudit = [];
-                    resourceFactory.loanClassificationResource.get({ loanId: routeParams.id }, function (data) {
-                        scope.loanClassification = data || {};
-                    }, function () {
-                        scope.loanClassification = {};
-                    });
-                    resourceFactory.loanClassificationAuditResource.getAll({ loanId: routeParams.id }, function (data) {
-                        scope.loanClassificationAudit = data || [];
-                    }, function () {
-                        scope.loanClassificationAudit = [];
-                    });
+                    if (scope.hasPermission('READ_LOANCLASSIFICATION')) {
+                        resourceFactory.loanClassificationResource.get({ loanId: routeParams.id }, function (data) {
+                            scope.loanClassification = data || {};
+                        }, function () {
+                            scope.loanClassification = {};
+                        });
+                        resourceFactory.loanClassificationAuditResource.getAll({ loanId: routeParams.id }, function (data) {
+                            scope.loanClassificationAudit = data || [];
+                        }, function () {
+                            scope.loanClassificationAudit = [];
+                        });
+                    }
 
                     if (scope.loandetails.charges) {
                         scope.charges = scope.loandetails.charges;
