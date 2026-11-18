@@ -121,7 +121,47 @@
                     formData.numberOfRepayments = term / every;
                 }
             },
-            validate: function (formData, hasLoanTerm) {
+            syncTermFromInstallments: function (formData) {
+                var installments = parseInt(formData.numberOfRepayments, 10);
+                var every = parseInt(formData.repaymentEvery, 10);
+                var freqType = this.resolveTypeId(formData.repaymentFrequencyType);
+                var termType = this.resolveTypeId(formData.loanTermFrequencyType);
+                if (freqType === MONTHS && termType === MONTHS && installments > 0 && every > 0) {
+                    formData.loanTermFrequency = installments * every;
+                }
+            },
+            productBounds: function (product) {
+                var min = product ? parseInt(product.minNumberOfRepayments, 10) : NaN;
+                var max = product ? parseInt(product.maxNumberOfRepayments, 10) : NaN;
+                return {
+                    min: isNaN(min) ? null : min,
+                    max: isNaN(max) ? null : max
+                };
+            },
+            isFixedNumberOfRepayments: function (product) {
+                var bounds = this.productBounds(product);
+                return bounds.min !== null && bounds.max !== null && bounds.min === bounds.max;
+            },
+            validateProductBounds: function (numberOfRepayments, product) {
+                if (isNaN(numberOfRepayments)) {
+                    return null;
+                }
+                var bounds = this.productBounds(product);
+                if (bounds.min !== null && bounds.max !== null) {
+                    if (numberOfRepayments < bounds.min || numberOfRepayments > bounds.max) {
+                        return 'Number of repayments must be between ' + bounds.min + ' and ' + bounds.max + '.';
+                    }
+                    return null;
+                }
+                if (bounds.min !== null && numberOfRepayments < bounds.min) {
+                    return 'Number of repayments must be at least ' + bounds.min + '.';
+                }
+                if (bounds.max !== null && numberOfRepayments > bounds.max) {
+                    return 'Number of repayments must be at most ' + bounds.max + '.';
+                }
+                return null;
+            },
+            validate: function (formData, hasLoanTerm, product) {
                 var every = parseInt(formData.repaymentEvery, 10);
                 var freqType = this.resolveTypeId(formData.repaymentFrequencyType);
                 var numberOfRepayments = parseInt(formData.numberOfRepayments, 10);
@@ -156,14 +196,20 @@
                         + (every === 3 ? 'quarterly' : 'semi-annual')
                         + ' repayments, loan term must be a multiple of ' + every + ' months.';
                 }
-                return null;
+                return this.validateProductBounds(numberOfRepayments, product);
             },
             bindTo: function (scope, formData) {
                 var self = this;
                 var data = formData || scope.formData;
+                var productFromScope = function () {
+                    return (scope.loanaccountinfo || {}).product;
+                };
                 scope.repaymentFrequencyPresets = this.presetsFor(data);
                 scope.repaymentFrequencyPreset = this.codeFrom(data.repaymentEvery, data.repaymentFrequencyType);
                 scope.repaymentFrequencyTooltipKey = this.tooltipKey(scope.repaymentFrequencyPreset);
+                scope.isNumberOfRepaymentsFixed = function () {
+                    return self.isFixedNumberOfRepayments(productFromScope());
+                };
                 scope.onRepaymentFrequencyPresetChange = function () {
                     if (!scope.repaymentFrequencyPreset) {
                         data.repaymentEvery = null;
@@ -177,16 +223,28 @@
                     self.preserveImpliedTerm(data, previousEvery, previousType);
                     scope.repaymentFrequencyTooltipKey = self.tooltipKey(scope.repaymentFrequencyPreset);
                     if (data.loanTermFrequency) {
-                        self.syncInstallmentsFromTerm(data);
+                        var term = parseInt(data.loanTermFrequency, 10);
+                        var every = parseInt(data.repaymentEvery, 10);
+                        var termType = self.resolveTypeId(data.loanTermFrequencyType);
+                        var freqType = self.resolveTypeId(data.repaymentFrequencyType);
+                        if (termType === MONTHS && freqType === MONTHS && term > 0 && every > 0 && (term % every) === 0) {
+                            self.syncInstallmentsFromTerm(data);
+                        } else {
+                            self.syncTermFromInstallments(data);
+                        }
                     }
-                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency);
+                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, productFromScope());
                 };
                 scope.onLoanTermOrFrequencyChange = function () {
                     self.syncInstallmentsFromTerm(data);
-                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency);
+                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, productFromScope());
+                };
+                scope.onNumberOfRepaymentsChange = function () {
+                    self.syncTermFromInstallments(data);
+                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, productFromScope());
                 };
                 scope.assertRepaymentFrequencyValid = function (hasLoanTerm) {
-                    scope.repaymentFrequencyError = self.validate(data, hasLoanTerm);
+                    scope.repaymentFrequencyError = self.validate(data, hasLoanTerm, productFromScope());
                     return !scope.repaymentFrequencyError;
                 };
             }
