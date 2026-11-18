@@ -1,9 +1,10 @@
 describe("AfricasTalkingCommunicationsController", function () {
-    var scope, messageCalls;
+    var scope, messageCalls, voiceCalls;
 
     beforeEach(function () {
         scope = {};
         messageCalls = [];
+        voiceCalls = [];
 
         var getAll = function () {
             var callback = arguments[arguments.length - 1];
@@ -24,7 +25,12 @@ describe("AfricasTalkingCommunicationsController", function () {
                     callback([]);
                 })
             },
-            africasTalkingVoiceResource: { getAll: getAll },
+            africasTalkingVoiceResource: {
+                getAll: jasmine.createSpy("getAll").andCallFake(function (params, callback) {
+                    voiceCalls.push(angular.copy(params));
+                    callback([]);
+                })
+            },
             whatsAppInteractiveDashboardResource: { get: get },
             whatsAppInteractiveTicketResource: { getAll: getAll },
             whatsAppInteractiveConfigResource: { getAll: getAll },
@@ -47,5 +53,15 @@ describe("AfricasTalkingCommunicationsController", function () {
 
         expect(scope.selectedStatus).toBe('FAILED');
         expect(messageCalls[messageCalls.length - 1]).toEqual({ status: 'FAILED' });
+    });
+
+    it("uses Voice provider statuses when filtering calls", function () {
+        scope.selectVoiceStatus('NO_ANSWER');
+
+        expect(scope.voiceSelectedStatus).toBe('NO_ANSWER');
+        expect(voiceCalls[voiceCalls.length - 1]).toEqual({ status: 'NO_ANSWER' });
+        expect(scope.voiceStatusTabs.map(function (tab) { return tab.id; })).toEqual([
+            'ALL', 'INITIATED', 'RINGING', 'ANSWERED', 'COMPLETED', 'FAILED', 'BUSY', 'REJECTED', 'NO_ANSWER'
+        ]);
     });
 });

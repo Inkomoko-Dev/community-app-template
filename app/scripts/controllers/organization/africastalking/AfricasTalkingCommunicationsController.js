@@ -29,11 +29,14 @@
             ];
             scope.voiceStatusTabs = [
                 { id: 'ALL', name: 'All Calls' },
-                { id: 'PENDING', name: 'Pending' },
-                { id: 'SENT', name: 'Sent' },
-                { id: 'DELIVERED', name: 'Delivered' },
-                { id: 'READ', name: 'Read' },
-                { id: 'FAILED', name: 'Failed' }
+                { id: 'INITIATED', name: 'Initiated' },
+                { id: 'RINGING', name: 'Ringing' },
+                { id: 'ANSWERED', name: 'Answered' },
+                { id: 'COMPLETED', name: 'Completed' },
+                { id: 'FAILED', name: 'Failed' },
+                { id: 'BUSY', name: 'Busy' },
+                { id: 'REJECTED', name: 'Rejected' },
+                { id: 'NO_ANSWER', name: 'No Answer' }
             ];
 
             scope.interactiveDashboard = null;
