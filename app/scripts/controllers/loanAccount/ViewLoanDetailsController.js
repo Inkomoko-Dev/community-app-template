@@ -1,6 +1,12 @@
 (function (module) {
+    // Survives a route change inside the app. A browser refresh clears it, so the button starts enabled again.
+    var crbVerificationInFlight = {};
+    var crbVerificationTimeoutNotice = {};
+    // Configurable wait before the verification button is released. The bureau call itself is not cancelled.
+    var CRB_VERIFICATION_TIMEOUT_MS = 60000;
+
     mifosX.controllers = _.extend(module, {
-        ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $window, interval, webStorage, localStorageService) {
+        ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $window, interval, webStorage, localStorageService, $log) {
             scope.bankDisbursementResult = $rootScope.bankDisbursementResult;
             delete $rootScope.bankDisbursementResult;
             scope.loandocuments = [];
@@ -57,6 +63,99 @@
             scope.crbReportTransUnion = null;
             scope.crbReportMetrolpolIdentityVerification = null;
             scope.isCrbVerificationInProgress = false;
+            scope.crbVerificationTimedOut = false;
+            var crbLoanKey = String(routeParams.id);
+            if (crbVerificationInFlight[crbLoanKey] && (Date.now() - crbVerificationInFlight[crbLoanKey].startedAt) < CRB_VERIFICATION_TIMEOUT_MS) {
+                scope.isCrbVerificationInProgress = true;
+            }
+            if (crbVerificationTimeoutNotice[crbLoanKey]) {
+                scope.crbVerificationTimedOut = true;
+                delete crbVerificationTimeoutNotice[crbLoanKey];
+            }
+
+            function logCrbVerification(loanId, bureau, event) {
+                $log.info('[CRB verification] ' + new Date().toISOString() + ' loanId=' + loanId + ' bureau=' + bureau + ' ' + event);
+            }
+
+            function armCrbVerificationTimeout(loanKey, token) {
+                var current = crbVerificationInFlight[loanKey];
+                if (!current || current.timer) {
+                    return;
+                }
+                var remaining = CRB_VERIFICATION_TIMEOUT_MS - (Date.now() - current.startedAt);
+                if (remaining < 0) {
+                    remaining = 0;
+                }
+                current.timer = setTimeout(function () {
+                    var inFlight = crbVerificationInFlight[loanKey];
+                    if (!inFlight || inFlight.token !== token) {
+                        return;
+                    }
+                    var bureau = inFlight.bureau;
+                    delete crbVerificationInFlight[loanKey];
+                    crbVerificationTimeoutNotice[loanKey] = true;
+                    logCrbVerification(loanKey, bureau, 'timed out after ' + CRB_VERIFICATION_TIMEOUT_MS + 'ms');
+                    $rootScope.$applyAsync(function () {
+                        $rootScope.$broadcast('crbVerificationTimedOut', { loanId: loanKey });
+                    });
+                }, remaining);
+            }
+
+            scope.$on('crbVerificationTimedOut', function (event, data) {
+                if (!data || String(data.loanId) !== crbLoanKey) {
+                    return;
+                }
+                scope.isCrbVerificationInProgress = false;
+                scope.crbVerificationTimedOut = true;
+                delete crbVerificationTimeoutNotice[crbLoanKey];
+            });
+
+            scope.$on('crbVerificationFinished', function (event, data) {
+                if (!data || String(data.loanId) !== crbLoanKey) {
+                    return;
+                }
+                scope.isCrbVerificationInProgress = false;
+            });
+
+            scope.isCrbVerificationFrozen = function (buttonName) {
+                return scope.isCrbVerificationInProgress && (buttonName === 'button.crbVerification' || buttonName === 'button.crbVerificationKenya');
+            };
+
+            function finishCrbVerification(loanKey, token, bureau, event) {
+                var current = crbVerificationInFlight[loanKey];
+                if (!current || current.token !== token) {
+                    logCrbVerification(loanKey, bureau, 'late ' + event + ' ignored');
+                    return false;
+                }
+                clearTimeout(current.timer);
+                delete crbVerificationInFlight[loanKey];
+                scope.isCrbVerificationInProgress = false;
+                logCrbVerification(loanKey, bureau, event);
+                $rootScope.$broadcast('crbVerificationFinished', { loanId: loanKey });
+                return true;
+            }
+
+            function beginCrbVerification(accountId, bureau, onSuccess) {
+                var loanKey = String(accountId);
+                if (crbVerificationInFlight[loanKey]) {
+                    logCrbVerification(accountId, bureau, 'duplicate click ignored');
+                    return;
+                }
+                var token = Date.now() + ':' + Math.random();
+                crbVerificationInFlight[loanKey] = { token: token, startedAt: Date.now(), bureau: bureau };
+                scope.isCrbVerificationInProgress = true;
+                scope.crbVerificationTimedOut = false;
+                logCrbVerification(accountId, bureau, 'request started');
+                armCrbVerificationTimeout(loanKey, token);
+                var resource = bureau === 'rwanda' ? resourceFactory.verifyLoanOnTransUnionRwanda : resourceFactory.verifyLoanOnMetropolKenya;
+                resource.post({ loanId: accountId }, function () {
+                    if (finishCrbVerification(loanKey, token, bureau, 'response received')) {
+                        onSuccess();
+                    }
+                }, function () {
+                    finishCrbVerification(loanKey, token, bureau, 'error response');
+                });
+            }
 
             function applicableDisbursementDetail(loan) {
                 var details = loan && loan.disbursementDetails ? loan.disbursementDetails.slice() : [];
@@ -724,31 +823,17 @@
                         location.path('/loanaccount/' + accountId + '/rejectprepareandsigncontract');
                         break;
                     case "crbVerification":
-                        if (scope.isCrbVerificationInProgress) {
-                            return;
-                        }
-                        scope.isCrbVerificationInProgress = true;
-                        resourceFactory.verifyLoanOnTransUnionRwanda.post({loanId: accountId}, function (data) {
+                        beginCrbVerification(accountId, 'rwanda', function () {
                             scope.getCrbReport();
-                            scope.isCrbVerificationInProgress = false;
                             location.path('/viewloanaccount/' + accountId);
-                        }, function (error) {
-                            scope.isCrbVerificationInProgress = false;
                         });
                         break;
                       case "crbVerificationKenya":
-                            if (scope.isCrbVerificationInProgress) {
-                                return;
-                            }
-                            scope.isCrbVerificationInProgress = true;
-                            resourceFactory.verifyLoanOnMetropolKenya.post({loanId: accountId}, function (data) {
-                                 scope.crbMetropolIdentityVerification();
-                                 scope.isCrbVerificationInProgress = false;
-                                 location.path('/viewloanaccount/' + accountId);
-                             }, function (error) {
-                                 scope.isCrbVerificationInProgress = false;
-                             });
-                            break;
+                        beginCrbVerification(accountId, 'kenya', function () {
+                            scope.crbMetropolIdentityVerification();
+                            location.path('/viewloanaccount/' + accountId);
+                        });
+                        break;
                       case "verifyLoanCreditInfoEnhancedOnMetropolKenya":
                               resourceFactory.verifyLoanCreditInfoEnhancedOnMetropolKenya.post({loanId: accountId},function (data) {
                                    scope.crbMetropolIdentityVerification();
@@ -2059,7 +2144,7 @@
         }
 
     });
-    mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', 'localStorageService', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
+    mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope','$window', '$interval', 'webStorage', 'localStorageService', '$log', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
         $log.info("ViewLoanDetailsController initialized");
     });
 }(mifosX.controllers || {}));

@@ -26,6 +26,9 @@
             <div style="margin-top: 12px;">{{ 'label.heading.crbVerification' | translate}}...</div>
         </div>
     </div>
+    <div class="alert alert-warning" ng-if="crbVerificationTimedOut" role="alert">
+        {{ 'label.msg.crbVerification.timeout' | translate }}
+    </div>
     <ul class="breadcrumb">
         <li ng-show="loandetails.clientName"><a
                 ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
@@ -354,9 +357,12 @@
                         <i class="fa" ng-class="queryingPaymentStatus ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>&nbsp;{{'label.button.queryPaymentStatus' | translate}}
                     </a>
 
-                    <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
+                    <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name"
+                       ng-click="isCrbVerificationFrozen(button.name) || clickEvent(button.name.replace('button.',''), loandetails.id)"
+                       ng-class="{disabled: isCrbVerificationFrozen(button.name)}"
+                       ng-style="isCrbVerificationFrozen(button.name) && {'pointer-events': 'none', 'opacity': 0.65}"
                        class="btn btn-primary" has-permission='{{button.taskPermissionName}}'><i
-                            class="{{button.icon}} "></i>&nbsp;{{'label.' + button.name |
+                            ng-class="isCrbVerificationFrozen(button.name) ? 'fa fa-spinner fa-spin' : button.icon"></i>&nbsp;{{'label.' + button.name |
                         translate}} </a>
 
                       <span ng-show="buttons.options" uib-dropdown  class="btn-group dropdown" on-toggle="toggled(open)">
@@ -366,9 +372,12 @@
                           </a>
                           <ul class="dropdown dropdown-menu dropdown-menu-right" style="width: max-content;" role="menu">
                               <li class="{{button.icon}}" ng-repeat="button in buttons.options">
-                                  <a ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
-                                     has-permission='{{button.taskPermissionName}}'>{{'label.'+
-                                      button.name | translate}}</a>
+                                  <a ng-click="isCrbVerificationFrozen(button.name) || clickEvent(button.name.replace('button.',''), loandetails.id)"
+                                     ng-class="{disabled: isCrbVerificationFrozen(button.name)}"
+                                     ng-style="isCrbVerificationFrozen(button.name) && {'pointer-events': 'none'}"
+                                     has-permission='{{button.taskPermissionName}}'>
+                                      <i ng-if="isCrbVerificationFrozen(button.name)" class="fa fa-spinner fa-spin"></i>
+                                      {{'label.'+ button.name | translate}}</a>
                               </li>
                           </ul>
                       </span>

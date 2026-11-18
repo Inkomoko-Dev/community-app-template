@@ -2819,6 +2819,7 @@
   "label.button.modifyapplication": "Modify Application",
   "label.button.crbVerification": "CRB Verification Rwanda",
   "label.button.crbVerificationKenya": "Identity Verification",
+  "label.msg.crbVerification.timeout": "Request timed out. Please try again.",
   "label.button.verifyLoanCreditInfoEnhancedOnMetropolKenya": "Credit Info Enhanced",
   "label.button.withdrawnbyclient": "Withdrawn by client",
   "label.button.addcharge": "Add Charge",
