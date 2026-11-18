@@ -1332,6 +1332,11 @@
                                             class="fa fa-pencil "></i></a>
                                 </td>
                             </tr>
+                            <tr ng-show="loandetails.multiDisburseLoan && totalTrancheDisbursed() > 0">
+                                <td colspan="2"><strong>{{ 'label.heading.totaldisbursed' | translate }}</strong></td>
+                                <td><strong>{{ totalTrancheDisbursed() | number }}</strong></td>
+                                <td colspan="2"></td>
+                            </tr>
                         </table>
 
                         <div class="tranche-section" ng-show="trancheReleaseEligibility || trancheMilestone">
@@ -1410,7 +1415,7 @@
                                 </tr>
                             </table>
                             <div class="form-group"
-                                 ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
+                                 ng-show="showTrancheReview()"
                                  has-permission="APPROVE_TRANCHEMILESTONE">
                                 <button type="button" class="btn btn-default" ng-click="openTrancheReview()">
                                     {{'label.button.reviewtranche' | translate}}

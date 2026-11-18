@@ -24,10 +24,19 @@
         <div class="alert alert-info" ng-show="isFormLoading()">{{ 'label.message.loan.action.form.loading' | translate }}</div>
         <fieldset>
             <api-validate></api-validate>
-            <div class="alert alert-info" ng-show="isDisbursementReviewAction() && currentTrancheNumber">
-                <strong>Tranche {{currentTrancheNumber}}</strong>
+            <div class="alert alert-info" ng-show="isDisbursementReviewAction() && trancheAuthorizationSummary.show">
+                <strong>{{ 'label.heading.tranche' | translate }} {{currentTrancheNumber}}</strong>
+                <div>{{ 'label.heading.approvedloanamount' | translate }}: {{trancheAuthorizationSummary.approvedLoanAmount | number}} {{loanCurrencyCode}}</div>
+                <div>{{ 'label.heading.firsttranchedisbursed' | translate }}: {{trancheAuthorizationSummary.firstTrancheDisbursed | number}} {{loanCurrencyCode}}</div>
+                <div>{{ 'label.heading.totaldisbursed' | translate }}: {{trancheAuthorizationSummary.totalDisbursed | number}} {{loanCurrencyCode}}</div>
+                <div>{{ 'label.heading.remainingapprovedcommitment' | translate }}: {{trancheAuthorizationSummary.remainingApprovedCommitment | number}} {{loanCurrencyCode}}</div>
+                <div ng-show="trancheAuthorizationSummary.proposedIsSecondTranche">{{ 'label.heading.proposedsecondtranche' | translate }}: {{trancheAuthorizationSummary.proposedTrancheAmount | number}} {{loanCurrencyCode}}</div>
+                <div ng-show="!trancheAuthorizationSummary.proposedIsSecondTranche">{{ 'label.heading.proposedtrancheamount' | translate }}: {{trancheAuthorizationSummary.proposedTrancheAmount | number}} {{loanCurrencyCode}}</div>
+            </div>
+            <div class="alert alert-info" ng-show="isDisbursementReviewAction() && currentTrancheNumber && !trancheAuthorizationSummary.show">
+                <strong>{{ 'label.heading.tranche' | translate }} {{currentTrancheNumber}}</strong>
                 <span> &mdash; {{ 'label.heading.approvedamount' | translate }}: {{currentTranchePrincipal | number}}</span>
-                <span> &mdash; Remaining undisbursed amount: {{remainingUndisbursedAmount | number}} {{loanCurrencyCode}}</span>
+                <span> &mdash; {{ 'label.heading.remainingundisbursed' | translate }}: {{remainingUndisbursedAmount | number}} {{loanCurrencyCode}}</span>
             </div>
             <div ng-show="submittedDatatables.length > 0" uib-alert type="success">
                 <span ng-repeat="table in submittedDatatables"><i class="fa fa-check"></i>Entry in ` {{table}} ` has been made successfully. If the inputs are changed, the datatable entries will be updated.<br></span>

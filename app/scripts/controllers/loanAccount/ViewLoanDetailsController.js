@@ -16,6 +16,24 @@
             scope.openTrancheReview = function () {
                 location.path('/viewloanaccount/' + routeParams.id + '/tranchereview').search('fromReview', null);
             };
+            scope.showTrancheReview = function () {
+                var status = scope.trancheMilestone && scope.trancheMilestone.status;
+                return !!(status && status.id === 440);
+            };
+            scope.totalTrancheDisbursed = function () {
+                var details = scope.loandetails && scope.loandetails.disbursementDetails;
+                var total = 0;
+                if (!details) {
+                    return total;
+                }
+                for (var i = 0; i < details.length; i++) {
+                    if (details[i].actualDisbursementDate != null) {
+                        var principal = Number(String(details[i].principal == null ? 0 : details[i].principal).replace(/,/g, ''));
+                        total += isNaN(principal) ? 0 : principal;
+                    }
+                }
+                return total;
+            };
             scope.date = {};
             scope.date.payDate = new Date();
             scope.hideAccrualTransactions = false;
