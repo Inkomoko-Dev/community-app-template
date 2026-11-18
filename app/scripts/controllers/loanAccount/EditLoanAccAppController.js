@@ -385,7 +385,7 @@
                 }
                 var trancheProductChoice = scope.loanaccountinfo.product || {};
                 scope.productAllowsMultiDisburse = trancheProductChoice.multiDisburseLoan === true;
-                scope.formData.multiDisburseLoan = scope.productAllowsMultiDisburse && scope.loanaccountinfo.multiDisburseLoan !== false;
+                scope.formData.multiDisburseLoan = scope.productAllowsMultiDisburse && scope.loanaccountinfo.multiDisburseLoan === true;
                 scope.multiDisburseLoan = scope.formData.multiDisburseLoan;
                 scope.formData.productId = scope.loanaccountinfo.loanProductId;
                 scope.formData.fundId = scope.loanaccountinfo.fundId;
