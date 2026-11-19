@@ -12,7 +12,8 @@
             };
             scope.showTrancheReview = function () {
                 var status = scope.trancheMilestone && scope.trancheMilestone.status;
-                return !!(status && status.id === 440);
+                // Expired (440) and Manual review (450) both need the review actions.
+                return !!(status && (status.id === 440 || status.id === 450));
             };
             scope.totalTrancheDisbursed = function () {
                 var details = scope.loandetails && scope.loandetails.disbursementDetails;
