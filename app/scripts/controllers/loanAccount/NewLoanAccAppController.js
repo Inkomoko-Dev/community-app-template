@@ -375,9 +375,9 @@
                 }
 
                 var trancheProduct = scope.loanaccountinfo.product || {};
-                scope.productAllowsMultiDisburse = trancheProduct.multiDisburseLoan === true || (trancheProduct.multiDisburseLoan == null && scope.loanaccountinfo.multiDisburseLoan === true);
-                scope.formData.multiDisburseLoan = scope.productAllowsMultiDisburse;
-                scope.multiDisburseLoan = scope.formData.multiDisburseLoan;
+                scope.productAllowsMultiDisburse = trancheProduct.multiDisburseLoan === true;
+                scope.formData.multiDisburseLoan = false;
+                scope.multiDisburseLoan = false;
                 scope.formData.productId = scope.loanaccountinfo.loanProductId;
                 scope.loanProductName = scope.loanaccountinfo.loanProductName;
                 scope.formData.fundId = scope.loanaccountinfo.fundId;

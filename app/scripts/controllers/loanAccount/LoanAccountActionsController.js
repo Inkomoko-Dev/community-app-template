@@ -1464,7 +1464,7 @@
                         associations: 'multiDisburseDetails'
                     }, function (data) {
                         scope.addDisburseDetails = true;
-                        scope.multiDisburseLoan = true;
+                        scope.multiDisburseLoan = !!data.multiDisburseLoan;
                         scope.formData.approvedLoanAmount = data.approvedPrincipal;
                         scope.form.expectedDisbursementDate = normalizeDate(data.timeline.expectedDisbursementDate);
 
