@@ -98,7 +98,9 @@
                 if (!_.isUndefined(scope.paramValues)) {
                     var obj = scope.paramValues;
                     for (var key in obj) {
-                        scope.formData["R_" + key] = String(obj[key]);
+                        if (key !== 'reportName') {
+                            scope.formData["R_" + key] = String(obj[key]);
+                        }
                     }
                 }
             }
