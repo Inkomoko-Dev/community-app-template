@@ -2541,7 +2541,7 @@
                             delete submitData.usdAmount;
                             delete submitData.fxSource;
                             delete submitData.fxTimestamp;
-                            delete submitData.mfiCode;
+                            // Keep mfiCode — disburse whitelist accepts it; needed at actual posting (CGLT-825).
                             // Third-party payout fields live on the loan already; omit so staff submit cannot overwrite them.
                             if (scope.enableThirdPartyDisbursement) {
                                 delete submitData.paymentTypeId;
@@ -2821,14 +2821,15 @@
 
             scope.isMfiCodeAccepted = function () {
                 if (!scope.showMfiCode) return false;
-                var isDisbursementApprovalAction = scope.action === "approveDisbursement"
-                    || scope.action === "disbursementapproval";
-                return !(isDisbursementApprovalAction && (scope.isCashPayment() || scope.enableThirdPartyDisbursement));
+                // Hide only for third-party disbursement; Cash and Mobile Money keep MFI at posting.
+                return !scope.enableThirdPartyDisbursement;
             };
 
             scope.isMfiCodeReadOnly = function () {
                 const isApprovalOrDRStage = scope.action === "approve"
-                    || scope.action === "disbursementpreapprovalrequest";
+                    || scope.action === "disbursementpreapprovalrequest"
+                    || scope.action === "approveDisbursement"
+                    || scope.action === "disbursementapproval";
                 const isRepaymentOrPrepay = scope.action === "repayment"
                     || scope.action === "modifytransaction";
                 return !(isApprovalOrDRStage || isRepaymentOrPrepay);
