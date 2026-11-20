@@ -205,7 +205,7 @@
                                     <div class="col-sm-3"><label>Phone number</label><input class="form-control" type="text" ng-model="details.clientPhoneNumber" ng-change="populateOtherTranchePaymentDetails($index, 'clientPhoneNumber')"></div>
                                     <div class="col-sm-3"><label>Bank name</label><input class="form-control" type="text" ng-model="details.clientBankName" ng-change="populateOtherTranchePaymentDetails($index, 'clientBankName')"></div>
                                     <div class="col-sm-3"><label>Account number</label><input class="form-control" type="text" ng-model="details.clientAccountNumber" ng-change="populateOtherTranchePaymentDetails($index, 'clientAccountNumber')"></div>
-                                    <div class="col-sm-3"><label>{{ 'label.anchor.mfiCode' | translate }}</label><input class="form-control" type="text" ng-model="details.mfiCode" ng-change="populateOtherTranchePaymentDetails($index, 'mfiCode')"></div>
+                                    <div class="col-sm-3"><label>{{ 'label.anchor.mfiCode' | translate }}</label><input class="form-control" type="text" name="trancheMfiCode" ng-model="details.mfiCode" maxlength="50" ng-pattern="/^[A-Za-z0-9 _\/-]*$/" ng-change="populateOtherTranchePaymentDetails($index, 'mfiCode')"></div>
                                 </div>
                                 <div class="row" ng-if="isSouthSudanSspLoan() && details.disbursementType === 'VENDOR'">
                                     <div class="col-sm-3"><label>FX Rate (SSP/USD)</label><input class="form-control" type="text" number-format ng-model="details.fxRate" ng-change="populateOtherTranchePaymentDetails($index, 'fxRate')"></div>
@@ -489,7 +489,11 @@
                         <label class="control-label col-sm-2" for="mfiCode">{{ 'label.anchor.mfiCode' | translate }}</label>
                         <div class="col-sm-3">
                             <input id="mfiCode" type="text" name="mfiCode" ng-model="formData.mfiCode"
-                                   class="form-control" ng-disabled="isMfiCodeReadOnly()">
+                                   class="form-control" maxlength="50" ng-pattern="/^[A-Za-z0-9 _\/-]*$/"
+                                   ng-disabled="isMfiCodeReadOnly()">
+                            <span class="error" ng-show="loanactionform.mfiCode.$error.pattern">
+                                {{ 'label.error.mfiCode.pattern' | translate }}
+                            </span>
                         </div>
                     </div>
 
@@ -870,7 +874,7 @@
                         <label class="control-label col-sm-2">Account number</label>
                         <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.clientAccountNumber"></div>
                         <label class="control-label col-sm-2">{{ 'label.anchor.mfiCode' | translate }}</label>
-                        <div class="col-sm-3"><input class="form-control" type="text" ng-model="formData.mfiCode"></div>
+                        <div class="col-sm-3"><input class="form-control" type="text" name="disburseMfiCode" ng-model="formData.mfiCode" maxlength="50" ng-pattern="/^[A-Za-z0-9 _\/-]*$/"></div>
                     </div>
                     <div class="form-group" ng-if="isSouthSudanSspLoan() && formData.disbursementType === 'VENDOR'">
                         <label class="control-label col-sm-2">FX Rate (SSP/USD)</label>
