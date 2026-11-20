@@ -1094,98 +1094,29 @@
                     if (scope.status == "Submitted and pending approval" || scope.status == "Active" || scope.status == "Approved") {
                         scope.choice = true;
                     }
+                    var loanLifecycleButtonsWarned = false;
+                    function missingLoanLifecycleButtons() {
+                        if (!loanLifecycleButtonsWarned) {
+                            loanLifecycleButtonsWarned = true;
+                            console.warn('LoanLifecycleButtons not loaded');
+                        }
+                        return null;
+                    }
+
                     function getLoanStage(data) {
-                        if((data.isExtendLoanLifeCycleConfig == false)){
-                            return {
-                                name: "button.approve",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'APPROVE_LOAN'
-                            };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState == null || data.loanDecisionState == ""))){
-                        return {
-                            name: "button.reviewapplication",
-                            icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_LOANAPPLICATIONREVIEW'
-                        };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "REVIEW_APPLICATION"))){
-                        return {
-                            name: "button.duediligence",
-                            icon: "fa fa-check",
-                            taskPermissionName: 'ACCEPT_DUEDILIGENCE'
-                        };
-                        }else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value == "DUE_DILIGENCE"))){
-                            return {
-                                name: "button.icreviewlevelone",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVELONE'
-                        };
+                        var logic = window.LoanLifecycleButtons;
+                        if (!logic || !logic.getLoanStage) {
+                            return missingLoanLifecycleButtons();
                         }
-                        // Dynamic IC Review Level handling
-                        else if((data.isExtendLoanLifeCycleConfig == true && data.loanDecisionState != null &&
-                                 data.loanDecisionState.value && data.loanDecisionState.value.indexOf('IC_REVIEW_LEVEL_') === 0 &&
-                                 data.nextLoanIcReviewDecisionState && data.nextLoanIcReviewDecisionState.value &&
-                                 data.nextLoanIcReviewDecisionState.value.indexOf('IC_REVIEW_LEVEL_') === 0)){
-                            // Extract level name from next state (e.g., IC_REVIEW_LEVEL_TWO -> two)
-                            var nextLevel = data.nextLoanIcReviewDecisionState.value.replace('IC_REVIEW_LEVEL_', '').toLowerCase();
-                            return {
-                                name: "button.icreviewlevel" + nextLevel.toLowerCase(),
-                                icon: "fa fa-check",
-                                taskPermissionName: 'ACCEPT_LOANICREVIEWDECISIONLEVEL' + nextLevel.toUpperCase()
-                            };
-                        }
-                        else if((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value != "PREPARE_AND_SIGN_CONTRACT"))){
-                            return {
-                                name: "button.prepareandsigncontract",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'ACCEPT_LOANPREPAREANDSIGNCONTRACT'
-                            };
-                        } else if(((data.isExtendLoanLifeCycleConfig == true) && (data.loanDecisionState != null && data.nextLoanIcReviewDecisionState.value == "PREPARE_AND_SIGN_CONTRACT" && data.loanDecisionState.value == "PREPARE_AND_SIGN_CONTRACT"))){
-                            return {
-                                name: "button.approve",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'APPROVE_LOAN'
-                            };
-                        }else{
-                                console.log("No Options Found here . . . . ");
-                            return null;
-                                }
+                        return logic.getLoanStage(data);
                     }
 
                     function getUndoLoanStage(data) {
-                        if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "REVIEW_APPLICATION"))) {
-                            return {
-                                name: "button.rejectreviewapplication",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANAPPLICATIONREVIEW'
-                            };
-                        } else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "DUE_DILIGENCE"))) {
-                            return {
-                                name: "button.rejectduediligence",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_DUEDILIGENCE'
-                            };
+                        var logic = window.LoanLifecycleButtons;
+                        if (!logic || !logic.getUndoLoanStage) {
+                            return missingLoanLifecycleButtons();
                         }
-                        // Dynamic IC Review Level rejection handling
-                        else if ((data.isExtendLoanLifeCycleConfig == true && data.loanDecisionState != null &&
-                                  data.loanDecisionState.value && data.loanDecisionState.value.indexOf('IC_REVIEW_LEVEL_') === 0)) {
-                            // Extract level name from current state (e.g., IC_REVIEW_LEVEL_ONE -> one)
-                            var currentLevel = data.loanDecisionState.value.replace('IC_REVIEW_LEVEL_', '').toLowerCase();
-                            return {
-                                name: "button.rejecticreviewlevel" + currentLevel.toLowerCase(),
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANICREVIEWDECISIONLEVEL' + currentLevel.toUpperCase()
-                            };
-                        }
-                        else if ((data.isExtendLoanLifeCycleConfig == true && (data.loanDecisionState != null && data.loanDecisionState.value === "PREPARE_AND_SIGN_CONTRACT"))) {
-                            return {
-                                name: "button.rejectprepareandsigncontract",
-                                icon: "fa fa-check",
-                                taskPermissionName: 'REJECT_LOANPREPAREANDSIGNCONTRACT'
-                            };
-                        } else {
-                            console.log("No Options Found here . . . . ");
-                            return null;
-                        }
+                        return logic.getUndoLoanStage(data);
                     }
 
                     function getCrbActionOptions(data) {
