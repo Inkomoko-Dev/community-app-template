@@ -63,12 +63,16 @@
                             intializeParams(temp, {});
                         }
                     } else if (temp.displayType === 'date') {
-                        if (temp.variable === 'asAtDate') {
-                            scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
-                        } else if (temp.defaultVal === 'today') {
-                            scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
-                        } else if (/^\d{4}-\d{2}-\d{2}$/.test(temp.defaultVal || '')) {
-                            scope.formData[temp.inputName] = temp.defaultVal;
+                        // Shared date parameters default to today. This report leaves them empty
+                        // so the officer chooses the range.
+                        if (scope.reportName !== 'Multi-tranche pipeline Report') {
+                            if (temp.variable === 'asAtDate') {
+                                scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
+                            } else if (temp.defaultVal === 'today') {
+                                scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
+                            } else if (/^\d{4}-\d{2}-\d{2}$/.test(temp.defaultVal || '')) {
+                                scope.formData[temp.inputName] = temp.defaultVal;
+                            }
                         }
                         scope.reportDateParams.push(temp);
                     } else if (temp.displayType === 'text') {

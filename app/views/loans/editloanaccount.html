@@ -283,7 +283,8 @@
                 </td>
                 <td class="paddedbottom10" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.numberOfRepayments == true">
                     <input id="numberOfRepayments" class="form-control" name="numofrepayments" type="text"
-                           ng-model="formData.numberOfRepayments" ng-change="onLoanTermOrFrequencyChange()" required late-Validate/>&nbsp;
+                           ng-model="formData.numberOfRepayments" ng-change="onNumberOfRepaymentsChange()"
+                           ng-disabled="isNumberOfRepaymentsFixed()" required late-Validate/>&nbsp;
                     <form-validate valattributeform="editloanaccountform" valattribute="numofrepayments"/>
                 </td>
                 <td ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true"><label>{{ 'label.input.repaymentfrequency' | translate }}&nbsp;<span class="required">*</span>
@@ -551,6 +552,15 @@
                 </td>
             </tr>
         </table>
+        <div class="row" ng-show="productAllowsMultiDisburse">
+            <div class="col-sm-12 paddedbottom10">
+                <label>
+                    <input id="loanMultiDisburse" type="checkbox" ng-model="formData.multiDisburseLoan" ng-change="onLoanMultiDisburseChanged()"/>
+                    {{ 'label.input.loanismultitranche' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.loanismultitranche' | translate }}" tooltip-append-to-body="true"></i>
+                </label>
+            </div>
+        </div>
         <div ng-show="multiDisburseLoan">
             <hr/>
             <label><strong>{{ 'label.heading.tranchedetails' | translate }}</strong></label>

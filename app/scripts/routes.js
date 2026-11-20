@@ -190,6 +190,9 @@
             .when('/viewloanaccount/:id/duediligence', {
                 templateUrl: 'views/loans/loanDueDiligence.html'
             })
+            .when('/viewloanaccount/:id/tranchereview', {
+                templateUrl: 'views/loans/tranchemanualreview.html'
+            })
             .when('/viewglimaccount/:groupId/:id/:glimId', {
                 templateUrl: 'views/loans/viewglimaccount.html'
             })
@@ -1096,6 +1099,9 @@
             })
             .when('/creditdecision/connection', {
                 templateUrl: 'views/organization/creditdecision/connection.html'
+            })
+            .when('/creditdecision/delegatedauthority', {
+                templateUrl: 'views/organization/creditdecision/delegatedauthority.html'
             })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'

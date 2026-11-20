@@ -26,6 +26,9 @@
             <div style="margin-top: 12px;">{{ 'label.heading.crbVerification' | translate}}...</div>
         </div>
     </div>
+    <div class="alert alert-warning" ng-if="crbVerificationTimedOut" role="alert">
+        {{ 'label.msg.crbVerification.timeout' | translate }}
+    </div>
     <ul class="breadcrumb">
         <li ng-show="loandetails.clientName"><a
                 ng-href="#/viewclient/{{loandetails.clientId}}">{{loandetails.clientName}}</a></li>
@@ -354,9 +357,12 @@
                         <i class="fa" ng-class="queryingPaymentStatus ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>&nbsp;{{'label.button.queryPaymentStatus' | translate}}
                     </a>
 
-                    <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name" ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
+                    <a ng-repeat="button in buttons.singlebuttons" ng-show="button.name"
+                       ng-click="isCrbVerificationFrozen(button.name) || clickEvent(button.name.replace('button.',''), loandetails.id)"
+                       ng-class="{disabled: isCrbVerificationFrozen(button.name)}"
+                       ng-style="isCrbVerificationFrozen(button.name) && {'pointer-events': 'none', 'opacity': 0.65}"
                        class="btn btn-primary" has-permission='{{button.taskPermissionName}}'><i
-                            class="{{button.icon}} "></i>&nbsp;{{'label.' + button.name |
+                            ng-class="isCrbVerificationFrozen(button.name) ? 'fa fa-spinner fa-spin' : button.icon"></i>&nbsp;{{'label.' + button.name |
                         translate}} </a>
 
                       <span ng-show="buttons.options" uib-dropdown  class="btn-group dropdown" on-toggle="toggled(open)">
@@ -366,9 +372,12 @@
                           </a>
                           <ul class="dropdown dropdown-menu dropdown-menu-right" style="width: max-content;" role="menu">
                               <li class="{{button.icon}}" ng-repeat="button in buttons.options">
-                                  <a ng-click="clickEvent(button.name.replace('button.',''), loandetails.id)"
-                                     has-permission='{{button.taskPermissionName}}'>{{'label.'+
-                                      button.name | translate}}</a>
+                                  <a ng-click="isCrbVerificationFrozen(button.name) || clickEvent(button.name.replace('button.',''), loandetails.id)"
+                                     ng-class="{disabled: isCrbVerificationFrozen(button.name)}"
+                                     ng-style="isCrbVerificationFrozen(button.name) && {'pointer-events': 'none'}"
+                                     has-permission='{{button.taskPermissionName}}'>
+                                      <i ng-if="isCrbVerificationFrozen(button.name)" class="fa fa-spinner fa-spin"></i>
+                                      {{'label.'+ button.name | translate}}</a>
                               </li>
                           </ul>
                       </span>
@@ -1250,16 +1259,16 @@
                     <uib-tab ng-show="loandetails.multiDisburseLoan" heading="{{'label.heading.tranchedetails' | translate}}">
                         <table class="width100">
 
-                            <tr>
+                            <tr ng-show="loandetails.maxOutstandingLoanBalance">
                                 <td>
                                     {{'label.input.outstandingloanbalance' | translate}} : &nbsp;{{loandetails.maxOutstandingLoanBalance| number}}&nbsp;
                                     <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.maxAllowedOutstandingBalance' | translate }}" tooltip-append-to-body="true"></i>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr ng-show="loandetails.firstInstallmentPrincipal">
                                 <td>{{'label.input.firstinstallmentprincipal' | translate}} : &nbsp;
                                     <span ng-if="loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal}}%</span>
-                                    <span ng-if="loandetails.firstInstallmentPrincipal && !loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal | number}}</span>
+                                    <span ng-if="!loandetails.firstInstallmentAsPercentage">{{loandetails.firstInstallmentPrincipal | number}}</span>
                                 </td>
                             </tr>
                             <tr ng-show="loandetails.previousTrancheRepaidPercentage">
@@ -1322,6 +1331,11 @@
                                        href="#/loandisbursedetail/{{loandetails.id}}/editdisbursedate/{{disbursementDetail.id}}"><i
                                             class="fa fa-pencil "></i></a>
                                 </td>
+                            </tr>
+                            <tr ng-show="loandetails.multiDisburseLoan && totalTrancheDisbursed() > 0">
+                                <td colspan="2"><strong>{{ 'label.heading.totaldisbursed' | translate }}</strong></td>
+                                <td><strong>{{ totalTrancheDisbursed() | number }}</strong></td>
+                                <td colspan="2"></td>
                             </tr>
                         </table>
 
@@ -1400,12 +1414,13 @@
                                     </td>
                                 </tr>
                             </table>
-                            <button type="button" class="btn btn-default"
-                                    ng-show="trancheMilestone && trancheMilestone.subsequentTranche && trancheMilestone.pastDeadline && !trancheMilestone.deadlineExceptionApproved && trancheMilestone.milestoneRequired"
-                                    has-permission="APPROVE_TRANCHEMILESTONE"
-                                    ng-click="approveDeadlineException()">
-                                {{'label.button.approvedeadlineexception' | translate}}
-                            </button>
+                            <div class="form-group"
+                                 ng-show="showTrancheReview()"
+                                 has-permission="APPROVE_TRANCHEMILESTONE">
+                                <button type="button" class="btn btn-default" ng-click="openTrancheReview()">
+                                    {{'label.button.reviewtranche' | translate}}
+                                </button>
+                            </div>
                         </div>
 
                         <div class="tranche-section" ng-show="trancheMilestone && trancheMilestone.milestoneRequired && trancheMilestone.tranches && trancheMilestone.tranches.length">
@@ -1441,15 +1456,15 @@
                             </table>
                         </div>
 
-                        <table class="width100">
+                        <table class="width100" ng-show="loandetails.emiAmountVariations.length>0">
                             <tr>
                                 <td>
                                     {{'label.input.fixedemiamountvariations' | translate}} : &nbsp;&nbsp;
                                 </td>
                             </tr>
                         </table>
-                        <table class="width100 table">
-                            <tr class="graybg" ng-show="loandetails.emiAmountVariations.length>0">
+                        <table class="width100 table" ng-show="loandetails.emiAmountVariations.length>0">
+                            <tr class="graybg">
                                 <th align="left">{{'label.input.emiamoutvariationfrom' | translate}}</th>
                                 <th align="left">{{'label.input.fixedemiamount' | translate}}</th>
                             </tr>

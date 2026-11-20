@@ -342,6 +342,9 @@
                     trancheMilestoneExceptionResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones/deadline-exception", { loanKey: '@loanKey' }, {
                         save: { method: 'POST', params: {} }
                     }),
+                    trancheMilestoneCancelResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones/cancel-undisbursed", { loanKey: '@loanKey' }, {
+                        save: { method: 'POST', params: {} }
+                    }),
                     PaymentHubDisbursementStatusResource: defineResource(apiVer + "/loans/:loanId/paymenthub-disbursement-status", { loanId: '@loanId' }, {
                         check: { method: 'POST' }
                     }),
@@ -1446,6 +1449,12 @@
                     }),
                     creditDecisionLoanFlagResource: defineResource(apiVer + "/creditdecision/loans/:loanId/flag", { loanId: '@loanId' }, {
                         update: { method: 'PUT', params: {} }
+                    }),
+                    creditDecisionDelegatedAuthorityResource: defineResource(apiVer + "/creditdecision/delegatedauthority/:ruleId", { ruleId: '@ruleId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, url: baseUrl + apiVer + '/creditdecision/delegatedauthority' },
+                        save: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/delegatedauthority' },
+                        update: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
                     })
                 };
             }];

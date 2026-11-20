@@ -6,6 +6,7 @@
             scope.accountId = routeParams.id;
 
             scope.trancheMinimumProceed = false;
+            scope.trancheAuthorizationSummary = { show: false };
 
             function trancheWarningMessages(report) {
                 var messages = [];
@@ -1008,6 +1009,7 @@
                             if (scope.trancheWarningReport) {
                                 applyTrancheReleaseWarning(scope.trancheWarningReport);
                             }
+                            scope.trancheAuthorizationSummary = scope.buildTrancheAuthorizationSummary(data, templateData);
                             var approvedDisplay = scope.approvedDisbursementDisplay(data, templateData);
                             scope.remainingUndisbursedAmount = approvedDisplay.remaining;
                             scope.currentTranchePrincipal = approvedDisplay.amount;
@@ -1462,7 +1464,7 @@
                         associations: 'multiDisburseDetails'
                     }, function (data) {
                         scope.addDisburseDetails = true;
-                        scope.multiDisburseLoan = true;
+                        scope.multiDisburseLoan = !!data.multiDisburseLoan;
                         scope.formData.approvedLoanAmount = data.approvedPrincipal;
                         scope.form.expectedDisbursementDate = normalizeDate(data.timeline.expectedDisbursementDate);
 
@@ -1744,6 +1746,42 @@
                 }
                 var cappedNet = approvedDisplay.amount - disbursementCharges;
                 return cappedNet < 0 ? 0 : cappedNet;
+            };
+
+            scope.buildTrancheAuthorizationSummary = function (loan, templateData) {
+                var details = loan && loan.disbursementDetails ? loan.disbursementDetails : [];
+                var approved = approvedPrincipalFromLoan(loan);
+                var totalDisbursed = 0;
+                var firstTrancheDisbursed = null;
+                var proposedTrancheAmount = null;
+                for (var i = 0; i < details.length; i++) {
+                    var principal = parseTrancheAmount(details[i].principal);
+                    if (details[i].actualDisbursementDate) {
+                        totalDisbursed += principal;
+                        if (firstTrancheDisbursed === null) {
+                            firstTrancheDisbursed = principal;
+                        }
+                    } else if (proposedTrancheAmount === null) {
+                        proposedTrancheAmount = principal;
+                    }
+                }
+                if (proposedTrancheAmount === null) {
+                    proposedTrancheAmount = parseTrancheAmount(templateData && templateData.amount);
+                }
+                var remaining = approved > 0 ? approved - totalDisbursed : 0;
+                if (remaining < 0) {
+                    remaining = 0;
+                }
+                var trancheNumber = Number(templateData && templateData.trancheNumber);
+                return {
+                    show: trancheNumber > 1,
+                    approvedLoanAmount: approved,
+                    firstTrancheDisbursed: firstTrancheDisbursed || 0,
+                    totalDisbursed: totalDisbursed,
+                    remainingApprovedCommitment: remaining,
+                    proposedTrancheAmount: proposedTrancheAmount,
+                    proposedIsSecondTranche: trancheNumber === 2
+                };
             };
 
             scope.approvedDisbursementDisplay = function (loan, templateData) {

@@ -138,6 +138,13 @@
 .cd .cd-picker-none { padding: 14px 0; color: #8a94a0; font-size: 13px; }
 .cd .cd-form.wide { max-width: 780px; }
 
+/* delegated authority: edit panel above the rules table */
+.cd .cd-da-form { position: static; max-width: none; margin: 0 0 22px; }
+.cd .cd-da-form .cd-form { max-width: none; }
+.cd .cd-da-form .has-error .help-block { color: #d9534f; }
+.cd .cd-da-actions { white-space: nowrap; }
+.cd .cd-da-actions .btn { margin-left: 4px; }
+
 /* loan details page, decision page and tab: Bootstrap alerts, labels and tables, so they look like the rest of the app */
 credit-decision-loan { display: block; }
 .cd.cd-strip { margin: 0 0 10px; padding: 8px 12px; }

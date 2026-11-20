@@ -1,0 +1,74 @@
+<div ng-controller="TrancheManualReviewController">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="#/viewloanaccount/{{loanId}}">{{'label.anchor.viewloanaccount' | translate}}</a></li>
+            <li class="active">{{'label.heading.manualreview' | translate}}</li>
+        </ul>
+    </div>
+    <form name="tranchemanualreviewform" novalidate="" class="form-horizontal well" ng-submit="submit()">
+        <api-validate></api-validate>
+        <div class="alert alert-danger" ng-if="error">{{error}}</div>
+        <fieldset>
+            <legend>{{'label.heading.manualreview' | translate}}</legend>
+            <p>{{'label.msg.manualreview.help' | translate}}</p>
+            <div class="form-group" ng-if="milestone">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.heading.status' | translate}}</label>
+                <div class="col-sm-6 paddedtop">
+                    <span ng-if="milestone.status.value">{{milestone.status.value}}</span>
+                    <span ng-if="milestone.trancheNumber"> — {{'label.heading.tranche' | translate}} {{milestone.trancheNumber}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.heading.manualreview' | translate}}<span class="required">*</span></label>
+                <div class="col-sm-6">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="reviewDecision" value="EXTEND" ng-model="formData.decision">
+                            {{'label.input.reviewdecision.extend' | translate}}
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="reviewDecision" value="CANCEL" ng-model="formData.decision">
+                            {{'label.input.reviewdecision.cancel' | translate}}
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="reviewDecision" value="RESCHEDULE" ng-model="formData.decision">
+                            {{'label.input.reviewdecision.reschedule' | translate}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" ng-if="formData.decision === 'EXTEND'">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.input.extensiondays' | translate}}<span class="required">*</span></label>
+                <div class="col-sm-3">
+                    <input type="number" class="form-control" min="1" max="3660" ng-model="formData.extensionDays">
+                </div>
+            </div>
+            <div class="form-group" ng-if="formData.decision === 'CANCEL'">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.input.cancellationreason' | translate}}<span class="required">*</span></label>
+                <div class="col-sm-6">
+                    <textarea class="form-control" rows="2" maxlength="500" ng-model="formData.reason"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{'label.input.reviewnote' | translate}}<span class="required">*</span></label>
+                <div class="col-sm-6">
+                    <textarea class="form-control" rows="3" maxlength="500" ng-model="formData.note"></textarea>
+                </div>
+            </div>
+            <div align="center">
+                <button type="button" class="btn btn-default" ng-click="cancel()" ng-disabled="saving">{{'label.button.cancel' | translate}}</button>
+                <button type="submit" class="btn btn-primary" ng-disabled="saving"
+                        has-permission="{{ formData.decision === 'CANCEL' ? 'CANCEL_TRANCHEMILESTONE' : 'APPROVE_TRANCHEMILESTONE' }}">
+                    <span ng-if="formData.decision === 'EXTEND'">{{'label.button.approvedeadlineexception' | translate}}</span>
+                    <span ng-if="formData.decision === 'CANCEL'">{{'label.input.reviewdecision.cancel' | translate}}</span>
+                    <span ng-if="formData.decision === 'RESCHEDULE'">{{'label.button.continuetoreschedule' | translate}}</span>
+                    <span ng-if="!formData.decision">{{'label.button.reviewtranche' | translate}}</span>
+                </button>
+            </div>
+        </fieldset>
+    </form>
+</div>

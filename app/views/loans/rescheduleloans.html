@@ -7,8 +7,9 @@
     </div>
     <form name="createloanrescheduleform" novalidate="" class="form-horizontal well" rc-submit="submit()">
         <api-validate></api-validate>
-        <div class="alert alert-danger" ng-if="error">{{error}}</div>
-        <fieldset>
+            <div class="alert alert-danger" ng-if="error">{{error}}</div>
+            <div class="alert alert-info" ng-if="fromManualReview">{{ 'label.msg.reschedule.fromreview' | translate }}</div>
+            <fieldset>
             <legend>{{'label.heading.rescheduleloan' | translate}}</legend>
             <div class="alert alert-danger" ng-if="multiTrancheNotice.nothingDisbursed">
                 {{ 'validation.msg.rescheduleloan.multiTranche.nothing.disbursed' | translate }}
@@ -60,10 +61,10 @@
             </div>
             <div class="form-group">
 
-                <label class="control-label col-sm-2 width20" style="text-align: left;">{{ 'label.input.comments' | translate }}</label>
+                <label class="control-label col-sm-2 width20" style="text-align: left;">{{ (fromManualReview ? 'label.input.reviewnote' : 'label.input.comments') | translate }}<span class="required" ng-if="fromManualReview">*</span></label>
                 <div class="col-sm-3 paddedbottom10 paddedtop">
 
-                    <textarea rows="2"  style="width: 402px; height: 76px;" class="form-control" ng-model="comments" ></textarea>
+                    <textarea rows="2"  style="width: 402px; height: 76px;" class="form-control" ng-model="comments" ng-required="fromManualReview" maxlength="500"></textarea>
                 </div>
             </div>
             <div class="form-group">
