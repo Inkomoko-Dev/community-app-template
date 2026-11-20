@@ -1100,6 +1100,9 @@
             .when('/creditdecision/connection', {
                 templateUrl: 'views/organization/creditdecision/connection.html'
             })
+            .when('/creditdecision/delegatedauthority', {
+                templateUrl: 'views/organization/creditdecision/delegatedauthority.html'
+            })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'
             })

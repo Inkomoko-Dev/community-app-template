@@ -349,6 +349,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'organization/creditdecision/CreditDecisionLogController',
             'organization/creditdecision/CreditDecisionExceptionsController',
             'organization/creditdecision/CreditDecisionConnectionController',
+            'organization/creditdecision/CreditDecisionDelegatedAuthorityController',
             'accounting/DefineOpeningBalancesController',
             'configurations/ExternalServicesController',
             'configurations/EditExternalServicesConfigurationController',

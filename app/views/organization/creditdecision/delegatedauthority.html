@@ -1,0 +1,149 @@
+<div class="content-container cd" ng-controller="CreditDecisionDelegatedAuthorityController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.delegatedauthority' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+            <api-validate></api-validate>
+            <div class="cd-note ok" ng-if="saved"><span><i class="fa fa-check"></i>&nbsp; {{'label.creditdecision.delegatedauthority.saved' | translate}}</span></div>
+
+            <p class="cd-lead">{{'label.creditdecision.delegatedauthority.intro' | translate}}</p>
+
+            <div class="cd-summary" ng-if="loaded && !editing">
+                <span class="cd-muted" ng-if="rules.length">{{'label.creditdecision.delegatedauthority.count' | translate:{n: rules.length} }}</span>
+                <a class="cd-clear" ng-click="load()"><i class="fa fa-refresh"></i> {{'label.creditdecision.delegatedauthority.refresh' | translate}}</a>
+                <i class="fa fa-spinner fa-spin cd-muted" ng-if="loading"></i>
+            </div>
+
+            <div class="cd-preview cd-da-form" ng-if="editing">
+                <h5>{{form.id ? ('label.creditdecision.delegatedauthority.edit' | translate) : ('label.creditdecision.delegatedauthority.add' | translate)}}</h5>
+                <form name="daform" novalidate class="cd-form" rc-submit="save()">
+                    <div class="row">
+                        <div class="col-sm-4 form-group" ng-class="{'has-error': formErrors.currency}">
+                            <label>{{'label.creditdecision.delegatedauthority.currency' | translate}}</label>
+                            <select class="form-control" ng-model="form.currency">
+                                <option value="">{{'label.creditdecision.delegatedauthority.anycurrency' | translate}}</option>
+                                <option ng-repeat="c in currencies" value="{{c.code}}">{{c.code}}{{c.name ? ' — ' + c.name : ''}}</option>
+                            </select>
+                            <p class="help-block" ng-if="formErrors.currency">{{formErrors.currency | translate}}</p>
+                        </div>
+                        <div class="col-sm-4 form-group" ng-class="{'has-error': formErrors.riskTier}">
+                            <label>{{'label.creditdecision.delegatedauthority.risktier' | translate}}</label>
+                            <input type="text" class="form-control" ng-model="form.riskTier" maxlength="30"
+                                   placeholder="{{'label.creditdecision.delegatedauthority.anytier' | translate}}">
+                            <p class="help-block" ng-if="formErrors.riskTier">{{formErrors.riskTier | translate}}</p>
+                        </div>
+                        <div class="col-sm-4 form-group" ng-class="{'has-error': formErrors.entryLevelNumber}">
+                            <label>{{'label.creditdecision.delegatedauthority.entrylevel' | translate}}</label>
+                            <select class="form-control" ng-model="form.entryLevelNumber"
+                                    ng-options="l.levelNumber as (l.levelName + ' (' + l.levelNumber + ')') for l in levels"
+                                    required>
+                            </select>
+                            <p class="help-block" ng-if="formErrors.entryLevelNumber">{{formErrors.entryLevelNumber | translate}}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 form-group" ng-class="{'has-error': formErrors.minAmount}">
+                            <label>{{'label.creditdecision.delegatedauthority.minamount' | translate}}</label>
+                            <input type="number" min="0" step="any" class="form-control" ng-model="form.minAmount">
+                            <p class="help-block" ng-if="formErrors.minAmount">{{formErrors.minAmount | translate}}</p>
+                        </div>
+                        <div class="col-sm-4 form-group" ng-class="{'has-error': formErrors.maxAmount}">
+                            <label>{{'label.creditdecision.delegatedauthority.maxamount' | translate}}</label>
+                            <input type="number" min="0" step="any" class="form-control" ng-model="form.maxAmount"
+                                   placeholder="{{'label.creditdecision.delegatedauthority.nomax' | translate}}">
+                            <p class="help-block" ng-if="formErrors.maxAmount">{{formErrors.maxAmount | translate}}</p>
+                        </div>
+                        <div class="col-sm-4 form-group" ng-class="{'has-error': formErrors.approverUserId}">
+                            <label>{{'label.creditdecision.delegatedauthority.approver' | translate}}</label>
+                            <select class="form-control" ng-model="form.approverUserId">
+                                <option value="">{{'label.creditdecision.delegatedauthority.noapprover' | translate}}</option>
+                                <option ng-repeat="u in users" value="{{u.id}}">{{u.username}}{{u.firstname || u.lastname ? ' — ' + (u.firstname || '') + ' ' + (u.lastname || '') : ''}}</option>
+                            </select>
+                            <p class="help-block" ng-if="formErrors.approverUserId">{{formErrors.approverUserId | translate}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': formErrors.description}">
+                        <label>{{'label.creditdecision.delegatedauthority.description' | translate}}</label>
+                        <input type="text" class="form-control" ng-model="form.description" maxlength="200">
+                        <p class="help-block" ng-if="formErrors.description">{{formErrors.description | translate}}</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" ng-model="form.active"> {{'label.creditdecision.delegatedauthority.active' | translate}}
+                        </label>
+                    </div>
+                    <div class="cd-actions">
+                        <button type="submit" class="btn btn-primary" ng-if="!form.id" ng-disabled="saving" has-permission='CREATE_ICDELEGATEDAUTHORITY'>
+                            <i class="fa fa-spinner fa-spin" ng-if="saving"></i>
+                            {{'label.button.save' | translate}}
+                        </button>
+                        <button type="submit" class="btn btn-primary" ng-if="form.id" ng-disabled="saving" has-permission='UPDATE_ICDELEGATEDAUTHORITY'>
+                            <i class="fa fa-spinner fa-spin" ng-if="saving"></i>
+                            {{'label.button.save' | translate}}
+                        </button>
+                        <button type="button" class="btn btn-default" ng-click="cancelEdit()" ng-disabled="saving">{{'label.button.cancel' | translate}}</button>
+                    </div>
+                </form>
+            </div>
+
+            <table class="cd-table hover" id="cd-delegated-authority" ng-if="rules.length && !editing">
+                <thead>
+                <tr>
+                    <th>{{'label.creditdecision.delegatedauthority.col.currency' | translate}}</th>
+                    <th>{{'label.creditdecision.delegatedauthority.col.risktier' | translate}}</th>
+                    <th>{{'label.creditdecision.delegatedauthority.col.amount' | translate}}</th>
+                    <th>{{'label.creditdecision.delegatedauthority.col.entrylevel' | translate}}</th>
+                    <th>{{'label.creditdecision.delegatedauthority.col.approver' | translate}}</th>
+                    <th>{{'label.creditdecision.delegatedauthority.col.status' | translate}}</th>
+                    <th>{{'label.creditdecision.delegatedauthority.col.updated' | translate}}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="rule in rules track by rule.id">
+                    <td>
+                        <strong>{{rule.currency || ('label.creditdecision.delegatedauthority.any' | translate)}}</strong>
+                        <span class="cd-sub" ng-if="rule.description">{{rule.description}}</span>
+                    </td>
+                    <td>{{rule.riskTier || ('label.creditdecision.delegatedauthority.any' | translate)}}</td>
+                    <td class="cd-mono cd-small">{{amountBand(rule)}}</td>
+                    <td>{{levelLabel(rule)}}</td>
+                    <td>{{rule.approverUsername || '-'}}</td>
+                    <td>
+                        <span class="cd-dot" ng-class="{'go': rule.active, 'nogo': !rule.active}"></span>
+                        {{rule.active ? ('label.creditdecision.delegatedauthority.status.active' | translate) : ('label.creditdecision.delegatedauthority.status.inactive' | translate)}}
+                    </td>
+                    <td class="cd-muted cd-small">
+                        <span ng-if="rule.updatedOn">{{rule.updatedOn | date:'medium'}}</span>
+                        <span class="cd-sub" ng-if="rule.updatedBy">{{rule.updatedBy}}</span>
+                        <span ng-if="!rule.updatedOn">-</span>
+                    </td>
+                    <td class="text-right cd-da-actions">
+                        <button type="button" class="btn btn-default btn-sm" ng-click="startEdit(rule)"
+                                has-permission='UPDATE_ICDELEGATEDAUTHORITY'>
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" ng-click="remove(rule)" ng-disabled="rule.busy"
+                                has-permission='DELETE_ICDELEGATEDAUTHORITY'>
+                            <i class="fa fa-spinner fa-spin" ng-if="rule.busy"></i>
+                            <i class="fa fa-trash" ng-if="!rule.busy"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="cd-empty" ng-if="loaded && !rules.length && !editing">
+                <i class="fa fa-sitemap"></i>
+                <p>{{'label.creditdecision.delegatedauthority.none' | translate}}</p>
+                <button type="button" class="btn btn-primary" ng-click="startCreate()" has-permission='CREATE_ICDELEGATEDAUTHORITY'>
+                    <i class="fa fa-plus"></i>&nbsp;{{'label.creditdecision.delegatedauthority.button.add' | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
