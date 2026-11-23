@@ -540,6 +540,7 @@
   "error.msg.fund.id.invalid": "Fund with identifier `{{params[0].value}}` does not exist.",
   "error.msg.charge.id.invalid": "Charge with identifier `{{params[0].value}}` does not exist.",
   "error.msg.loan.id.is.invalid": "Loan with identifier `{{params[0].value}}` does not exist.",
+  "error.msg.loan.id.invalid": "Loan with identifier {{params[0].value}} does not exist.",
   "error.msg.glaccount.id.invalid": "General Ledger account with identifier `{{params[0].value}}` does not exist.",
   "error.msg.calendar.id.invalid": "Calendar with identifier `{{params[0].value}}` does not exist.",
   "validation.msg.calendar.title.cannot.be.blank": "The Title field is mandatory.",
@@ -1655,6 +1656,7 @@
   "label.anchor.deleteloancharge": "Delete Loan Charge",
   "label.anchor.unassignloanofficer": "Unassign Loan Officer",
   "label.anchor.showpaymentdetails": "Show Payment Details",
+  "label.anchor.mfiCode": "MFI Code",
   "label.anchor.viewcharge": "View Charge",
   "label.anchor.viewcollateral": "View Collateral",
   "label.anchor.viewschedule": "Schedule",
@@ -5434,6 +5436,8 @@
   "label.button.bulkexcessrefund": "Bulk Refunds",
   "label.heading.excessrefundwizard": "Create Excess Refund",
   "label.heading.excessrefunddetail": "Excess Refund Detail",
-  "label.heading.excessrefundbulk": "Bulk Excess Refunds"
+  "label.heading.excessrefundbulk": "Bulk Excess Refunds",
+  "label.msg.excessrefund.no.overpayment": "This loan has no unallocated overpayment. Excess Refund only applies while total overpaid is greater than zero. If surplus was moved by Deposit Redraw, use redraw withdrawal instead of Excess Refund.",
+  "label.msg.excessrefund.redraw.balance.hint": "Current redraw balance:"
 
 }

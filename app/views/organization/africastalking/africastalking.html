@@ -38,11 +38,11 @@
                         </div>
                     </div>
                     <br>
-                    <ul class="nav nav-pills">
-                        <li ng-repeat="tab in statusTabs" ng-class="{active: selectedStatus === tab.id}">
-                            <a href="" ng-click="selectedStatus = tab.id">{{tab.name}}</a>
-                        </li>
-                    </ul>
+                        <ul class="nav nav-pills">
+                            <li ng-repeat="tab in statusTabs" ng-class="{active: selectedStatus === tab.id}">
+                                <a href="" ng-click="selectMessageStatus(tab.id)">{{tab.name}}</a>
+                            </li>
+                        </ul>
                     <br>
                     <table class="table">
                         <thead>
@@ -81,6 +81,12 @@
                                    placeholder="{{'label.input.filterbyname' | translate}}">
                         </div>
                     </div>
+                    <br>
+                    <ul class="nav nav-pills">
+                        <li ng-repeat="tab in voiceStatusTabs" ng-class="{active: voiceSelectedStatus === tab.id}">
+                            <a href="" ng-click="selectVoiceStatus(tab.id)">{{tab.name}}</a>
+                        </li>
+                    </ul>
                     <br>
                     <table class="table">
                         <thead>
@@ -587,6 +593,7 @@
                         </table>
                     </div>
                 </uib-tab>
+
             </uib-tabset>
         </div>
     </div>

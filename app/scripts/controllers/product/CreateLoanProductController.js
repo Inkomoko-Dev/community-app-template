@@ -1,4 +1,36 @@
 (function (module) {
+    function blankTrancheValue(value) {
+        if (value === undefined || value === null || String(value).trim() === '') {
+            return null;
+        }
+        return value;
+    }
+
+    function prepareTrancheReleaseFields(formData) {
+        formData.outstandingLoanBalance = null;
+        formData.previousTrancheRepaidPercentage = null;
+        if (!formData.multiDisburseLoan) {
+            formData.firstInstallmentPrincipal = null;
+            formData.firstInstallmentAsPercentage = null;
+            formData.tranchePrincipalPercentages = null;
+            formData.firstTrancheAsPercentage = null;
+            formData.firstTrancheAmount = null;
+            formData.minTrancheCount = null;
+            formData.requireMilestoneSurvey = false;
+            formData.blockApplicationWhileUnsettled = false;
+            return;
+        }
+        formData.requireMilestoneSurvey = formData.requireMilestoneSurvey === true;
+        formData.blockApplicationWhileUnsettled = formData.blockApplicationWhileUnsettled === true;
+        formData.firstInstallmentPrincipal = blankTrancheValue(formData.firstInstallmentPrincipal);
+        formData.firstInstallmentAsPercentage = formData.firstInstallmentPrincipal === null ? null : formData.firstInstallmentAsPercentage === true;
+        formData.minTrancheCount = blankTrancheValue(formData.minTrancheCount);
+        formData.firstTrancheAmount = blankTrancheValue(formData.firstTrancheAmount);
+        formData.firstTrancheAsPercentage = formData.firstTrancheAmount === null ? null : formData.firstTrancheAsPercentage === true;
+        var percentages = blankTrancheValue(formData.tranchePrincipalPercentages);
+        formData.tranchePrincipalPercentages = percentages === null ? null : String(percentages).trim();
+    }
+
     mifosX.controllers = _.extend(module, {
         CreateLoanProductController: function (scope, $rootScope, resourceFactory, location, dateFilter,WizardHandler, translate) {
             scope.restrictDate = new Date();
@@ -488,6 +520,7 @@
                     this.formData.residualAutoCloseEnabled = false;
                     this.formData.residualClosureThreshold = null;
                 }
+                prepareTrancheReleaseFields(this.formData);
 
                 if(scope.chart.chartSlabs.length > 0){
                       var newChart = copyChartData(scope.chart);

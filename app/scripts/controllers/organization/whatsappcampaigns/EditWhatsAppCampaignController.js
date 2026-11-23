@@ -22,6 +22,21 @@
                 scope.campaignData.bodyVariableMapping.splice(index, 1);
             };
 
+            scope.insertFreeformPlaceholder = function (columnName) {
+                if (!scope.campaignData.campaignMessage) {
+                    scope.campaignData.campaignMessage = '';
+                }
+                scope.campaignData.campaignMessage += ' ${' + columnName + '}';
+            };
+
+            scope.onMessageTypeChanged = function () {
+                if (scope.campaignData.messageType === 'FREEFORM') {
+                    scope.campaignData.atTemplateName = '';
+                    scope.campaignData.languageCode = '';
+                    scope.campaignData.bodyVariableMapping = [];
+                }
+            };
+
             scope.reportSelected = function (reportName) {
                 scope.reqFields = [];
                 scope.reportParams = [];
@@ -57,6 +72,7 @@
             resourceFactory.whatsAppCampaignResource.get({campaignId: routeParams.campaignId}, function (data) {
                 scope.campaignData.id = data.id;
                 scope.campaignData.campaignName = data.campaignName;
+                scope.campaignData.messageType = data.messageType;
                 scope.campaignData.atTemplateName = data.atTemplateName;
                 scope.campaignData.languageCode = data.languageCode;
                 scope.campaignData.bodyVariableMapping = data.bodyVariableMappingList ? data.bodyVariableMappingList.slice() : [];
@@ -82,7 +98,9 @@
                 if (!_.isUndefined(scope.paramValues)) {
                     var obj = scope.paramValues;
                     for (var key in obj) {
-                        scope.formData["R_" + key] = String(obj[key]);
+                        if (key !== 'reportName') {
+                            scope.formData["R_" + key] = String(obj[key]);
+                        }
                     }
                 }
             }
@@ -146,10 +164,47 @@
                 });
             };
 
+            scope.atTemplateOptions = [];
+            scope.selectedAtTemplateOption = null;
+            scope.useOtherAtTemplate = false;
+
+            scope.onAtTemplateOptionChanged = function () {
+                if (scope.selectedAtTemplateOption) {
+                    scope.useOtherAtTemplate = false;
+                    scope.campaignData.atTemplateName = scope.selectedAtTemplateOption.name;
+                    scope.campaignData.languageCode = scope.selectedAtTemplateOption.languageCode;
+                }
+            };
+
+            scope.onUseOtherAtTemplateChanged = function () {
+                if (scope.useOtherAtTemplate) {
+                    scope.selectedAtTemplateOption = null;
+                }
+            };
+
             resourceFactory.whatsAppCampaignTemplateResource.get(function (data) {
                 scope.triggerTypeOptions = data.triggerTypeOptions;
                 scope.businessRuleOptions = data.businessRulesOptions;
                 scope.recipientTypeOptions = data.recipientTypeOptions || [];
+                scope.atTemplateOptions = data.atTemplateOptions || [];
+                scope.messageTypeOptions = [{id: 'FREEFORM', value: 'Freeform'}, {id: 'TEMPLATE', value: 'Template'}];
+                if (scope.campaignData.atTemplateName) {
+                    var match = null;
+                    angular.forEach(scope.atTemplateOptions, function (opt) {
+                        if (opt.name === scope.campaignData.atTemplateName
+                                && opt.languageCode === scope.campaignData.languageCode) {
+                            match = opt;
+                        }
+                    });
+                    if (match) {
+                        scope.selectedAtTemplateOption = match;
+                        scope.useOtherAtTemplate = false;
+                    } else {
+                        scope.useOtherAtTemplate = true;
+                    }
+                } else {
+                    scope.useOtherAtTemplate = scope.atTemplateOptions.length === 0;
+                }
             });
 
             scope.submit = function () {
@@ -162,13 +217,15 @@
                     scheduledDateTime = dateFilter(scheduledDateTime, scope.dft);
                 }
 
+                var isFreeform = scope.campaignData.messageType === 'FREEFORM';
                 scope.submissionData = {
                     triggerType: scope.campaignData.triggerType,
                     campaignName: scope.campaignData.campaignName,
                     campaignType: scope.campaignData.campaignType,
-                    atTemplateName: scope.campaignData.atTemplateName,
-                    languageCode: scope.campaignData.languageCode,
-                    bodyVariableMapping: scope.campaignData.bodyVariableMapping,
+                    messageType: scope.campaignData.messageType,
+                    atTemplateName: isFreeform ? '' : scope.campaignData.atTemplateName,
+                    languageCode: isFreeform ? '' : scope.campaignData.languageCode,
+                    bodyVariableMapping: isFreeform ? [] : scope.campaignData.bodyVariableMapping,
                     message: scope.campaignData.campaignMessage || "",
                     dateFormat: scope.df,
                     locale: scope.optlang.code,

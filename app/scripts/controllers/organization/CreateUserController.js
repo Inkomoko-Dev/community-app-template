@@ -78,9 +78,7 @@
             };
 
             scope.submit = function () {
-                for (var i in scope.selectedRoles) {
-                    scope.formData.roles.push(scope.selectedRoles[i].id) ;
-                }
+                scope.formData.roles = _.pluck(scope.selectedRoles, 'id');
                 resourceFactory.userListResource.save(this.formData, function (data) {
                     location.path('/viewuser/' + data.resourceId);
                 });

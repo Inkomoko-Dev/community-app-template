@@ -3,6 +3,7 @@
         ExcessRefundWizardController: function (scope, resourceFactory, location, dateFilter) {
             scope.step = 1;
             scope.formData = {
+                accountNo: '',
                 loanId: null,
                 amount: null,
                 paymentMode: 'MANUAL',
@@ -20,18 +21,52 @@
             };
             scope.template = null;
 
+            scope.prefillBeneficiaryFromTemplate = function (data) {
+                if (data.clientDisplayName) {
+                    scope.formData.beneficiary.beneficiaryName = data.clientDisplayName;
+                }
+                if (data.clientPhoneNumber) {
+                    scope.formData.beneficiary.msisdn = data.clientPhoneNumber;
+                }
+                if (data.clientAccountNumber) {
+                    scope.formData.beneficiary.accountNumber = data.clientAccountNumber;
+                }
+                if (data.clientBankName) {
+                    scope.formData.beneficiary.bankName = data.clientBankName;
+                }
+            };
+
             scope.loadTemplate = function () {
-                if (!scope.formData.loanId) {
+                if (!scope.formData.accountNo) {
                     return;
                 }
-                resourceFactory.excessRefundTemplateResource.get({ loanId: scope.formData.loanId }, function (data) {
+                resourceFactory.excessRefundTemplateByAccountResource.get({ accountNo: scope.formData.accountNo }, function (data) {
                     scope.template = data;
+                    scope.formData.loanId = data.loanId;
                     scope.formData.amount = data.totalOverpaid;
+                    scope.formData.paymentTypeId = null;
+                    scope.prefillBeneficiaryFromTemplate(data);
                     scope.step = 2;
                 });
             };
 
+            scope.filteredPaymentTypes = function () {
+                if (!scope.template || !scope.template.paymentTypeOptions) {
+                    return [];
+                }
+                var channel = scope.formData.beneficiary.channel;
+                return scope.template.paymentTypeOptions.filter(function (pt) {
+                    if (channel === 'MOBILE_MONEY') {
+                        return !!pt.isMobileMoney;
+                    }
+                    return !pt.isMobileMoney;
+                });
+            };
+
             scope.next = function () {
+                if (scope.step === 4 && !scope.formData.paymentTypeId) {
+                    return;
+                }
                 if (scope.step < 6) {
                     scope.step = scope.step + 1;
                 }

@@ -8,11 +8,14 @@
             scope.voiceVoicemails = [];
             scope.voiceQueue = [];
             scope.connectivityResult = null;
+            scope.metaProvider = null;
+            scope.metaProviderError = null;
             scope.messagesPerPage = 15;
             scope.voiceCallsPerPage = 15;
             scope.filterText = '';
             scope.voiceFilterText = '';
             scope.selectedStatus = 'ALL';
+            scope.voiceSelectedStatus = 'ALL';
             scope.loadingMessages = false;
             scope.loadingVoiceCalls = false;
             scope.loadError = null;
@@ -23,6 +26,17 @@
                 { id: 'DELIVERED', name: 'Delivered' },
                 { id: 'READ', name: 'Read' },
                 { id: 'FAILED', name: 'Failed' }
+            ];
+            scope.voiceStatusTabs = [
+                { id: 'ALL', name: 'All Calls' },
+                { id: 'INITIATED', name: 'Initiated' },
+                { id: 'RINGING', name: 'Ringing' },
+                { id: 'ANSWERED', name: 'Answered' },
+                { id: 'COMPLETED', name: 'Completed' },
+                { id: 'FAILED', name: 'Failed' },
+                { id: 'BUSY', name: 'Busy' },
+                { id: 'REJECTED', name: 'Rejected' },
+                { id: 'NO_ANSWER', name: 'No Answer' }
             ];
 
             scope.interactiveDashboard = null;
@@ -112,6 +126,9 @@
             };
 
             scope.filterVoiceCalls = function (callLog) {
+                if (scope.voiceSelectedStatus !== 'ALL' && callLog.status !== scope.voiceSelectedStatus) {
+                    return false;
+                }
                 if (!scope.voiceFilterText) {
                     return true;
                 }
@@ -124,7 +141,11 @@
             scope.loadMessages = function (done) {
                 scope.loadingMessages = true;
                 scope.loadError = null;
-                resourceFactory.africasTalkingMessageResource.getAll(function (data) {
+                var params = {};
+                if (scope.selectedStatus !== 'ALL') {
+                    params.status = scope.selectedStatus;
+                }
+                resourceFactory.africasTalkingMessageResource.getAll(params, function (data) {
                     scope.messages = data || [];
                     scope.loadingMessages = false;
                     if (angular.isFunction(done)) {
@@ -140,9 +161,18 @@
                 });
             };
 
+            scope.selectMessageStatus = function (status) {
+                scope.selectedStatus = status;
+                scope.loadMessages();
+            };
+
             scope.loadVoiceCalls = function (done) {
                 scope.loadingVoiceCalls = true;
-                resourceFactory.africasTalkingVoiceResource.getAll(function (data) {
+                var params = {};
+                if (scope.voiceSelectedStatus !== 'ALL') {
+                    params.status = scope.voiceSelectedStatus;
+                }
+                resourceFactory.africasTalkingVoiceResource.getAll(params, function (data) {
                     scope.voiceCalls = data || [];
                     scope.loadingVoiceCalls = false;
                     if (angular.isFunction(done)) {
@@ -157,6 +187,11 @@
                         done();
                     }
                 });
+            };
+
+            scope.selectVoiceStatus = function (status) {
+                scope.voiceSelectedStatus = status;
+                scope.loadVoiceCalls();
             };
 
             scope.loadInteractiveDashboard = function (done) {

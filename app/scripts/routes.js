@@ -190,6 +190,9 @@
             .when('/viewloanaccount/:id/duediligence', {
                 templateUrl: 'views/loans/loanDueDiligence.html'
             })
+            .when('/viewloanaccount/:id/tranchereview', {
+                templateUrl: 'views/loans/tranchemanualreview.html'
+            })
             .when('/viewglimaccount/:groupId/:id/:glimId', {
                 templateUrl: 'views/loans/viewglimaccount.html'
             })
@@ -201,6 +204,9 @@
             })
             .when('/adjustrepaymentschedule/:accountId', {
                 templateUrl: 'views/loans/AdjustRepaymentSchdule.html'
+            })
+            .when('/loanaccount/:id/creditdecision', {
+                templateUrl: 'views/loans/creditdecisionloan.html'
             })
             .when('/loanaccount/:id/:action', {
                 templateUrl: 'views/loans/loanaccountactions.html'
@@ -890,6 +896,9 @@
             .when('/excessrefunds/bulk', {
                 templateUrl: 'views/loans/excessrefund/bulk.html'
             })
+            .when('/excessrefunds/bulk/:batchId', {
+                templateUrl: 'views/loans/excessrefund/bulk.html'
+            })
             .when('/excessrefunds/:refundId', {
                 templateUrl: 'views/loans/excessrefund/detail.html'
             })
@@ -1070,6 +1079,30 @@
             .when('/loanclassificationsummary', {
                 templateUrl: 'views/organization/loanclassification/LoanClassificationSummary.html'
             })
+            .when('/creditdecision', {
+                templateUrl: 'views/organization/creditdecision/profiles.html'
+            })
+            .when('/creditdecision/create', {
+                templateUrl: 'views/organization/creditdecision/createprofile.html'
+            })
+            .when('/creditdecision/profile/:profileId', {
+                templateUrl: 'views/organization/creditdecision/profile.html'
+            })
+            .when('/creditdecision/catalogue', {
+                templateUrl: 'views/organization/creditdecision/catalogue.html'
+            })
+            .when('/creditdecision/log', {
+                templateUrl: 'views/organization/creditdecision/log.html'
+            })
+            .when('/creditdecision/exceptions', {
+                templateUrl: 'views/organization/creditdecision/exceptions.html'
+            })
+            .when('/creditdecision/connection', {
+                templateUrl: 'views/organization/creditdecision/connection.html'
+            })
+            .when('/creditdecision/delegatedauthority', {
+                templateUrl: 'views/organization/creditdecision/delegatedauthority.html'
+            })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'
             })
@@ -1162,6 +1195,9 @@
             })
             .when('/editwhatsappcampaign/:campaignId', {
                 templateUrl: 'views/organization/whatsappcampaigns/editwhatsappcampaign.html'
+            })
+            .when('/createwhatsapptemplate', {
+                templateUrl: 'views/organization/whatsappcampaigns/createwhatsapptemplate.html'
             })
             .when('/africastalking', {
                 templateUrl: 'views/organization/africastalking/africastalking.html'

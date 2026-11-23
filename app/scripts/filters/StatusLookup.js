@@ -49,7 +49,13 @@
                     "purchasedSharesStatusType.rejected": "statusrejected",
                     "charges.StatusType.active.true": "statusactive",
                     "employees.StatusType.active.true": "statusactive",
-                    "loanSubStatus.loanSubStatusType.pending.disbursement": "statuspendingdisbursement"
+                    "loanSubStatus.loanSubStatusType.pending.disbursement": "statuspendingdisbursement",
+                    "loanSubStatus.loanSubStatusType.repayment.not.met": "statusrepaymentnotmet",
+                    "loanSubStatus.loanSubStatusType.repayment.met": "statusrepaymentmet",
+                    "loanSubStatus.loanSubStatusType.awaiting.survey": "statusawaitingsurvey",
+                    "loanSubStatus.loanSubStatusType.survey.successful": "statussurveysuccessful",
+                    "loanSubStatus.loanSubStatusType.expired": "statustrancheexpired",
+                    "loanSubStatus.loanSubStatusType.requires.review": "statusrequirereview"
                 }
 
                 return cssClassNameLookup[input];

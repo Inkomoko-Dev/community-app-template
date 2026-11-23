@@ -1,4 +1,36 @@
 (function (module) {
+    function blankTrancheValue(value) {
+        if (value === undefined || value === null || String(value).trim() === '') {
+            return null;
+        }
+        return value;
+    }
+
+    function prepareTrancheReleaseFields(formData) {
+        formData.outstandingLoanBalance = null;
+        formData.previousTrancheRepaidPercentage = null;
+        if (!formData.multiDisburseLoan) {
+            formData.firstInstallmentPrincipal = null;
+            formData.firstInstallmentAsPercentage = null;
+            formData.tranchePrincipalPercentages = null;
+            formData.firstTrancheAsPercentage = null;
+            formData.firstTrancheAmount = null;
+            formData.minTrancheCount = null;
+            formData.requireMilestoneSurvey = false;
+            formData.blockApplicationWhileUnsettled = false;
+            return;
+        }
+        formData.requireMilestoneSurvey = formData.requireMilestoneSurvey === true;
+        formData.blockApplicationWhileUnsettled = formData.blockApplicationWhileUnsettled === true;
+        formData.firstInstallmentPrincipal = blankTrancheValue(formData.firstInstallmentPrincipal);
+        formData.firstInstallmentAsPercentage = formData.firstInstallmentPrincipal === null ? null : formData.firstInstallmentAsPercentage === true;
+        formData.minTrancheCount = blankTrancheValue(formData.minTrancheCount);
+        formData.firstTrancheAmount = blankTrancheValue(formData.firstTrancheAmount);
+        formData.firstTrancheAsPercentage = formData.firstTrancheAmount === null ? null : formData.firstTrancheAsPercentage === true;
+        var percentages = blankTrancheValue(formData.tranchePrincipalPercentages);
+        formData.tranchePrincipalPercentages = percentages === null ? null : String(percentages).trim();
+    }
+
     mifosX.controllers = _.extend(module, {
         EditLoanProductController: function (scope, resourceFactory, location, routeParams, dateFilter, translate) {
             scope.formData = {};
@@ -106,7 +138,16 @@
                     numberOfRepaymentVariationsForBorrowerCycle: [],
                     multiDisburseLoan: scope.product.multiDisburseLoan,
                     maxTrancheCount: scope.product.maxTrancheCount,
+                    minTrancheCount: scope.product.minTrancheCount,
                     outstandingLoanBalance: scope.product.outstandingLoanBalance,
+                    firstInstallmentPrincipal: scope.product.firstInstallmentPrincipal,
+                    firstInstallmentAsPercentage: scope.product.firstInstallmentAsPercentage,
+                    firstTrancheAsPercentage: scope.product.firstTrancheAsPercentage,
+                    firstTrancheAmount: scope.product.firstTrancheAmount,
+                    tranchePrincipalPercentages: scope.product.tranchePrincipalPercentages,
+                    previousTrancheRepaidPercentage: scope.product.previousTrancheRepaidPercentage,
+                    requireMilestoneSurvey: scope.product.requireMilestoneSurvey === true,
+                    blockApplicationWhileUnsettled: scope.product.blockApplicationWhileUnsettled === true,
                     daysInYearType: scope.product.daysInYearType.id,
                     daysInMonthType: scope.product.daysInMonthType.id,
                     isInterestRecalculationEnabled: scope.product.isInterestRecalculationEnabled,
@@ -655,6 +696,7 @@
                     this.formData.residualAutoCloseEnabled = false;
                     this.formData.residualClosureThreshold = null;
                 }
+                prepareTrancheReleaseFields(this.formData);
 
                 if(scope.chart){
                      var newChart = copyChartData(scope.chart);

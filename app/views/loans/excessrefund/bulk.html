@@ -4,40 +4,76 @@
         <li class="active">{{'label.heading.excessrefundbulk' | translate}}</li>
     </ul>
 
+    <api-validate></api-validate>
+
     <div class="panel panel-default">
         <div class="panel-body">
-            <label>Office ID</label>
-            <input type="number" class="form-control" ng-model="formData.officeId"/>
-            <label>Note</label>
-            <textarea class="form-control" ng-model="formData.note"></textarea>
+            <div ng-if="!batchId">
+                <label>Office ID</label>
+                <input type="number" class="form-control" ng-model="formData.officeId"/>
+                <label>Note</label>
+                <textarea class="form-control" ng-model="formData.note"></textarea>
 
-            <h5 class="m-t-20">Add line</h5>
-            <input type="number" class="form-control" placeholder="Loan ID" ng-model="newItem.loanId"/>
-            <input type="number" class="form-control m-t-5" placeholder="Amount" ng-model="newItem.amount"/>
-            <input class="form-control m-t-5" placeholder="Beneficiary name" ng-model="newItem.beneficiary.beneficiaryName"/>
-            <input class="form-control m-t-5" placeholder="MSISDN" ng-model="newItem.beneficiary.msisdn"/>
-            <button class="btn btn-default m-t-10" ng-click="addItem()">Add item</button>
+                <h5 class="m-t-20">Add line</h5>
+                <input type="text" class="form-control" placeholder="Loan account number" ng-model="newItem.accountNo"/>
+                <input type="number" class="form-control m-t-5" placeholder="Amount" ng-model="newItem.amount"/>
+                <input type="number" class="form-control m-t-5" placeholder="Payment type ID" ng-model="newItem.paymentTypeId"/>
+                <input class="form-control m-t-5" placeholder="Beneficiary name" ng-model="newItem.beneficiary.beneficiaryName"/>
+                <input class="form-control m-t-5" placeholder="MSISDN" ng-model="newItem.beneficiary.msisdn"/>
+                <button class="btn btn-default m-t-10" ng-click="addItem()" ng-disabled="resolving">Add item</button>
+                <span ng-if="resolveError" class="text-danger m-l-10">{{resolveError}}</span>
 
-            <table class="table m-t-20" ng-if="formData.items.length">
-                <thead><tr><th>Loan</th><th>Amount</th><th>Beneficiary</th></tr></thead>
-                <tbody>
-                <tr ng-repeat="item in formData.items">
-                    <td>{{item.loanId}}</td>
-                    <td>{{item.amount}}</td>
-                    <td>{{item.beneficiary.beneficiaryName}} / {{item.beneficiary.msisdn}}</td>
-                </tr>
-                </tbody>
-            </table>
+                <table class="table m-t-20" ng-if="formData.items.length">
+                    <thead><tr><th>Account</th><th>Loan ID</th><th>Amount</th><th>Beneficiary</th></tr></thead>
+                    <tbody>
+                    <tr ng-repeat="item in formData.items">
+                        <td>{{item.accountNo}}</td>
+                        <td>{{item.loanId}}</td>
+                        <td>{{item.amount}}</td>
+                        <td>{{item.beneficiary.beneficiaryName}} / {{item.beneficiary.msisdn}}</td>
+                    </tr>
+                    </tbody>
+                </table>
 
-            <div class="alert alert-warning m-t-20" ng-if="batchResult && batchResult.failedCount > 0">
-                <p>Batch {{batchResult.resourceId}}: {{batchResult.successCount}} succeeded, {{batchResult.failedCount}} failed.</p>
-                <ul>
-                    <li ng-repeat="err in batchResult.lineErrors">{{err}}</li>
-                </ul>
-                <a href="#/excessrefunds" class="btn btn-default">Back to list</a>
+                <div class="alert alert-warning m-t-20" ng-if="batchResult && batchResult.failedCount > 0">
+                    <p>Batch {{batchResult.resourceId}}: {{batchResult.successCount}} succeeded, {{batchResult.failedCount}} failed.</p>
+                    <ul>
+                        <li ng-repeat="err in batchResult.lineErrors">{{err}}</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary" ng-click="submit()" has-permission="CREATE_EXCESS_REFUND_BATCH">Submit batch</button>
             </div>
 
-            <button class="btn btn-primary" ng-click="submit()" has-permission="CREATE_EXCESS_REFUND_BATCH">Submit batch</button>
+            <div ng-if="batchId">
+                <h4>Batch #{{batchId}}</h4>
+                <p ng-if="!pendingLines.length">No pending lines to approve or reject.</p>
+                <table class="table" ng-if="pendingLines.length">
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" ng-model="selectAll" ng-change="toggleSelectAll()"/></th>
+                        <th>Refund ID</th>
+                        <th>Loan</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="line in pendingLines">
+                        <td><input type="checkbox" ng-model="line.selected"/></td>
+                        <td>{{line.id}}</td>
+                        <td>{{line.loanAccountNo || line.loanId}}</td>
+                        <td>{{line.amount}} {{line.currencyCode}}</td>
+                        <td>{{line.statusLabel}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success" ng-click="approveSelected()" has-permission="APPROVE_EXCESS_REFUND_BATCH"
+                        ng-disabled="!selectedIds().length">Approve selected</button>
+                <button class="btn btn-warning" ng-click="rejectSelected()" has-permission="REJECT_EXCESS_REFUND_BATCH"
+                        ng-disabled="!selectedIds().length">Reject selected</button>
+                <a href="#/excessrefunds" class="btn btn-default">Back to list</a>
+            </div>
         </div>
     </div>
 </div>

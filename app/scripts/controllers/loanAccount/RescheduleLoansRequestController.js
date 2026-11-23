@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        RescheduleLoansRequestController: function (scope, resourceFactory, routeParams, location, dateFilter, $translate) {
+        RescheduleLoansRequestController: function (scope, resourceFactory, routeParams, location, dateFilter, $translate, $window) {
             var fallbackRepaymentFrequencyTypeOptions = [
                 { id: 0, value: 'Days' },
                 { id: 1, value: 'Weeks' },
@@ -88,6 +88,18 @@
             };
 
             scope.loanId = routeParams.loanId;
+            scope.fromManualReview = String(location.search().fromReview || '') === '1';
+            scope.comments = '';
+            if (scope.fromManualReview) {
+                try {
+                    var storedReview = JSON.parse($window.sessionStorage.getItem('trancheManualReviewReschedule') || 'null');
+                    if (storedReview && String(storedReview.loanId) === String(scope.loanId) && storedReview.note) {
+                        scope.comments = storedReview.note;
+                    }
+                } catch (ignored) {
+                    scope.comments = '';
+                }
+            }
             scope.formData = { recalculateEvenIfObligationsMet: false };
             scope.rejectData = {};
             scope.adjustFuturePayments = true;
@@ -106,7 +118,25 @@
                 scope.transactionTemplateDate = normalizeDate(data.loanTransactionData.date);
             });
 
-            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, associations: 'repaymentSchedule'}, function (data) {
+            function translateNotice(key, params) {
+                return $translate.instant(key, params);
+            }
+
+            scope.refreshMultiTrancheWarning = function () {
+                scope.multiTrancheNotice = MultiTrancheRescheduleNotice.assess(scope.loanAccount, scope.formData.rescheduleFromDate);
+                scope.multiTrancheWarnings = MultiTrancheRescheduleNotice.lines(scope.multiTrancheNotice, translateNotice);
+                if (scope.fromManualReview && scope.multiTrancheNotice && !scope.multiTrancheNotice.nothingDisbursed) {
+                    scope.formData.acknowledgeMultiTrancheReschedule = true;
+                }
+            };
+            scope.$watch('formData.rescheduleFromDate', function () {
+                if (scope.loanAccount) {
+                    scope.refreshMultiTrancheWarning();
+                }
+            });
+
+            resourceFactory.loanResource.get({loanId: scope.loanId, template: true, associations: 'repaymentSchedule,multiDisburseDetails'}, function (data) {
+                scope.loanAccount = data;
                 scope.currentRepaymentEvery = data.repaymentEvery;
                 scope.currentRepaymentFrequencyType = data.repaymentFrequencyType;
                 scope.repaymentFrequencyTypeOptions = normalizeRepaymentFrequencyOptions(data);
@@ -117,10 +147,11 @@
                 scope.formData.loanTermFrequency = data.termFrequency;
                 scope.formData.loanTermFrequencyType = data.termPeriodFrequencyType ? data.termPeriodFrequencyType.id : null;
                 mifosX.models.RepaymentFrequency.bindTo(scope);
+                scope.refreshMultiTrancheWarning();
             });
 
             scope.cancel = function () {
-                location.path('/viewloanaccount/' + scope.loanId);
+                location.path('/viewloanaccount/' + scope.loanId).search('fromReview', null);
             };
 
             function isBlank(value) {
@@ -128,6 +159,10 @@
             }
 
             scope.submit = function () {
+                if (scope.fromManualReview && isBlank(scope.comments)) {
+                    scope.error = $translate.instant('validation.msg.tranche.review.note.required');
+                    return;
+                }
                 if (scope.assertRepaymentFrequencyValid && !scope.assertRepaymentFrequencyValid(true)) {
                     return;
                 }
@@ -160,6 +195,15 @@
                     scope.error = $translate.instant('validation.msg.rescheduleloan.graceOnPrincipal.cannot.be.blank');
                     return;
                 }
+                scope.refreshMultiTrancheWarning();
+                if (scope.multiTrancheNotice && scope.multiTrancheNotice.nothingDisbursed) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.multiTranche.nothing.disbursed');
+                    return;
+                }
+                if (scope.multiTrancheNotice && !scope.formData.acknowledgeMultiTrancheReschedule) {
+                    scope.error = $translate.instant('validation.msg.rescheduleloan.acknowledgeMultiTrancheReschedule.required');
+                    return;
+                }
 
                 if (scope.changeFixedPrincipal && scope.changeFixedPrincipalPercentagePerInstallment) {
                     scope.error = $translate.instant('validation.msg.rescheduleloan.fixedPrincipal.amountAndPercentage');
@@ -184,7 +228,7 @@
                     this.formData.carryForwardChargeDueDate =
                         dateFilter(this.formData.carryForwardChargeDueDate, scope.df);
                 }
-                this.formData.rescheduleReasonComment = scope.comments;
+                this.formData.rescheduleReasonComment = scope.fromManualReview ? String(scope.comments).trim() : scope.comments;
 
                 if (scope.changeRepaymentDate && this.formData.adjustedDueDate) {
                     this.formData.adjustedDueDate = dateFilter(this.formData.adjustedDueDate, scope.df);
@@ -216,6 +260,10 @@
                     delete this.formData.emi;
                 }
 
+                if (!scope.multiTrancheNotice) {
+                    delete this.formData.acknowledgeMultiTrancheReschedule;
+                }
+
                 if (repaymentFrequencyChanged) {
                     this.formData.repaymentEvery = repaymentEvery;
                     this.formData.repaymentFrequencyType = repaymentFrequencyType;
@@ -234,7 +282,10 @@
                 delete this.formData.loanTermFrequencyType;
                 resourceFactory.loanRescheduleResource.put(this.formData, function (data) {
                     scope.requestId = data.resourceId;
-                    location.path('/loans/' + scope.loanId + '/viewreschedulerequest/'+ data.resourceId);
+                    if (scope.fromManualReview) {
+                        $window.sessionStorage.removeItem('trancheManualReviewReschedule');
+                    }
+                    location.path('/loans/' + scope.loanId + '/viewreschedulerequest/'+ data.resourceId).search('fromReview', null);
                 }, function (response) {
                     var errors = response && response.data && response.data.errors;
                     var backendError = response && response.data;
@@ -248,7 +299,7 @@
 
         }
     });
-    mifosX.ng.application.controller('RescheduleLoansRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', '$translate', mifosX.controllers.RescheduleLoansRequestController]).run(function ($log) {
+    mifosX.ng.application.controller('RescheduleLoansRequestController', ['$scope', 'ResourceFactory', '$routeParams', '$location', 'dateFilter', '$translate', '$window', mifosX.controllers.RescheduleLoansRequestController]).run(function ($log) {
         $log.info("RescheduleLoansRequestController initialized");
     });
 }(mifosX.controllers || {}));

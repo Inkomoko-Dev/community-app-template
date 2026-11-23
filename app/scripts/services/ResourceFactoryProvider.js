@@ -277,6 +277,9 @@
                     excessRefundTemplateResource: defineResource(apiVer + "/loans/:loanId/excess-refund-template", { loanId: '@loanId' }, {
                         get: { method: 'GET' }
                     }),
+                    excessRefundTemplateByAccountResource: defineResource(apiVer + "/loans/by-account/:accountNo/excess-refund-template", { accountNo: '@accountNo' }, {
+                        get: { method: 'GET' }
+                    }),
                     excessRefundBatchResource: defineResource(apiVer + "/excess-refund-batches/:batchId", { batchId: '@batchId', command: '@command' }, {
                         save: { method: 'POST' },
                         command: { method: 'POST', params: { command: '@command' } }
@@ -329,6 +332,18 @@
                     LoanAccountResource: defineResource(apiVer + "/loans/:loanId/:resourceType/:chargeId", { loanId: '@loanId', resourceType: '@resourceType', chargeId: '@chargeId' }, {
                         getLoanAccountDetails: { method: 'GET', params: {} },
                         update: { method: 'PUT' }
+                    }),
+                    trancheReleaseReportResource: defineResource(apiVer + "/loans/:loanId/tranche-release-report", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    trancheMilestoneResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones", { loanKey: '@loanKey' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    trancheMilestoneExceptionResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones/deadline-exception", { loanKey: '@loanKey' }, {
+                        save: { method: 'POST', params: {} }
+                    }),
+                    trancheMilestoneCancelResource: defineResource(apiVer + "/loans/:loanKey/tranche-milestones/cancel-undisbursed", { loanKey: '@loanKey' }, {
+                        save: { method: 'POST', params: {} }
                     }),
                     PaymentHubDisbursementStatusResource: defineResource(apiVer + "/loans/:loanId/paymenthub-disbursement-status", { loanId: '@loanId' }, {
                         check: { method: 'POST' }
@@ -1166,6 +1181,10 @@
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } }
                     }),
 
+                    africasTalkingTemplateResource: defineResource(apiVer + "/africastalking/template/send", {}, {
+                        save: { method: 'POST', params: {} }
+                    }),
+
                     africasTalkingVoiceCallbackResource: defineResource(apiVer + "/africastalking/voice/callbacks/:callbackId", { callbackId: '@callbackId' }, {
                         getAll: { method: 'GET', url: baseUrl + apiVer + "/africastalking/voice/callbacks", params: {}, isArray: true, headers: { 'Content-Type': undefined } },
                         get: { method: 'GET', params: {}, headers: { 'Content-Type': undefined } },
@@ -1378,6 +1397,64 @@
                     }),
                     loanClassificationAuditResource: defineResource(apiVer + "/loans/:loanId/classification/audit", { loanId: '@loanId' }, {
                         getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionCatalogueResource: defineResource(apiVer + "/creditdecision/catalogue", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionProductsResource: defineResource(apiVer + "/creditdecision/products", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionProfileResource: defineResource(apiVer + "/creditdecision/profiles/:profileId", { profileId: '@profileId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, url: baseUrl + apiVer + '/creditdecision/profiles' },
+                        get: { method: 'GET', params: {} },
+                        save: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/profiles' }
+                    }),
+                    creditDecisionVersionResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/versions/:versionNo", { profileId: '@profileId', versionNo: '@versionNo' }, {
+                        saveDraft: { method: 'PUT', params: {} },
+                        newDraft: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/profiles/:profileId/versions' },
+                        command: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionModeResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/mode", { profileId: '@profileId' }, {
+                        update: { method: 'PUT', params: {} },
+                        command: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionPolicyResource: defineResource(apiVer + "/creditdecision/policy", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionHistoryResource: defineResource(apiVer + "/creditdecision/profiles/:profileId/history", { profileId: '@profileId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionConnectionResource: defineResource(apiVer + "/creditdecision/connection", {}, {
+                        get: { method: 'GET', params: {} },
+                        update: { method: 'PUT', params: {} }
+                    }),
+                    creditDecisionLogResource: defineResource(apiVer + "/creditdecision/log", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionExceptionsResource: defineResource(apiVer + "/creditdecision/exceptions", {}, {
+                        get: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionLogEntryResource: defineResource(apiVer + "/creditdecision/log/:logId", { logId: '@logId' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionProductProfileResource: defineResource(apiVer + "/creditdecision/products/:productId/profile", { productId: '@productId' }, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionLoanResource: defineResource(apiVer + "/creditdecision/loans/:loanId", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {} },
+                        command: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionLoanHistoryResource: defineResource(apiVer + "/creditdecision/loans/:loanId/history", { loanId: '@loanId' }, {
+                        get: { method: 'GET', params: {}, isArray: true }
+                    }),
+                    creditDecisionLoanFlagResource: defineResource(apiVer + "/creditdecision/loans/:loanId/flag", { loanId: '@loanId' }, {
+                        update: { method: 'PUT', params: {} }
+                    }),
+                    creditDecisionDelegatedAuthorityResource: defineResource(apiVer + "/creditdecision/delegatedauthority/:ruleId", { ruleId: '@ruleId' }, {
+                        getAll: { method: 'GET', params: {}, isArray: true, url: baseUrl + apiVer + '/creditdecision/delegatedauthority' },
+                        save: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/delegatedauthority' },
+                        update: { method: 'PUT', params: {} },
+                        delete: { method: 'DELETE', params: {} }
                     })
                 };
             }];

@@ -165,3 +165,39 @@ test('clears a displayed error only when the same write is submitted again', fun
     assert.equal(api.shouldClearForRequest('POST', '/loans/1?command=approve', null), false);
     assert.equal(api.shouldClearForRequest('GET', '/loans/1', null), false);
 });
+
+test('clears an error from a read once that read or any save succeeds', function () {
+    const readError = api.requestKey('GET', '/loans/1?associations=all');
+    assert.equal(api.shouldClearOnSuccess('GET', '/loans/1?associations=all', readError), true);
+    assert.equal(api.shouldClearOnSuccess('POST', '/loans/1/notes', readError), true);
+    assert.equal(api.shouldClearOnSuccess('PUT', '/users/5', readError), true);
+    assert.equal(api.shouldClearOnSuccess('GET', '/offices', readError), false);
+    assert.equal(api.shouldClearOnSuccess('GET', '/offices', api.requestKey('POST', '/users')), false);
+    assert.equal(api.shouldClearOnSuccess('POST', '/loans/1/notes', api.requestKey('POST', '/users')), false);
+    assert.equal(api.shouldClearOnSuccess('POST', '/users', null), false);
+});
+
+test('does not let a cancelled request or a background read replace what the user is looking at', function () {
+    const saveError = api.requestKey('POST', '/users');
+    const readError = api.requestKey('GET', '/staff');
+    assert.equal(api.shouldPublishError('GET', 'abort', null), false);
+    assert.equal(api.shouldPublishError('POST', 'abort', null), false);
+    assert.equal(api.shouldPublishError('GET', 'error', saveError), false);
+    assert.equal(api.shouldPublishError('GET', 'complete', saveError), false);
+    assert.equal(api.shouldPublishError('GET', 'complete', readError), true);
+    assert.equal(api.shouldPublishError('GET', 'error', null), true);
+    assert.equal(api.shouldPublishError('GET', 'timeout', null), true);
+    assert.equal(api.shouldPublishError('POST', 'error', saveError), true);
+    assert.equal(api.shouldPublishError('POST', 'complete', null), true);
+});
+
+test('identifies a save by what it sends so a repeated click can be recognised', function () {
+    const body = {note: 'Client asked for a lower amount'};
+    const url = '/loans/decision/prepareAndSignContract/reject/431738';
+    assert.equal(api.writeSignature('GET', '/offices', null, null), null);
+    assert.equal(api.writeSignature(undefined, '/offices', null, null), null);
+    assert.equal(api.writeSignature('POST', url, null, body), api.writeSignature('POST', url, null, JSON.stringify(body)));
+    assert.notEqual(api.writeSignature('POST', url, null, body), api.writeSignature('POST', url, null, {note: 'Other'}));
+    assert.notEqual(api.writeSignature('POST', url, null, body), api.writeSignature('PUT', url, null, body));
+    assert.notEqual(api.writeSignature('POST', '/loans/1', {command: 'approve'}, body), api.writeSignature('POST', '/loans/1', {command: 'reject'}, body));
+});

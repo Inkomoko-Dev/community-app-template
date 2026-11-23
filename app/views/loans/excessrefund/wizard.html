@@ -4,18 +4,27 @@
         <li class="active">{{'label.heading.excessrefundwizard' | translate}}</li>
     </ul>
 
+    <api-validate></api-validate>
+
     <div class="panel panel-default">
         <div class="panel-heading"><strong>Step {{step}} of 6</strong></div>
         <div class="panel-body">
             <div ng-if="step === 1">
-                <label>Loan ID</label>
-                <input type="number" class="form-control" ng-model="formData.loanId"/>
+                <label>Loan account number</label>
+                <input type="text" class="form-control" ng-model="formData.accountNo"/>
                 <button class="btn btn-primary m-t-10" ng-click="loadTemplate()">Load excess</button>
             </div>
             <div ng-if="step === 2 && template">
                 <p>Account: <strong>{{template.accountNo}}</strong></p>
                 <p>Total overpaid: <strong>{{template.totalOverpaid}} {{template.currencyCode}}</strong></p>
-                <button class="btn btn-primary" ng-click="next()">Continue</button>
+                <div class="alert alert-warning" ng-if="!template.totalOverpaid || template.totalOverpaid == 0">
+                    <p>{{'label.msg.excessrefund.no.overpayment' | translate}}</p>
+                    <p ng-if="template.redrawBalance > 0">
+                        {{'label.msg.excessrefund.redraw.balance.hint' | translate}}
+                        <strong>{{template.redrawBalance}} {{template.currencyCode}}</strong>
+                    </p>
+                </div>
+                <button class="btn btn-primary" ng-click="next()" ng-disabled="!template.totalOverpaid || template.totalOverpaid == 0">Continue</button>
             </div>
             <div ng-if="step === 3">
                 <label>Channel</label>
@@ -48,8 +57,13 @@
                     <option value="MANUAL">Manual</option>
                     <option value="PAYMENT_HUB">Payment Hub</option>
                 </select>
+                <label>Payment type</label>
+                <select id="paymentTypeId" class="form-control" ng-model="formData.paymentTypeId"
+                        ng-options="paymentType.id as paymentType.name for paymentType in filteredPaymentTypes()">
+                    <option value="">-- select --</option>
+                </select>
                 <button class="btn btn-default" ng-click="back()">Back</button>
-                <button class="btn btn-primary" ng-click="next()">Continue</button>
+                <button class="btn btn-primary" ng-click="next()" ng-disabled="!formData.paymentTypeId">Continue</button>
             </div>
             <div ng-if="step === 5">
                 <p>Review refund for loan {{formData.loanId}} amount {{formData.amount}} via {{formData.paymentMode}}.</p>

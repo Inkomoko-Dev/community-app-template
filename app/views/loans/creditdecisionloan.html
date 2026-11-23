@@ -1,0 +1,22 @@
+<div class="content-container cd" ng-controller="CreditDecisionLoanPageController">
+    <ul class="breadcrumb">
+        <li><a href="#/viewloanaccount/{{loanId}}">{{'label.anchor.viewloanaccount' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.loan.page' | translate}}</li>
+    </ul>
+    <div class="card well">
+        <legend>{{'label.creditdecision.loan.page' | translate}}
+            <small ng-if="summary">&nbsp;{{summary.clientName}} &middot; {{summary.loanProductName}} &middot; #{{summary.accountNo}}</small>
+        </legend>
+
+        <credit-decision-loan loan="loan" mode="page"></credit-decision-loan>
+
+        <credit-decision-record status="status" compact="true"></credit-decision-record>
+
+        <credit-decision-history status="status"></credit-decision-history>
+
+        <div class="cd-page-actions">
+            <a class="btn btn-default" id="cd-page-back" ng-href="#/viewloanaccount/{{loanId}}">{{'label.button.back' | translate}}</a>
+            <a href="" class="pull-right" id="cd-loan-notrequired" ng-if="canRemove()" ng-click="remove()">{{'label.creditdecision.loan.remove' | translate}}</a>
+        </div>
+    </div>
+</div>

@@ -48,13 +48,15 @@
                 };
                 var found = count(s.found, s.totalFound, s.totalLoansFound);
                 var excluded = count(s.excluded, s.totalExcluded);
+                var skipped = count(s.skipped, s.totalSkipped);
                 var failed = count(s.failed, s.totalFailed);
                 var succeeded = count(s.totalSucceeded);
                 return {
                     found: found,
-                    affected: succeeded || Math.max(0, found - excluded - failed),
+                    affected: succeeded || Math.max(0, found - excluded - failed - skipped),
                     succeeded: succeeded,
                     excluded: excluded,
+                    skipped: skipped,
                     failed: failed
                 };
             };

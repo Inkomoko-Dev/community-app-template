@@ -13,6 +13,13 @@ angular.module('notificationWidget', [])
     .config(['$httpProvider', function ($httpProvider) {
         $httpProvider.interceptors.push(function ($q, $injector, $location, $rootScope) {
             var notificationChannel, $http;
+            var savesInFlight = {};
+
+            function releaseSave(config) {
+                if (config && config.cbsWriteSignature) {
+                    delete savesInFlight[config.cbsWriteSignature];
+                }
+            }
 
             function translateCode(code, params) {
                 try {
@@ -62,6 +69,14 @@ angular.module('notificationWidget', [])
 
             return {
                 request: function (config) {
+                    var signature = config ? ApiErrorMessage.writeSignature(config.method, config.url, config.params, config.data) : null;
+                    if (signature && savesInFlight[signature]) {
+                        return $q.defer().promise;
+                    }
+                    if (signature) {
+                        savesInFlight[signature] = true;
+                        config.cbsWriteSignature = signature;
+                    }
                     $rootScope.blockUI = true;
                     if (ApiErrorMessage.shouldClearForRequest(config && config.method, config && config.url, $rootScope._apiErrorRequestKey)) {
                         clearDisplayedErrors();
@@ -76,6 +91,7 @@ angular.module('notificationWidget', [])
                 },
                 requestError: function (rejection) {
                     $rootScope.blockUI = false;
+                    releaseSave(rejection && rejection.config);
 
                     // get $http via $injector because of circular dependency problem
                     $http = $http || $injector.get('$http');
@@ -90,6 +106,11 @@ angular.module('notificationWidget', [])
                 },
                 response: function (response) {
                     $rootScope.blockUI = false;
+                    releaseSave(response && response.config);
+                    var succeeded = response && response.config;
+                    if (succeeded && ApiErrorMessage.shouldClearOnSuccess(succeeded.method, succeeded.url, $rootScope._apiErrorRequestKey)) {
+                        clearDisplayedErrors();
+                    }
 
                     //contains the responses successful and failed responses
                     $rootScope.successfulResponses = [];
@@ -147,6 +168,7 @@ angular.module('notificationWidget', [])
                 },
                 responseError: function (rejection) {
                     $rootScope.blockUI = false;
+                    releaseSave(rejection && rejection.config);
 
                     // get $http via $injector because of circular dependency problem
                     $http = $http || $injector.get('$http');
@@ -160,6 +182,10 @@ angular.module('notificationWidget', [])
 
                     var requestUrl = rejection && rejection.config ? rejection.config.url || '' : '';
                     if (rejection && rejection.config && rejection.config.ignoreErrorBanner) {
+                        return $q.reject(rejection);
+                    }
+                    if (!ApiErrorMessage.shouldPublishError(rejection && rejection.config && rejection.config.method,
+                            rejection && rejection.xhrStatus, $rootScope._apiErrorRequestKey)) {
                         return $q.reject(rejection);
                     }
                     var parsed;
@@ -204,23 +230,92 @@ angular.module('notificationWidget', [])
         });
     }])
     .directive('form', ['$injector', '$timeout', function ($injector, $timeout) {
+        function hasPendingWrite($http) {
+            for (var i = 0; i < $http.pendingRequests.length; i++) {
+                var method = $http.pendingRequests[i].method;
+                if (method && method !== 'GET') {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function lockSubmitButtonsUntilSaved(element, $rootScope, $http) {
+            var locked = [];
+            angular.forEach(element[0].querySelectorAll('button[type="submit"], input[type="submit"]'), function (button) {
+                if (!button.disabled) {
+                    button.disabled = true;
+                    button.setAttribute('aria-busy', 'true');
+                    locked.push(button);
+                }
+            });
+            if (!locked.length) {
+                return;
+            }
+            var stopWatching = $rootScope.$watch(function () {
+                return hasPendingWrite($http);
+            }, function (pending) {
+                if (pending) {
+                    return;
+                }
+                stopWatching();
+                angular.forEach(locked, function (button) {
+                    button.disabled = false;
+                    button.removeAttribute('aria-busy');
+                });
+            });
+        }
+
+        function lockWhenSaveStarts(element) {
+            if (element.data('cbsAwaitingSave')) {
+                return;
+            }
+            var $rootScope = $injector.get('$rootScope');
+            var $http = $injector.get('$http');
+            if (hasPendingWrite($http)) {
+                lockSubmitButtonsUntilSaved(element, $rootScope, $http);
+                return;
+            }
+            element.data('cbsAwaitingSave', true);
+            var giveUp;
+            var stopWatching = $rootScope.$watch(function () {
+                return hasPendingWrite($http);
+            }, function (pending) {
+                if (!pending) {
+                    return;
+                }
+                stopWatching();
+                $timeout.cancel(giveUp);
+                element.data('cbsAwaitingSave', false);
+                lockSubmitButtonsUntilSaved(element, $rootScope, $http);
+            });
+            giveUp = $timeout(function () {
+                stopWatching();
+                element.data('cbsAwaitingSave', false);
+            }, 2000, false);
+        }
+
         return {
             restrict: 'E',
             require: 'form',
             link: function (scope, element, attrs, formCtrl) {
+                element.on('click', function (event) {
+                    var target = event.target && event.target.closest ? event.target.closest('button[type="submit"], input[type="submit"]') : null;
+                    var prevented = event.isDefaultPrevented ? event.isDefaultPrevented() : event.defaultPrevented;
+                    if (!target || !prevented) {
+                        return;
+                    }
+                    lockWhenSaveStarts(element);
+                });
                 element.on('submit', function () {
+                    lockWhenSaveStarts(element);
                     var $rootScope = $injector.get('$rootScope');
                     var generation = $rootScope._apiErrorGeneration || 0;
                     var hadClientError = !$rootScope._apiErrorRequestKey &&
                         ($rootScope.errorStatus || ($rootScope.errorDetails && $rootScope.errorDetails.length));
                     $timeout(function () {
                         var $http = $injector.get('$http');
-                        var pendingWrite = false;
-                        angular.forEach($http.pendingRequests, function (request) {
-                            if (request.method && request.method !== 'GET') {
-                                pendingWrite = true;
-                            }
-                        });
+                        var pendingWrite = hasPendingWrite($http);
                         var stillSame = ($rootScope._apiErrorGeneration || 0) === generation;
                         if (hadClientError && stillSame && (pendingWrite || !formCtrl.$invalid)) {
                             if ($rootScope.dismissUserErrors) {

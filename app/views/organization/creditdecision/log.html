@@ -1,0 +1,185 @@
+<div class="content-container cd" ng-controller="CreditDecisionLogController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.log' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+
+            <div class="cd-tabs">
+                <a ng-repeat="tab in tabs" ng-class="{on: filter.outcome == tab}" ng-click="setOutcome(tab)">
+                    {{'label.creditdecision.log.tab.' + (tab || 'ALL') | translate}}
+                    <span class="cd-count">{{tabCount(tab)}}</span>
+                </a>
+            </div>
+
+            <form class="cd-filterbar" ng-submit="refilter()">
+                <div class="cd-field cd-grow">
+                    <label>{{'label.creditdecision.log.search' | translate}}</label>
+                    <input type="text" class="form-control input-sm" ng-model="filter.search" ng-change="typed()">
+                </div>
+                <div class="cd-field">
+                    <label>{{'label.creditdecision.log.filter.profile' | translate}}</label>
+                    <select class="form-control input-sm" ng-model="filter.profileId" ng-change="refilter()"
+                            ng-options="p.id as p.name for p in profiles">
+                        <option value="">{{'label.creditdecision.log.filter.profile.any' | translate}}</option>
+                    </select>
+                </div>
+                <div class="cd-field">
+                    <label>{{'label.creditdecision.log.filter.from' | translate}}</label>
+                    <input type="date" class="form-control input-sm" ng-model="filter.from" max="{{filter.to | date:'yyyy-MM-dd'}}" ng-change="refilter()">
+                </div>
+                <div class="cd-field">
+                    <label>{{'label.creditdecision.log.filter.to' | translate}}</label>
+                    <input type="date" class="form-control input-sm" ng-model="filter.to" min="{{filter.from | date:'yyyy-MM-dd'}}" ng-change="refilter()">
+                </div>
+                <a class="cd-more" ng-click="showMore = !showMore">
+                    <i class="fa" ng-class="showMore ? 'fa-angle-up' : 'fa-angle-down'"></i> {{'label.creditdecision.log.filter.more' | translate}}
+                </a>
+                <button type="submit" class="ng-hide"></button>
+            </form>
+            <form class="cd-filterbar cd-filterbar-more" ng-if="showMore" ng-submit="refilter()">
+                <div class="cd-field">
+                    <label>{{'label.creditdecision.log.filter.mode' | translate}}</label>
+                    <select class="form-control input-sm" ng-model="filter.mode" ng-change="refilter()">
+                        <option value="">{{'label.creditdecision.log.filter.mode.any' | translate}}</option>
+                        <option ng-repeat="m in modes" value="{{m}}">{{'label.creditdecision.mode.' + m | translate}}</option>
+                    </select>
+                </div>
+                <div class="cd-field">
+                    <label>{{'label.creditdecision.log.filter.reason' | translate}}</label>
+                    <input type="text" class="form-control input-sm" ng-model="filter.reason" ng-change="typed()">
+                </div>
+                <div class="cd-field" ng-if="riskTiers.length || filter.riskTier">
+                    <label>{{'label.creditdecision.log.filter.risktier' | translate}}</label>
+                    <select class="form-control input-sm" id="cd-filter-risktier" ng-model="filter.riskTier" ng-change="refilter()">
+                        <option value="">{{'label.creditdecision.log.filter.risktier.any' | translate}}</option>
+                        <option ng-repeat="t in riskTiers" value="{{t}}">{{t}}</option>
+                    </select>
+                </div>
+                <div class="cd-field" ng-if="modelVersions.length || filter.modelVersion">
+                    <label>{{'label.creditdecision.log.filter.model' | translate}}</label>
+                    <select class="form-control input-sm" id="cd-filter-model" ng-model="filter.modelVersion" ng-change="refilter()">
+                        <option value="">{{'label.creditdecision.log.filter.model.any' | translate}}</option>
+                        <option ng-repeat="v in modelVersions" value="{{v}}">{{v}}</option>
+                    </select>
+                </div>
+                <div class="cd-field">
+                    <label>{{'label.creditdecision.log.filter.sort' | translate}}</label>
+                    <select class="form-control input-sm" ng-model="filter.sort" ng-change="refilter()">
+                        <option ng-repeat="s in sorts" value="{{s}}">{{'label.creditdecision.log.sort.' + s | translate}}</option>
+                    </select>
+                </div>
+            </form>
+
+            <div class="cd-summary" ng-if="loaded">
+                <span class="cd-muted" ng-if="total">{{'label.creditdecision.log.page.range' | translate:range}}</span>
+                <span ng-if="isFiltered()">
+                    <span class="cd-muted" ng-if="activeFilters()">&middot; {{'label.creditdecision.log.filter.active' | translate:{n: activeFilters()} }}</span>
+                    <a class="cd-clear" ng-click="clear()">{{'label.creditdecision.log.filter.clear' | translate}}</a>
+                </span>
+                <i class="fa fa-spinner fa-spin cd-muted" ng-if="loading"></i>
+            </div>
+
+            <div ng-class="{'cd-busy': loading}">
+            <table class="cd-table hover" ng-if="rows.length">
+                <thead>
+                <tr>
+                    <th>{{'label.creditdecision.log.col.application' | translate}}</th>
+                    <th>{{'label.creditdecision.log.col.profile' | translate}}</th>
+                    <th>{{'label.creditdecision.log.col.decision' | translate}}</th>
+                    <th>{{'label.creditdecision.log.col.reasons' | translate}}</th>
+                    <th>{{'label.creditdecision.col.date' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in rows" ng-click="show(row)">
+                    <td>
+                        <strong>{{row.applicationRef}}</strong>
+                        <span class="cd-sub cd-mono">{{row.customerRef}}</span>
+                    </td>
+                    <td>
+                        {{row.profileName}}
+                        <span class="cd-sub"><span ng-if="row.versionNo">v{{row.versionNo}}</span><span ng-if="row.mode"> &middot; {{'label.creditdecision.mode.' + row.mode | translate}}</span></span>
+                    </td>
+                    <td>
+                        <span ng-if="row.decision">
+                            <span class="cd-dot" ng-class="{go: row.decision == 'AUTO_APPROVE', review: row.decision == 'IC_REVIEW_REQUIRED', nogo: row.decision == 'INELIGIBLE'}"></span>{{'label.creditdecision.decision.' + row.decision | translate}}
+                            <span class="cd-muted" ng-if="row.score !== null && row.score !== undefined">&nbsp;{{row.score}}</span>
+                            <span class="cd-sub" ng-if="row.riskTier || row.modelVersion"><span ng-if="row.riskTier">{{'label.creditdecision.page.risktier' | translate}} {{row.riskTier}}</span><span ng-if="row.riskTier && row.modelVersion"> &middot; </span><span ng-if="row.modelVersion">{{row.modelVersion}}</span></span>
+                        </span>
+                        <span class="cd-muted" ng-if="!row.decision">
+                            <span class="cd-dot" ng-class="row.status == 'HELD' ? 'held' : 'review'"></span>{{'label.creditdecision.log.status.' + row.status | translate}}
+                        </span>
+                    </td>
+                    <td><span class="cd-mono cd-small" ng-if="row.reasonCodes">{{row.reasonCodes}}</span><span class="cd-muted" ng-if="!row.reasonCodes">-</span></td>
+                    <td class="cd-muted cd-small">{{row.createdOn | date:'medium'}}</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="cd-pager" ng-if="totalPages > 1 || total > 10">
+                <div class="cd-size">
+                    <span class="cd-muted">{{'label.creditdecision.log.page.size' | translate}}</span>
+                    <select class="form-control input-sm" ng-model="pageSize" ng-options="n for n in pageSizes" ng-change="setPageSize()"></select>
+                </div>
+                <ul class="cd-pages" ng-if="totalPages > 1">
+                    <li ng-class="{off: page == 1}"><a ng-click="goTo(1)" title="{{'label.creditdecision.log.page.first' | translate}}"><i class="fa fa-angle-double-left"></i></a></li>
+                    <li ng-class="{off: page == 1}"><a ng-click="goTo(page - 1)" title="{{'label.creditdecision.log.page.prev' | translate}}"><i class="fa fa-angle-left"></i></a></li>
+                    <li ng-repeat="n in pageNumbers track by $index" ng-class="{on: n == page, gap: n === null}">
+                        <span ng-if="n === null">&hellip;</span>
+                        <a ng-if="n !== null" ng-click="goTo(n)" title="{{'label.creditdecision.log.page.label' | translate:{n: n} }}">{{n}}</a>
+                    </li>
+                    <li ng-class="{off: page == totalPages}"><a ng-click="goTo(page + 1)" title="{{'label.creditdecision.log.page.next' | translate}}"><i class="fa fa-angle-right"></i></a></li>
+                    <li ng-class="{off: page == totalPages}"><a ng-click="goTo(totalPages)" title="{{'label.creditdecision.log.page.last' | translate}}"><i class="fa fa-angle-double-right"></i></a></li>
+                </ul>
+            </div>
+
+            <div class="cd-empty" ng-if="loaded && !rows.length">
+                <i class="fa fa-list-alt"></i>
+                <p ng-if="!isFiltered()">{{'label.creditdecision.log.none' | translate}}</p>
+                <p ng-if="isFiltered()">{{'label.creditdecision.log.nomatch' | translate}}</p>
+                <a class="btn btn-default btn-sm" ng-if="isFiltered()" ng-click="clear()">{{'label.creditdecision.log.filter.clear' | translate}}</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="creditDecisionLogEntry.html">
+        <div class="modal-header">
+            <h3 class="modal-title">{{'label.creditdecision.log.entry.title' | translate:{ref: row.applicationRef} }}</h3>
+            <small class="text-muted">{{row.profileName}} <span ng-if="row.versionNo">v{{row.versionNo}}</span> &middot; {{row.createdOn | date:'medium'}}</small>
+        </div>
+        <div class="modal-body">
+            <dl class="dl-horizontal">
+                <dt>{{'label.creditdecision.log.entry.provider' | translate}}</dt><dd>{{row.provider}}</dd>
+                <dt>{{'label.creditdecision.log.col.customer' | translate}}</dt><dd><code>{{row.customerRef}}</code></dd>
+                <dt>{{'label.creditdecision.log.col.decision' | translate}}</dt>
+                <dd>
+                    <span ng-if="row.decision">{{row.decision}}</span>
+                    <span ng-if="!row.decision">{{'label.creditdecision.log.status.' + row.status | translate}}</span>
+                    <span ng-if="row.score !== null && row.score !== undefined"> &middot; {{'label.creditdecision.log.col.score' | translate}} {{row.score}}</span>
+                </dd>
+                <dt>{{'label.creditdecision.log.col.reasons' | translate}}</dt><dd>{{row.reasonCodes || '-'}}</dd>
+                <dt ng-if="row.riskTier">{{'label.creditdecision.page.risktier' | translate}}</dt><dd ng-if="row.riskTier">{{row.riskTier}}</dd>
+                <dt ng-if="row.maxExposure !== null && row.maxExposure !== undefined">{{'label.creditdecision.page.maxexposure' | translate}}</dt><dd ng-if="row.maxExposure !== null && row.maxExposure !== undefined">{{row.maxExposure | number:0}}</dd>
+                <dt ng-if="row.modelVersion">{{'label.creditdecision.page.model' | translate}}</dt><dd ng-if="row.modelVersion">{{row.modelVersion}}</dd>
+                <dt ng-if="row.requestId">{{'label.creditdecision.log.entry.requestid' | translate}}</dt><dd ng-if="row.requestId"><code>{{row.requestId}}</code></dd>
+                <dt>{{'label.creditdecision.log.entry.nextstep' | translate}}</dt><dd>{{row.nextStep || '-'}}</dd>
+                <dt>{{'label.creditdecision.log.entry.replytime' | translate}}</dt><dd>{{row.replyMs ? row.replyMs + ' ms' : '-'}}</dd>
+            </dl>
+            <p class="cd-muted" ng-if="loading"><i class="fa fa-spinner fa-spin"></i> {{'label.creditdecision.log.entry.loading' | translate}}</p>
+            <label ng-if="request">{{'label.creditdecision.log.entry.request' | translate}}</label>
+            <pre ng-if="request" style="max-height: 260px; overflow: auto; font-size: 12px;">{{request}}</pre>
+            <div ng-if="reply">
+                <label>{{'label.creditdecision.log.entry.reply' | translate}}</label>
+                <pre style="max-height: 260px; overflow: auto; font-size: 12px;">{{reply}}</pre>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" ng-click="close()">{{'label.creditdecision.button.close' | translate}}</button>
+        </div>
+    </script>
+</div>

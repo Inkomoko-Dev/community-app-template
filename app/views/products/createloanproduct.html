@@ -1281,33 +1281,80 @@
                     <i class="fa fa-question-circle " uib-tooltip="{{'label.tooltip.isMultiDisburseLoan' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </label>
-
                 <div class="checkbox col-sm-2">
                     <label>
                         <input type="checkbox" ng-model="formData.multiDisburseLoan"/>
                     </label>
                 </div>
+                <label class="control-label col-sm-2 col-sm-offset-2" ng-show="formData.multiDisburseLoan">{{ 'label.input.requiremilestonesurvey' | translate }}</label>
+                <div class="checkbox col-sm-2" ng-show="formData.multiDisburseLoan">
+                    <label>
+                        <input type="checkbox" id="requireMilestoneSurvey" ng-model="formData.requireMilestoneSurvey"/>
+                    </label>
+                </div>
             </div>
             <div class="form-group" ng-show="formData.multiDisburseLoan">
-                <label class="control-label col-sm-2">{{ 'label.input.maxtranchecount' | translate }}
-                    <i class="fa fa-question-circle " uib-tooltip="{{'label.tooltip.maxtranchecount' | translate}}"
+                <label class="control-label col-sm-2">{{ 'label.input.blockapplicationwhileunsettled' | translate }}</label>
+                <div class="checkbox col-sm-2">
+                    <label>
+                        <input type="checkbox" id="blockApplicationWhileUnsettled" ng-model="formData.blockApplicationWhileUnsettled"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" ng-show="formData.multiDisburseLoan">
+                <label class="control-label col-sm-2">{{ 'label.input.mintranchecount' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.mintranchecount' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </label>
-
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="minTrancheCount" name="minTrancheCount"
+                           ng-model="formData.minTrancheCount"/>
+                </div>
+                <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.maxtranchecount' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.maxtranchecount' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="maxTrancheCount" name="maxTrancheCount"
                            ng-model="formData.maxTrancheCount"/>
                 </div>
-                <label class="control-label col-sm-3 col-sm-offset-1">{{ 'label.input.outstandingloanbalance' |
-                    translate }}
-                    <i class="fa fa-question-circle "
-                       uib-tooltip="{{'label.tooltip.maxAllowedOutstandingBalance' | translate}}"
+            </div>
+            <div class="form-group" ng-show="formData.multiDisburseLoan">
+                <label class="control-label col-sm-2">{{ 'label.input.defaultfirsttranche' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.defaultfirsttranche' | translate}}"
                        tooltip-append-to-body="true"></i>
                 </label>
-
                 <div class="col-sm-2">
-                    <input type="text" class="form-control" id="outstandingLoanBalance"
-                           name="outstandingLoanBalance" number-format ng-model="formData.outstandingLoanBalance"/>
+                    <div class="input-group">
+                        <input ng-if="formData.firstTrancheAsPercentage" type="text" class="form-control" id="firstTrancheAmount"
+                               name="firstTrancheAmount" ng-model="formData.firstTrancheAmount"
+                               placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
+                        <input ng-if="!formData.firstTrancheAsPercentage" type="text" class="form-control" id="firstTrancheAmount"
+                               name="firstTrancheAmount" number-format ng-model="formData.firstTrancheAmount"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-class="{'btn-primary': formData.firstTrancheAsPercentage}"
+                                    ng-click="formData.firstTrancheAsPercentage = !formData.firstTrancheAsPercentage"
+                                    uib-tooltip="{{ 'label.tooltip.trancheamountmode' | translate }}" tooltip-append-to-body="true">%</button>
+                        </span>
+                    </div>
+                </div>
+                <label class="control-label col-sm-2 col-sm-offset-2">{{ 'label.input.defaultfirstrepaymentprincipal' | translate }}
+                    <i class="fa fa-question-circle" uib-tooltip="{{'label.tooltip.firstinstallmentprincipal' | translate}}"
+                       tooltip-append-to-body="true"></i>
+                </label>
+                <div class="col-sm-2">
+                    <div class="input-group">
+                        <input ng-if="formData.firstInstallmentAsPercentage" type="text" class="form-control" id="firstInstallmentPrincipal"
+                               name="firstInstallmentPrincipal" ng-model="formData.firstInstallmentPrincipal"
+                               placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
+                        <input ng-if="!formData.firstInstallmentAsPercentage" type="text" class="form-control" id="firstInstallmentPrincipal"
+                               name="firstInstallmentPrincipal" number-format ng-model="formData.firstInstallmentPrincipal"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-class="{'btn-primary': formData.firstInstallmentAsPercentage}"
+                                    ng-click="formData.firstInstallmentAsPercentage = !formData.firstInstallmentAsPercentage"
+                                    uib-tooltip="{{ 'label.tooltip.trancheamountmode' | translate }}" tooltip-append-to-body="true">%</button>
+                        </span>
+                    </div>
                 </div>
             </div>
             <h3>{{ 'label.heading.configurableAttributes' | translate }}</h3>
@@ -2275,12 +2322,34 @@
                     <td colspan="3">{{loanproduct.multiDisburseLoan}}</td>
                 </tr>
                 <tr ng-show="loanproduct.multiDisburseLoan">
+                    <td>{{'label.input.requiremilestonesurvey' | translate}}</td>
+                    <td colspan="3">{{loanproduct.requireMilestoneSurvey ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
+                </tr>
+                <tr ng-show="loanproduct.multiDisburseLoan">
+                    <td>{{'label.input.blockapplicationwhileunsettled' | translate}}</td>
+                    <td colspan="3">{{loanproduct.blockApplicationWhileUnsettled ? ('label.heading.yes' | translate) : ('label.heading.no' | translate)}}</td>
+                </tr>
+                <tr ng-show="loanproduct.multiDisburseLoan">
+                    <td>{{'label.input.mintranchecount' | translate}}</td>
+                    <td colspan="3">{{loanproduct.minTrancheCount}}</td>
+                </tr>
+                <tr ng-show="loanproduct.multiDisburseLoan">
                     <td>{{'label.input.maxtranchecount' | translate}}</td>
                     <td colspan="3">{{loanproduct.maxTrancheCount}}</td>
                 </tr>
                 <tr ng-show="loanproduct.multiDisburseLoan">
-                    <td>{{'label.input.outstandingloanbalance' | translate}}</td>
-                    <td colspan="3">{{loanproduct.outstandingLoanBalance}}</td>
+                    <td>{{'label.input.defaultfirsttranche' | translate}}</td>
+                    <td colspan="3">
+                        <span ng-if="loanproduct.firstTrancheAsPercentage">{{loanproduct.firstTrancheAmount}}%</span>
+                        <span ng-if="loanproduct.firstTrancheAmount && !loanproduct.firstTrancheAsPercentage">{{loanproduct.firstTrancheAmount}}</span>
+                    </td>
+                </tr>
+                <tr ng-show="loanproduct.multiDisburseLoan">
+                    <td>{{'label.input.defaultfirstrepaymentprincipal' | translate}}</td>
+                    <td colspan="3">
+                        <span ng-if="loanproduct.firstInstallmentAsPercentage">{{loanproduct.firstInstallmentPrincipal}}%</span>
+                        <span ng-if="loanproduct.firstInstallmentPrincipal && !loanproduct.firstInstallmentAsPercentage">{{loanproduct.firstInstallmentPrincipal}}</span>
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="4"><br/></td>
