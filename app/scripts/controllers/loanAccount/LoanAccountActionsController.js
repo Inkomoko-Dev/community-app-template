@@ -1023,10 +1023,10 @@
                             scope.formData.routingCode = templateData.routingCode || '';
                             scope.formData.receiptNumber = templateData.receiptNumber || '';
                             scope.formData.bankNumber = templateData.bankNumber || '';
+                            scope.formData.mfiCode = templateData.mfiCode || '';
                             
                             // Apply saved disbursement details first
                             if (savedDetail) {
-                                scope.formData.mfiCode = savedDetail.mfiCode || templateData.mfiCode || '';
                                 scope.formData.paymentTo = savedDetail.paymentTo || (templateData.paymentTo ? Number(templateData.paymentTo) : 1);
                                 scope.formData.clientPhoneNumber = savedDetail.clientPhoneNumber || templateData.clientPhoneNumber || '';
                                 scope.formData.clientAccountNumber = savedDetail.clientAccountNumber || templateData.clientAccountNumber || '';
@@ -1040,7 +1040,6 @@
                                 scope.formData.fxTimestamp = savedDetail.fxTimestamp || templateData.fxTimestamp || null;
                                 scope.formData.usdAmount = savedDetail.usdAmount || templateData.usdAmount || null;
                             } else {
-                                scope.formData.mfiCode = templateData.mfiCode || '';
                                 scope.formData.paymentTo = templateData.paymentTo ? Number(templateData.paymentTo) : 1;
                                 scope.formData.clientPhoneNumber = templateData.clientPhoneNumber || '';
                                 scope.formData.clientAccountNumber = templateData.clientAccountNumber || '';
