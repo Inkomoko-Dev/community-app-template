@@ -363,6 +363,10 @@
                 scope.previewRepayment =  !scope.previewRepayment;
             };
 
+            scope.canLeaveLoanTerms = function () {
+                return scope.assertRepaymentFrequencyValid && scope.assertRepaymentFrequencyValid(true);
+            };
+
             scope.previewClientLoanAccInfo = function () {
                 scope.previewRepayment = false;
                 scope.charges = scope.loanaccountinfo.charges || [];

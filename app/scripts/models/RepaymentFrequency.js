@@ -8,6 +8,14 @@
     var CUSTOM = { code: 'CUSTOM', value: 'Custom', repaymentEvery: null, repaymentFrequencyType: null };
     var TYPE_NAMES = { Days: 0, Weeks: 1, Months: 2, Years: 3 };
 
+    function parseInstallmentCount(value) {
+        if (!/^\d+$/.test(String(value).trim())) {
+            return NaN;
+        }
+        var count = Number(value);
+        return Number.isSafeInteger(count) ? count : NaN;
+    }
+
     mifosX.models = _.extend(module, {
         RepaymentFrequency: {
             MONTHS: MONTHS,
@@ -122,7 +130,7 @@
                 }
             },
             syncTermFromInstallments: function (formData) {
-                var installments = parseInt(formData.numberOfRepayments, 10);
+                var installments = parseInstallmentCount(formData.numberOfRepayments);
                 var every = parseInt(formData.repaymentEvery, 10);
                 var freqType = this.resolveTypeId(formData.repaymentFrequencyType);
                 var termType = this.resolveTypeId(formData.loanTermFrequencyType);
@@ -164,12 +172,20 @@
             validate: function (formData, hasLoanTerm, product) {
                 var every = parseInt(formData.repaymentEvery, 10);
                 var freqType = this.resolveTypeId(formData.repaymentFrequencyType);
-                var numberOfRepayments = parseInt(formData.numberOfRepayments, 10);
+                var numberOfRepayments = freqType === MONTHS
+                    ? parseInstallmentCount(formData.numberOfRepayments)
+                    : parseInt(formData.numberOfRepayments, 10);
+                if (freqType === MONTHS && isNaN(numberOfRepayments)) {
+                    return 'Enter a whole number of repayments greater than zero.';
+                }
                 if (!isNaN(numberOfRepayments) && numberOfRepayments < 1) {
                     return 'Number of installments must be at least 1.';
                 }
                 if (freqType !== MONTHS || isNaN(every)) {
                     return null;
+                }
+                if (numberOfRepayments <= Number(formData.graceOnPrincipalPayment || 0)) {
+                    return 'Number of repayments must exceed the principal grace period.';
                 }
                 var termMonths;
                 if (hasLoanTerm) {
@@ -184,6 +200,12 @@
                     }
                 } else {
                     termMonths = numberOfRepayments * every;
+                }
+                if (hasLoanTerm && this.isFixedNumberOfRepayments(product)) {
+                    var requiredTerm = this.productBounds(product).min * every;
+                    if (termMonths !== requiredTerm) {
+                        return 'Loan term must be ' + requiredTerm + ' months for this fixed repayment count.';
+                    }
                 }
                 if (every === 3 && termMonths < 3) {
                     return 'For quarterly repayments, loan term must be at least 3 months.';
@@ -206,22 +228,39 @@
                 };
                 scope.repaymentFrequencyPresets = this.presetsFor(data);
                 scope.repaymentFrequencyPreset = this.codeFrom(data.repaymentEvery, data.repaymentFrequencyType);
+                scope.repaymentFrequencySelection = { preset: scope.repaymentFrequencyPreset };
                 scope.repaymentFrequencyTooltipKey = this.tooltipKey(scope.repaymentFrequencyPreset);
+                scope.repaymentFrequencyError = this.validate(data, !!data.loanTermFrequency, productFromScope());
                 scope.isNumberOfRepaymentsFixed = function () {
                     return self.isFixedNumberOfRepayments(productFromScope());
                 };
-                scope.onRepaymentFrequencyPresetChange = function () {
+                scope.onRepaymentFrequencyPresetChange = function (preset) {
+                    if (arguments.length) {
+                        scope.repaymentFrequencyPreset = preset;
+                        scope.previewRepayment = false;
+                    }
                     if (!scope.repaymentFrequencyPreset) {
                         data.repaymentEvery = null;
                         data.repaymentFrequencyType = null;
                         scope.repaymentFrequencyError = null;
                         return;
                     }
+                    var previousCount = data.numberOfRepayments;
                     var previousEvery = data.repaymentEvery;
                     var previousType = data.repaymentFrequencyType;
                     self.apply(data, scope.repaymentFrequencyPreset);
-                    self.preserveImpliedTerm(data, previousEvery, previousType);
                     scope.repaymentFrequencyTooltipKey = self.tooltipKey(scope.repaymentFrequencyPreset);
+                    var product = productFromScope();
+                    if (scope.repaymentFrequencyPreset !== 'CUSTOM' &&
+                            self.resolveTypeId(data.repaymentFrequencyType) === MONTHS &&
+                            self.isFixedNumberOfRepayments(product)) {
+                        data.numberOfRepayments = self.productBounds(product).min;
+                        data.loanTermFrequencyType = MONTHS;
+                        self.syncTermFromInstallments(data);
+                        scope.repaymentFrequencyError = self.validate(data, true, product);
+                        return;
+                    }
+                    self.preserveImpliedTerm(data, previousEvery, previousType);
                     if (data.loanTermFrequency) {
                         var term = parseInt(data.loanTermFrequency, 10);
                         var every = parseInt(data.repaymentEvery, 10);
@@ -233,14 +272,30 @@
                             self.syncTermFromInstallments(data);
                         }
                     }
-                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, productFromScope());
+                    if (scope.repaymentFrequencyPreset !== 'CUSTOM' &&
+                            self.resolveTypeId(data.repaymentFrequencyType) === MONTHS &&
+                            self.resolveTypeId(data.loanTermFrequencyType) === MONTHS &&
+                            data.numberOfRepayments <= Number(data.graceOnPrincipalPayment || 0) &&
+                            previousCount > Number(data.graceOnPrincipalPayment || 0)) {
+                        data.numberOfRepayments = previousCount;
+                        self.syncTermFromInstallments(data);
+                    }
+                    scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, product);
                 };
                 scope.onLoanTermOrFrequencyChange = function () {
-                    self.syncInstallmentsFromTerm(data);
+                    if (!scope.isNumberOfRepaymentsFixed()) {
+                        self.syncInstallmentsFromTerm(data);
+                    }
+                    if (scope.previewRepayment) {
+                        scope.previewRepayment = false;
+                    }
                     scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, productFromScope());
                 };
                 scope.onNumberOfRepaymentsChange = function () {
                     self.syncTermFromInstallments(data);
+                    if (scope.previewRepayment) {
+                        scope.previewRepayment = false;
+                    }
                     scope.repaymentFrequencyError = self.validate(data, !!data.loanTermFrequency, productFromScope());
                 };
                 scope.assertRepaymentFrequencyValid = function (hasLoanTerm) {

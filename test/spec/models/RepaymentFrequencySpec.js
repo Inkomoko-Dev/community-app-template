@@ -203,4 +203,82 @@ describe("RepaymentFrequency", function () {
 
         expect(scope.isNumberOfRepaymentsFixed()).toEqual(true);
     });
+    it("applies wizard child-scope preset changes without changing the fixed count", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var scope = {
+            formData: monthlyForm({ loanTermFrequency: 6, numberOfRepayments: 6 }),
+            loanaccountinfo: { product: { minNumberOfRepayments: 6, maxNumberOfRepayments: 6 } }
+        };
+        RF.bindTo(scope);
+        var child = Object.create(scope);
+
+        ['QUARTERLY', 'SEMI_ANNUAL'].forEach(function (code, index) {
+            child.repaymentFrequencySelection.preset = code;
+            child.onRepaymentFrequencyPresetChange(child.repaymentFrequencySelection.preset);
+            expect(scope.formData.repaymentEvery).toEqual(index ? 6 : 3);
+            expect(scope.formData.repaymentFrequencyType).toEqual(MONTHS);
+            expect(scope.formData.numberOfRepayments).toEqual(6);
+            expect(scope.formData.loanTermFrequency).toEqual(index ? 36 : 18);
+            expect(scope.repaymentFrequencyError).toEqual(null);
+        });
+    });
+
+    it("rejects invalid Terms counts and clears the error when a valid product loads", function () {
+        var RF = mifosX.models.RepaymentFrequency;
+        var scope = {
+            formData: monthlyForm(),
+            loanaccountinfo: { product: { minNumberOfRepayments: 3, maxNumberOfRepayments: 12 } }
+        };
+        RF.bindTo(scope);
+
+        [2, 13].forEach(function (count) {
+            scope.formData.numberOfRepayments = count;
+            expect(scope.assertRepaymentFrequencyValid(true)).toEqual(false);
+            expect(scope.repaymentFrequencyError).toEqual('Number of repayments must be between 3 and 12.');
+        });
+
+        scope.loanaccountinfo.product = { minNumberOfRepayments: 6, maxNumberOfRepayments: 6 };
+        scope.formData = monthlyForm({ loanTermFrequency: 6, numberOfRepayments: 6 });
+        RF.bindTo(scope);
+        expect(scope.repaymentFrequencyError).toEqual(null);
+    });
+    it("preserves a fixed count when the term is edited and invalidates the preview", function () {
+        var scope = {
+            formData: monthlyForm({ loanTermFrequency: 18, numberOfRepayments: 6, repaymentEvery: 3 }),
+            loanaccountinfo: { product: { minNumberOfRepayments: 6, maxNumberOfRepayments: 6 } },
+            previewRepayment: true
+        };
+        mifosX.models.RepaymentFrequency.bindTo(scope);
+        scope.formData.loanTermFrequency = 12;
+        scope.onLoanTermOrFrequencyChange();
+        expect(scope.formData.numberOfRepayments).toEqual(6);
+        expect(scope.previewRepayment).toEqual(false);
+        expect(scope.repaymentFrequencyError).toEqual('Loan term must be 18 months for this fixed repayment count.');
+    });
+
+    it("rejects fractional and mixed-text monthly counts before syncing term", function () {
+        var scope = { formData: monthlyForm({ loanTermFrequency: 12 }) };
+        mifosX.models.RepaymentFrequency.bindTo(scope);
+        ['6.5', '6abc'].forEach(function (count) {
+            scope.formData.numberOfRepayments = count;
+            scope.onNumberOfRepaymentsChange();
+            expect(scope.formData.loanTermFrequency).toEqual(12);
+            expect(scope.assertRepaymentFrequencyValid(true)).toEqual(false);
+        });
+    });
+    it("preserves installments when the preset would leave no principal-paying period", function () {
+        var scope = {
+            formData: monthlyForm({ loanTermFrequency: 6, numberOfRepayments: 6, graceOnPrincipalPayment: 2 })
+        };
+        mifosX.models.RepaymentFrequency.bindTo(scope);
+        scope.onRepaymentFrequencyPresetChange('QUARTERLY');
+        expect(scope.formData.repaymentEvery).toEqual(3);
+        expect(scope.formData.numberOfRepayments).toEqual(6);
+        expect(scope.formData.loanTermFrequency).toEqual(18);
+        expect(scope.formData.graceOnPrincipalPayment).toEqual(2);
+        expect(scope.assertRepaymentFrequencyValid(true)).toEqual(true);
+        scope.formData.numberOfRepayments = 2;
+        scope.formData.loanTermFrequency = 6;
+        expect(scope.assertRepaymentFrequencyValid(true)).toEqual(false);
+    });
 });

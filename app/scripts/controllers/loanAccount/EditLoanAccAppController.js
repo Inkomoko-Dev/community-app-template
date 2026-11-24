@@ -680,6 +680,7 @@
                 }
                 prepareTrancheOverrides(this.formData);
                 var schedulePreviewData = angular.copy(this.formData);
+                delete schedulePreviewData.applicationDate;
                 delete schedulePreviewData.thirdPartyDisbursementProvider;
                 resourceFactory.loanResource.save({command: 'calculateLoanSchedule'}, schedulePreviewData, function (data) {
                     scope.repaymentscheduleinfo = data;

@@ -312,7 +312,7 @@
                 </fieldset>
             </form>
         </wz-step>
-        <wz-step wz-title="{{ 'label.heading.terms' | translate }}" wz-disabled="{{disabled}}">
+        <wz-step wz-title="{{ 'label.heading.terms' | translate }}" wz-disabled="{{disabled}}" canexit="canLeaveLoanTerms">
             <form name="Terms" ng-submit="goNext(Terms)" class="form-inline">
                 <fieldset>
                     <api-validate></api-validate>
@@ -355,6 +355,7 @@
                                     ng-disabled="isNumberOfRepaymentsFixed()"
                                     required late-Validate>&nbsp;
                                 <form-validate valattributeform="Terms" valattribute="numofrepayments" />
+                                <div ng-show="repaymentFrequencyError" role="alert"><span class="error">{{repaymentFrequencyError}}</span></div>
                             </td>
                             <td ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true">
                                 <label>{{ 'label.input.repaymentfrequency' | translate }}&nbsp;
@@ -364,16 +365,16 @@
                             </td>
                             <td class="paddedbottom20 width500px" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true">
 
-                                <select id="repaymentFrequencyPreset" class="form-control" ng-model="repaymentFrequencyPreset"
-                                    ng-change="onRepaymentFrequencyPresetChange();loandetails.repaymentFrequencyValue = formValue(loanaccountinfo.termFrequencyTypeOptions,formData.repaymentFrequencyType)"
+                                <select id="repaymentFrequencyPreset" class="form-control" ng-model="repaymentFrequencySelection.preset"
+                                    ng-change="onRepaymentFrequencyPresetChange(repaymentFrequencySelection.preset);loandetails.repaymentFrequencyValue = formValue(loanaccountinfo.termFrequencyTypeOptions,formData.repaymentFrequencyType)"
                                     ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
                                     ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"></select>
                                 <input id="repaymentEvery" class="form-control" type="text" name="repaidevery" ng-model="formData.repaymentEvery" ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"
-                                    ng-if="repaymentFrequencyPreset === 'CUSTOM'"
+                                    ng-if="repaymentFrequencySelection.preset === 'CUSTOM'"
                                     required late-Validate/>
                                 <select id="repaymentFrequencyType" class="form-control" ng-model="formData.repaymentFrequencyType" ng-change="loandetails.repaymentFrequencyValue = formValue(loanaccountinfo.termFrequencyTypeOptions,formData.repaymentFrequencyType);onLoanTermOrFrequencyChange()"
                                     ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in loanaccountinfo.termFrequencyTypeOptions"
-                                    ng-if="repaymentFrequencyPreset === 'CUSTOM'"
+                                    ng-if="repaymentFrequencySelection.preset === 'CUSTOM'"
                                     ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery" value="{{repaymentFrequencyType.id}}"></select>&nbsp;
                                 <span ng-show="formData.repaymentFrequencyType == 2">on</span>
                                 <select id="repaymentFrequencyNthDayType" class="form-control" ng-model="formData.repaymentFrequencyNthDayType" ng-change="loandetails.repaymentFrequencyNthDayValue = formValue(loanaccountinfo.repaymentFrequencyNthDayTypeOptions,formData.repaymentFrequencyNthDayType)"
@@ -388,7 +389,6 @@
                                 </select>&nbsp;
 
                                 <form-validate valattributeform="Terms" valattribute="repaidevery" />
-                                <div ng-show="repaymentFrequencyError"><span class="error">{{repaymentFrequencyError}}</span></div>
                             </td>
 
                         </tr>
@@ -1459,6 +1459,7 @@
                         <button id="cancel3" type="reset" class="btn btn-default" ng-click="cancel()">
                             {{'label.button.cancel' | translate}}
                         </button>
+                        <div ng-show="repaymentFrequencyError" role="alert"><span class="error">{{repaymentFrequencyError}}</span></div>
                         <button id="save" type="submit" has-permission='CREATE_LOAN' class="btn btn-primary" ng-show="loanaccountinfo" wz-next>{{'label.button.save' | translate}}
                         </button>
                     </div>

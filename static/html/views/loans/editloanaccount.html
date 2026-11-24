@@ -289,9 +289,15 @@
                 </td>
                 <td ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true"><label>{{ 'label.input.repaidevery' | translate }}&nbsp;<span class="required">*</span></label></td>
                 <td class="paddedbottom10" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true">
+                    <select id="repaymentFrequencyPreset" class="form-control" ng-model="repaymentFrequencySelection.preset"
+                            ng-change="onRepaymentFrequencyPresetChange(repaymentFrequencySelection.preset)"
+                            ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
+                            ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"></select>
                     <input id="repaymentEvery" class="form-control" type="text" name="repaidevery"
-                           ng-model="formData.repaymentEvery" ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery" required late-Validate/>
+                           ng-model="formData.repaymentEvery" ng-if="repaymentFrequencySelection.preset === 'CUSTOM'"
+                           ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery" required late-Validate/>
                     <select id="repaymentFrequencyType" class="form-control" ng-model="formData.repaymentFrequencyType"
+                            ng-if="repaymentFrequencySelection.preset === 'CUSTOM'"
                             ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"
                             ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in loanaccountinfo.termFrequencyTypeOptions"
                             value="{{repaymentFrequencyType.id}}"/>&nbsp;
@@ -303,6 +309,7 @@
                     <option value="">{{'label.selectday' | translate}}</option>
                     </select>&nbsp;
                     <form-validate valattributeform="editloanaccountform" valattribute="repaidevery"/>
+                    <div ng-show="repaymentFrequencyError"><span class="error">{{repaymentFrequencyError}}</span></div>
                 </td>
             </tr>
             <tr>
