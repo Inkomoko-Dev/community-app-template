@@ -1455,6 +1455,19 @@
                         save: { method: 'POST', params: {}, url: baseUrl + apiVer + '/creditdecision/delegatedauthority' },
                         update: { method: 'PUT', params: {} },
                         delete: { method: 'DELETE', params: {} }
+                    }),
+                    creditDecisionKillSwitchResource: defineResource(apiVer + "/creditdecision/killswitch", {}, {
+                        getAll: { method: 'GET', params: {}, isArray: true },
+                        update: { method: 'PUT', params: {} }
+                    }),
+                    creditDecisionMetricsResource: defineResource(apiVer + "/creditdecision/metrics", {}, {
+                        get: { method: 'GET', params: {} }
+                    }),
+                    creditDecisionExceptionOverrideResource: defineResource(apiVer + "/creditdecision/exceptions/:loanId/override", { loanId: '@loanId' }, {
+                        save: { method: 'POST', params: {} }
+                    }),
+                    creditDecisionExceptionOverrideDecideResource: defineResource(apiVer + "/creditdecision/exceptions/overrides/:overrideId", { overrideId: '@overrideId' }, {
+                        command: { method: 'POST', params: {} }
                     })
                 };
             }];

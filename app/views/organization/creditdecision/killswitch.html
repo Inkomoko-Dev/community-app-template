@@ -1,0 +1,89 @@
+<div class="content-container cd" ng-controller="CreditDecisionKillSwitchController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.killswitch' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+            <api-validate></api-validate>
+            <div class="cd-note warn">
+                <span><i class="fa fa-exclamation-triangle"></i>&nbsp; {{'label.creditdecision.killswitch.warning' | translate}}</span>
+            </div>
+            <div class="cd-note ok" ng-if="saved"><span><i class="fa fa-check"></i>&nbsp; {{'label.creditdecision.killswitch.saved' | translate}}</span></div>
+
+            <p class="cd-lead">{{'label.creditdecision.killswitch.intro' | translate}}</p>
+
+            <form name="killform" novalidate class="cd-form" rc-submit="save()" has-permission='UPDATE_CREDITDECISIONKILLSWITCH'>
+                <div class="row">
+                    <div class="col-sm-3 form-group">
+                        <label>{{'label.creditdecision.killswitch.scope' | translate}}</label>
+                        <select class="form-control" ng-model="form.scope">
+                            <option value="GLOBAL">{{'label.creditdecision.killswitch.scope.GLOBAL' | translate}}</option>
+                            <option value="COUNTRY">{{'label.creditdecision.killswitch.scope.COUNTRY' | translate}}</option>
+                            <option value="PRODUCT">{{'label.creditdecision.killswitch.scope.PRODUCT' | translate}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 form-group" ng-if="form.scope == 'COUNTRY'">
+                        <label>{{'label.creditdecision.killswitch.currency' | translate}}</label>
+                        <select class="form-control" ng-model="form.scopeKey">
+                            <option ng-repeat="c in currencies" value="{{c.code}}">{{c.code}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 form-group" ng-if="form.scope == 'PRODUCT'">
+                        <label>{{'label.creditdecision.killswitch.product' | translate}}</label>
+                        <select class="form-control" ng-model="form.scopeKey">
+                            <option ng-repeat="p in products" value="{{p.id}}">{{p.name}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label>{{'label.creditdecision.killswitch.state' | translate}}</label>
+                        <div class="cd-seg">
+                            <button type="button" ng-class="{on: form.enabled}" ng-click="form.enabled = true">{{'label.creditdecision.killswitch.on' | translate}}</button>
+                            <button type="button" ng-class="{on: !form.enabled}" ng-click="form.enabled = false">{{'label.creditdecision.killswitch.off' | translate}}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{'label.creditdecision.killswitch.reason' | translate}}</label>
+                    <input type="text" class="form-control" ng-model="form.reason" maxlength="500">
+                </div>
+                <button type="submit" class="btn btn-primary">{{'label.button.save' | translate}}</button>
+            </form>
+
+            <table class="cd-table" style="margin-top: 24px;" ng-if="switches.length">
+                <thead>
+                <tr>
+                    <th>{{'label.creditdecision.killswitch.col.scope' | translate}}</th>
+                    <th>{{'label.creditdecision.killswitch.col.key' | translate}}</th>
+                    <th>{{'label.creditdecision.killswitch.col.state' | translate}}</th>
+                    <th>{{'label.creditdecision.killswitch.col.reason' | translate}}</th>
+                    <th>{{'label.creditdecision.killswitch.col.updated' | translate}}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in switches track by row.id">
+                    <td>{{'label.creditdecision.killswitch.scope.' + row.scope | translate}}</td>
+                    <td class="cd-mono">{{row.scopeKey}}</td>
+                    <td>
+                        <span class="cd-dot" ng-class="{'nogo': row.enabled, 'go': !row.enabled}"></span>
+                        {{row.enabled ? ('label.creditdecision.killswitch.on' | translate) : ('label.creditdecision.killswitch.off' | translate)}}
+                    </td>
+                    <td>{{row.reason || '-'}}</td>
+                    <td class="cd-muted cd-small">
+                        <span ng-if="row.updatedOn">{{row.updatedOn | date:'medium'}}</span>
+                        <span class="cd-sub" ng-if="row.updatedBy">{{row.updatedBy}}</span>
+                    </td>
+                    <td class="text-right">
+                        <button type="button" class="btn btn-default btn-sm" has-permission='UPDATE_CREDITDECISIONKILLSWITCH' ng-click="toggle(row)">
+                            {{row.enabled ? ('label.creditdecision.killswitch.turnoff' | translate) : ('label.creditdecision.killswitch.turnon' | translate)}}
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

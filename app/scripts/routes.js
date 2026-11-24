@@ -1103,6 +1103,12 @@
             .when('/creditdecision/delegatedauthority', {
                 templateUrl: 'views/organization/creditdecision/delegatedauthority.html'
             })
+            .when('/creditdecision/killswitch', {
+                templateUrl: 'views/organization/creditdecision/killswitch.html'
+            })
+            .when('/creditdecision/operations', {
+                templateUrl: 'views/organization/creditdecision/operations.html'
+            })
             .when('/taxconfiguration',{
                 templateUrl: 'views/products/tax/TaxConfigurations.html'
             })
