@@ -71,7 +71,12 @@ angular.module('notificationWidget', [])
                 request: function (config) {
                     var signature = config ? ApiErrorMessage.writeSignature(config.method, config.url, config.params, config.data) : null;
                     if (signature && savesInFlight[signature]) {
-                        return $q.defer().promise;
+                        return $q.reject({
+                            config: {method: config.method, url: config.url, cbsDuplicateSave: true},
+                            status: -1,
+                            xhrStatus: 'abort',
+                            data: null
+                        });
                     }
                     if (signature) {
                         savesInFlight[signature] = true;
@@ -167,6 +172,9 @@ angular.module('notificationWidget', [])
                     }
                 },
                 responseError: function (rejection) {
+                    if (rejection && rejection.config && rejection.config.cbsDuplicateSave) {
+                        return $q.reject(rejection);
+                    }
                     $rootScope.blockUI = false;
                     releaseSave(rejection && rejection.config);
 

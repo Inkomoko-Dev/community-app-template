@@ -203,7 +203,8 @@
                         scope.auditHistory = [];
                         scope.canViewAudit = false;
                     });
-                    if (scope.isPreview()) {
+                    if (scope.isPreview() && (scope.hasPermission('CREATE_RESCHEDULELOAN') ||
+                        Number(scope.request.createdById) === Number(scope.currentUserId()))) {
                         resourceFactory.bulkLoanRescheduleExecutionResource.approvers({ executionId: scope.executionId }, function (approvers) {
                             scope.approverOptions = approvers || [];
                         });

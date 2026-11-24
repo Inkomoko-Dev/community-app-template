@@ -212,6 +212,28 @@ describe('notificationWidget error banner', function () {
             expect(bannerShowing()).toBe(false);
         });
 
+        it('settles the repeated click quietly and keeps holding back the save until the first one finishes', function () {
+            var outcome = null;
+            $httpBackend.expectPOST(returnUrl, returnBody).respond(200, {loanId: 431738});
+            send('POST', returnUrl, returnBody);
+            $http({method: 'POST', url: returnUrl, data: returnBody}).then(function () {
+                outcome = 'saved';
+            }, function (rejection) {
+                outcome = rejection.xhrStatus;
+            });
+            $rootScope.$digest();
+
+            expect(outcome).toBe('abort');
+            expect(bannerShowing()).toBe(false);
+            expect($rootScope.blockUI).toBe(true);
+
+            send('POST', returnUrl, returnBody);
+            $httpBackend.flush();
+
+            expect($rootScope.blockUI).toBe(false);
+            expect(bannerShowing()).toBe(false);
+        });
+
         it('sends the save again when the user retries after it finished', function () {
             $httpBackend.expectPOST(returnUrl, returnBody).respond(400, {errors: [{userMessageGlobalisationCode: 'validation.msg.loan.prepareandsigncontract.reject.note.cannot.be.blank', defaultUserMessage: 'Note is mandatory.', parameterName: 'note'}]});
             send('POST', returnUrl, returnBody);
