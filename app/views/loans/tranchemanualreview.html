@@ -33,12 +33,6 @@
                             {{'label.input.reviewdecision.cancel' | translate}}
                         </label>
                     </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="reviewDecision" value="RESCHEDULE" ng-model="formData.decision">
-                            {{'label.input.reviewdecision.reschedule' | translate}}
-                        </label>
-                    </div>
                 </div>
             </div>
             <div class="form-group" ng-if="formData.decision === 'EXTEND'">
@@ -65,7 +59,6 @@
                         has-permission="{{ formData.decision === 'CANCEL' ? 'CANCEL_TRANCHEMILESTONE' : 'APPROVE_TRANCHEMILESTONE' }}">
                     <span ng-if="formData.decision === 'EXTEND'">{{'label.button.approvedeadlineexception' | translate}}</span>
                     <span ng-if="formData.decision === 'CANCEL'">{{'label.input.reviewdecision.cancel' | translate}}</span>
-                    <span ng-if="formData.decision === 'RESCHEDULE'">{{'label.button.continuetoreschedule' | translate}}</span>
                     <span ng-if="!formData.decision">{{'label.button.reviewtranche' | translate}}</span>
                 </button>
             </div>
