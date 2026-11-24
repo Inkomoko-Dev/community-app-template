@@ -9,19 +9,36 @@
             scope.saved = false;
             scope.form = {scope: 'GLOBAL', scopeKey: '', enabled: true, reason: ''};
 
+            function quiet() {
+                if (scope.$root && scope.$root.dismissUserErrors) {
+                    scope.$root.dismissUserErrors();
+                }
+            }
+
             function load() {
                 resourceFactory.creditDecisionKillSwitchResource.getAll(function (rows) {
                     scope.switches = rows || [];
                     scope.loaded = true;
+                    quiet();
+                }, function () {
+                    scope.switches = [];
+                    scope.loaded = true;
+                    quiet();
                 });
             }
 
+            scope.onScopeChange = function () {
+                scope.form.scopeKey = '';
+            };
+
             resourceFactory.getApprovalMatrixEngineTemplateResource.get({}, function (data) {
                 scope.currencies = data.currencyOptions || [];
-            });
+                quiet();
+            }, quiet);
             resourceFactory.loanProductResource.getAllLoanProducts(function (products) {
                 scope.products = products || [];
-            });
+                quiet();
+            }, quiet);
             load();
 
             scope.save = function () {
