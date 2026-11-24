@@ -291,15 +291,15 @@
                     <i class="fa fa-question-circle" uib-tooltip="{{ repaymentFrequencyTooltipKey | translate }}"></i>
                 </label></td>
                 <td class="paddedbottom10" ng-hide="response.uiDisplayConfigurations.loanAccount.isHiddenField.repaymentEvery == true">
-                    <select id="repaymentFrequencyPreset" class="form-control" ng-model="repaymentFrequencyPreset"
-                            ng-change="onRepaymentFrequencyPresetChange()"
+                    <select id="repaymentFrequencyPreset" class="form-control" ng-model="repaymentFrequencySelection.preset"
+                            ng-change="onRepaymentFrequencyPresetChange(repaymentFrequencySelection.preset)"
                             ng-options="preset.code as preset.value for preset in repaymentFrequencyPresets"
                             ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"></select>
                     <input id="repaymentEvery" class="form-control" type="text" name="repaidevery"
-                           ng-model="formData.repaymentEvery" ng-if="repaymentFrequencyPreset === 'CUSTOM'"
+                           ng-model="formData.repaymentEvery" ng-if="repaymentFrequencySelection.preset === 'CUSTOM'"
                            ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery" required late-Validate/>
                     <select id="repaymentFrequencyType" class="form-control" ng-model="formData.repaymentFrequencyType"
-                            ng-if="repaymentFrequencyPreset === 'CUSTOM'"
+                            ng-if="repaymentFrequencySelection.preset === 'CUSTOM'"
                             ng-disabled="!loanaccountinfo.product.allowAttributeOverrides.repaymentEvery"
                             ng-options="repaymentFrequencyType.id as repaymentFrequencyType.value for repaymentFrequencyType in loanaccountinfo.termFrequencyTypeOptions"
                             value="{{repaymentFrequencyType.id}}"/>&nbsp;
