@@ -211,11 +211,23 @@
                 scope.canSubmit = scope.validation.ok && scope.policyCheck.ok;
                 scope.polScopes = policyScopes();
                 scope.polScopeSections = policyScopeSections(scope.polScopes);
+                var selectedId = scope.polSel;
                 scope.polCurrent = _.find(scope.polScopes, function (item) {
-                    return item.id === scope.polSel;
+                    return item.id === selectedId;
                 }) || scope.polScopes[0];
-                scope.polSel = scope.polCurrent.id;
+                if (scope.polCurrent) {
+                    scope.polSel = scope.polCurrent.id;
+                }
             }
+
+            /** Switch Everyone / country / product without relying on fragile $parent chains (ng-if creates a child scope). */
+            scope.selectPolicyScope = function (item) {
+                if (!item) {
+                    return;
+                }
+                scope.polSel = item.id;
+                scope.polCurrent = item;
+            };
 
             function currencyOf(productId) {
                 var p = scope.productsById[productId];
@@ -248,18 +260,52 @@
             }
 
             scope.polInherited = function (def) {
-                var item = scope.polCurrent;
-                if (!item || item.scope === Policy.GLOBAL) {
-                    return '';
-                }
-                var inh = Policy.inherited(scope.edit.policy, item.scope, item.scopeKey, def.key, item.currency);
+                var inh = scope.polInheritedInfo(def);
                 return inh ? String(inh.value) : '';
             };
 
-            scope.polInheritedFrom = function (def) {
+            scope.polInheritedInfo = function (def) {
                 var item = scope.polCurrent;
-                var inh = item && item.scope !== Policy.GLOBAL ? Policy.inherited(scope.edit.policy, item.scope, item.scopeKey, def.key, item.currency) : null;
+                if (!item || item.scope === Policy.GLOBAL) {
+                    return null;
+                }
+                return Policy.inherited(scope.edit.policy, item.scope, item.scopeKey, def.key, item.currency);
+            };
+
+            scope.polInheritedFromName = function (def) {
+                var inh = scope.polInheritedInfo(def);
+                if (!inh) {
+                    return '';
+                }
+                if (inh.from === Policy.GLOBAL) {
+                    return $translate.instant('label.creditdecision.policy.scope.everyone');
+                }
+                if (inh.from === Policy.COUNTRY) {
+                    var country = _.find(scope.polScopes, {scope: Policy.COUNTRY, scopeKey: inh.scopeKey});
+                    return country ? scope.polScopeName(country) : inh.scopeKey;
+                }
+                return inh.scopeKey;
+            };
+
+            scope.polInheritedFrom = function (def) {
+                var inh = scope.polInheritedInfo(def);
                 return inh ? $translate.instant('label.creditdecision.policy.from.' + inh.from, {key: inh.scopeKey}) : '';
+            };
+
+            scope.polHasOwnValue = function (def) {
+                var values = scope.polValues();
+                var raw = values && values[def.key];
+                return raw !== undefined && raw !== null && String(raw).trim() !== '';
+            };
+
+            scope.polShowsInherit = function (def) {
+                return scope.polCurrent && scope.polCurrent.scope !== Policy.GLOBAL
+                    && !scope.polHasOwnValue(def) && !!scope.polInherited(def);
+            };
+
+            scope.polIsOverride = function (def) {
+                return scope.polCurrent && scope.polCurrent.scope !== Policy.GLOBAL
+                    && scope.polHasOwnValue(def) && !!scope.polInherited(def);
             };
 
             scope.polValues = function () {

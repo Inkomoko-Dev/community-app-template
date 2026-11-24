@@ -120,6 +120,44 @@
 .cd .cd-form .required { color: #d9534f; margin-left: 2px; }
 .cd .cd-form .alert-danger { border-radius: 4px; }
 
+/* kill switch: aligned scope / state / reason fields */
+.cd .cd-kill-form { max-width: 640px; }
+.cd .cd-kill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px 20px;
+    align-items: end;
+    margin-bottom: 16px;
+}
+.cd .cd-kill-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cd .cd-kill-field > label {
+    margin: 0;
+    font-weight: 600;
+    font-size: 13px;
+    color: #1f2630;
+    line-height: 1.2;
+}
+.cd .cd-kill-field .form-control {
+    height: 34px;
+    box-sizing: border-box;
+}
+.cd .cd-seg.cd-seg-control {
+    display: inline-flex;
+    height: 34px;
+    width: 100%;
+    max-width: 220px;
+    box-sizing: border-box;
+}
+.cd .cd-seg.cd-seg-control button {
+    flex: 1 1 0;
+    height: 100%;
+    padding: 0 12px;
+    line-height: 32px;
+}
+.cd .cd-kill-reason { margin-bottom: 16px; }
+.cd .cd-kill-actions { margin-top: 4px; }
+.cd .cd-kill-table { margin-top: 24px; }
+
 /* product picker: a compact, searchable, scrollable grid instead of one checkbox per row */
 .cd .cd-picker { border: 1px solid #e6e9ed; border-radius: 4px; background: #fff; }
 .cd .cd-picker-bar { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-bottom: 1px solid #e6e9ed; }
@@ -228,6 +266,14 @@ credit-decision-loan { display: block; }
 .cd .cd-polscopes a:hover { background: #f4f6f8; }
 .cd .cd-polscopes a.on { background: #1f2630; color: #fff; }
 .cd .cd-polscopes a.on small { color: #c8d0d8; }
+
+/* Policy inheritance: show baseline next to country/product values */
+.cd .cd-pol-title { margin: 0 0 4px; font-weight: 600; }
+.cd .cd-pol-input { width: 190px; }
+.cd .cd-pol-source { display: block; margin-top: 4px; font-size: 12px; line-height: 1.35; max-width: 280px; }
+.cd .cd-pol-source-inherit { color: #8a94a0; }
+.cd .cd-pol-source-override { color: #8a5a00; }
+.cd .cd-row.cd-pol-overridden .cd-pol-input .form-control { border-color: #e0a030; }
 .cd .cd-badge { display: inline-block; min-width: 18px; margin-left: 6px; padding: 0 5px; border-radius: 9px; font-size: 11px; line-height: 18px; text-align: center; background: #e5e8ec; color: #3b4350; }
 .cd .cd-badge.bad { background: #c0392b; color: #fff; }
 .cd .cd-seg button.asked { background: #fdf8ee; color: #8a5a00; box-shadow: inset 0 -2px 0 #e0a030; }

@@ -1457,7 +1457,7 @@
                         delete: { method: 'DELETE', params: {} }
                     }),
                     creditDecisionKillSwitchResource: defineResource(apiVer + "/creditdecision/killswitch", {}, {
-                        getAll: { method: 'GET', params: {}, isArray: true },
+                        getAll: { method: 'GET', params: {}, isArray: true, ignoreErrorBanner: true },
                         update: { method: 'PUT', params: {} }
                     }),
                     creditDecisionMetricsResource: defineResource(apiVer + "/creditdecision/metrics", {}, {

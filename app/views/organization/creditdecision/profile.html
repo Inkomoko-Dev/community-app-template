@@ -118,15 +118,18 @@
                         <div class="cd-polscopes">
                             <div class="cd-polscope-section" ng-repeat="section in polScopeSections">
                                 <div class="cd-polscope-label">{{section.label}}</div>
-                                <a ng-repeat="item in section.items" class="pointer" ng-class="{on: polSel == item.id}" ng-click="$parent.$parent.polSel = item.id">
+                                <a ng-repeat="item in section.items" href="" class="pointer"
+                                   ng-class="{on: polCurrent.id == item.id}"
+                                   ng-click="selectPolicyScope(item)">
                                     <span>{{polScopeName(item)}}</span>
                                     <small class="cd-muted" ng-if="item.count">{{item.count}}</small>
                                 </a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-9">
-                        <h5 style="margin-top: 0; font-weight: 600;">{{polScopeName(polCurrent)}}</h5>
+                    <div class="col-md-9" ng-if="polCurrent">
+                        <h5 class="cd-pol-title">{{polScopeName(polCurrent)}}</h5>
+                        <p class="cd-muted cd-small" ng-if="polCurrent.scope == 'GLOBAL'">{{'label.creditdecision.policy.baselinehelp' | translate}}</p>
                         <p class="cd-muted cd-small" ng-if="polCurrent.scope == 'COUNTRY'">{{'label.creditdecision.policy.countryhelp' | translate:{country: polCurrent.name, currency: polCurrent.scopeKey} }}</p>
                         <p class="cd-muted cd-small" ng-if="polCurrent.scope == 'PRODUCT'">{{'label.creditdecision.policy.overridehelp' | translate}}</p>
                         <div class="cd-note warn" ng-if="polScopeProblem()"><span>{{polScopeProblem()}}</span></div>
@@ -138,20 +141,25 @@
                                     {{'label.creditdecision.policy.weightsum' | translate:{sum: polWeights().sum} }}
                                 </span>
                             </div>
-                            <div class="cd-row" ng-repeat="def in group.rules" ng-class="{'has-error': polError(def) || polRequired(def)}">
+                            <div class="cd-row" ng-repeat="def in group.rules" ng-class="{'has-error': polError(def) || polRequired(def), 'cd-pol-overridden': polIsOverride(def)}">
                                 <div class="cd-what">
                                     <span class="cd-name">{{def.label}}</span>
                                     <span class="cd-desc">{{def.description}}</span>
                                 </div>
                                 <div class="cd-config">
                                     <div>
-                                        <div class="input-group input-group-sm" style="width: 190px;">
+                                        <div class="input-group input-group-sm cd-pol-input">
                                             <input type="text" class="form-control" ng-model="polValues()[def.key]" ng-change="markDirty()"
                                                    ng-disabled="!editable" placeholder="{{polInherited(def)}}" inputmode="decimal">
                                             <span class="input-group-addon">{{'label.creditdecision.policy.unit.' + def.unit | translate}}</span>
                                         </div>
                                         <span class="help-block" ng-if="polError(def) || polRequired(def)">{{polError(def) || polRequired(def)}}</span>
-                                        <span class="cd-muted cd-small" ng-if="polCurrent.scope != 'GLOBAL' && !polValues()[def.key] && polInherited(def)">{{polInheritedFrom(def)}}</span>
+                                        <span class="cd-pol-source cd-pol-source-inherit" ng-if="polShowsInherit(def)">
+                                            {{'label.creditdecision.policy.using' | translate:{from: polInheritedFromName(def), value: polInherited(def)} }}
+                                        </span>
+                                        <span class="cd-pol-source cd-pol-source-override" ng-if="polIsOverride(def)">
+                                            {{'label.creditdecision.policy.overrides' | translate:{from: polInheritedFromName(def), value: polInherited(def)} }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
