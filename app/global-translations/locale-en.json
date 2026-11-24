@@ -1604,6 +1604,7 @@
   "label.button.parameters": "Parameters",
   "label.button.exportcsv": "Export CSV",
   "label.button.exportexcel2": "Export XLSX",
+  "label.button.exportpdf": "Export PDF",
   "label.button.export": "Export",
   "label.button.email": "Email",
   "label.button.exportSchedule": "Export Schedule",

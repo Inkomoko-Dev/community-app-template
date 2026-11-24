@@ -190,6 +190,10 @@
                 downloadReport({exportCSV: true}, scope.reportName + '.csv');
             };
 
+            scope.exportToPdf = function () {
+                downloadReport({exportPDF: true}, scope.reportName + '.pdf');
+            };
+
             function estimateTotalRecords(data, pageNumber) {
                 if (scope.knownTotalRecords || scope.knownTotalRecords === 0) {
                     return scope.knownTotalRecords;
@@ -228,6 +232,7 @@
                 delete payload.includeCount;
                 delete payload.exportCSV;
                 delete payload.exportXLSX;
+                delete payload.exportPDF;
                 payload.reportSource = scope.reportName;
                 return angular.extend(payload, overrides || {});
             }
