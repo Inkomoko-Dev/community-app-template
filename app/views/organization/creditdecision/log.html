@@ -167,6 +167,9 @@
                 <dt ng-if="row.maxExposure !== null && row.maxExposure !== undefined">{{'label.creditdecision.page.maxexposure' | translate}}</dt><dd ng-if="row.maxExposure !== null && row.maxExposure !== undefined">{{row.maxExposure | number:0}}</dd>
                 <dt ng-if="row.modelVersion">{{'label.creditdecision.page.model' | translate}}</dt><dd ng-if="row.modelVersion">{{row.modelVersion}}</dd>
                 <dt ng-if="row.requestId">{{'label.creditdecision.log.entry.requestid' | translate}}</dt><dd ng-if="row.requestId"><code>{{row.requestId}}</code></dd>
+                <dt ng-if="row.requestHash">{{'label.creditdecision.log.entry.requesthash' | translate}}</dt><dd ng-if="row.requestHash"><code>{{row.requestHash}}</code></dd>
+                <dt ng-if="row.replyHash">{{'label.creditdecision.log.entry.replyhash' | translate}}</dt><dd ng-if="row.replyHash"><code>{{row.replyHash}}</code></dd>
+                <dt ng-if="row.integrity">{{'label.creditdecision.log.entry.integrity' | translate}}</dt><dd ng-if="row.integrity">{{row.integrity}}</dd>
                 <dt>{{'label.creditdecision.log.entry.nextstep' | translate}}</dt><dd>{{row.nextStep || '-'}}</dd>
                 <dt>{{'label.creditdecision.log.entry.replytime' | translate}}</dt><dd>{{row.replyMs ? row.replyMs + ' ms' : '-'}}</dd>
             </dl>

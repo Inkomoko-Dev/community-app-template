@@ -5,6 +5,8 @@
         <li ng-class="{active: section == 'log'}"><a href="#/creditdecision/log">{{'label.creditdecision.nav.log' | translate}}</a></li>
         <li ng-class="{active: section == 'exceptions'}"><a href="#/creditdecision/exceptions">{{'label.creditdecision.nav.exceptions' | translate}}</a></li>
         <li ng-class="{active: section == 'delegatedauthority'}"><a href="#/creditdecision/delegatedauthority">{{'label.creditdecision.nav.delegatedauthority' | translate}}</a></li>
+        <li ng-class="{active: section == 'killswitch'}" has-permission='READ_CREDITDECISIONKILLSWITCH'><a href="#/creditdecision/killswitch">{{'label.creditdecision.nav.killswitch' | translate}}</a></li>
+        <li ng-class="{active: section == 'operations'}"><a href="#/creditdecision/operations">{{'label.creditdecision.nav.operations' | translate}}</a></li>
         <li ng-class="{active: section == 'connection'}"><a href="#/creditdecision/connection">{{'label.creditdecision.nav.connection' | translate}}</a></li>
     </ul>
     <a href="#/creditdecision/create" class="btn btn-primary btn-sm" ng-if="section == 'profiles' && profiles.length" has-permission='CREATE_CREDITDECISION'>

@@ -1,0 +1,77 @@
+<div class="content-container cd" ng-controller="CreditDecisionOperationsController">
+    <ul class="breadcrumb">
+        <li><a href="#/organization">{{'label.anchor.organization' | translate}}</a></li>
+        <li><a href="#/creditdecision">{{'label.anchor.creditdecision' | translate}}</a></li>
+        <li class="active">{{'label.creditdecision.nav.operations' | translate}}</li>
+    </ul>
+    <div class="card">
+        <div class="content">
+            <div ng-include="'views/organization/creditdecision/nav.html'"></div>
+            <api-validate></api-validate>
+
+            <p class="cd-lead">{{'label.creditdecision.operations.intro' | translate}}</p>
+
+            <form class="cd-form wide" ng-submit="load()">
+                <div class="row">
+                    <div class="col-sm-2 form-group">
+                        <label>{{'label.creditdecision.operations.from' | translate}}</label>
+                        <input type="text" class="form-control" ng-model="filter.from" placeholder="yyyy-MM-dd">
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <label>{{'label.creditdecision.operations.to' | translate}}</label>
+                        <input type="text" class="form-control" ng-model="filter.to" placeholder="yyyy-MM-dd">
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <label>{{'label.creditdecision.operations.currency' | translate}}</label>
+                        <select class="form-control" ng-model="filter.currency">
+                            <option value="">{{'label.creditdecision.delegatedauthority.any' | translate}}</option>
+                            <option ng-repeat="c in currencies" value="{{c.code}}">{{c.code}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label>{{'label.creditdecision.operations.product' | translate}}</label>
+                        <select class="form-control" ng-model="filter.productId">
+                            <option value="">{{'label.creditdecision.delegatedauthority.any' | translate}}</option>
+                            <option ng-repeat="p in products" value="{{p.id}}">{{p.name}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <label>&nbsp;</label><br>
+                        <button type="submit" class="btn btn-primary">{{'label.creditdecision.exceptions.refresh' | translate}}</button>
+                        <i class="fa fa-spinner fa-spin cd-muted" ng-if="loading"></i>
+                    </div>
+                </div>
+            </form>
+
+            <div class="cd-stats" ng-if="metrics">
+                <div><b>{{metrics.throughput}}</b><span>{{'label.creditdecision.operations.throughput' | translate}}</span></div>
+                <div><b>{{metrics.autoApproveRate}}%</b><span>{{'label.creditdecision.operations.autorate' | translate}}</span></div>
+                <div><b>{{metrics.reviewRate}}%</b><span>{{'label.creditdecision.operations.reviewrate' | translate}}</span></div>
+                <div><b>{{metrics.exceptionRate}}%</b><span>{{'label.creditdecision.operations.exceptionrate' | translate}}</span></div>
+                <div><b>{{metrics.tatP50Ms || '-'}}</b><span>{{'label.creditdecision.operations.tatp50' | translate}}</span></div>
+                <div><b>{{metrics.tatP95Ms || '-'}}</b><span>{{'label.creditdecision.operations.tatp95' | translate}}</span></div>
+            </div>
+
+            <table class="cd-table" ng-if="metrics.daily.length">
+                <thead>
+                <tr>
+                    <th>{{'label.creditdecision.operations.col.day' | translate}}</th>
+                    <th>{{'label.creditdecision.operations.throughput' | translate}}</th>
+                    <th>{{'label.creditdecision.operations.col.auto' | translate}}</th>
+                    <th>{{'label.creditdecision.operations.col.review' | translate}}</th>
+                    <th>{{'label.creditdecision.operations.col.exceptions' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="d in metrics.daily track by d.day">
+                    <td>{{d.day}}</td>
+                    <td>{{d.throughput}}</td>
+                    <td>{{d.autoApprove}}</td>
+                    <td>{{d.icReview}}</td>
+                    <td>{{d.exceptions}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
