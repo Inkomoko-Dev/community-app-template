@@ -51,6 +51,34 @@
 .cd table.cd-table.hover tbody tr:hover { background: #fafbfc; cursor: pointer; }
 .cd table.cd-table td .cd-sub { color: #8a94a0; font-size: 12px; display: block; margin-top: 2px; }
 
+/* Exceptions queue: keep guidance + actions readable */
+.cd table.cd-exceptions-table { table-layout: auto; }
+.cd table.cd-exceptions-table th,
+.cd table.cd-exceptions-table td { vertical-align: top; }
+.cd table.cd-exceptions-table .cd-ex-app { min-width: 120px; }
+.cd table.cd-exceptions-table .cd-ex-problem { min-width: 160px; max-width: 280px; }
+.cd table.cd-exceptions-table .cd-ex-last { white-space: nowrap; }
+.cd table.cd-exceptions-table .cd-ex-next { min-width: 260px; max-width: 420px; }
+.cd .cd-ex-guidance {
+    color: #3b4350;
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    margin-bottom: 10px;
+}
+.cd .cd-ex-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+.cd .cd-ex-actions .btn {
+    margin: 0;
+    white-space: nowrap;
+}
+
 /* empty state */
 .cd .cd-empty { text-align: center; padding: 64px 0 56px; }
 .cd .cd-empty > i { font-size: 34px; color: #c3cad2; display: block; margin-bottom: 14px; }

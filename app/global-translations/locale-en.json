@@ -6851,6 +6851,7 @@
   "label.creditdecision.history.DECIDED": "Sent to the decision engine, outcome",
   "label.creditdecision.history.FAILED": "Sent to the decision engine, no usable reply",
   "label.creditdecision.history.HELD": "Request held back",
+  "label.creditdecision.history.ROUTED": "Routed for credit review",
   "label.creditdecision.loan.blocker.OUTCOME_FINAL": "The decision engine has given a final outcome for this application. Only IC_REVIEW_REQUIRED can be sent again.",
   "label.creditdecision.decision.AUTO_APPROVE": "Auto-approve",
   "label.creditdecision.decision.IC_REVIEW_REQUIRED": "IC review required",

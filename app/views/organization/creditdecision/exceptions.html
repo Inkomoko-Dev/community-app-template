@@ -17,7 +17,7 @@
                 <i class="fa fa-spinner fa-spin cd-muted" ng-if="loading"></i>
             </div>
 
-            <table class="cd-table" id="cd-exceptions" ng-if="rows.length">
+            <table class="cd-table cd-exceptions-table" id="cd-exceptions" ng-if="rows.length">
                 <thead>
                 <tr>
                     <th>{{'label.creditdecision.log.col.application' | translate}}</th>
@@ -26,17 +26,16 @@
                     <th>{{'label.creditdecision.exceptions.col.failures' | translate}}</th>
                     <th>{{'label.creditdecision.exceptions.col.last' | translate}}</th>
                     <th>{{'label.creditdecision.exceptions.col.next' | translate}}</th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="row in rows track by row.loanId">
-                    <td>
+                    <td class="cd-ex-app">
                         <a ng-href="#/loanaccount/{{row.loanId}}/creditdecision"><strong>{{row.applicationRef}}</strong></a>
                         <span class="cd-sub cd-mono">{{row.customerRef}}</span>
                         <span class="cd-sub">{{row.productName}}</span>
                     </td>
-                    <td>
+                    <td class="cd-ex-problem">
                         <span class="cd-dot" ng-class="dot(row)"></span>{{'label.creditdecision.exceptions.kind.' + row.kind | translate}}
                         <span class="cd-sub" ng-if="row.message">{{row.message}}</span>
                         <span class="cd-sub cd-mono" ng-if="row.requestId">{{row.requestId}}</span>
@@ -46,13 +45,13 @@
                     </td>
                     <td><span class="cd-mono cd-small">{{row.reasonCode || '-'}}</span></td>
                     <td>{{row.failureCount || '-'}}</td>
-                    <td class="cd-muted cd-small">{{row.lastAttemptOn ? (row.lastAttemptOn | date:'medium') : '-'}}</td>
-                    <td class="cd-small">
-                        {{next(row).key | translate:{at: (next(row).at | date:'medium')} }}
-                        <span class="cd-sub" ng-if="row.alertedOn"><i class="fa fa-bell"></i> {{'label.creditdecision.exceptions.alerted' | translate:{at: (row.alertedOn | date:'medium')} }}</span>
-                    </td>
-                    <td class="text-right">
-                        <span ng-if="!row.pendingOverrideId">
+                    <td class="cd-muted cd-small cd-ex-last">{{row.lastAttemptOn ? (row.lastAttemptOn | date:'medium') : '-'}}</td>
+                    <td class="cd-ex-next">
+                        <div class="cd-ex-guidance">
+                            {{next(row).key | translate:{at: (next(row).at | date:'medium')} }}
+                            <span class="cd-sub" ng-if="row.alertedOn"><i class="fa fa-bell"></i> {{'label.creditdecision.exceptions.alerted' | translate:{at: (row.alertedOn | date:'medium')} }}</span>
+                        </div>
+                        <div class="cd-ex-actions" ng-if="!row.pendingOverrideId">
                             <button type="button" class="btn btn-default btn-sm" ng-if="hasPermission('SEND_CREDITDECISIONLOAN') && row.kind != 'HELD'"
                                     ng-disabled="row.busy" ng-click="retry(row)">
                                 <i class="fa fa-spinner fa-spin" ng-if="row.busy"></i><i class="fa fa-refresh" ng-if="!row.busy"></i> {{'label.creditdecision.exceptions.retry' | translate}}
@@ -66,8 +65,8 @@
                                     ng-disabled="row.busy" ng-click="requestOverride(row, 'MANUAL_IC')">
                                 {{'label.creditdecision.exceptions.manualic' | translate}}
                             </button>
-                        </span>
-                        <span ng-if="row.pendingOverrideId">
+                        </div>
+                        <div class="cd-ex-actions" ng-if="row.pendingOverrideId">
                             <button type="button" class="btn btn-primary btn-sm" has-permission='APPROVE_CREDITDECISIONEXCEPTIONOVERRIDE'
                                     ng-if="!isOverrideMaker(row)"
                                     ng-disabled="row.busy" ng-click="approveOverride(row)">
@@ -78,7 +77,7 @@
                                     ng-disabled="row.busy" ng-click="cancelOverride(row)">
                                 {{'label.creditdecision.exceptions.cancel' | translate}}
                             </button>
-                        </span>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
