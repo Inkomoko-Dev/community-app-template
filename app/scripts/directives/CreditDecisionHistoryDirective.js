@@ -38,7 +38,17 @@
                     scope.eventKey = function (event) {
                         return event.eventType === 'FAILED' && event.decision === 'INELIGIBLE' ? 'REJECT_FAILED' : event.eventType;
                     };
-                    var ICONS = {FLAGGED: 'fa-flag', UNFLAGGED: 'fa-times', VERIFIED: 'fa-check', REOPENED: 'fa-undo', DECIDED: 'fa-paper-plane', FAILED: 'fa-exclamation', HELD: 'fa-pause', REJECTED: 'fa-ban'};
+                    var ICONS = {
+                        FLAGGED: 'fa-flag',
+                        UNFLAGGED: 'fa-times',
+                        VERIFIED: 'fa-check',
+                        REOPENED: 'fa-undo',
+                        DECIDED: 'fa-paper-plane',
+                        FAILED: 'fa-exclamation',
+                        HELD: 'fa-pause',
+                        REJECTED: 'fa-ban',
+                        ROUTED: 'fa-share'
+                    };
                     scope.icon = function (event) {
                         return ICONS[event.eventType] || 'fa-circle';
                     };
