@@ -1221,6 +1221,10 @@
                         loanId: scope.accountId,
                         command: 'payoff'
                     }, function (data) {
+                        scope.paymentTypes = data.paymentTypeOptions || [];
+                        if (scope.paymentTypes.length > 0) {
+                            scope.formData.paymentTypeId = scope.paymentTypes[0].id;
+                        }
                         scope.formData[scope.modelName] = new Date(data.date) || new Date();
                         scope.writeOffAmount = data.amount;
                         scope.formData.transactionAmount = data.amount;
@@ -1229,6 +1233,7 @@
                     });
                     scope.title = 'label.heading.payoffloanaccount';
                     scope.labelName = 'label.input.payoffondate';
+                    scope.isTransaction = true;
                     scope.taskPermissionName = 'PAY_OFF_LOAN';
                     scope.fetchEntities('m_loan', 'PAY_OFF');
                     break;
@@ -1276,6 +1281,7 @@
                         },
                         function (data) {
                             finishTransactionLoading();
+                            scope.editingRepayment = !!(data.type && (data.type.repayment || data.type.recoveryRepayment));
                             scope.paymentTypes = data.paymentTypeOptions || [];
                             scope.formData.transactionAmount = data.amount;
                             scope.formData[scope.modelName] = new Date(data.date) || new Date();
@@ -1967,6 +1973,17 @@
                 scope.addTrancheAmounts();
             };
 
+            scope.isPaymentTypeRequired = function () {
+                if (scope.action === 'repayment' || scope.action === 'recoverypayment' || scope.action === 'payoff') {
+                    return true;
+                }
+                if (scope.action === 'modifytransaction' && scope.editingRepayment) {
+                    var amount = parseFloat(String(scope.formData.transactionAmount || '').replace(/,/g, ''));
+                    return amount > 0;
+                }
+                return false;
+            };
+
             scope.submit = function () {
                 scope.processDate = false;
                 scope.error = null;
@@ -1991,6 +2008,14 @@
                 var requiredDateLabel = scope.isICReview ? 'IC review date' : approvalStageDateLabels[scope.action];
                 if (requiredDateLabel && !scope.formData[scope.modelName]) {
                     scope.error = requiredDateLabel + ' is required.';
+                    return;
+                }
+
+                if (scope.isPaymentTypeRequired() && !scope.formData.paymentTypeId) {
+                    presentActionError((scope.paymentTypes && scope.paymentTypes.length)
+                        ? 'Please select a payment type.'
+                        : 'Payment types did not load. Refresh the page and try again.', 'paymentTypeId',
+                        'validation.msg.loan.transaction.paymentTypeId.cannot.be.blank');
                     return;
                 }
 
