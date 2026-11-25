@@ -12,6 +12,7 @@
             scope.reportParams = new Array();
             scope.reportDateParams = new Array();
             scope.reqFields = new Array();
+            var prefilledToday = {};
             scope.reportTextParams = new Array();
             scope.reportData = {};
             scope.reportData.columnHeaders = [];
@@ -66,10 +67,9 @@
                         // Shared date parameters default to today. This report leaves them empty
                         // so the officer chooses the range.
                         if (scope.reportName !== 'Multi-tranche pipeline Report') {
-                            if (temp.variable === 'asAtDate') {
+                            if (temp.variable === 'asAtDate' || temp.defaultVal === 'today') {
                                 scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
-                            } else if (temp.defaultVal === 'today') {
-                                scope.formData[temp.inputName] = dateFilter(new Date(), 'yyyy-MM-dd');
+                                prefilledToday[temp.inputName] = scope.formData[temp.inputName];
                             } else if (/^\d{4}-\d{2}-\d{2}$/.test(temp.defaultVal || '')) {
                                 scope.formData[temp.inputName] = temp.defaultVal;
                             }
@@ -229,6 +229,11 @@
                 delete payload.exportCSV;
                 delete payload.exportXLSX;
                 payload.reportSource = scope.reportName;
+                for (var inputName in prefilledToday) {
+                    if (payload[inputName] === prefilledToday[inputName]) {
+                        payload[inputName] = 'today';
+                    }
+                }
                 return angular.extend(payload, overrides || {});
             }
 

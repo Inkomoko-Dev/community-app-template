@@ -100,3 +100,73 @@ describe("RunReportsController", function () {
         expect(last.R_startDate).toBe('2015-01-01');
     });
 });
+
+describe("RunReportsController As at date", function () {
+    var calls, dateFilter, scope;
+
+    function row(name, variable, displayType, formatType, defaultVal, selectAll) {
+        return {row: [name, variable, variable, displayType, formatType, defaultVal, null, selectAll || null, null]};
+    }
+
+    function respond(reportSource, rows) {
+        for (var i in calls) {
+            if (calls[i].params.reportSource === reportSource) {
+                calls[i].callback({data: rows});
+                return;
+            }
+        }
+        throw "no request for " + reportSource;
+    }
+
+    function lastRun() {
+        return calls[calls.length - 1].params;
+    }
+
+    beforeEach(function () {
+        calls = [];
+        $ = jQuery = jasmine.createSpy('jQuery').andReturn({each: function () {}, addClass: function () {}, removeClass: function () {}});
+        dateFilter = jasmine.createSpy('dateFilter').andCallFake(function (value) {
+            return value instanceof Date ? '2026-11-20' : value;
+        });
+        scope = {};
+        var resourceFactory = {
+            runReportsResource: {
+                getReport: jasmine.createSpy('getReport').andCallFake(function (params, callback) {
+                    calls.push({params: params, callback: callback});
+                })
+            },
+            reportsResource: {get: jasmine.createSpy('reportsResource.get')}
+        };
+        new mifosX.controllers.RunReportsController(scope, {name: 'Aging Detail', type: 'Table', reportId: 52},
+            resourceFactory, {}, dateFilter, {}, 'v1', {}, {}, {});
+        respond('FullParameterList', [
+            row('OfficeIdSelectOne', 'officeId', 'select', 'number', '0', null),
+            row('asAtDate', 'asAtDate', 'date', 'date', 'today'),
+            row('parCategorySelectAll', 'parCategory', 'select', 'number', '-1', 'Y')
+        ]);
+        respond('OfficeIdSelectOne', [{row: [1, 'Head Office']}]);
+        respond('parCategorySelectAll', [{row: [1, 'Normal']}, {row: [2, 'Watch']}]);
+        scope.formData.R_officeId = 1;
+    });
+
+    it("shows today's date in the As at field", function () {
+        expect(scope.formData.R_asAtDate).toBe('2026-11-20');
+    });
+
+    it("asks the server for its business date when the As at date was left as pre-filled", function () {
+        scope.getResultsPage(1);
+        expect(scope.errorDetails).toEqual([]);
+        expect(lastRun().R_asAtDate).toBe('today');
+    });
+
+    it("sends a date the user picked as that date", function () {
+        scope.formData.R_asAtDate = '2026-03-31';
+        scope.getResultsPage(1);
+        expect(lastRun().R_asAtDate).toBe('2026-03-31');
+    });
+
+    it("keeps the form showing the pre-filled date after a run", function () {
+        scope.getResultsPage(1);
+        expect(scope.formData.R_asAtDate).toBe('2026-11-20');
+    });
+});
