@@ -1023,10 +1023,10 @@
                             scope.formData.routingCode = templateData.routingCode || '';
                             scope.formData.receiptNumber = templateData.receiptNumber || '';
                             scope.formData.bankNumber = templateData.bankNumber || '';
+                            scope.formData.mfiCode = templateData.mfiCode || '';
                             
                             // Apply saved disbursement details first
                             if (savedDetail) {
-                                scope.formData.mfiCode = savedDetail.mfiCode || templateData.mfiCode || '';
                                 scope.formData.paymentTo = savedDetail.paymentTo || (templateData.paymentTo ? Number(templateData.paymentTo) : 1);
                                 scope.formData.clientPhoneNumber = savedDetail.clientPhoneNumber || templateData.clientPhoneNumber || '';
                                 scope.formData.clientAccountNumber = savedDetail.clientAccountNumber || templateData.clientAccountNumber || '';
@@ -1040,7 +1040,6 @@
                                 scope.formData.fxTimestamp = savedDetail.fxTimestamp || templateData.fxTimestamp || null;
                                 scope.formData.usdAmount = savedDetail.usdAmount || templateData.usdAmount || null;
                             } else {
-                                scope.formData.mfiCode = templateData.mfiCode || '';
                                 scope.formData.paymentTo = templateData.paymentTo ? Number(templateData.paymentTo) : 1;
                                 scope.formData.clientPhoneNumber = templateData.clientPhoneNumber || '';
                                 scope.formData.clientAccountNumber = templateData.clientAccountNumber || '';
@@ -2541,7 +2540,7 @@
                             delete submitData.usdAmount;
                             delete submitData.fxSource;
                             delete submitData.fxTimestamp;
-                            delete submitData.mfiCode;
+                            // Keep mfiCode — disburse whitelist accepts it; needed at actual posting (CGLT-825).
                             // Third-party payout fields live on the loan already; omit so staff submit cannot overwrite them.
                             if (scope.enableThirdPartyDisbursement) {
                                 delete submitData.paymentTypeId;
@@ -2821,14 +2820,15 @@
 
             scope.isMfiCodeAccepted = function () {
                 if (!scope.showMfiCode) return false;
-                var isDisbursementApprovalAction = scope.action === "approveDisbursement"
-                    || scope.action === "disbursementapproval";
-                return !(isDisbursementApprovalAction && (scope.isCashPayment() || scope.enableThirdPartyDisbursement));
+                // Hide only for third-party disbursement; Cash and Mobile Money keep MFI at posting.
+                return !scope.enableThirdPartyDisbursement;
             };
 
             scope.isMfiCodeReadOnly = function () {
                 const isApprovalOrDRStage = scope.action === "approve"
-                    || scope.action === "disbursementpreapprovalrequest";
+                    || scope.action === "disbursementpreapprovalrequest"
+                    || scope.action === "approveDisbursement"
+                    || scope.action === "disbursementapproval";
                 const isRepaymentOrPrepay = scope.action === "repayment"
                     || scope.action === "modifytransaction";
                 return !(isApprovalOrDRStage || isRepaymentOrPrepay);
