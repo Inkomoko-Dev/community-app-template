@@ -3,9 +3,13 @@
         ViewAuditController: function (scope, resourceFactory, routeParams) {
             scope.details = {};
 
-            function formatDisplayValue(value) {
+            function formatDisplayValue(value, field) {
                 if (value === null || value === undefined) {
                     return '';
+                }
+                if (field === 'effectiveFrom' && _.isArray(value) && value.length === 3
+                        && value.every(function (part) { return Number.isInteger(part); })) {
+                    return value[0] + '-' + ('0' + value[1]).slice(-2) + '-' + ('0' + value[2]).slice(-2);
                 }
                 if (typeof value === 'object') {
                     return JSON.stringify(value);
@@ -30,13 +34,26 @@
                 var rows = [];
                 _.each(obj, function (value, key) {
                     var name = prefix ? prefix + '.' + key : key;
-                    if (value && typeof value === 'object' && value.hasOwnProperty('before') && value.hasOwnProperty('after')
+                    if (!prefix && key === 'criteria' && value && typeof value === 'object'
+                            && Object.keys(value).every(function (side) { return side === 'before' || side === 'after'; })
+                            && ((value.before == null && value.after) || (value.after == null && value.before))) {
+                        var snapshot = value.before || value.after;
+                        _.each(snapshot, function (fieldValue, field) {
+                            var displayValue = formatDisplayValue(fieldValue, field);
+                            rows.push({
+                                name: name + '.' + field,
+                                before: value.before ? displayValue : '',
+                                after: value.after ? displayValue : '',
+                                isChange: true
+                            });
+                        });
+                    } else if (value && typeof value === 'object' && value.hasOwnProperty('before') && value.hasOwnProperty('after')
                             && Object.keys(value).length === 2) {
                         if (valuesDiffer(value.before, value.after)) {
                             rows.push({
                                 name: name,
-                                before: formatDisplayValue(value.before),
-                                after: formatDisplayValue(value.after),
+                                before: formatDisplayValue(value.before, key),
+                                after: formatDisplayValue(value.after, key),
                                 isChange: true
                             });
                         }
