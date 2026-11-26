@@ -131,17 +131,21 @@
                                        min="minDate" ng-disabled="!isTrancheEditable(details)" />
                             </td>
                             <td>
-                                <div class="input-group" ng-if="multiDisburseLoan && isTrancheEditable(details)">
-                                    <input ng-if="details.principalAsPercentage" type="text" class="form-control"
-                                           ng-model="details.principalPercentage" ng-change="addTrancheAmounts()"
-                                           placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
-                                    <input ng-if="!details.principalAsPercentage" type="text" class="form-control" id="details[{{$index}}].principal"
-                                           ng-change="addTrancheAmounts()" ng-model="details.principal">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" ng-class="{'btn-primary': details.principalAsPercentage}"
-                                                ng-click="details.principalAsPercentage = !details.principalAsPercentage; addTrancheAmounts()"
-                                                uib-tooltip="{{ 'label.tooltip.trancheamountmode' | translate }}" tooltip-append-to-body="true">%</button>
-                                    </span>
+                                <div class="percentage-choice" ng-if="multiDisburseLoan && isTrancheEditable(details)">
+                                    <div class="percentage-choice-input">
+                                        <input ng-if="details.principalAsPercentage" type="text" class="form-control"
+                                               ng-model="details.principalPercentage" ng-change="addTrancheAmounts()"
+                                               placeholder="{{ 'label.placeholder.principalpercentage' | translate }}"/>
+                                        <input ng-if="!details.principalAsPercentage" type="text" class="form-control" id="details[{{$index}}].principal"
+                                               ng-change="addTrancheAmounts()" ng-model="details.principal">
+                                    </div>
+                                    <div class="percentage-choice-check">
+                                        <label>
+                                            <input type="checkbox" ng-model="details.principalAsPercentage" ng-change="addTrancheAmounts()"/>
+                                            {{ 'label.input.percentage' | translate }}
+                                        </label>
+                                        <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.principalaspercentage' | translate }}" tooltip-append-to-body="true"></i>
+                                    </div>
                                 </div>
                                 <span ng-if="!multiDisburseLoan || !isTrancheEditable(details)">{{details.principal | number}}</span>
                                 <span class="text-danger" ng-if="details.principalAsPercentage && (details.principalPercentage <= 0 || details.principalPercentage > 100)">
@@ -151,18 +155,22 @@
                             </td>
                             <td ng-if="multiDisburseLoan">
                                 <span ng-if="$index === 0">&mdash;</span>
-                                <div class="input-group" ng-if="$index > 0 && isTrancheEditable(details)">
-                                    <input ng-if="details.previousTrancheRepaidAsPercentage" type="text" class="form-control"
-                                           ng-model="details.previousTrancheRepaidMinimum"
-                                           placeholder="{{ 'label.placeholder.tranchepercentage' | translate }}"/>
-                                    <input ng-if="!details.previousTrancheRepaidAsPercentage" type="text" class="form-control" number-format
-                                           ng-model="details.previousTrancheRepaidMinimum"
-                                           placeholder="{{ 'label.input.amount' | translate }}"/>
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" ng-class="{'btn-primary': details.previousTrancheRepaidAsPercentage}"
-                                                ng-click="details.previousTrancheRepaidAsPercentage = !details.previousTrancheRepaidAsPercentage"
-                                                uib-tooltip="{{ 'label.tooltip.trancheminimummode' | translate }}" tooltip-append-to-body="true">%</button>
-                                    </span>
+                                <div class="percentage-choice" ng-if="$index > 0 && isTrancheEditable(details)">
+                                    <div class="percentage-choice-input">
+                                        <input ng-if="details.previousTrancheRepaidAsPercentage" type="text" class="form-control"
+                                               ng-model="details.previousTrancheRepaidMinimum"
+                                               placeholder="{{ 'label.placeholder.tranchepercentage' | translate }}"/>
+                                        <input ng-if="!details.previousTrancheRepaidAsPercentage" type="text" class="form-control" number-format
+                                               ng-model="details.previousTrancheRepaidMinimum"
+                                               placeholder="{{ 'label.input.amount' | translate }}"/>
+                                    </div>
+                                    <div class="percentage-choice-check">
+                                        <label>
+                                            <input type="checkbox" ng-model="details.previousTrancheRepaidAsPercentage"/>
+                                            {{ 'label.input.percentage' | translate }}
+                                        </label>
+                                        <i class="fa fa-question-circle" uib-tooltip="{{ 'label.tooltip.trancheminimummode' | translate }}" tooltip-append-to-body="true"></i>
+                                    </div>
                                 </div>
                                 <span class="text-danger" ng-if="$index > 0 && details.previousTrancheRepaidAsPercentage && details.previousTrancheRepaidMinimum >= 100">
                                     {{ 'validation.msg.trancheminimum.below100' | translate }}
