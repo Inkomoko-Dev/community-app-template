@@ -124,13 +124,17 @@
                     </td>
                     <td class="text-right cd-da-actions">
                         <button type="button" class="btn btn-default btn-sm" ng-click="startEdit(rule)"
-                                has-permission='UPDATE_ICDELEGATEDAUTHORITY'>
+                                has-permission='UPDATE_ICDELEGATEDAUTHORITY'
+                                title="{{'label.button.edit' | translate}}">
                             <i class="fa fa-pencil"></i>
+                            {{'label.button.edit' | translate}}
                         </button>
                         <button type="button" class="btn btn-default btn-sm" ng-click="remove(rule)" ng-disabled="rule.busy"
-                                has-permission='DELETE_ICDELEGATEDAUTHORITY'>
+                                has-permission='DELETE_ICDELEGATEDAUTHORITY'
+                                title="{{'label.button.delete' | translate}}">
                             <i class="fa fa-spinner fa-spin" ng-if="rule.busy"></i>
-                            <i class="fa fa-trash" ng-if="!rule.busy"></i>
+                            <i class="fa fa-trash-o" ng-if="!rule.busy"></i>
+                            {{'label.button.delete' | translate}}
                         </button>
                     </td>
                 </tr>

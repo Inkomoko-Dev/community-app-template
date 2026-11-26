@@ -210,6 +210,7 @@
 .cd .cd-da-form .has-error .help-block { color: #d9534f; }
 .cd .cd-da-actions { white-space: nowrap; }
 .cd .cd-da-actions .btn { margin-left: 4px; }
+.cd .cd-da-actions .btn .fa { margin-right: 4px; }
 
 /* loan details page, decision page and tab: Bootstrap alerts, labels and tables, so they look like the rest of the app */
 credit-decision-loan { display: block; }
